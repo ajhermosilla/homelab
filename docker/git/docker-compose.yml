@@ -1,0 +1,16 @@
+services:
+  soft-serve:
+    image: charmcli/soft-serve:latest
+    container_name: soft-serve
+    restart: unless-stopped
+    volumes:
+      - soft-serve-data:/soft-serve
+    ports:
+      - "23231:23231"  # SSH
+      - "23232:23232"  # HTTP (for cloning)
+      - "23233:23233"  # Stats
+    environment:
+      - SOFT_SERVE_INITIAL_ADMIN_KEYS=${SOFT_SERVE_INITIAL_ADMIN_KEYS}
+
+volumes:
+  soft-serve-data:
