@@ -1,0 +1,101 @@
+# DERP Relay - Tailscale NAT traversal helper
+# VPS - Vultr
+# https://tailscale.com/kb/1118/custom-derp-servers/
+
+services:
+  derp:
+    image: fredliang/derper:latest
+    container_name: derp
+    restart: unless-stopped
+    ports:
+      - "3478:3478/udp"  # STUN
+      - "8443:443"       # HTTPS (DERP) - mapped to 8443, Caddy handles 443
+    environment:
+      - DERP_DOMAIN=${DERP_DOMAIN:-derp.cronova.dev}
+      - DERP_CERT_MODE=manual
+      - DERP_CERT_DIR=/certs
+      - DERP_ADDR=:443
+      - DERP_STUN=true
+      - DERP_STUN_PORT=3478
+      - DERP_HTTP_PORT=-1
+      - DERP_VERIFY_CLIENTS=false
+    volumes:
+      - derp-certs:/certs
+    networks:
+      - derp-net
+
+volumes:
+  derp-certs:
+    name: derp-certs
+
+networks:
+  derp-net:
+    name: derp-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Set domain in .env:
+#    echo "DERP_DOMAIN=derp.cronova.dev" >> ../../.env
+#
+# 2. Option A: Use Caddy for TLS termination
+#    - Add to Caddyfile:
+#      derp.cronova.dev {
+#          reverse_proxy localhost:8443
+#      }
+#    - Set DERP_CERT_MODE=manual
+#
+# 3. Option B: Let DERP handle its own certs
+#    - Change ports to "443:443"
+#    - Set DERP_CERT_MODE=letsencrypt
+#    - Stop Caddy on port 443 temporarily for cert issuance
+#
+# 4. Start the service:
+#    docker compose up -d
+#
+# 5. Add to Headscale config:
+#    # /etc/headscale/config.yaml
+#    derp:
+#      urls: []
+#      paths:
+#        - /etc/headscale/derp.yaml
+#
+# 6. Create custom DERP map:
+#    # /etc/headscale/derp.yaml
+#    regions:
+#      900:
+#        regionid: 900
+#        regioncode: cronova
+#        regionname: Cronova VPS
+#        nodes:
+#          - name: cronova-derp
+#            regionid: 900
+#            hostname: derp.cronova.dev
+#            stunport: 3478
+#            stunonly: false
+#            derpport: 443
+#
+# =============================================================================
+# WHY CUSTOM DERP?
+# =============================================================================
+#
+# - Tailscale's DERP servers are far from Paraguay
+# - Custom DERP on US VPS reduces latency for relay connections
+# - Not required for direct connections (peer-to-peer)
+# - Useful when NAT traversal fails
+#
+# =============================================================================
+# VERIFY
+# =============================================================================
+#
+# # Test STUN
+# stun derp.cronova.dev:3478
+#
+# # Check Tailscale is using your DERP
+# tailscale netcheck
+#
+# # Should show your custom region
+# tailscale status --json | jq '.DERPMap'
+#
+# =============================================================================

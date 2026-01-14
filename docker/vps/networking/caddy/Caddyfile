@@ -1,0 +1,128 @@
+# =============================================================================
+# VPS Caddyfile - cronova.dev + verava.ai
+# =============================================================================
+
+{
+    email augusto@cronova.dev
+}
+
+# =============================================================================
+# CRONOVA.DEV - Developer/Homelab Services
+# =============================================================================
+
+cronova.dev {
+    redir https://www.cronova.dev{uri} permanent
+}
+
+# Vault - Password manager (proxied to Fixed Homelab via Tailscale)
+vault.cronova.dev {
+    reverse_proxy 100.64.0.10:8843 {
+        health_uri /alive
+        health_interval 30s
+        transport http {
+            dial_timeout 10s
+            response_header_timeout 30s
+        }
+    }
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# Status - Uptime monitoring
+status.cronova.dev {
+    reverse_proxy localhost:3001
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+    }
+}
+
+# Notify - Push notifications
+notify.cronova.dev {
+    reverse_proxy localhost:8080
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+    }
+}
+
+# API - Public developer APIs (future)
+api.cronova.dev {
+    reverse_proxy localhost:8081
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+}
+
+# SaaS - Micro SaaS applications (future)
+saas.cronova.dev {
+    reverse_proxy localhost:3000
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+    }
+}
+
+# =============================================================================
+# VERAVA.AI - Business/Supply Chain Services
+# =============================================================================
+
+verava.ai {
+    redir https://www.verava.ai{uri} permanent
+}
+
+www.verava.ai {
+    root * /var/www/verava
+    file_server
+    try_files {path} /index.html
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+    @static {
+        path *.css *.js *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2
+    }
+    header @static Cache-Control "public, max-age=31536000"
+}
+
+app.verava.ai {
+    reverse_proxy localhost:4000
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+    }
+}
+
+api.verava.ai {
+    reverse_proxy localhost:4001
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Access-Control-Allow-Origin "https://app.verava.ai"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Allow-Credentials "true"
+    }
+}
+
+docs.verava.ai {
+    root * /var/www/verava-docs
+    file_server
+    try_files {path} /index.html
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+    }
+}

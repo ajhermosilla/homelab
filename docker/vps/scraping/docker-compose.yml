@@ -1,0 +1,95 @@
+# changedetection.io - Website change monitoring
+# VPS - Vultr
+# https://changedetection.io/
+
+services:
+  changedetection:
+    image: ghcr.io/dgtlmoon/changedetection.io:latest
+    container_name: changedetection
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - changedetection-data:/datastore
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+      - PUID=1000
+      - PGID=1000
+      - BASE_URL=https://watch.cronova.dev
+      - PLAYWRIGHT_DRIVER_URL=ws://playwright:3000
+    depends_on:
+      - playwright
+    networks:
+      - scraping-net
+
+  # Playwright for JavaScript rendering
+  playwright:
+    image: dgtlmoon/sockpuppetbrowser:latest
+    container_name: playwright
+    restart: unless-stopped
+    environment:
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1080
+      - SCREEN_DEPTH=24
+      - MAX_CONCURRENT_CHROME_PROCESSES=4
+    networks:
+      - scraping-net
+
+volumes:
+  changedetection-data:
+    name: changedetection-data
+
+networks:
+  scraping-net:
+    name: scraping-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Start services:
+#    docker compose up -d
+#
+# 2. Access web interface:
+#    http://vps-ip:5000 (or via Caddy at watch.cronova.dev)
+#
+# 3. Set password on first visit
+#
+# 4. Configure ntfy notifications:
+#    Settings > Notifications > Add
+#    URL: https://notify.cronova.dev/cronova-info
+#
+# =============================================================================
+# USE CASES
+# =============================================================================
+#
+# - Price tracking on e-commerce sites
+# - Documentation changes for tools you use
+# - Job postings on company career pages
+# - Government/regulatory announcements
+# - Software release notes
+# - Stock availability for hardware
+#
+# =============================================================================
+# OPTIONAL: ADD TO CADDY
+# =============================================================================
+#
+# If you want public access (not recommended):
+#
+# watch.cronova.dev {
+#     basicauth * {
+#         augusto $2a$14$... # Generate with: caddy hash-password
+#     }
+#     reverse_proxy localhost:5000
+# }
+#
+# =============================================================================
+# NOTES
+# =============================================================================
+#
+# - Playwright container handles JavaScript-heavy sites
+# - Uses built-in browser (no separate Browserless needed)
+# - Data stored in /datastore volume
+# - Can export/import watches via JSON
+#
+# =============================================================================

@@ -1,0 +1,121 @@
+# Monitoring Stack - Uptime Kuma + ntfy
+# VPS - Vultr
+# External monitoring for all homelab services
+
+services:
+  # =========================================================================
+  # Uptime Kuma - Status monitoring
+  # https://github.com/louislam/uptime-kuma
+  # =========================================================================
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+    networks:
+      - monitoring-net
+
+  # =========================================================================
+  # ntfy - Push notifications
+  # https://ntfy.sh/
+  # =========================================================================
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: ntfy
+    restart: unless-stopped
+    command:
+      - serve
+    ports:
+      - "8080:80"  # Behind Caddy at notify.cronova.dev
+    volumes:
+      - ntfy-cache:/var/cache/ntfy
+      - ntfy-config:/etc/ntfy
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+      - NTFY_BASE_URL=https://notify.cronova.dev
+      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+      - NTFY_BEHIND_PROXY=true
+      - NTFY_AUTH_DEFAULT_ACCESS=deny-all
+      - NTFY_ENABLE_LOGIN=true
+    networks:
+      - monitoring-net
+
+volumes:
+  uptime-kuma-data:
+    name: uptime-kuma-data
+  ntfy-cache:
+    name: ntfy-cache
+  ntfy-config:
+    name: ntfy-config
+
+networks:
+  monitoring-net:
+    name: monitoring-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Start services:
+#    docker compose up -d
+#
+# 2. Access Uptime Kuma:
+#    https://status.cronova.dev (via Caddy)
+#    - Create admin account on first visit
+#
+# 3. Configure ntfy:
+#    docker exec -it ntfy ntfy user add --role=admin augusto
+#    docker exec -it ntfy ntfy access augusto '*' rw
+#
+# 4. Test ntfy:
+#    curl -d "Test notification" https://notify.cronova.dev/test
+#
+# =============================================================================
+# UPTIME KUMA MONITORS TO CREATE
+# =============================================================================
+#
+# Critical (check every 60s):
+#   - Headscale:    https://hs.cronova.dev/health (or TCP 443)
+#   - Vaultwarden:  https://vault.cronova.dev/alive
+#   - Pi-hole:      TCP 100.64.0.1:53 (RPi 5)
+#
+# High (check every 5m):
+#   - Home Assistant: http://100.64.0.10:8123 (via Tailscale)
+#   - Jellyfin:       http://100.64.0.10:8096 (via Tailscale)
+#   - Start9:         http://100.64.0.11 (via Tailscale)
+#   - NAS:            TCP 100.64.0.12:445 (via Tailscale)
+#
+# External (check every 15m):
+#   - cronova.dev:    https://cronova.dev
+#   - verava.ai:      https://verava.ai (when live)
+#
+# =============================================================================
+# NTFY TOPICS
+# =============================================================================
+#
+# Create topics for different alert levels:
+#   - cronova-critical: Headscale, Vaultwarden down
+#   - cronova-warning:  Services degraded
+#   - cronova-info:     Backups, maintenance
+#
+# Subscribe on phone:
+#   ntfy subscribe https://notify.cronova.dev/cronova-critical
+#
+# =============================================================================
+# UPTIME KUMA → NTFY INTEGRATION
+# =============================================================================
+#
+# In Uptime Kuma, add notification:
+#   Type: ntfy
+#   Server URL: https://notify.cronova.dev
+#   Topic: cronova-critical
+#   Priority: urgent (for critical alerts)
+#   Username: augusto
+#   Password: <your-password>
+#
+# =============================================================================
