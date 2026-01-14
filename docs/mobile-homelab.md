@@ -146,22 +146,36 @@ docker/
 │       └── docker-compose.yml
 ```
 
+## Backup Strategy
+
+| Source | Destination | Method | Frequency |
+|--------|-------------|--------|-----------|
+| Headscale DB | NAS (home) | Restic over Tailscale | Daily |
+| Headscale config | Git repo | age-encrypted | On change |
+| AdGuard config | Git repo | age-encrypted | On change |
+
+**Critical:** Headscale DB contains all mesh coordination data. Losing it means re-registering all devices.
+
 ## Security Considerations
 
 - Headscale API key stored in `.env` (gitignored)
 - AdGuard admin password in `.env`
 - Beryl AX admin password: change from default
 - Enable Beryl AX firewall, disable WAN access to admin
+- Consider age + SOPS for encrypted secrets in git
 
 ## Future Enhancements
 
 - [ ] Tailscale exit node on RPi 5 (route all traffic through it)
-- [ ] Automated backups of Headscale DB
-- [ ] Monitoring (Prometheus + Grafana on RPi 5?)
-- [ ] File sync (Syncthing) between MacBook and RPi 5
+- [ ] Syncthing between MacBook and RPi 5
+- [ ] Ansible playbooks for declarative deployment
+- [ ] age + SOPS for encrypted secrets in git
 
 ## References
 
 - [Headscale Docs](https://headscale.net/)
 - [AdGuard Home](https://adguard.com/adguard-home.html)
 - [GL-MT3000 Docs](https://docs.gl-inet.com/router/en/4/user_guide/gl-mt3000/)
+- [Restic](https://restic.net/)
+- [age encryption](https://age-encryption.org/)
+- [SOPS](https://github.com/getsops/sops)
