@@ -1,0 +1,86 @@
+# Headscale - Self-hosted Tailscale coordination server
+# Mobile Kit - RPi 5
+# https://headscale.net/
+
+services:
+  headscale:
+    image: headscale/headscale:latest
+    container_name: headscale
+    restart: unless-stopped
+    command: serve
+    ports:
+      - "443:443"       # HTTPS (coordination)
+      - "3478:3478/udp" # STUN
+    volumes:
+      - ./config:/etc/headscale
+      - headscale-data:/var/lib/headscale
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - headscale-net
+
+volumes:
+  headscale-data:
+    name: headscale-data
+
+networks:
+  headscale-net:
+    name: headscale-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Copy config template:
+#    cp config.yaml.example config/config.yaml
+#
+# 2. Generate private key:
+#    docker run --rm -it headscale/headscale:latest headscale generate private-key > config/private.key
+#
+# 3. Edit config/config.yaml:
+#    - Set server_url to your domain (https://hs.cronova.dev)
+#    - Update listen_addr if needed
+#
+# 4. Start the service:
+#    docker compose up -d
+#
+# 5. Create a user:
+#    docker exec headscale headscale users create augusto
+#
+# 6. Generate auth key for devices:
+#    docker exec headscale headscale preauthkeys create --user augusto --reusable --expiration 24h
+#
+# 7. Connect devices:
+#    tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
+#
+# =============================================================================
+# BACKUP
+# =============================================================================
+#
+# Critical files to backup (hourly):
+#   - /var/lib/headscale/db.sqlite (via volume)
+#   - /etc/headscale/config.yaml
+#   - /etc/headscale/private.key
+#
+# Backup script location: /opt/scripts/backup-headscale.sh
+# See: docs/disaster-recovery.md
+#
+# =============================================================================
+# USEFUL COMMANDS
+# =============================================================================
+#
+# List nodes:
+#   docker exec headscale headscale nodes list
+#
+# List users:
+#   docker exec headscale headscale users list
+#
+# Generate new auth key:
+#   docker exec headscale headscale preauthkeys create --user augusto --reusable --expiration 24h
+#
+# View logs:
+#   docker logs -f headscale
+#
+# =============================================================================

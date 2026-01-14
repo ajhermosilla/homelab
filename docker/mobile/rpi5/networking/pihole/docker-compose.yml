@@ -1,0 +1,117 @@
+# Pi-hole - DNS sinkhole for ad blocking
+# Mobile Kit - RPi 5
+# https://pi-hole.net/
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    hostname: pihole-mobile
+    ports:
+      - "53:53/tcp"   # DNS TCP
+      - "53:53/udp"   # DNS UDP
+      - "8080:80/tcp" # Web interface (80 reserved for other services)
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      WEBPASSWORD: ${PIHOLE_PASSWORD:-changeme}
+      FTLCONF_LOCAL_IPV4: ${HOST_IP:-192.168.8.10}
+      PIHOLE_DNS_: ${UPSTREAM_DNS:-1.1.1.1;9.9.9.9}
+      DNSSEC: "true"
+      DNSMASQ_LISTENING: all
+    volumes:
+      - pihole-config:/etc/pihole
+      - pihole-dnsmasq:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - pihole-net
+
+volumes:
+  pihole-config:
+    name: pihole-config
+  pihole-dnsmasq:
+    name: pihole-dnsmasq
+
+networks:
+  pihole-net:
+    name: pihole-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create .env file from template:
+#    cp ../../.env.example .env
+#
+# 2. Edit .env:
+#    - Set PIHOLE_PASSWORD (strong password for web UI)
+#    - Set HOST_IP to RPi 5's IP on the network
+#    - Optionally change UPSTREAM_DNS
+#
+# 3. Start the service:
+#    docker compose up -d
+#
+# 4. Access web interface:
+#    http://<rpi5-ip>:8080/admin
+#
+# 5. Configure Beryl AX router:
+#    - Set DHCP DNS server to RPi 5's IP
+#    - Or manually configure devices
+#
+# =============================================================================
+# UPSTREAM DNS OPTIONS
+# =============================================================================
+#
+# Mobile (simple, for travel):
+#   UPSTREAM_DNS=1.1.1.1;9.9.9.9
+#
+# Privacy-focused:
+#   UPSTREAM_DNS=9.9.9.9;149.112.112.112  (Quad9)
+#
+# Fixed homelab (with Unbound):
+#   UPSTREAM_DNS=100.64.0.10#5353  (OPNsense Unbound via Tailscale)
+#
+# =============================================================================
+# USEFUL COMMANDS
+# =============================================================================
+#
+# View live query log:
+#   docker exec -it pihole pihole -t
+#
+# Update gravity (blocklists):
+#   docker exec -it pihole pihole -g
+#
+# Check status:
+#   docker exec -it pihole pihole status
+#
+# Tail logs:
+#   docker logs -f pihole
+#
+# Disable blocking temporarily (5 minutes):
+#   docker exec -it pihole pihole disable 5m
+#
+# Re-enable blocking:
+#   docker exec -it pihole pihole enable
+#
+# =============================================================================
+# BLOCKLISTS (Add via Web UI > Adlists)
+# =============================================================================
+#
+# Recommended lists:
+#   - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+#   - https://v.firebog.net/hosts/Easyprivacy.txt
+#   - https://v.firebog.net/hosts/AdguardDNS.txt
+#
+# =============================================================================
+# BACKUP
+# =============================================================================
+#
+# Backup via Teleporter (Web UI > Settings > Teleporter)
+# Or backup volumes:
+#   - pihole-config:/etc/pihole
+#   - pihole-dnsmasq:/etc/dnsmasq.d
+#
+# See: docs/disaster-recovery.md
+#
+# =============================================================================
