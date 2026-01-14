@@ -1,6 +1,8 @@
 # VPS Architecture
 
-Cloud node for coordination, monitoring, and scraping - no personal data at rest.
+Cloud helper node for NAT traversal, monitoring, and scraping - no personal data at rest.
+
+**Key principle:** Headscale runs on RPi 5 (mobile kit). VPS is a helper, not critical infrastructure. If VPS dies, your mesh still works.
 
 ## Goals
 
@@ -23,14 +25,15 @@ Cloud node for coordination, monitoring, and scraping - no personal data at rest
 
 ## Services
 
-### Tier 1: Coordination (No Personal Data)
+### Tier 1: Network Helpers (No Personal Data)
 
 | Service | Port | Purpose | RAM |
 |---------|------|---------|-----|
-| Headscale | 443, 3478 | Tailscale coordination server | ~50MB |
-| DERP Relay | 3478 | NAT traversal relay | ~30MB |
+| DERP Relay | 443, 3478 | Tailscale NAT traversal relay | ~30MB |
 | Uptime Kuma | 3001 | Monitor homelab externally | ~100MB |
 | ntfy | 80 | Push notifications | ~50MB |
+
+*Note: Headscale runs on RPi 5 (mobile kit), not here.*
 
 ### Tier 2: Web Scraping (US IP)
 
@@ -55,26 +58,28 @@ Cloud node for coordination, monitoring, and scraping - no personal data at rest
                             |
          +------------------+------------------+
          |                  |                  |
-    [Headscale]       [Uptime Kuma]    [changedetection]
-    [DERP Relay]         [ntfy]         [Browserless]
+    [DERP Relay]      [Uptime Kuma]    [changedetection]
+    (NAT helper)         [ntfy]         [Browserless]
                             |
                      [Tailscale Mesh]
                             |
         +-------------------+-------------------+
         |                                       |
    [Mobile Kit]                          [Fixed Homelab]
-   MacBook + RPi 5                       Mini PC + RPi 4
+   RPi 5 (HEADSCALE) + MacBook           Mini PC + RPi 4
    100.64.0.1-2                          100.64.0.10-11
 ```
 
+**Flow:** RPi 5 runs Headscale (coordination). VPS DERP relay helps when direct connections fail (NAT/firewall).
+
 ## Privacy Model
 
-### What VPS Sees (Coordination Only)
+### What VPS Sees (Helper Only)
 
-- Device names and Tailscale IPs
-- When devices connect/disconnect
+- DERP relay traffic (encrypted, can't read contents)
 - Which websites you monitor for changes
 - Encrypted backup blobs (client-side encryption)
+- Uptime check results (is X online?)
 
 ### What VPS Never Sees
 
@@ -82,6 +87,7 @@ Cloud node for coordination, monitoring, and scraping - no personal data at rest
 - Passwords, documents, media
 - Traffic between mesh devices (WireGuard encrypted)
 - Backup contents (you hold the keys)
+- Mesh coordination metadata (that's on RPi 5)
 
 ### Trust Level: Moderate
 
@@ -104,8 +110,8 @@ Cloud node for coordination, monitoring, and scraping - no personal data at rest
 ```
 docker/
 └── vps/
-    ├── headscale/
-    │   └── docker-compose.yml
+    ├── derp/
+    │   └── docker-compose.yml  # DERP relay
     ├── monitoring/
     │   └── docker-compose.yml  # uptime-kuma + ntfy
     ├── scraping/
@@ -121,11 +127,12 @@ docker/
 | 1 | Create Vultr account, deploy VPS | Pending |
 | 2 | Basic hardening (SSH keys, firewall) | Pending |
 | 3 | Install Docker | Pending |
-| 4 | Deploy Headscale + DERP | Pending |
+| 4 | Deploy DERP relay | Pending |
 | 5 | Deploy Uptime Kuma + ntfy | Pending |
 | 6 | Deploy changedetection.io | Pending |
 | 7 | Configure Restic REST server | Pending |
-| 8 | Join all devices to mesh | Pending |
+| 8 | Join VPS to Tailscale (RPi 5 Headscale) | Pending |
+| 9 | Configure DERP in Headscale | Pending |
 
 ## Security Hardening
 
@@ -147,14 +154,13 @@ docker/
 ## Future Enhancements
 
 - [ ] Add Caddy as reverse proxy with auto-SSL
-- [ ] Headscale-UI for web management
 - [ ] Grafana for VPS metrics
-- [ ] Automated backups of Headscale DB to home
 - [ ] n8n for advanced automation workflows
+- [ ] Additional DERP relays in other regions
 
 ## References
 
-- [Headscale Docs](https://headscale.net/)
+- [Tailscale DERP](https://tailscale.com/kb/1118/custom-derp-servers/)
 - [Uptime Kuma](https://github.com/louislam/uptime-kuma)
 - [ntfy](https://ntfy.sh/)
 - [changedetection.io](https://changedetection.io/)
