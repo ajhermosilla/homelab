@@ -40,7 +40,7 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 | Service | Port | Purpose |
 |---------|------|---------|
 | Headscale | 443, 3478 | **Primary** Tailscale coordination server |
-| AdGuard Home | 53, 80, 3000 | DNS server + ad blocking |
+| Pi-hole | 53, 80 | DNS sinkhole + ad blocking |
 | Tailscale | - | Exit node (optional) |
 | Future containers | - | TBD |
 
@@ -116,7 +116,7 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 ```
 
 - Local network still works
-- AdGuard Home DNS resolves local names
+- Pi-hole DNS resolves local names
 - Tailscale mesh works for cached keys
 - Headscale coordination works locally
 - Demos work without internet
@@ -128,7 +128,7 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 | 1 | Wait for RPi 5 PSU | In transit |
 | 2 | Flash RPi OS, install Docker | Pending |
 | 3 | Deploy Headscale on RPi 5 | Pending |
-| 4 | Deploy AdGuard Home on RPi 5 | Pending |
+| 4 | Deploy Pi-hole on RPi 5 | Pending |
 | 5 | Configure Beryl AX DHCP reservations | Pending |
 | 6 | Join MacBook to Headscale | Pending |
 | 7 | Join home devices to Headscale | Pending |
@@ -142,7 +142,7 @@ docker/
 │   ├── headscale/
 │   │   ├── docker-compose.yml
 │   │   └── config/
-│   └── adguard/
+│   └── pihole/
 │       └── docker-compose.yml
 ```
 
@@ -152,14 +152,14 @@ docker/
 |--------|-------------|--------|-----------|
 | Headscale DB | NAS (home) | Restic over Tailscale | Daily |
 | Headscale config | Git repo | age-encrypted | On change |
-| AdGuard config | Git repo | age-encrypted | On change |
+| Pi-hole config | Git repo | Teleporter export | On change |
 
 **Critical:** Headscale DB contains all mesh coordination data. Losing it means re-registering all devices.
 
 ## Security Considerations
 
 - Headscale API key stored in `.env` (gitignored)
-- AdGuard admin password in `.env`
+- Pi-hole web password in `.env` (set via `pihole -a -p`)
 - Beryl AX admin password: change from default
 - Enable Beryl AX firewall, disable WAN access to admin
 - Consider age + SOPS for encrypted secrets in git
@@ -174,7 +174,7 @@ docker/
 ## References
 
 - [Headscale Docs](https://headscale.net/)
-- [AdGuard Home](https://adguard.com/adguard-home.html)
+- [Pi-hole](https://pi-hole.net/)
 - [GL-MT3000 Docs](https://docs.gl-inet.com/router/en/4/user_guide/gl-mt3000/)
 - [Restic](https://restic.net/)
 - [age encryption](https://age-encryption.org/)
