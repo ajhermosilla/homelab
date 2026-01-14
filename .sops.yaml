@@ -1,0 +1,41 @@
+# SOPS configuration for homelab secrets
+# https://github.com/getsops/sops
+
+# Before using, generate your age key:
+#   age-keygen -o ~/.config/sops/age/keys.txt
+#
+# Then replace AGE_PUBLIC_KEY below with your public key:
+#   age-keygen -y ~/.config/sops/age/keys.txt
+
+creation_rules:
+  # Mobile kit secrets (RPi 5)
+  - path_regex: docker/mobile/.*\.enc\.yaml$
+    age: AGE_PUBLIC_KEY
+
+  # Fixed homelab secrets (Docker VM, NAS)
+  - path_regex: docker/fixed/.*\.enc\.yaml$
+    age: AGE_PUBLIC_KEY
+
+  # VPS secrets
+  - path_regex: docker/vps/.*\.enc\.yaml$
+    age: AGE_PUBLIC_KEY
+
+  # Catch-all for any .enc.yaml file
+  - path_regex: \.enc\.yaml$
+    age: AGE_PUBLIC_KEY
+
+# Usage:
+#   # Encrypt a file
+#   sops -e secrets.yaml > secrets.enc.yaml
+#
+#   # Encrypt in place
+#   sops -e -i secrets.enc.yaml
+#
+#   # Decrypt to stdout
+#   sops -d secrets.enc.yaml
+#
+#   # Decrypt to .env for docker-compose
+#   sops -d secrets.enc.yaml > .env
+#
+#   # Edit encrypted file (decrypt, edit, re-encrypt)
+#   sops secrets.enc.yaml
