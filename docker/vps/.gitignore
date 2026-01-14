@@ -1,0 +1,16 @@
+# Environment files with secrets
+.env
+
+# htpasswd files
+htpasswd
+*/htpasswd
+**/htpasswd
+
+# Any local overrides
+*.local
+*.override
+
+# SSL certificates (managed by Caddy)
+*.crt
+*.key
+*.pem

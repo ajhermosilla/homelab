@@ -1,0 +1,66 @@
+# Caddy - Reverse proxy with automatic HTTPS
+# VPS - Vultr
+# https://caddyserver.com/
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"  # HTTP/3 QUIC
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+      - /var/www:/var/www:ro
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+    networks:
+      - proxy-net
+    healthcheck:
+      test: ["CMD", "caddy", "validate", "--config", "/etc/caddy/Caddyfile"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  caddy-data:
+    name: caddy-data
+  caddy-config:
+    name: caddy-config
+
+networks:
+  proxy-net:
+    name: proxy-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Copy Caddyfile from docs:
+#    cp /path/to/docs/caddy-config.md ./Caddyfile
+#    # Extract the VPS Caddyfile section
+#
+# 2. Create web directories:
+#    sudo mkdir -p /var/www/verava /var/www/verava-docs
+#
+# 3. Start the service:
+#    docker compose up -d
+#
+# 4. Verify certificates:
+#    docker logs caddy
+#    curl -I https://status.cronova.dev
+#
+# =============================================================================
+# NOTES
+# =============================================================================
+#
+# - Caddy handles SSL automatically via Let's Encrypt
+# - All services should connect to proxy-net network
+# - Caddyfile references localhost ports for local services
+# - For Tailscale services (vault), use 100.64.x.x IPs
+#
+# =============================================================================

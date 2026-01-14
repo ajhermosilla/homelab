@@ -1,0 +1,102 @@
+# Restic REST Server - Encrypted backup target
+# VPS - Vultr
+# https://github.com/restic/rest-server
+
+services:
+  restic-rest:
+    image: restic/rest-server:latest
+    container_name: restic-rest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - restic-data:/data
+      - ./htpasswd:/data/.htpasswd:ro
+    environment:
+      - OPTIONS=--private-repos --prometheus
+    command: --listen :8000
+    networks:
+      - backup-net
+
+volumes:
+  restic-data:
+    name: restic-data
+
+networks:
+  backup-net:
+    name: backup-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create htpasswd file for authentication:
+#    # Install htpasswd if needed: apt install apache2-utils
+#    htpasswd -B -c htpasswd augusto
+#
+# 2. Start the service:
+#    docker compose up -d
+#
+# 3. Initialize repository from client:
+#    export RESTIC_REPOSITORY="rest:http://augusto:password@vps-ip:8000/homelab"
+#    export RESTIC_PASSWORD="your-encryption-password"
+#    restic init
+#
+# 4. Test backup:
+#    restic backup /path/to/data
+#    restic snapshots
+#
+# =============================================================================
+# BACKUP SOURCES
+# =============================================================================
+#
+# Critical data to backup to VPS:
+#   - Headscale DB: /var/lib/headscale/db.sqlite
+#   - Vaultwarden: /var/lib/vaultwarden/
+#   - Home Assistant: /config/
+#
+# Use with SOPS-encrypted credentials in backup scripts.
+#
+# =============================================================================
+# SECURITY NOTES
+# =============================================================================
+#
+# - REST server only accessible via Tailscale (don't expose to internet)
+# - Data is encrypted client-side by restic before upload
+# - Even if server is compromised, data remains encrypted
+# - Use strong RESTIC_PASSWORD (different from htpasswd)
+#
+# Tailscale-only access:
+#   Change ports to "127.0.0.1:8000:8000"
+#   Access via Tailscale IP: 100.64.0.20:8000
+#
+# =============================================================================
+# RESTIC CLIENT EXAMPLES
+# =============================================================================
+#
+# # Environment setup
+# export RESTIC_REPOSITORY="rest:http://augusto:pass@100.64.0.20:8000/homelab"
+# export RESTIC_PASSWORD_FILE=/root/.restic-password
+#
+# # Backup
+# restic backup /etc/headscale
+#
+# # List snapshots
+# restic snapshots
+#
+# # Restore
+# restic restore latest --target /tmp/restore
+#
+# # Prune old snapshots (keep 7 daily, 4 weekly, 12 monthly)
+# restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune
+#
+# =============================================================================
+# MONITORING
+# =============================================================================
+#
+# Prometheus metrics available at:
+#   http://localhost:8000/metrics
+#
+# Add to monitoring for backup health checks.
+#
+# =============================================================================
