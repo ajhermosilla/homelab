@@ -21,6 +21,31 @@ services:
     networks:
       - headscale-net
 
+  # Hourly backup sidecar - backs up Headscale DB and config
+  headscale-backup:
+    image: alpine:latest
+    container_name: headscale-backup
+    restart: unless-stopped
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache sqlite
+        echo "0 * * * * /backup.sh" | crontab -
+        crond -f -l 2
+    volumes:
+      - ./config:/etc/headscale:ro
+      - headscale-data:/var/lib/headscale:ro
+      - ${BACKUP_PATH:-./backups}:/backups
+      - ./backup.sh:/backup.sh:ro
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+      - BACKUP_RETENTION_HOURS=${BACKUP_RETENTION_HOURS:-720}
+    networks:
+      - headscale-net
+    depends_on:
+      - headscale
+
 volumes:
   headscale-data:
     name: headscale-data
@@ -56,15 +81,29 @@ networks:
 #    tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 #
 # =============================================================================
-# BACKUP
+# BACKUP (AUTOMATED - HOURLY)
 # =============================================================================
 #
-# Critical files to backup (hourly):
-#   - /var/lib/headscale/db.sqlite (via volume)
-#   - /etc/headscale/config.yaml
-#   - /etc/headscale/private.key
+# The headscale-backup sidecar runs hourly backups automatically.
 #
-# Backup script location: /opt/scripts/backup-headscale.sh
+# What's backed up:
+#   - db.sqlite (using sqlite3 .backup for consistency)
+#   - config/ directory (config.yaml, private.key, etc.)
+#
+# Configuration (in .env):
+#   - BACKUP_PATH: Where backups are stored (default: ./backups)
+#   - BACKUP_RETENTION_HOURS: How long to keep backups (default: 720 = 30 days)
+#
+# For NAS backup, mount your NAS to BACKUP_PATH:
+#   BACKUP_PATH=/mnt/nas/backups/headscale
+#
+# Manual backup:
+#   docker exec headscale-backup /backup.sh
+#
+# Check backup status:
+#   ls -la ${BACKUP_PATH}/
+#   docker logs headscale-backup
+#
 # See: docs/disaster-recovery.md
 #
 # =============================================================================

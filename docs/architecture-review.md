@@ -86,12 +86,12 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 ### Critical (Fix Before Deployment)
 
-| Issue | Impact | Solution |
-|-------|--------|----------|
-| **Headscale backup only daily** | Lose DB = re-register ALL devices | Increase to hourly, add restore testing |
-| **No disaster recovery runbook** | Can't recover from failures | Document recovery procedures |
-| **Caddy reverse proxy undefined** | Can't expose services externally | Create Caddyfile with subdomain mappings |
-| **MQTT missing** | Home Assistant ↔ Frigate broken | Add Mosquitto to Docker VM |
+| Issue | Impact | Solution | Status |
+|-------|--------|----------|--------|
+| **Headscale backup only daily** | Lose DB = re-register ALL devices | Increase to hourly, add restore testing | ✅ Fixed |
+| **No disaster recovery runbook** | Can't recover from failures | Document recovery procedures | ✅ Fixed |
+| **Caddy reverse proxy undefined** | Can't expose services externally | Create Caddyfile with subdomain mappings | ✅ Fixed |
+| **MQTT missing** | Home Assistant ↔ Frigate broken | Add Mosquitto to Docker VM | ✅ Fixed |
 
 ### High Priority
 
@@ -363,14 +363,14 @@ verava.net {
 
 ## Improvement Roadmap
 
-### Phase 1: Critical Fixes (Before Deployment)
+### Phase 1: Critical Fixes (Before Deployment) ✅ COMPLETE
 
-| # | Task | Deliverable | Priority |
-|---|------|-------------|----------|
-| 1 | Increase Headscale backup frequency | Cron job: hourly to NAS | Critical |
-| 2 | Create disaster recovery runbook | `docs/disaster-recovery.md` | Critical |
-| 3 | Add MQTT broker to services | Update `services.md`, compose file | Critical |
-| 4 | Document Caddy configuration | `docs/caddy-config.md` | Critical |
+| # | Task | Deliverable | Status |
+|---|------|-------------|--------|
+| 1 | Increase Headscale backup frequency | Backup sidecar in docker-compose | ✅ Done |
+| 2 | Create disaster recovery runbook | `docs/disaster-recovery.md` | ✅ Done |
+| 3 | Add MQTT broker to services | Update `services.md`, compose file | ✅ Done |
+| 4 | Document Caddy configuration | `docs/caddy-config.md` | ✅ Done |
 
 ### Phase 2: High Priority (During Deployment)
 
