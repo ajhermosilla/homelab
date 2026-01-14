@@ -29,7 +29,7 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
               +------------+------------+
               |                         |
          [Mobile Kit]              [VPS - US]
-         RPi 5 + MacBook           Coordination
+         RPi 5 + MacBook              Helper
 ```
 
 ## Mini PC - Proxmox VE Hypervisor
@@ -73,7 +73,7 @@ Virtualization host running network gateway and Docker services.
               |
     +---------+---------+---------+
     |         |         |         |
-[Jellyfin] [HA]  [Nextcloud] [Traefik]
+[Jellyfin] [HA]  [Pi-hole] [Caddy]
 ```
 
 ### OPNsense VM
@@ -272,16 +272,17 @@ Debian-based storage server with mergerfs + snapraid.
 | 2 | Configure networking (vmbr0, passthrough) | Mini PC | Pending |
 | 3 | Create OPNsense VM, configure WAN/LAN | Mini PC | Pending |
 | 4 | Create Docker Host VM, install Docker | Mini PC | Pending |
-| 5 | Deploy Caddy + Vaultwarden | Docker VM | Pending |
-| 6 | Deploy media stack | Docker VM | Pending |
-| 7 | Deploy Home Assistant | Docker VM | Pending |
-| 8 | Flash Start9 on RPi 4 | RPi 4 | Pending |
-| 9 | Sync Bitcoin blockchain | RPi 4 | Pending |
-| 10 | Install Debian on NAS | Old PC | Pending |
-| 11 | Configure mergerfs + snapraid | Old PC | Pending |
-| 12 | Deploy Syncthing + Frigate | Old PC | Pending |
-| 13 | Configure Samba shares | Old PC | Pending |
-| 14 | Join all to Tailscale mesh | All | Pending |
+| 5 | Deploy Pi-hole | Docker VM | Pending |
+| 6 | Deploy Caddy + Vaultwarden | Docker VM | Pending |
+| 7 | Deploy media stack | Docker VM | Pending |
+| 8 | Deploy Home Assistant | Docker VM | Pending |
+| 9 | Flash Start9 on RPi 4 | RPi 4 | Pending |
+| 10 | Sync Bitcoin blockchain | RPi 4 | Pending |
+| 11 | Install Debian on NAS | Old PC | Pending |
+| 12 | Configure mergerfs + snapraid | Old PC | Pending |
+| 13 | Deploy Syncthing + Frigate | Old PC | Pending |
+| 14 | Configure Samba shares | Old PC | Pending |
+| 15 | Join all to Tailscale mesh | All | Pending |
 
 ## Backup Strategy
 

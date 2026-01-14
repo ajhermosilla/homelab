@@ -75,7 +75,7 @@ sops -d docker/git/.env.enc.yaml > docker/git/.env
 | Secret | Storage | Method |
 |--------|---------|--------|
 | Headscale API key | `.env` | SOPS encrypted in git |
-| AdGuard admin password | `.env` | SOPS encrypted in git |
+| Pi-hole web password | `.env` | SOPS encrypted in git |
 | age private key | `~/.config/sops/age/` | Manual backup only |
 
 ### Fixed Homelab
