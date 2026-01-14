@@ -108,16 +108,16 @@ Virtualization host running network gateway and Docker services.
 
 | Service | Category | Port | Purpose |
 |---------|----------|------|---------|
-| Portainer | Management | 9000 | Container management |
 | Jellyfin | Media | 8096 | Media streaming |
 | Sonarr | Media | 8989 | TV show management |
 | Radarr | Media | 7878 | Movie management |
 | Prowlarr | Media | 9696 | Indexer management |
 | qBittorrent | Media | 8080 | Torrent client |
 | Home Assistant | Automation | 8123 | Home automation |
-| Nextcloud | Storage | 443 | Personal cloud |
 | Vaultwarden | Security | 8843 | Password manager |
-| Traefik | Networking | 80, 443 | Reverse proxy |
+| Caddy | Networking | 80, 443 | Reverse proxy (simpler than Traefik) |
+
+**Management:** Use `lazydocker` (TUI) or `docker compose` CLI - no web GUI needed.
 
 ### Docker Structure
 
@@ -127,10 +127,10 @@ docker/
 │   └── docker-compose.yml    # Jellyfin, *arr stack
 ├── automation/
 │   └── docker-compose.yml    # Home Assistant
-├── cloud/
-│   └── docker-compose.yml    # Nextcloud, Vaultwarden
+├── security/
+│   └── docker-compose.yml    # Vaultwarden
 └── networking/
-    └── docker-compose.yml    # Traefik
+    └── docker-compose.yml    # Caddy
 ```
 
 ### Proxmox Backup
@@ -161,7 +161,8 @@ Sovereign Bitcoin infrastructure with Start9 OS.
 | Bitcoin Core | Full node | ~600GB blockchain |
 | LND or CLN | Lightning Network | ~1GB |
 | Electrum Server | SPV wallet backend | ~50GB index |
-| BTCPay Server | Payment processing (optional) | Minimal |
+
+*BTCPay Server: Add later only if you need payment processing.*
 
 ### Hardware Requirements
 
@@ -204,6 +205,7 @@ Debian-based storage server with mergerfs + snapraid.
 | Service | Port | Purpose |
 |---------|------|---------|
 | Samba | 445 | Network shares |
+| Syncthing | 8384, 22000 | Peer-to-peer file sync (replaces Nextcloud) |
 | Frigate | 5000 | NVR for security cameras |
 | Restic REST | 8000 | Backup target |
 | Snapraid | - | Parity protection |
@@ -266,15 +268,16 @@ Debian-based storage server with mergerfs + snapraid.
 | 2 | Configure networking (vmbr0, passthrough) | Mini PC | Pending |
 | 3 | Create OPNsense VM, configure WAN/LAN | Mini PC | Pending |
 | 4 | Create Docker Host VM, install Docker | Mini PC | Pending |
-| 5 | Deploy Portainer + Traefik | Docker VM | Pending |
+| 5 | Deploy Caddy + Vaultwarden | Docker VM | Pending |
 | 6 | Deploy media stack | Docker VM | Pending |
-| 7 | Flash Start9 on RPi 4 | RPi 4 | Pending |
-| 8 | Sync Bitcoin blockchain | RPi 4 | Pending |
-| 9 | Install Debian on NAS | Old PC | Pending |
-| 10 | Configure mergerfs + snapraid | Old PC | Pending |
-| 11 | Deploy Frigate | Old PC | Pending |
-| 12 | Configure Samba shares | Old PC | Pending |
-| 13 | Join all to Tailscale mesh | All | Pending |
+| 7 | Deploy Home Assistant | Docker VM | Pending |
+| 8 | Flash Start9 on RPi 4 | RPi 4 | Pending |
+| 9 | Sync Bitcoin blockchain | RPi 4 | Pending |
+| 10 | Install Debian on NAS | Old PC | Pending |
+| 11 | Configure mergerfs + snapraid | Old PC | Pending |
+| 12 | Deploy Syncthing + Frigate | Old PC | Pending |
+| 13 | Configure Samba shares | Old PC | Pending |
+| 14 | Join all to Tailscale mesh | All | Pending |
 
 ## Backup Strategy
 
@@ -283,7 +286,8 @@ Debian-based storage server with mergerfs + snapraid.
 | Mini PC configs | NAS | Restic | Daily |
 | Start9 | NAS | Start9 backup | Weekly |
 | NAS critical | VPS (encrypted) | Restic | Weekly |
-| Family devices | NAS | Syncthing/Restic | Continuous |
+| Family devices | NAS | Syncthing | Continuous |
+| RPi 5 Headscale DB | NAS | Restic | Daily |
 
 ## Power Considerations
 
@@ -302,14 +306,19 @@ Debian-based storage server with mergerfs + snapraid.
 - [ ] VLANs for IoT isolation
 - [ ] Proxmox Backup Server on NAS
 - [ ] HA cluster (second Proxmox node)
+- [ ] Ansible playbooks for declarative deployment
+- [ ] age + SOPS for encrypted secrets in git
 
 ## References
 
 - [Proxmox VE](https://www.proxmox.com/en/proxmox-ve)
 - [OPNsense](https://opnsense.org/)
+- [Caddy](https://caddyserver.com/)
 - [Start9 Docs](https://docs.start9.com/)
+- [Syncthing](https://syncthing.net/)
 - [mergerfs GitHub](https://github.com/trapexit/mergerfs)
 - [Snapraid](https://www.snapraid.it/)
 - [Frigate NVR](https://frigate.video/)
 - [Home Assistant](https://www.home-assistant.io/)
 - [Jellyfin](https://jellyfin.org/)
+- [lazydocker](https://github.com/jesseduffield/lazydocker)

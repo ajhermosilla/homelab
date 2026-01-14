@@ -40,7 +40,8 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
 | Service | Port | Purpose | RAM |
 |---------|------|---------|-----|
 | changedetection.io | 5000 | Website change monitoring | ~100MB |
-| Browserless | 3000 | Headless Chrome (optional) | ~500MB |
+
+*Note: changedetection.io has built-in Playwright support. No need for separate Browserless (saves ~500MB RAM).*
 
 ### Tier 3: Backup Relay (Encrypted)
 
@@ -59,7 +60,7 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
          +------------------+------------------+
          |                  |                  |
     [DERP Relay]      [Uptime Kuma]    [changedetection]
-    (NAT helper)         [ntfy]         [Browserless]
+    (NAT helper)         [ntfy]        [Restic REST]
                             |
                      [Tailscale Mesh]
                             |
@@ -71,6 +72,14 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
 ```
 
 **Flow:** RPi 5 runs Headscale (coordination). VPS DERP relay helps when direct connections fail (NAT/firewall).
+
+**RAM Budget (~1GB VPS):**
+- DERP: ~30MB
+- Uptime Kuma: ~100MB
+- ntfy: ~50MB
+- changedetection: ~100MB
+- Restic REST: ~50MB
+- **Total:** ~330MB (plenty of headroom)
 
 ## Privacy Model
 
