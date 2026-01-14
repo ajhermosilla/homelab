@@ -108,6 +108,7 @@ Virtualization host running network gateway and Docker services.
 
 | Service | Category | Port | Purpose |
 |---------|----------|------|---------|
+| Pi-hole | Network | 53, 80 | DNS sinkhole (home network) |
 | Jellyfin | Media | 8096 | Media streaming |
 | Sonarr | Media | 8989 | TV show management |
 | Radarr | Media | 7878 | Movie management |
@@ -115,7 +116,7 @@ Virtualization host running network gateway and Docker services.
 | qBittorrent | Media | 8080 | Torrent client |
 | Home Assistant | Automation | 8123 | Home automation |
 | Vaultwarden | Security | 8843 | Password manager |
-| Caddy | Networking | 80, 443 | Reverse proxy (simpler than Traefik) |
+| Caddy | Networking | 443 | Reverse proxy (simpler than Traefik) |
 
 **Management:** Use `lazydocker` (TUI) or `docker compose` CLI - no web GUI needed.
 
@@ -123,14 +124,17 @@ Virtualization host running network gateway and Docker services.
 
 ```
 docker/
+├── networking/
+│   ├── pihole/
+│   │   └── docker-compose.yml
+│   └── caddy/
+│       └── docker-compose.yml
 ├── media/
 │   └── docker-compose.yml    # Jellyfin, *arr stack
 ├── automation/
 │   └── docker-compose.yml    # Home Assistant
-├── security/
-│   └── docker-compose.yml    # Vaultwarden
-└── networking/
-    └── docker-compose.yml    # Caddy
+└── security/
+    └── docker-compose.yml    # Vaultwarden
 ```
 
 ### Proxmox Backup
@@ -174,7 +178,7 @@ Sovereign Bitcoin infrastructure with Start9 OS.
 ### Backup Role
 
 If Mini PC fails, RPi 4 can run essential services:
-- Pi-hole DNS (failover)
+- Pi-hole (Start9 has it as an app)
 - Lightweight containers
 - Network monitoring
 
@@ -313,6 +317,7 @@ Debian-based storage server with mergerfs + snapraid.
 
 - [Proxmox VE](https://www.proxmox.com/en/proxmox-ve)
 - [OPNsense](https://opnsense.org/)
+- [Pi-hole](https://pi-hole.net/)
 - [Caddy](https://caddyserver.com/)
 - [Start9 Docs](https://docs.start9.com/)
 - [Syncthing](https://syncthing.net/)

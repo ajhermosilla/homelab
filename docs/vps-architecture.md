@@ -30,6 +30,7 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
 | Service | Port | Purpose | RAM |
 |---------|------|---------|-----|
 | DERP Relay | 443, 3478 | Tailscale NAT traversal relay | ~30MB |
+| Pi-hole | 53, 8080 | DNS sinkhole (US-based, fallback) | ~30MB |
 | Uptime Kuma | 3001 | Monitor homelab externally | ~100MB |
 | ntfy | 80 | Push notifications | ~50MB |
 
@@ -57,10 +58,10 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
                      [Vultr VPS - US]
                       100.64.0.100
                             |
-         +------------------+------------------+
-         |                  |                  |
-    [DERP Relay]      [Uptime Kuma]    [changedetection]
-    (NAT helper)         [ntfy]        [Restic REST]
+    +------------+------------+------------+
+    |            |            |            |
+[DERP Relay] [Pi-hole]  [Uptime Kuma] [changedetection]
+(NAT helper) (US DNS)      [ntfy]     [Restic REST]
                             |
                      [Tailscale Mesh]
                             |
@@ -75,11 +76,12 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
 
 **RAM Budget (~1GB VPS):**
 - DERP: ~30MB
+- Pi-hole: ~30MB
 - Uptime Kuma: ~100MB
 - ntfy: ~50MB
 - changedetection: ~100MB
 - Restic REST: ~50MB
-- **Total:** ~330MB (plenty of headroom)
+- **Total:** ~360MB (plenty of headroom)
 
 ## Privacy Model
 
@@ -119,8 +121,11 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
 ```
 docker/
 └── vps/
-    ├── derp/
-    │   └── docker-compose.yml  # DERP relay
+    ├── networking/
+    │   ├── derp/
+    │   │   └── docker-compose.yml
+    │   └── pihole/
+    │       └── docker-compose.yml
     ├── monitoring/
     │   └── docker-compose.yml  # uptime-kuma + ntfy
     ├── scraping/
@@ -137,11 +142,12 @@ docker/
 | 2 | Basic hardening (SSH keys, firewall) | Pending |
 | 3 | Install Docker | Pending |
 | 4 | Deploy DERP relay | Pending |
-| 5 | Deploy Uptime Kuma + ntfy | Pending |
-| 6 | Deploy changedetection.io | Pending |
-| 7 | Configure Restic REST server | Pending |
-| 8 | Join VPS to Tailscale (RPi 5 Headscale) | Pending |
-| 9 | Configure DERP in Headscale | Pending |
+| 5 | Deploy Pi-hole | Pending |
+| 6 | Deploy Uptime Kuma + ntfy | Pending |
+| 7 | Deploy changedetection.io | Pending |
+| 8 | Configure Restic REST server | Pending |
+| 9 | Join VPS to Tailscale (RPi 5 Headscale) | Pending |
+| 10 | Configure DERP in Headscale | Pending |
 
 ## Security Hardening
 
@@ -170,6 +176,7 @@ docker/
 ## References
 
 - [Tailscale DERP](https://tailscale.com/kb/1118/custom-derp-servers/)
+- [Pi-hole](https://pi-hole.net/)
 - [Uptime Kuma](https://github.com/louislam/uptime-kuma)
 - [ntfy](https://ntfy.sh/)
 - [changedetection.io](https://changedetection.io/)
