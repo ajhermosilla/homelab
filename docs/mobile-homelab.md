@@ -75,6 +75,7 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 | MacBook Air | 100.64.0.2 | macbook |
 | Mini PC (home) | 100.64.0.10 | minipc |
 | RPi 4 (home) | 100.64.0.11 | rpi4 |
+| NAS (home) | 100.64.0.12 | nas |
 
 *IPs are examples - Headscale assigns them.*
 
