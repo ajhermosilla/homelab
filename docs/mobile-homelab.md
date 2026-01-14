@@ -2,6 +2,8 @@
 
 Self-contained portable infrastructure for dev, self-hosting, and demos.
 
+**Key principle:** The mobile kit is fully sovereign. Headscale runs here, not on VPS. Your mesh network travels with you.
+
 ## Hardware
 
 | Device | Role | Power |
@@ -37,9 +39,16 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Headscale | 443, 3478 | Tailscale coordination server |
+| Headscale | 443, 3478 | **Primary** Tailscale coordination server |
 | AdGuard Home | 53, 80, 3000 | DNS server + ad blocking |
+| Tailscale | - | Exit node (optional) |
 | Future containers | - | TBD |
+
+**Why Headscale lives here:**
+- Mobile kit is self-contained (works offline/air-gapped)
+- You carry your coordination server in your backpack
+- No dependency on VPS or external services
+- True digital nomad infrastructure
 
 ### MacBook Air M1 (Workstation)
 
@@ -107,8 +116,9 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 ```
 
 - Local network still works
-- Pi-hole DNS resolves local names
+- AdGuard Home DNS resolves local names
 - Tailscale mesh works for cached keys
+- Headscale coordination works locally
 - Demos work without internet
 
 ## Deployment Order
