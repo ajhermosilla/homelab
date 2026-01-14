@@ -1,6 +1,6 @@
 # Services
 
-22 services across 3 environments. Organized by location and category.
+23 services across 3 environments. Organized by location and category.
 
 ## Service Matrix
 
@@ -17,6 +17,7 @@
 | Prowlarr | Media | Fixed | Docker VM | Planned |
 | qBittorrent | Media | Fixed | Docker VM | Planned |
 | Home Assistant | Automation | Fixed | Docker VM | Planned |
+| Mosquitto | Messaging | Fixed | Docker VM | Planned |
 | Vaultwarden | Security | Fixed | Docker VM | Planned |
 | Bitcoin Core | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
 | LND | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
@@ -54,6 +55,7 @@
 | **Prowlarr** | 9696 | Indexer management |
 | **qBittorrent** | 8080 | Torrent client |
 | **Home Assistant** | 8123 | Home automation |
+| **Mosquitto** | 1883 | MQTT broker (HA ↔ Frigate) |
 | **Vaultwarden** | 8843 | Password manager |
 
 ### Fixed Homelab - Start9 (RPi 4)
@@ -109,6 +111,7 @@
 | 80 | Pi-hole Web / ntfy | All |
 | 443 | Caddy / Headscale | Fixed / Mobile |
 | 445 | Samba | NAS |
+| 1883 | Mosquitto MQTT | Fixed |
 | 3001 | Uptime Kuma | VPS |
 | 3478 | STUN (Headscale/DERP) | Mobile / VPS |
 | 5000 | Frigate / changedetection | NAS / VPS |
@@ -172,7 +175,7 @@ docker/
 │   │   ├── media/
 │   │   │   └── docker-compose.yml  # Jellyfin, *arr, qBit
 │   │   ├── automation/
-│   │   │   └── docker-compose.yml  # Home Assistant
+│   │   │   └── docker-compose.yml  # Home Assistant, Mosquitto
 │   │   └── security/
 │   │       └── docker-compose.yml  # Vaultwarden
 │   └── nas/
@@ -206,12 +209,13 @@ docker/
 | Storage | Samba, Syncthing | 2 |
 | Security | Vaultwarden, Frigate | 2 |
 | Automation | Home Assistant | 1 |
+| Messaging | Mosquitto | 1 |
 | Monitoring | Uptime Kuma, ntfy | 2 |
 | Backup | Restic REST (x2) | 2 |
 | Scraping | changedetection | 1 |
 | Git | soft-serve | 1 |
 
-**Unique services:** 22 | **Total deployments:** 25
+**Unique services:** 23 | **Total deployments:** 26
 
 ## References
 
@@ -224,6 +228,7 @@ docker/
 - [Prowlarr](https://prowlarr.com/)
 - [qBittorrent](https://www.qbittorrent.org/)
 - [Home Assistant](https://www.home-assistant.io/)
+- [Mosquitto](https://mosquitto.org/)
 - [Vaultwarden](https://github.com/dani-garcia/vaultwarden)
 - [Start9](https://start9.com/)
 - [Syncthing](https://syncthing.net/)
