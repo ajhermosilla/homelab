@@ -4,32 +4,63 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
 
 ## Hardware
 
-| Device | Specs | Role | Storage |
-|--------|-------|------|---------|
-| Mini PC | Intel N150, 12GB RAM, 512GB SSD | Primary server | Internal SSD |
-| Raspberry Pi 4 | 4GB RAM | Bitcoin node + backup | External 1TB SSD |
-| Old PC (NAS) | TBD | Network storage | 2TB + 6TB HDDs |
+*Full specifications in `docs/hardware.md`*
+
+| Device | Specs | Role | Status |
+|--------|-------|------|--------|
+| Mini PC | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Pending setup |
+| Raspberry Pi 4 | 4GB RAM, 1TB external SSD | Start9 (Bitcoin node) | Pending setup |
+| NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian (Frigate, Samba, Syncthing) | Pending setup |
+| MokerLink Switch | 8x 2.5G + 10G SFP+ | Main LAN backbone | Owned |
+| TP-Link PoE Switch | 5x 1G, 4x PoE+ @65W | Camera power | Owned |
+| Forza UPS | NT-1012U 1000VA, 220V | Power protection | Owned |
+
+### WiFi
+
+| Device | Model | Specs | Role |
+|--------|-------|-------|------|
+| Access Point | TP-Link AX3000 | WiFi 6, Dual Band, Gigabit | AP mode (stock firmware) |
+
+*Connected to MokerLink switch, provides WiFi for devices and Tapo camera.*
+
+### Cameras
+
+| Model | Count | Specs | Connection |
+|-------|-------|-------|------------|
+| Reolink RLC-520A | 2 | 5MP PoE | TP-Link PoE Switch |
+| TP-Link Tapo C110 | 1 | 3MP WiFi | AX3000 AP (WiFi) |
 
 ## Architecture Diagram
 
 ```
-                      [Home Router]
-                           |
-         +-----------------+-----------------+
-         |                 |                 |
-    [Mini PC]          [RPi 4]          [Old PC/NAS]
-   Primary Server    Bitcoin Node         Storage
-   192.168.1.10      192.168.1.11       192.168.1.12
-         |                 |                 |
-         +-----------------+-----------------+
-                           |
+                        [ISP Modem]
+                             |
+                      [Mini PC - Proxmox]
+                             |
+                      [OPNsense VM - WAN]
+                             |
+                    [MokerLink 2.5G Switch]
+                      8x 2.5G + 10G SFP+
+                             |
+     +------------+----------+-----------+------------+
+     |            |          |           |            |
+[Docker VM]   [RPi 4]     [NAS]    [TP-Link AP]  [PoE Switch]
+192.168.1.10  .11         .12      AX3000        TL-SG1005P
+                                   (WiFi 6)      4x PoE+
+                                      |              |
+                                [Tapo C110]    +-----+-----+
+                                  (WiFi)       |           |
+                                          [RLC-520A] [RLC-520A]
+                                           Cam 1      Cam 2
+
                     [Tailscale Mesh]
                      100.64.0.10-12
                            |
               +------------+------------+
               |                         |
          [Mobile Kit]              [VPS - US]
-         RPi 5 + MacBook              Helper
+         RPi 5 + MacBook           Helper Node
+         100.64.0.1-2              100.64.0.100
 ```
 
 ## Mini PC - Proxmox VE Hypervisor
@@ -68,12 +99,14 @@ Virtualization host running network gateway and Docker services.
                                     |
               +─────────────────────+─────────────────────+
               |                     |                     |
-       [Docker Host VM]        [RPi 4]              [NAS/Old PC]
+       [Docker Host VM]        [RPi 4]              [NAS]
         192.168.1.10         192.168.1.11          192.168.1.12
-              |
-    +---------+---------+---------+
-    |         |         |         |
-[Jellyfin] [HA]  [Pi-hole] [Caddy]
+              |                                          |
+    +---------+---------+---------+              +-------+-------+
+    |         |         |         |              |       |       |
+[Pi-hole] [Caddy] [Media] [Automation]       [Frigate] [Samba] [Sync]
+                          |                      |
+                    [HA + Mosquitto] ←──MQTT──→ [Cameras]
 ```
 
 ### OPNsense VM
@@ -108,17 +141,20 @@ Virtualization host running network gateway and Docker services.
 
 | Service | Category | Port | Purpose |
 |---------|----------|------|---------|
-| Pi-hole | Network | 53, 80 | DNS sinkhole (home network) |
+| Pi-hole | Network | 53, 8053 | DNS sinkhole (home network) |
+| Caddy | Networking | 80, 443 | Reverse proxy |
 | Jellyfin | Media | 8096 | Media streaming |
 | Sonarr | Media | 8989 | TV show management |
 | Radarr | Media | 7878 | Movie management |
 | Prowlarr | Media | 9696 | Indexer management |
-| qBittorrent | Media | 8080 | Torrent client |
+| qBittorrent | Media | 6881 | Torrent client |
 | Home Assistant | Automation | 8123 | Home automation |
+| Mosquitto | Automation | 1883 | MQTT broker (HA ↔ Frigate) |
 | Vaultwarden | Security | 8843 | Password manager |
-| Caddy | Networking | 443 | Reverse proxy (simpler than Traefik) |
 
 **Management:** Use `lazydocker` (TUI) or `docker compose` CLI - no web GUI needed.
+
+**See also:** `docs/caddy-config.md` for reverse proxy configuration.
 
 ### Docker Structure
 
@@ -182,60 +218,102 @@ If Mini PC fails, RPi 4 can run essential services:
 - Lightweight containers
 - Network monitoring
 
-## Old PC - NAS
+## NAS (DIY Mini-ITX)
 
-Debian-based storage server with mergerfs + snapraid.
+Debian-based storage server. Repurposed 2013 build, compact and low-power.
 
-### Storage Layout
+*Full hardware specs in `docs/hardware.md`*
+
+### Hardware
+
+| Component | Model | Notes |
+|-----------|-------|-------|
+| Case | Cooler Master Elite 120 Advanced | Mini-ITX, compact |
+| Motherboard | ASUS P8H77-I | Intel H77, LGA 1155 |
+| CPU | Intel Core i3-3220T | Dual-Core 2.8GHz, 35W TDP |
+| RAM | Kingston HyperX 8GB | 2x4GB DDR3-1600 |
+| PSU | TBD (2013) | Solid state, verify model |
+| OS | Debian 12 | Docker-based services |
+
+### Storage Strategy
+
+No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instead.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    NAS (Primary)                         │
+│  SSD 1TB │ Purple 2TB │ Red Plus 8TB                    │
+│  OS/Apps │ Frigate    │ Media + Data                    │
+└─────────────────────────────────────────────────────────┘
+                          │
+          ┌───────────────┴───────────────┐
+          ▼                               ▼
+   [Local Backup]                  [Offsite Backup]
+   WD Red 3TB                      Google Drive 1TB
+   Sabrent Dock                    (rclone + crypt)
+```
+
+**Internal Drives:**
 
 | Drive | Model | Size | Purpose |
 |-------|-------|------|---------|
-| Drive 1 | WD Nighthawk | 2TB | Frigate NVR recordings |
-| Drive 2 | WD Red | 6TB | Media + family backups |
-| Parity | (future) | 6TB+ | Snapraid parity |
+| SSD | Crucial MX500 | 1TB | Debian OS, Docker, configs |
+| HDD | WD Purple | 2TB | Frigate NVR recordings (dedicated) |
+| HDD | WD Red Plus (WD80EFBX) | 8TB | Media, family backups, service backups |
 
-### Why mergerfs + snapraid
+**Backup Targets:**
 
-| Feature | Benefit |
-|---------|---------|
-| No special hardware | Works with any drives |
-| Mix drive sizes | 2TB + 6TB no problem |
-| Add drives anytime | No array rebuild |
-| File-level recovery | Not block-level |
-| Low overhead | Simple and reliable |
+| Target | Size | Purpose | Method |
+|--------|------|---------|--------|
+| WD Red 3TB | 3TB | Local critical backup | Restic to Sabrent dock |
+| Google Drive | 1TB | Offsite critical backup | rclone crypt (encrypted) |
+
+**Why this approach:**
+- Purple dedicated to Frigate = optimized for 24/7 surveillance writes
+- No parity overhead, simpler management
+- 3-2-1 backup protects against more failure modes than parity alone
+- Can add SnapRAID parity later with 8TB+ drive if needed
 
 ### Services
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Samba | 445 | Network shares |
-| Syncthing | 8384, 22000 | Peer-to-peer file sync (replaces Nextcloud) |
 | Frigate | 5000 | NVR for security cameras |
-| Restic REST | 8000 | Backup target |
-| Snapraid | - | Parity protection |
+| Samba | 445 | Network shares |
+| Syncthing | 8384, 22000 | Peer-to-peer file sync |
+| Restic REST | 8000 | Backup target for other devices |
 
 ### Directory Structure
 
 ```
 /mnt/
-├── disk1/              # WD Nighthawk 2TB
-│   └── frigate/        # NVR recordings
-├── disk2/              # WD Red 6TB
+├── ssd/                # Crucial MX500 1TB
+│   ├── docker/         # Docker data
+│   └── configs/        # Service configs
+├── purple/             # WD Purple 2TB (dedicated)
+│   └── frigate/        # NVR recordings only
+├── data/               # WD Red Plus 8TB
 │   ├── media/          # Movies, TV, Music
-│   └── backups/        # Family backups
-└── storage/            # mergerfs pool
-    ├── media/          # Merged view
-    └── backups/        # Merged view
+│   ├── backups/        # Service backups (Headscale, Vaultwarden, etc.)
+│   ├── family/         # Family file sync (Syncthing)
+│   └── photos/         # Photo archive
+└── external/           # Sabrent dock mount point
+    └── backup/         # Local backup target (3TB)
 ```
 
 ### Frigate Setup
 
 | Component | Purpose |
 |-----------|---------|
-| Frigate NVR | AI-powered camera detection |
-| Coral TPU | Hardware ML acceleration (optional) |
-| MQTT | Home Assistant integration |
-| RTSP cameras | IP camera feeds |
+| Frigate NVR | AI-powered object detection |
+| Coral TPU | Hardware ML acceleration (future) |
+| Mosquitto | MQTT broker on Docker VM |
+| Cameras | 2x Reolink RLC-520A (PoE), 1x Tapo C110 (WiFi) |
+
+**Camera Integration:**
+- PoE cameras → TP-Link PoE Switch → NAS (Frigate)
+- WiFi camera → Router → NAS (Frigate)
+- Frigate → MQTT → Home Assistant (Docker VM)
 
 ## Network Configuration
 
@@ -274,45 +352,111 @@ Debian-based storage server with mergerfs + snapraid.
 | 4 | Create Docker Host VM, install Docker | Mini PC | Pending |
 | 5 | Deploy Pi-hole | Docker VM | Pending |
 | 6 | Deploy Caddy + Vaultwarden | Docker VM | Pending |
-| 7 | Deploy media stack | Docker VM | Pending |
-| 8 | Deploy Home Assistant | Docker VM | Pending |
-| 9 | Flash Start9 on RPi 4 | RPi 4 | Pending |
-| 10 | Sync Bitcoin blockchain | RPi 4 | Pending |
-| 11 | Install Debian on NAS | Old PC | Pending |
-| 12 | Configure mergerfs + snapraid | Old PC | Pending |
-| 13 | Deploy Syncthing + Frigate | Old PC | Pending |
-| 14 | Configure Samba shares | Old PC | Pending |
-| 15 | Join all to Tailscale mesh | All | Pending |
+| 7 | Deploy media stack (Jellyfin, *arr, qBittorrent) | Docker VM | Pending |
+| 8 | Deploy Mosquitto MQTT broker | Docker VM | Pending |
+| 9 | Deploy Home Assistant | Docker VM | Pending |
+| 10 | Flash Start9 on RPi 4 | RPi 4 | Pending |
+| 11 | Sync Bitcoin blockchain | RPi 4 | Pending |
+| 12 | Install Debian 12 on NAS | NAS | Pending |
+| 13 | Mount drives (SSD, Purple, Red Plus) | NAS | Pending |
+| 14 | Deploy Frigate NVR | NAS | Pending |
+| 15 | Deploy Syncthing + Samba | NAS | Pending |
+| 16 | Deploy Restic REST server | NAS | Pending |
+| 17 | Configure cameras in Frigate | NAS | Pending |
+| 18 | Connect Frigate → MQTT → Home Assistant | All | Pending |
+| 19 | Join all devices to Tailscale mesh | All | Pending |
+| 20 | Configure backup jobs (local + cloud) | NAS | Pending |
 
 ## Backup Strategy
 
-| Source | Destination | Method | Frequency |
+**3-2-1 Backup Rule:**
+- 3 copies of data (primary + 2 backups)
+- 2 different media types (SSD/HDD + cloud)
+- 1 offsite (Google Drive)
+
+*Full procedures in `docs/disaster-recovery.md`*
+
+### Critical Services (Hourly)
+
+| Source | Destination | Method | Retention |
 |--------|-------------|--------|-----------|
-| Mini PC configs | NAS | Restic | Daily |
-| Start9 | NAS | Start9 backup | Weekly |
-| NAS critical | VPS (encrypted) | Restic | Weekly |
-| Family devices | NAS | Syncthing | Continuous |
-| RPi 5 Headscale DB | NAS | Restic | Daily |
+| Headscale DB (RPi 5) | NAS + Google Drive | Restic + rclone | 30 days |
+| Vaultwarden (Docker VM) | NAS + Google Drive | Restic + rclone | 30 days |
+
+### Standard Services (Daily)
+
+| Source | Destination | Method | Retention |
+|--------|-------------|--------|-----------|
+| Pi-hole config | NAS | Restic | 7 days |
+| Home Assistant | NAS | Restic | 14 days |
+| Docker VM configs | NAS | Restic | 14 days |
+| Frigate clips (important) | NAS 8TB | Manual export | As needed |
+
+### Other Backups
+
+| Source | Destination | Method | Retention |
+|--------|-------------|--------|-----------|
+| Start9 | NAS | Start9 built-in | 4 weeks |
+| Family devices | NAS (Syncthing) | Continuous sync | N/A |
+| Photos | NAS + Google Drive | Syncthing + rclone | Permanent |
+
+### Backup Paths
+
+```
+NAS: /mnt/data/backups/
+├── headscale/          # Hourly, 30 days
+├── vaultwarden/        # Hourly, 30 days
+├── pihole/             # Daily, 7 days
+├── homeassistant/      # Daily, 14 days
+├── docker-vm/          # Daily, 14 days
+└── start9/             # Weekly, 4 weeks
+
+External: /mnt/external/backup/
+└── critical/           # Local copy of critical backups
+
+Cloud: Google Drive (via rclone crypt)
+└── homelab-backup/     # Encrypted offsite
+    ├── headscale/
+    ├── vaultwarden/
+    └── photos/
+```
 
 ## Power Considerations
 
-- UPS recommended for all devices
-- Graceful shutdown scripts
-- Start9 handles power loss well
-- Snapraid: run sync before shutdown
+All critical devices connected to **Forza NT-1012U 1000VA UPS**.
+
+| Device | Power | UPS Protected |
+|--------|-------|---------------|
+| Mini PC | ~35W | Yes |
+| RPi 4 | 15W | Yes |
+| NAS | ~50W idle | Yes |
+| MokerLink Switch | ~15W | Yes |
+| TP-Link PoE Switch | ~65W max | Yes |
+
+**Total estimated load:** ~180W (well under 1000VA capacity)
+
+**TODO:** Configure NUT (Network UPS Tools) for graceful shutdown on power loss.
 
 ## Future Enhancements
 
-- [ ] Coral TPU for Frigate ML acceleration
-- [ ] Second parity drive for snapraid
+### Hardware
+- [ ] Coral USB TPU for Frigate ML acceleration
+- [ ] 8TB HDD for SnapRAID parity (when budget allows)
+- [ ] 8TB HDD for larger external backup
 - [ ] GPU passthrough for Jellyfin transcoding
 - [ ] Zigbee/Z-Wave coordinator for Home Assistant
-- [ ] Additional cameras for Frigate
-- [ ] VLANs for IoT isolation
+- [ ] Replace NAS PSU (2013, aging)
+
+### Infrastructure
+- [ ] VLANs for IoT/camera isolation (OPNsense)
 - [ ] Proxmox Backup Server on NAS
+- [ ] NUT for UPS graceful shutdown
 - [ ] HA cluster (second Proxmox node)
+
+### Automation
 - [ ] Ansible playbooks for declarative deployment
-- [ ] age + SOPS for encrypted secrets in git
+- [ ] age + SOPS for encrypted secrets in git (`.sops.yaml` ready)
+- [ ] Automated backup verification scripts
 
 ## References
 
@@ -322,9 +466,11 @@ Debian-based storage server with mergerfs + snapraid.
 - [Caddy](https://caddyserver.com/)
 - [Start9 Docs](https://docs.start9.com/)
 - [Syncthing](https://syncthing.net/)
-- [mergerfs GitHub](https://github.com/trapexit/mergerfs)
-- [Snapraid](https://www.snapraid.it/)
 - [Frigate NVR](https://frigate.video/)
 - [Home Assistant](https://www.home-assistant.io/)
 - [Jellyfin](https://jellyfin.org/)
+- [Mosquitto MQTT](https://mosquitto.org/)
+- [Restic](https://restic.net/)
+- [rclone crypt](https://rclone.org/crypt/)
 - [lazydocker](https://github.com/jesseduffield/lazydocker)
+- [NUT - Network UPS Tools](https://networkupstools.org/)

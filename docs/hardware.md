@@ -9,6 +9,7 @@
 ├── Beryl AX Router            ├── NAS (DIY Mini-ITX)
 └── Samsung A13                ├── MokerLink 2.5G Switch
                                ├── TP-Link PoE Switch
+                               ├── TP-Link AX3000 AP
                                ├── 3x IP Cameras
                                └── Forza UPS
 ```
@@ -83,6 +84,7 @@ Always-on infrastructure at home.
 |--------|-------|-------|------|
 | Managed Switch | MokerLink 8-Port | 8x 2.5G + 10G SFP+, fanless, metal | Main LAN backbone |
 | PoE Switch | TP-Link TL-SG1005P | 5x 1G, 4x PoE+ @65W, fanless | Camera power |
+| Access Point | TP-Link AX3000 | WiFi 6, Dual Band, Gigabit | AP mode (stock firmware) |
 
 ### Cameras
 
@@ -204,21 +206,17 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
                   [MokerLink 2.5G Switch]
                     8x 2.5G + 10G SFP+
                            |
-         +-----------------+-----------------+
-         |                 |                 |
-    [Docker VM]        [RPi 4]            [NAS]
-    192.168.1.10      192.168.1.11      192.168.1.12
-         |                                   |
-         |                          [TP-Link PoE Switch]
-         |                            4x PoE+ @65W
-         |                                   |
-         |                 +-----------------+-----------------+
-         |                 |                 |                 |
-         |           [RLC-520A]        [RLC-520A]        [Tapo C110]
-         |            Camera 1          Camera 2          Camera 3
-         |
-         +-----------------+-----------------+
-                           |
+     +----------+----------+-----------+----------+
+     |          |          |           |          |
+[Docker VM] [RPi 4]     [NAS]    [TP-Link AP] [PoE Switch]
+192.168.1.10  .11        .12      AX3000      TL-SG1005P
+                                  (WiFi 6)    4x PoE+
+                                     |            |
+                               [Tapo C110]   +----+----+
+                                 (WiFi)      |         |
+                                        [RLC-520A] [RLC-520A]
+                                         Cam 1      Cam 2
+
                     [Tailscale Mesh]
                      100.64.0.10-12
 ```
@@ -317,6 +315,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | WD Red Plus 8TB | 2021 | Owned |
 | WD Purple 2TB | 2026 | Owned |
 | Sabrent HDD Dock | 2021 | Owned |
+| TP-Link AX3000 AP | 2021 | Owned |
 | MokerLink 2.5G Switch | 2026 | Owned |
 | TP-Link PoE Switch | 2026 | Owned |
 | Forza UPS 1000VA | 2026 | Owned |
