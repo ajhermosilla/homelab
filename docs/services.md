@@ -24,7 +24,7 @@
 | Electrum Server | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
 | Samba | Storage | Fixed | NAS | Planned |
 | Syncthing | Storage | Fixed | NAS | Planned |
-| Frigate | Security | Fixed | NAS | Planned |
+| Frigate | Security | Fixed | Docker VM | Planned |
 | Restic REST | Backup | Fixed | NAS | Planned |
 | DERP Relay | Networking | VPS | Vultr | Planned |
 | Pi-hole | Networking | VPS | Vultr | Planned |
@@ -57,6 +57,7 @@
 | **Home Assistant** | 8123 | Home automation |
 | **Mosquitto** | 1883 | MQTT broker (HA ↔ Frigate) |
 | **Vaultwarden** | 8843 | Password manager |
+| **Frigate** | 5000 | NVR with AI detection (NFS to NAS) |
 
 ### Fixed Homelab - Start9 (RPi 4)
 
@@ -74,8 +75,8 @@
 |---------|---------|---------|
 | **Samba** | 445 | Network file shares |
 | **Syncthing** | 8384, 22000 | Peer-to-peer file sync |
-| **Frigate** | 5000 | NVR with AI detection |
 | **Restic REST** | 8000 | Backup target |
+| **NFS** | 2049 | Exports Purple 2TB for Frigate |
 
 ### VPS (Vultr)
 
@@ -114,7 +115,7 @@
 | 1883 | Mosquitto MQTT | Fixed |
 | 3001 | Uptime Kuma | VPS |
 | 3478 | STUN (Headscale/DERP) | Mobile / VPS |
-| 5000 | Frigate / changedetection | NAS / VPS |
+| 5000 | Frigate / changedetection | Fixed / VPS |
 | 5353 | Unbound (OPNsense) | Fixed |
 | 7878 | Radarr | Fixed |
 | 8000 | Restic REST | NAS / VPS |
@@ -177,12 +178,10 @@ docker/
 │   │   ├── automation/
 │   │   │   └── docker-compose.yml  # Home Assistant, Mosquitto
 │   │   └── security/
-│   │       └── docker-compose.yml  # Vaultwarden
+│   │       └── docker-compose.yml  # Vaultwarden, Frigate
 │   └── nas/
 │       ├── storage/
 │       │   └── docker-compose.yml  # Samba, Syncthing
-│       ├── security/
-│       │   └── docker-compose.yml  # Frigate
 │       └── backup/
 │           └── docker-compose.yml  # Restic REST
 ├── vps/
