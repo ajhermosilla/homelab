@@ -4,16 +4,18 @@ Comprehensive codebase review after completing hardware documentation.
 
 ## Critical (Fix Now)
 
-- [ ] **1. Update architecture-review.md domains**
+- [x] **1. Update architecture-review.md domains**
   - File: `docs/architecture-review.md`
   - Issue: References old domains (nanduti.io, verava.net)
   - Action: Update to cronova.dev + verava.ai
   - Lines: 130-484 (Domain Coexistence Strategy, Caddyfile examples, costs)
+  - **DONE**: Replaced all domain references, updated costs
 
-- [ ] **2. Fix Frigate location in services.md**
+- [x] **2. Fix Frigate location in services.md**
   - File: `docs/services.md:77`
   - Issue: Lists Frigate under NAS services
   - Action: Move to Docker VM, NAS only exports NFS
+  - **DONE**: Moved Frigate to Docker VM, added NFS export to NAS
 
 ## High Priority
 
@@ -88,8 +90,8 @@ Comprehensive codebase review after completing hardware documentation.
 
 | # | Task | Status | Commit |
 |---|------|--------|--------|
-| 1 | Update architecture-review.md domains | Pending | |
-| 2 | Fix Frigate location in services.md | Pending | |
+| 1 | Update architecture-review.md domains | Done | ef92139 |
+| 2 | Fix Frigate location in services.md | Done | ef92139 |
 | 3 | Docker VM docker-compose files | Pending | |
 | 4 | NAS docker-compose files | Pending | |
 | 5 | Port 8080 conflict | Pending | |

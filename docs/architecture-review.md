@@ -127,8 +127,8 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Domain | Purpose | Audience |
 |--------|---------|----------|
-| **nanduti.io** | Personal homelab infrastructure | You, family |
-| **verava.net** | Business, customer-facing | Customers, public |
+| **cronova.dev** | Personal homelab infrastructure | You, family |
+| **verava.ai** | Business, customer-facing | Customers, public |
 
 ### Why Two Domains?
 
@@ -137,7 +137,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 │                     SEPARATION OF CONCERNS                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  nanduti.io                          verava.net                  │
+│  cronova.dev                          verava.ai                  │
 │  ───────────                         ──────────                  │
 │  • Personal infrastructure           • Professional presence     │
 │  • Homelab services                  • Customer-facing apps      │
@@ -145,39 +145,39 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 │  • Guarani cultural flex             • Easy to spell/remember    │
 │  • ~$30/year                         • ~$12/year                 │
 │                                                                  │
-│  "ssh admin@nanduti.io"              "Visit verava.net"          │
+│  "ssh admin@cronova.dev"              "Visit verava.ai"          │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Subdomain Architecture
 
-#### nanduti.io (Personal Infrastructure)
+#### cronova.dev (Personal Infrastructure)
 
 ```
-nanduti.io
-├── hs.nanduti.io        → Headscale (RPi 5)
-├── dns.nanduti.io       → Pi-hole (all environments)
-├── git.nanduti.io       → soft-serve (MacBook)
-├── home.nanduti.io      → Home Assistant (Docker VM)
-├── media.nanduti.io     → Jellyfin (Docker VM)
-├── vault.nanduti.io     → Vaultwarden (Docker VM) [PUBLIC]
-├── status.nanduti.io    → Uptime Kuma (VPS) [PUBLIC]
-├── notify.nanduti.io    → ntfy (VPS) [PUBLIC]
-├── btc.nanduti.io       → Start9 (RPi 4)
-├── nas.nanduti.io       → Syncthing/Samba (NAS)
-└── watch.nanduti.io     → changedetection (VPS)
+cronova.dev
+├── hs.cronova.dev        → Headscale (RPi 5)
+├── dns.cronova.dev       → Pi-hole (all environments)
+├── git.cronova.dev       → soft-serve (MacBook)
+├── home.cronova.dev      → Home Assistant (Docker VM)
+├── media.cronova.dev     → Jellyfin (Docker VM)
+├── vault.cronova.dev     → Vaultwarden (Docker VM) [PUBLIC]
+├── status.cronova.dev    → Uptime Kuma (VPS) [PUBLIC]
+├── notify.cronova.dev    → ntfy (VPS) [PUBLIC]
+├── btc.cronova.dev       → Start9 (RPi 4)
+├── nas.cronova.dev       → Syncthing/Samba (NAS)
+└── watch.cronova.dev     → changedetection (VPS)
 ```
 
-#### verava.net (Business)
+#### verava.ai (Business)
 
 ```
-verava.net
-├── www.verava.net       → Company landing page
-├── api.verava.net       → Customer APIs
-├── app.verava.net       → Web application / SaaS
-├── docs.verava.net      → Documentation
-└── demo.verava.net      → Sales demos
+verava.ai
+├── www.verava.ai       → Company landing page
+├── api.verava.ai       → Customer APIs
+├── app.verava.ai       → Web application / SaaS
+├── docs.verava.ai      → Documentation
+└── demo.verava.ai      → Sales demos
 ```
 
 ### Service Access Model
@@ -192,8 +192,8 @@ verava.net
 | **Start9** | No | Yes | Bitcoin = maximum privacy |
 | **soft-serve** | No | Yes | Code is private |
 | **Syncthing** | No | Yes | Files are private |
-| **www.verava.net** | Yes | No | Public website |
-| **api.verava.net** | Yes | No | Customer API |
+| **www.verava.ai** | Yes | No | Public website |
+| **api.verava.ai** | Yes | No | Customer API |
 
 ---
 
@@ -207,7 +207,7 @@ verava.net
 │                   (Registrar + DNS + CDN)                         │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                   │
-│  nanduti.io                          verava.net                   │
+│  cronova.dev                          verava.ai                   │
 │  ───────────                         ──────────                   │
 │  A      @     → VPS_IP               A      @     → VPS_IP        │
 │  A      *     → VPS_IP (wildcard)    A      *     → VPS_IP        │
@@ -226,7 +226,7 @@ verava.net
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              INTERNET                                    │
 │                                                                          │
-│         nanduti.io (homelab)              verava.net (business)          │
+│         cronova.dev (homelab)              verava.ai (business)          │
 └────────────────────────────────┬─────────────────────────────────────────┘
                                  │
                           [Cloudflare DNS]
@@ -237,11 +237,11 @@ verava.net
                     │                     │
               [Public Services]    [Tailscale Mesh]
               ─────────────────    ────────────────
-              status.nanduti.io    All internal
-              notify.nanduti.io    services via
-              vault.nanduti.io     100.64.0.x
-              www.verava.net
-              api.verava.net
+              status.cronova.dev    All internal
+              notify.cronova.dev    services via
+              vault.cronova.dev     100.64.0.x
+              www.verava.ai
+              api.verava.ai
                                           │
                     ┌─────────────────────┼─────────────────────┐
                     │                     │                     │
@@ -254,36 +254,36 @@ verava.net
 ### Caddy Reverse Proxy Config (Proposed)
 
 ```caddyfile
-# nanduti.io - Public services
-vault.nanduti.io {
+# cronova.dev - Public services
+vault.cronova.dev {
     reverse_proxy 100.64.0.10:8843
 }
 
-status.nanduti.io {
+status.cronova.dev {
     reverse_proxy localhost:3001
 }
 
-notify.nanduti.io {
+notify.cronova.dev {
     reverse_proxy localhost:80
 }
 
-# verava.net - Business services
-www.verava.net {
+# verava.ai - Business services
+www.verava.ai {
     root * /var/www/verava
     file_server
 }
 
-api.verava.net {
+api.verava.ai {
     reverse_proxy localhost:8080
 }
 
 # Catch-all redirect
-nanduti.io {
-    redir https://status.nanduti.io
+cronova.dev {
+    redir https://status.cronova.dev
 }
 
-verava.net {
-    redir https://www.verava.net
+verava.ai {
+    redir https://www.verava.ai
 }
 ```
 
@@ -295,7 +295,7 @@ verava.net {
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              INTERNET                                    │
 │                                                                          │
-│              nanduti.io                      verava.net                  │
+│              cronova.dev                      verava.ai                  │
 │         (Personal Homelab)              (Business/Customers)             │
 └────────────────────────────────┬─────────────────────────────────────────┘
                                  │
@@ -436,18 +436,18 @@ verava.net {
 | Item | Cost |
 |------|------|
 | VPS (Vultr) | $6.00 |
-| Domain (nanduti.io) | $2.50 |
-| Domain (verava.net) | $1.00 |
-| **Total** | **~$9.50/mo** |
+| Domain (cronova.dev) | Already owned |
+| Domain (verava.ai) | ~$5.00 |
+| **Total** | **~$11/mo** |
 
 ### Annual
 
 | Item | Cost |
 |------|------|
 | VPS | $72.00 |
-| nanduti.io | $30.00 |
-| verava.net | $12.00 |
-| **Total** | **~$114/yr** |
+| cronova.dev | Already owned |
+| verava.ai | ~$60.00 |
+| **Total** | **~$132/yr** |
 
 ---
 
@@ -469,8 +469,8 @@ These MUST work for the architecture to function:
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2026-01-14 | nanduti.io for homelab | Guarani "web" metaphor, cultural flex |
-| 2026-01-14 | verava.net for business | Professional, easy to spell |
+| 2026-01-14 | cronova.dev for homelab | Already owned, established brand, $0 additional cost |
+| 2026-01-14 | verava.ai for business | AI-first positioning, modern TLD |
 | 2026-01-14 | Both domains via Cloudflare | At-cost pricing, DNS + CDN included |
 | 2026-01-14 | Public: vault, status, notify | Need access from anywhere |
 | 2026-01-14 | Private: media, home, bitcoin | Personal/sensitive data |
@@ -481,7 +481,7 @@ These MUST work for the architecture to function:
 
 | Priority | Action | Blocks |
 |----------|--------|--------|
-| 1 | Purchase nanduti.io + verava.net | Nothing |
+| 1 | Purchase verava.ai | Nothing |
 | 2 | Create disaster recovery runbook | Nothing |
 | 3 | Create Caddy config documentation | Domain purchase |
 | 4 | Add MQTT to service inventory | Nothing |
