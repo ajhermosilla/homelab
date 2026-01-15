@@ -171,7 +171,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Drive | Model | Size | Purpose |
 |-------|-------|------|---------|
-| SSD | Crucial MX500 | 1TB | Debian OS, Docker, configs |
+| SSD | Lexar NQ110 | 240GB | Debian OS, Docker, configs (boot) |
 | HDD | WD Purple | 2TB | Frigate NVR recordings (dedicated) |
 | HDD | WD Red Plus (WD80EFBX) | 8TB | Media, family backups, service backups |
 
@@ -186,6 +186,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Drive | Size | Age | Status |
 |-------|------|-----|--------|
+| Crucial MX500 | 1TB | 2021? | Spare - available for future use |
 | WD Red 3TB (2nd) | 3TB | 2013 | Test with SMART, keep as spare |
 
 **Strategy Notes:**
@@ -299,7 +300,6 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | Flash Drive | Lexar D40E 128GB | USB-C/USB-A dual, portable transfers |
 | Card Reader | UGREEN SD/MicroSD | USB-C/USB 3.0, for RPi SD cards |
 | USB-C Cables | UGREEN 100W 6.6ft (2-pack) | Device charging/data |
-| SSD (spare) | Lexar NQ110 240GB SATA | Spare/testing |
 | HDD Dock | Sabrent EC-DFLT | USB 3.0 SATA dock for backup drives |
 
 ---
