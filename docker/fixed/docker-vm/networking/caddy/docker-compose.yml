@@ -1,0 +1,87 @@
+# Caddy - Reverse proxy with auto-SSL
+# Fixed Homelab - Docker VM
+# https://caddyserver.com/
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "443:443/tcp"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+    networks:
+      - caddy-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  caddy-data:
+    name: caddy-data
+  caddy-config:
+    name: caddy-config
+
+networks:
+  caddy-net:
+    name: caddy-net
+
+# =============================================================================
+# CADDYFILE
+# =============================================================================
+#
+# Create a Caddyfile in this directory with:
+#
+# vault.cronova.dev {
+#     reverse_proxy localhost:8843
+# }
+#
+# home.cronova.dev {
+#     reverse_proxy localhost:8123
+# }
+#
+# media.cronova.dev {
+#     reverse_proxy localhost:8096
+# }
+#
+# frigate.cronova.dev {
+#     reverse_proxy localhost:5000
+# }
+#
+# =============================================================================
+# SSL OPTIONS
+# =============================================================================
+#
+# Option 1: Tailscale HTTPS (recommended for internal services)
+#   - Use machine certificates via Tailscale
+#   - See: https://tailscale.com/kb/1153/enabling-https/
+#
+# Option 2: Internal CA
+#   - Generate self-signed CA
+#   - Distribute CA to devices
+#
+# Option 3: Let's Encrypt (for public services)
+#   - Requires public DNS + port 443 open
+#   - Works automatically with Caddy
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create Caddyfile in this directory
+#
+# 2. Start Caddy:
+#    docker compose up -d
+#
+# 3. Check logs:
+#    docker logs -f caddy
+#
+# 4. Test:
+#    curl -k https://vault.cronova.dev
+#
+# =============================================================================

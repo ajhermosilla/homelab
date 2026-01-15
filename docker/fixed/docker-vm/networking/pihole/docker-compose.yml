@@ -1,0 +1,85 @@
+# Pi-hole - DNS ad-blocking
+# Fixed Homelab - Docker VM
+# https://pi-hole.net/
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    hostname: pihole-fixed
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"     # Web admin
+    volumes:
+      - pihole-config:/etc/pihole
+      - pihole-dnsmasq:/etc/dnsmasq.d
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      WEBPASSWORD: ${PIHOLE_PASSWORD}
+      FTLCONF_LOCAL_IPV4: ${HOST_IP:-192.168.1.10}
+      PIHOLE_DNS_: 1.1.1.1;9.9.9.9
+      DNSSEC: "true"
+      QUERY_LOGGING: "true"
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - pihole-net
+
+volumes:
+  pihole-config:
+    name: pihole-config
+  pihole-dnsmasq:
+    name: pihole-dnsmasq
+
+networks:
+  pihole-net:
+    name: pihole-net
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# TZ=America/Asuncion
+# PIHOLE_PASSWORD=your-secure-password
+# HOST_IP=192.168.1.10
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Copy .env.example to .env and configure
+#
+# 2. Start Pi-hole:
+#    docker compose up -d
+#
+# 3. Access web admin:
+#    http://192.168.1.10/admin
+#
+# 4. Configure OPNsense DHCP to use this as DNS:
+#    Services → DHCPv4 → LAN → DNS Server: 192.168.1.10
+#
+# =============================================================================
+# LOCAL DNS RECORDS
+# =============================================================================
+#
+# Add to Pi-hole Local DNS (Settings → Local DNS → DNS Records):
+#
+# Domain                    IP
+# ------                    --
+# home.cronova.dev          100.64.0.10
+# media.cronova.dev         100.64.0.10
+# vault.cronova.dev         100.64.0.10
+# nas.cronova.dev           100.64.0.12
+# btc.cronova.dev           100.64.0.11
+#
+# =============================================================================
+# AD LISTS
+# =============================================================================
+#
+# Default lists are included. Consider adding:
+#   - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+#   - https://dbl.oisd.nl/
+#
+# =============================================================================

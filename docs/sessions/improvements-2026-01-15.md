@@ -19,7 +19,7 @@ Comprehensive codebase review after completing hardware documentation.
 
 ## High Priority
 
-- [ ] **3. Create fixed homelab docker-compose files (Docker VM)**
+- [x] **3. Create fixed homelab docker-compose files (Docker VM)**
   - Missing: `docker/fixed/docker-vm/`
   - Services needed:
     - networking/pihole/docker-compose.yml
@@ -27,13 +27,15 @@ Comprehensive codebase review after completing hardware documentation.
     - media/docker-compose.yml (Jellyfin, Sonarr, Radarr, Prowlarr, qBittorrent)
     - automation/docker-compose.yml (Home Assistant, Mosquitto)
     - security/docker-compose.yml (Vaultwarden, Frigate)
+  - **DONE**: Created all 5 docker-compose files with documentation
 
-- [ ] **4. Create fixed homelab docker-compose files (NAS)**
+- [x] **4. Create fixed homelab docker-compose files (NAS)**
   - Missing: `docker/fixed/nas/`
   - Services needed:
     - storage/docker-compose.yml (Samba, Syncthing)
     - backup/docker-compose.yml (Restic REST)
     - NFS export configuration
+  - **DONE**: Created storage and backup docker-compose files with NFS instructions
 
 ## Medium Priority
 
@@ -92,8 +94,8 @@ Comprehensive codebase review after completing hardware documentation.
 |---|------|--------|--------|
 | 1 | Update architecture-review.md domains | Done | ef92139 |
 | 2 | Fix Frigate location in services.md | Done | ef92139 |
-| 3 | Docker VM docker-compose files | Pending | |
-| 4 | NAS docker-compose files | Pending | |
+| 3 | Docker VM docker-compose files | Done | (pending) |
+| 4 | NAS docker-compose files | Done | (pending) |
 | 5 | Port 8080 conflict | Pending | |
 | 6 | NUT configuration | Pending | |
 | 7 | Monitoring strategy | Pending | |

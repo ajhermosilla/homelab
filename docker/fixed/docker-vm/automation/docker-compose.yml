@@ -1,0 +1,152 @@
+# Automation Stack - Home Assistant + Mosquitto
+# Fixed Homelab - Docker VM
+# Smart home automation with MQTT
+
+services:
+  # =========================================================================
+  # Home Assistant - Home Automation
+  # https://www.home-assistant.io/
+  # =========================================================================
+  homeassistant:
+    image: homeassistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+    volumes:
+      - homeassistant-config:/config
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+    privileged: true
+    networks:
+      - automation-net
+    depends_on:
+      - mosquitto
+
+  # =========================================================================
+  # Mosquitto - MQTT Broker
+  # https://mosquitto.org/
+  # =========================================================================
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"     # MQTT
+      - "9001:9001"     # WebSocket (optional)
+    volumes:
+      - mosquitto-config:/mosquitto/config
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+    networks:
+      - automation-net
+
+volumes:
+  homeassistant-config:
+    name: homeassistant-config
+  mosquitto-config:
+    name: mosquitto-config
+  mosquitto-data:
+    name: mosquitto-data
+  mosquitto-log:
+    name: mosquitto-log
+
+networks:
+  automation-net:
+    name: automation-net
+
+# =============================================================================
+# MOSQUITTO CONFIGURATION
+# =============================================================================
+#
+# Create mosquitto.conf in this directory:
+#
+# listener 1883
+# allow_anonymous false
+# password_file /mosquitto/config/password.txt
+#
+# # WebSocket support (optional)
+# listener 9001
+# protocol websockets
+#
+# persistence true
+# persistence_location /mosquitto/data/
+#
+# log_dest file /mosquitto/log/mosquitto.log
+# log_dest stdout
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create mosquitto.conf (see above)
+#
+# 2. Start services:
+#    docker compose up -d
+#
+# 3. Create Mosquitto user:
+#    docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/password.txt homeassistant
+#    docker exec -it mosquitto mosquitto_passwd -b /mosquitto/config/password.txt frigate frigate-password
+#    docker compose restart mosquitto
+#
+# 4. Access Home Assistant:
+#    http://192.168.1.10:8123
+#    - Create admin account on first visit
+#    - Complete onboarding wizard
+#
+# =============================================================================
+# HOME ASSISTANT INTEGRATIONS
+# =============================================================================
+#
+# MQTT (for Frigate):
+#   Settings → Devices & Services → Add Integration → MQTT
+#   Broker: mosquitto (or 192.168.1.10)
+#   Port: 1883
+#   Username: homeassistant
+#   Password: <your-password>
+#
+# Frigate:
+#   Settings → Devices & Services → Add Integration → Frigate
+#   URL: http://192.168.1.10:5000
+#
+# =============================================================================
+# FRIGATE ↔ HOME ASSISTANT ↔ MQTT
+# =============================================================================
+#
+# Frigate → MQTT → Home Assistant
+#
+# 1. Frigate publishes events to MQTT:
+#    - frigate/events (new detections)
+#    - frigate/camera_name/person (object detection)
+#    - frigate/stats (system stats)
+#
+# 2. Home Assistant subscribes to MQTT topics
+#
+# 3. Create automations:
+#    - Send notification on person detection
+#    - Turn on lights when motion detected
+#    - Record clips when camera detects person
+#
+# =============================================================================
+# EXAMPLE AUTOMATION (configuration.yaml)
+# =============================================================================
+#
+# automation:
+#   - alias: "Notify on Person Detection"
+#     trigger:
+#       platform: mqtt
+#       topic: "frigate/events"
+#     condition:
+#       condition: template
+#       value_template: "{{ trigger.payload_json.after.label == 'person' }}"
+#     action:
+#       - service: notify.mobile_app
+#         data:
+#           message: "Person detected on {{ trigger.payload_json.after.camera }}"
+#           data:
+#             image: "http://192.168.1.10:5000/api/events/{{ trigger.payload_json.after.id }}/snapshot.jpg"
+#
+# =============================================================================

@@ -1,0 +1,201 @@
+# Media Stack - Jellyfin + *arr Suite + qBittorrent
+# Fixed Homelab - Docker VM
+# Self-hosted media streaming and management
+
+services:
+  # =========================================================================
+  # Jellyfin - Media Server
+  # https://jellyfin.org/
+  # =========================================================================
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - ${MEDIA_PATH:-/mnt/nas/media}:/media:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      JELLYFIN_PublishedServerUrl: https://media.cronova.dev
+    devices:
+      # Intel QuickSync for hardware transcoding (N150)
+      - /dev/dri:/dev/dri
+    group_add:
+      - "render"
+      - "video"
+    networks:
+      - media-net
+
+  # =========================================================================
+  # Sonarr - TV Show Management
+  # https://sonarr.tv/
+  # =========================================================================
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    volumes:
+      - sonarr-config:/config
+      - ${MEDIA_PATH:-/mnt/nas/media}:/media
+      - ${DOWNLOADS_PATH:-/mnt/nas/downloads}:/downloads
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+    networks:
+      - media-net
+
+  # =========================================================================
+  # Radarr - Movie Management
+  # https://radarr.video/
+  # =========================================================================
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "7878:7878"
+    volumes:
+      - radarr-config:/config
+      - ${MEDIA_PATH:-/mnt/nas/media}:/media
+      - ${DOWNLOADS_PATH:-/mnt/nas/downloads}:/downloads
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+    networks:
+      - media-net
+
+  # =========================================================================
+  # Prowlarr - Indexer Management
+  # https://prowlarr.com/
+  # =========================================================================
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "9696:9696"
+    volumes:
+      - prowlarr-config:/config
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+    networks:
+      - media-net
+
+  # =========================================================================
+  # qBittorrent - Torrent Client
+  # https://www.qbittorrent.org/
+  # =========================================================================
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    ports:
+      - "8080:8080"       # Web UI
+      - "6881:6881/tcp"   # Torrent
+      - "6881:6881/udp"   # Torrent
+    volumes:
+      - qbittorrent-config:/config
+      - ${DOWNLOADS_PATH:-/mnt/nas/downloads}:/downloads
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      WEBUI_PORT: 8080
+    networks:
+      - media-net
+
+volumes:
+  jellyfin-config:
+    name: jellyfin-config
+  jellyfin-cache:
+    name: jellyfin-cache
+  sonarr-config:
+    name: sonarr-config
+  radarr-config:
+    name: radarr-config
+  prowlarr-config:
+    name: prowlarr-config
+  qbittorrent-config:
+    name: qbittorrent-config
+
+networks:
+  media-net:
+    name: media-net
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# TZ=America/Asuncion
+# PUID=1000
+# PGID=1000
+# MEDIA_PATH=/mnt/nas/media
+# DOWNLOADS_PATH=/mnt/nas/downloads
+#
+# =============================================================================
+# NFS MOUNT (Docker VM → NAS)
+# =============================================================================
+#
+# Mount NAS shares on Docker VM host:
+#
+# sudo mkdir -p /mnt/nas/{media,downloads}
+# sudo mount -t nfs 192.168.1.12:/srv/media /mnt/nas/media
+# sudo mount -t nfs 192.168.1.12:/srv/downloads /mnt/nas/downloads
+#
+# Add to /etc/fstab for persistence:
+# 192.168.1.12:/srv/media    /mnt/nas/media    nfs defaults 0 0
+# 192.168.1.12:/srv/downloads /mnt/nas/downloads nfs defaults 0 0
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Mount NFS shares from NAS (see above)
+#
+# 2. Copy .env.example to .env and configure
+#
+# 3. Start media stack:
+#    docker compose up -d
+#
+# 4. Configure services:
+#    - Jellyfin: http://192.168.1.10:8096 (create admin, add libraries)
+#    - Prowlarr: http://192.168.1.10:9696 (add indexers)
+#    - Sonarr: http://192.168.1.10:8989 (connect Prowlarr, qBit)
+#    - Radarr: http://192.168.1.10:7878 (connect Prowlarr, qBit)
+#    - qBittorrent: http://192.168.1.10:8080 (default: admin/adminadmin)
+#
+# =============================================================================
+# INTEGRATION FLOW
+# =============================================================================
+#
+# Prowlarr → Sonarr/Radarr → qBittorrent → Jellyfin
+#
+# 1. Add indexers to Prowlarr
+# 2. Connect Prowlarr to Sonarr/Radarr (Settings → Apps)
+# 3. Add qBittorrent as download client in Sonarr/Radarr
+# 4. Configure root folders in Sonarr/Radarr to /media/tv and /media/movies
+# 5. Jellyfin automatically picks up new media
+#
+# =============================================================================
+# HARDWARE TRANSCODING (Intel QuickSync)
+# =============================================================================
+#
+# The Intel N150 supports QuickSync. To enable:
+#
+# 1. Ensure Docker VM has /dev/dri passed through
+# 2. Verify in Jellyfin: Dashboard → Playback → Transcoding
+# 3. Select "Intel QuickSync (QSV)" for hardware acceleration
+#
+# Test with:
+#   docker exec jellyfin ls -la /dev/dri
+#
+# =============================================================================
