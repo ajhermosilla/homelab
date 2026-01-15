@@ -1,0 +1,179 @@
+# Backup Stack - Restic REST Server
+# Fixed Homelab - NAS (Debian)
+# Local backup target for homelab services
+
+services:
+  # =========================================================================
+  # Restic REST Server - Backup Target
+  # https://github.com/restic/rest-server
+  # =========================================================================
+  restic-rest:
+    image: restic/rest-server:latest
+    container_name: restic-rest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${BACKUP_DATA:-/srv/backup/restic}:/data
+      - ./htpasswd:/data/.htpasswd:ro
+    environment:
+      OPTIONS: --private-repos --prometheus
+    command: --listen :8000
+    networks:
+      - backup-net
+
+networks:
+  backup-net:
+    name: backup-net
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# BACKUP_DATA=/srv/backup/restic
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create backup directory:
+#    sudo mkdir -p /srv/backup/restic
+#    sudo chown -R 1000:1000 /srv/backup
+#
+# 2. Create htpasswd file:
+#    # Install htpasswd if needed
+#    sudo apt install apache2-utils
+#
+#    # Create password file
+#    htpasswd -B -c htpasswd augusto
+#
+# 3. Start service:
+#    docker compose up -d
+#
+# 4. Initialize repository from client:
+#    export RESTIC_REPOSITORY="rest:http://augusto:password@192.168.1.12:8000/homelab"
+#    export RESTIC_PASSWORD="your-encryption-password"
+#    restic init
+#
+# =============================================================================
+# BACKUP SOURCES (from Docker VM)
+# =============================================================================
+#
+# Critical data to backup:
+#
+# | Service        | Path                    | Frequency |
+# |----------------|-------------------------|-----------|
+# | Headscale      | /var/lib/headscale/     | Hourly    |
+# | Vaultwarden    | /var/lib/vaultwarden/   | Daily     |
+# | Home Assistant | /config/                | Daily     |
+# | Frigate config | /config/                | Weekly    |
+# | Pi-hole        | /etc/pihole/            | Weekly    |
+#
+# =============================================================================
+# 3-2-1 BACKUP STRATEGY
+# =============================================================================
+#
+# 3 copies of data:
+#   1. Original on NAS (Red 8TB)
+#   2. Restic backup on NAS (same or different drive)
+#   3. Offsite on Google Drive (rclone crypt)
+#
+# 2 different media:
+#   1. NAS internal drives
+#   2. Local external (WD Red 3TB in Sabrent dock)
+#
+# 1 offsite:
+#   1. Google Drive 1TB (encrypted with rclone crypt)
+#
+# =============================================================================
+# OFFSITE BACKUP WITH RCLONE
+# =============================================================================
+#
+# 1. Configure rclone remote:
+#    rclone config
+#    - Name: gdrive-crypt
+#    - Type: crypt
+#    - Remote: gdrive:backup
+#    - Password: <encryption-password>
+#
+# 2. Sync critical data:
+#    rclone sync /srv/backup/critical gdrive-crypt:homelab
+#
+# 3. Schedule with cron:
+#    0 3 * * * rclone sync /srv/backup/critical gdrive-crypt:homelab --log-file=/var/log/rclone.log
+#
+# =============================================================================
+# LOCAL EXTERNAL BACKUP
+# =============================================================================
+#
+# Mount WD Red 3TB (Sabrent dock):
+#    sudo mkdir -p /mnt/backup-external
+#    sudo mount /dev/sdd1 /mnt/backup-external
+#
+# Sync with rsync:
+#    rsync -avz --delete /srv/backup/critical/ /mnt/backup-external/homelab/
+#
+# =============================================================================
+# RESTIC CLIENT EXAMPLES
+# =============================================================================
+#
+# # On Docker VM or any Tailscale-connected device
+#
+# # Environment setup
+# export RESTIC_REPOSITORY="rest:http://augusto:pass@192.168.1.12:8000/homelab"
+# export RESTIC_PASSWORD_FILE=/root/.restic-password
+#
+# # Backup Headscale
+# restic backup /var/lib/headscale
+#
+# # Backup Vaultwarden
+# restic backup /var/lib/vaultwarden
+#
+# # List snapshots
+# restic snapshots
+#
+# # Restore to specific path
+# restic restore latest --target /tmp/restore
+#
+# # Prune old snapshots (keep 7 daily, 4 weekly, 12 monthly)
+# restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune
+#
+# # Check repository integrity
+# restic check
+#
+# =============================================================================
+# BACKUP SCRIPT EXAMPLE
+# =============================================================================
+#
+# #!/bin/bash
+# # /usr/local/bin/backup-homelab.sh
+#
+# export RESTIC_REPOSITORY="rest:http://augusto:pass@192.168.1.12:8000/homelab"
+# export RESTIC_PASSWORD_FILE=/root/.restic-password
+#
+# echo "$(date) - Starting backup..."
+#
+# # Backup critical services
+# restic backup /var/lib/headscale --tag headscale
+# restic backup /var/lib/vaultwarden --tag vaultwarden
+# restic backup /config --tag homeassistant
+#
+# # Prune old backups
+# restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune
+#
+# # Notify on completion
+# curl -d "Backup completed" https://notify.cronova.dev/cronova-info
+#
+# echo "$(date) - Backup completed"
+#
+# =============================================================================
+# MONITORING
+# =============================================================================
+#
+# Prometheus metrics available at:
+#   http://192.168.1.12:8000/metrics
+#
+# Add Uptime Kuma check:
+#   TCP 192.168.1.12:8000
+#
+# =============================================================================

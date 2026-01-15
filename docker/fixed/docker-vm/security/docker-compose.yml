@@ -1,0 +1,252 @@
+# Security Stack - Vaultwarden + Frigate
+# Fixed Homelab - Docker VM
+# Password management and NVR with AI detection
+
+services:
+  # =========================================================================
+  # Vaultwarden - Password Manager
+  # https://github.com/dani-garcia/vaultwarden
+  # =========================================================================
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    ports:
+      - "8843:80"
+    volumes:
+      - vaultwarden-data:/data
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      DOMAIN: https://vault.cronova.dev
+      SIGNUPS_ALLOWED: ${VAULTWARDEN_SIGNUPS:-false}
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
+      WEBSOCKET_ENABLED: "true"
+      LOG_LEVEL: info
+    networks:
+      - security-net
+
+  # =========================================================================
+  # Frigate - NVR with AI Object Detection
+  # https://frigate.video/
+  # =========================================================================
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: frigate
+    restart: unless-stopped
+    privileged: true
+    shm_size: "256mb"
+    ports:
+      - "5000:5000"     # Web UI
+      - "8554:8554"     # RTSP restream
+      - "8555:8555/tcp" # WebRTC
+      - "8555:8555/udp"
+    volumes:
+      - ./frigate.yml:/config/config.yml:ro
+      - frigate-config:/config
+      - ${FRIGATE_RECORDINGS:-/mnt/nas/frigate}:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000  # 1GB for cache
+    devices:
+      # Intel QuickSync for hardware decoding (N150)
+      - /dev/dri:/dev/dri
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      FRIGATE_RTSP_PASSWORD: ${FRIGATE_RTSP_PASSWORD}
+    networks:
+      - security-net
+
+volumes:
+  vaultwarden-data:
+    name: vaultwarden-data
+  frigate-config:
+    name: frigate-config
+
+networks:
+  security-net:
+    name: security-net
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# TZ=America/Asuncion
+# VAULTWARDEN_ADMIN_TOKEN=<generate-with-openssl-rand-base64-32>
+# VAULTWARDEN_SIGNUPS=false
+# FRIGATE_RTSP_PASSWORD=camera-password
+# FRIGATE_RECORDINGS=/mnt/nas/frigate
+#
+# =============================================================================
+# NFS MOUNT FOR FRIGATE (Docker VM → NAS)
+# =============================================================================
+#
+# Mount NAS Purple 2TB for Frigate recordings:
+#
+# sudo mkdir -p /mnt/nas/frigate
+# sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+#
+# Add to /etc/fstab:
+# 192.168.1.12:/srv/frigate /mnt/nas/frigate nfs defaults 0 0
+#
+# =============================================================================
+# FRIGATE CONFIGURATION (frigate.yml)
+# =============================================================================
+#
+# Create frigate.yml in this directory:
+#
+# mqtt:
+#   enabled: true
+#   host: mosquitto
+#   port: 1883
+#   user: frigate
+#   password: frigate-password
+#
+# detectors:
+#   default:
+#     type: cpu  # Use Coral USB if available later
+#
+# ffmpeg:
+#   hwaccel_args: preset-vaapi  # Intel QuickSync
+#
+# cameras:
+#   front_door:
+#     ffmpeg:
+#       inputs:
+#         - path: rtsp://admin:password@192.168.1.101:554/stream1
+#           roles:
+#             - detect
+#             - record
+#     detect:
+#       enabled: true
+#       width: 1920
+#       height: 1080
+#       fps: 5
+#     record:
+#       enabled: true
+#       retain:
+#         days: 7
+#         mode: motion
+#       events:
+#         retain:
+#           default: 14
+#     snapshots:
+#       enabled: true
+#       retain:
+#         default: 14
+#
+#   back_yard:
+#     ffmpeg:
+#       inputs:
+#         - path: rtsp://admin:password@192.168.1.102:554/stream1
+#           roles:
+#             - detect
+#             - record
+#     detect:
+#       enabled: true
+#       width: 1920
+#       height: 1080
+#       fps: 5
+#     record:
+#       enabled: true
+#       retain:
+#         days: 7
+#         mode: motion
+#
+#   indoor_cam:
+#     ffmpeg:
+#       inputs:
+#         - path: rtsp://admin:password@192.168.1.103:554/stream1
+#           roles:
+#             - detect
+#             - record
+#     detect:
+#       enabled: true
+#       width: 1920
+#       height: 1080
+#       fps: 5
+#     record:
+#       enabled: true
+#       retain:
+#         days: 3
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Mount NFS share for recordings (see above)
+#
+# 2. Create .env with admin token:
+#    openssl rand -base64 32
+#
+# 3. Create frigate.yml with camera configuration
+#
+# 4. Start services:
+#    docker compose up -d
+#
+# 5. Access services:
+#    - Vaultwarden: https://vault.cronova.dev (or http://192.168.1.10:8843)
+#    - Frigate: http://192.168.1.10:5000
+#
+# =============================================================================
+# VAULTWARDEN ADMIN PANEL
+# =============================================================================
+#
+# Access at: https://vault.cronova.dev/admin
+# Use VAULTWARDEN_ADMIN_TOKEN from .env
+#
+# Disable public signups after creating your account.
+#
+# =============================================================================
+# CAMERA SETUP (Reolink RLC-520A)
+# =============================================================================
+#
+# 1. Configure static IPs in OPNsense DHCP
+# 2. Access each camera at http://192.168.1.10x
+# 3. Enable RTSP in camera settings
+# 4. Note stream URLs:
+#    - Main: rtsp://admin:password@ip:554/h264Preview_01_main
+#    - Sub:  rtsp://admin:password@ip:554/h264Preview_01_sub
+#
+# Use sub stream for detection (lower res = faster), main for recording.
+#
+# =============================================================================
+# TAPO C110 (WiFi Camera)
+# =============================================================================
+#
+# RTSP URL format:
+#   rtsp://username:password@192.168.1.103:554/stream1
+#
+# Enable RTSP in Tapo app:
+#   Camera Settings → Advanced Settings → Device Account
+#   Create username/password for RTSP access
+#
+# =============================================================================
+# HARDWARE ACCELERATION
+# =============================================================================
+#
+# Intel N150 supports VA-API (QuickSync):
+#
+# Verify with:
+#   docker exec frigate vainfo
+#
+# Expected output shows decode capabilities:
+#   VAProfileH264High : VAEntrypointVLD
+#   VAProfileHEVCMain : VAEntrypointVLD
+#
+# =============================================================================
+# FUTURE: CORAL USB TPU
+# =============================================================================
+#
+# When Coral USB is added, update frigate.yml detectors:
+#
+# detectors:
+#   coral:
+#     type: edgetpu
+#     device: usb
+#
+# And add device mount:
+#   devices:
+#     - /dev/bus/usb:/dev/bus/usb
+#
+# =============================================================================

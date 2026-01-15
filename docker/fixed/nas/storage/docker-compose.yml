@@ -1,0 +1,187 @@
+# Storage Stack - Samba + Syncthing
+# Fixed Homelab - NAS (Debian)
+# Network file shares and P2P sync
+
+services:
+  # =========================================================================
+  # Samba - Network File Shares (SMB/CIFS)
+  # https://www.samba.org/
+  # =========================================================================
+  samba:
+    image: dperson/samba:latest
+    container_name: samba
+    restart: unless-stopped
+    ports:
+      - "139:139"
+      - "445:445"
+    volumes:
+      - ${MEDIA_PATH:-/srv/media}:/media
+      - ${DATA_PATH:-/srv/data}:/data
+      - ${DOWNLOADS_PATH:-/srv/downloads}:/downloads
+      - ${BACKUP_PATH:-/srv/backup}:/backup
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      USERID: ${PUID:-1000}
+      GROUPID: ${PGID:-1000}
+    command: >
+      -u "${SAMBA_USER:-augusto};${SAMBA_PASSWORD}"
+      -s "media;/media;yes;no;no;augusto"
+      -s "data;/data;yes;no;no;augusto"
+      -s "downloads;/downloads;yes;no;no;augusto"
+      -s "backup;/backup;yes;no;no;augusto"
+      -p
+    networks:
+      - storage-net
+
+  # =========================================================================
+  # Syncthing - P2P File Sync
+  # https://syncthing.net/
+  # =========================================================================
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    restart: unless-stopped
+    ports:
+      - "8384:8384"     # Web UI
+      - "22000:22000/tcp"  # Transfer
+      - "22000:22000/udp"
+      - "21027:21027/udp"  # Discovery
+    volumes:
+      - syncthing-config:/config
+      - ${SYNC_PATH:-/srv/sync}:/sync
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+    networks:
+      - storage-net
+
+volumes:
+  syncthing-config:
+    name: syncthing-config
+
+networks:
+  storage-net:
+    name: storage-net
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# TZ=America/Asuncion
+# PUID=1000
+# PGID=1000
+# SAMBA_USER=augusto
+# SAMBA_PASSWORD=your-secure-password
+# MEDIA_PATH=/srv/media
+# DATA_PATH=/srv/data
+# DOWNLOADS_PATH=/srv/downloads
+# BACKUP_PATH=/srv/backup
+# SYNC_PATH=/srv/sync
+#
+# =============================================================================
+# NAS DISK LAYOUT
+# =============================================================================
+#
+# Lexar NQ110 240GB (boot):
+#   /           - Debian OS
+#   /var/lib/docker - Docker data
+#   /srv        - Service data root
+#
+# WD Purple 2TB (Frigate via NFS):
+#   /mnt/purple - Mount point
+#   /srv/frigate -> /mnt/purple/frigate (symlink)
+#
+# WD Red Plus 8TB (Media + Data):
+#   /mnt/red8   - Mount point
+#   /srv/media -> /mnt/red8/media (symlink)
+#   /srv/downloads -> /mnt/red8/downloads (symlink)
+#   /srv/data -> /mnt/red8/data (symlink)
+#   /srv/sync -> /mnt/red8/sync (symlink)
+#
+# =============================================================================
+# NFS EXPORTS (for Docker VM)
+# =============================================================================
+#
+# Install NFS server:
+#   sudo apt install nfs-kernel-server
+#
+# Add to /etc/exports:
+#   /srv/frigate 192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
+#   /srv/media 192.168.1.10(ro,sync,no_subtree_check)
+#   /srv/downloads 192.168.1.10(rw,sync,no_subtree_check)
+#
+# Apply:
+#   sudo exportfs -ra
+#   sudo systemctl restart nfs-kernel-server
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Mount drives and create directories:
+#    sudo mkdir -p /mnt/{purple,red8}
+#    sudo mount /dev/sdb1 /mnt/purple
+#    sudo mount /dev/sdc1 /mnt/red8
+#
+#    # Add to /etc/fstab for persistence
+#
+# 2. Create directory structure:
+#    sudo mkdir -p /mnt/red8/{media,downloads,data,sync}
+#    sudo mkdir -p /mnt/purple/frigate
+#
+#    # Create symlinks
+#    sudo ln -s /mnt/red8/media /srv/media
+#    sudo ln -s /mnt/red8/downloads /srv/downloads
+#    sudo ln -s /mnt/red8/data /srv/data
+#    sudo ln -s /mnt/red8/sync /srv/sync
+#    sudo ln -s /mnt/purple/frigate /srv/frigate
+#
+# 3. Set ownership:
+#    sudo chown -R 1000:1000 /mnt/red8 /mnt/purple
+#
+# 4. Configure NFS exports (see above)
+#
+# 5. Copy .env.example to .env and configure
+#
+# 6. Start services:
+#    docker compose up -d
+#
+# 7. Access services:
+#    - Samba: \\192.168.1.12\media (from Windows/macOS)
+#    - Syncthing: http://192.168.1.12:8384
+#
+# =============================================================================
+# SAMBA SHARES
+# =============================================================================
+#
+# | Share     | Path       | Use Case                    |
+# |-----------|------------|------------------------------|
+# | media     | /srv/media | Movies, TV, Music (Jellyfin) |
+# | downloads | /srv/downloads | Active downloads (*arr)   |
+# | data      | /srv/data  | Documents, photos, archives  |
+# | backup    | /srv/backup | Backup target               |
+#
+# =============================================================================
+# SYNCTHING FOLDERS
+# =============================================================================
+#
+# Configure folders in Syncthing web UI:
+#
+# | Folder     | Path          | Sync With      |
+# |------------|---------------|----------------|
+# | documents  | /sync/docs    | MacBook, Phone |
+# | photos     | /sync/photos  | Phone          |
+# | configs    | /sync/configs | MacBook        |
+#
+# =============================================================================
+# MACOS SAMBA CONNECTION
+# =============================================================================
+#
+# Finder → Go → Connect to Server
+# smb://192.168.1.12/media
+#
+# Or via Tailscale:
+# smb://100.64.0.12/media
+#
+# =============================================================================
