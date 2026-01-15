@@ -94,8 +94,8 @@ Comprehensive codebase review after completing hardware documentation.
 |---|------|--------|--------|
 | 1 | Update architecture-review.md domains | Done | ef92139 |
 | 2 | Fix Frigate location in services.md | Done | ef92139 |
-| 3 | Docker VM docker-compose files | Done | (pending) |
-| 4 | NAS docker-compose files | Done | (pending) |
+| 3 | Docker VM docker-compose files | Done | bc86158 |
+| 4 | NAS docker-compose files | Done | bc86158 |
 | 5 | Port 8080 conflict | Pending | |
 | 6 | NUT configuration | Pending | |
 | 7 | Monitoring strategy | Pending | |
