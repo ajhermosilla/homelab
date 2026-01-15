@@ -249,8 +249,8 @@ No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instea
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    NAS (Primary)                         │
-│  SSD 1TB │ Purple 2TB │ Red Plus 8TB                    │
-│  OS/Apps │ Frigate    │ Media + Data                    │
+│  SSD 240GB │ Purple 2TB │ Red Plus 8TB                  │
+│  OS/Docker │ Frigate    │ Media + Data                  │
 └─────────────────────────────────────────────────────────┘
                           │
           ┌───────────────┴───────────────┐
@@ -264,9 +264,11 @@ No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instea
 
 | Drive | Model | Size | Purpose |
 |-------|-------|------|---------|
-| SSD | Crucial MX500 | 1TB | Debian OS, Docker, configs |
+| SSD | Lexar NQ110 | 240GB | Debian OS, Docker, configs (boot) |
 | HDD | WD Purple | 2TB | Frigate NVR recordings (dedicated) |
 | HDD | WD Red Plus (WD80EFBX) | 8TB | Media, family backups, service backups |
+
+**Spare:** Crucial MX500 1TB SSD available for future use.
 
 **Backup Targets:**
 
