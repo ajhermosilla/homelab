@@ -225,9 +225,11 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Device | Services |
 |--------|----------|
-| Docker VM | Pi-hole, Caddy, Jellyfin, *arr stack, Home Assistant, Vaultwarden, Mosquitto |
+| Docker VM | Pi-hole, Caddy, Jellyfin, *arr stack, Home Assistant, Vaultwarden, Mosquitto, Frigate |
 | RPi 4 | Bitcoin Core, LND, Electrum Server (Start9) |
-| NAS | Frigate, Samba, Syncthing, Restic REST |
+| NAS | NFS (for Frigate), Samba, Syncthing, Restic REST |
+
+*Frigate runs on Docker VM (Intel N150 QuickSync) with NFS mount to NAS Purple 2TB for recordings.*
 
 ---
 
@@ -330,7 +332,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | Item | Purpose | Priority |
 |------|---------|----------|
 | NVMe HAT for RPi 5 | Faster storage | Low |
-| Coral USB TPU | Frigate ML acceleration | Medium |
+| Coral USB TPU | Frigate ML acceleration (Mini PC) | Medium |
 | 8TB HDD (parity) | SnapRAID parity drive | Low |
 | 8TB HDD (external) | Larger local backup | Low |
 | 3D printed case | RPi 5 enclosure | Medium |

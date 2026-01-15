@@ -150,7 +150,14 @@ Virtualization host running network gateway and Docker services.
 | qBittorrent | Media | 6881 | Torrent client |
 | Home Assistant | Automation | 8123 | Home automation |
 | Mosquitto | Automation | 1883 | MQTT broker (HA ↔ Frigate) |
+| Frigate | Security | 5000 | NVR (recordings via NFS to NAS) |
 | Vaultwarden | Security | 8843 | Password manager |
+
+**Why Frigate on Docker VM:**
+- Intel N150 has modern QuickSync for hardware video decode
+- i3-3220T (NAS) too old for efficient multi-stream decode
+- NFS mount to NAS Purple 2TB for recordings
+- Coral USB TPU can be added to Mini PC later
 
 **Management:** Use `lazydocker` (TUI) or `docker compose` CLI - no web GUI needed.
 
@@ -278,7 +285,7 @@ No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instea
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Frigate | 5000 | NVR for security cameras |
+| NFS Server | 2049 | Export Purple 2TB for Frigate (Docker VM) |
 | Samba | 445 | Network shares |
 | Syncthing | 8384, 22000 | Peer-to-peer file sync |
 | Restic REST | 8000 | Backup target for other devices |
@@ -301,19 +308,44 @@ No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instea
     └── backup/         # Local backup target (3TB)
 ```
 
-### Frigate Setup
+### NFS Export for Frigate
 
-| Component | Purpose |
-|-----------|---------|
-| Frigate NVR | AI-powered object detection |
-| Coral TPU | Hardware ML acceleration (future) |
-| Mosquitto | MQTT broker on Docker VM |
-| Cameras | 2x Reolink RLC-520A (PoE), 1x Tapo C110 (WiFi) |
+The Purple 2TB drive is exported via NFS to Docker VM for Frigate recordings.
 
-**Camera Integration:**
-- PoE cameras → TP-Link PoE Switch → NAS (Frigate)
-- WiFi camera → Router → NAS (Frigate)
-- Frigate → MQTT → Home Assistant (Docker VM)
+```
+NAS: /mnt/purple/frigate  →  NFS export
+Docker VM: /mnt/frigate   →  NFS mount (rw, sync, no_subtree_check)
+```
+
+**Why NFS:**
+- Frigate runs on Docker VM (better hardware decode)
+- Recordings stored on NAS (dedicated surveillance drive)
+- Low latency on local gigabit+ network
+
+## Frigate Setup (Docker VM)
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Frigate NVR | Docker VM | AI-powered object detection |
+| Coral USB TPU | Mini PC USB (future) | Hardware ML acceleration |
+| Mosquitto | Docker VM | MQTT broker |
+| Recordings | NAS (NFS) | Purple 2TB dedicated |
+| Cameras | Network | 2x RLC-520A (PoE), 1x Tapo C110 (WiFi) |
+
+**Camera Flow:**
+```
+[Cameras] → [Network] → [Docker VM: Frigate]
+                              ↓
+                        [NFS Mount]
+                              ↓
+                    [NAS: Purple 2TB]
+
+[Frigate] → [MQTT] → [Home Assistant]
+```
+
+**Hardware Acceleration:**
+- Intel N150 QuickSync for video decode (vaapi)
+- Coral USB TPU for detection (future purchase)
 
 ## Network Configuration
 
@@ -359,13 +391,15 @@ No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instea
 | 11 | Sync Bitcoin blockchain | RPi 4 | Pending |
 | 12 | Install Debian 12 on NAS | NAS | Pending |
 | 13 | Mount drives (SSD, Purple, Red Plus) | NAS | Pending |
-| 14 | Deploy Frigate NVR | NAS | Pending |
+| 14 | Configure NFS export for Purple 2TB | NAS | Pending |
 | 15 | Deploy Syncthing + Samba | NAS | Pending |
 | 16 | Deploy Restic REST server | NAS | Pending |
-| 17 | Configure cameras in Frigate | NAS | Pending |
-| 18 | Connect Frigate → MQTT → Home Assistant | All | Pending |
-| 19 | Join all devices to Tailscale mesh | All | Pending |
-| 20 | Configure backup jobs (local + cloud) | NAS | Pending |
+| 17 | Mount NFS share on Docker VM | Docker VM | Pending |
+| 18 | Deploy Frigate NVR (with NFS + vaapi) | Docker VM | Pending |
+| 19 | Configure cameras in Frigate | Docker VM | Pending |
+| 20 | Connect Frigate → MQTT → Home Assistant | Docker VM | Pending |
+| 21 | Join all devices to Tailscale mesh | All | Pending |
+| 22 | Configure backup jobs (local + cloud) | NAS | Pending |
 
 ## Backup Strategy
 
@@ -440,7 +474,7 @@ All critical devices connected to **Forza NT-1012U 1000VA UPS**.
 ## Future Enhancements
 
 ### Hardware
-- [ ] Coral USB TPU for Frigate ML acceleration
+- [ ] Coral USB TPU for Frigate ML acceleration (connect to Mini PC)
 - [ ] 8TB HDD for SnapRAID parity (when budget allows)
 - [ ] 8TB HDD for larger external backup
 - [ ] GPU passthrough for Jellyfin transcoding
