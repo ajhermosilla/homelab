@@ -289,7 +289,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 **Total estimated load:** ~180W (well under 1000VA capacity)
 
-**TODO:** Configure NUT for graceful shutdown on power loss
+**See:** `docs/nut-config.md` for NUT graceful shutdown configuration
 
 ---
 
