@@ -83,7 +83,7 @@
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
 | **DERP Relay** | 443, 3478 | Tailscale NAT traversal |
-| **Pi-hole** | 53, 8080 | DNS (US-based fallback) |
+| **Pi-hole** | 53, 8053 | DNS (US-based fallback) |
 | **Uptime Kuma** | 3001 | External monitoring |
 | **ntfy** | 80 | Push notifications |
 | **changedetection** | 5000 | Website change monitor |
@@ -119,7 +119,8 @@
 | 5353 | Unbound (OPNsense) | Fixed |
 | 7878 | Radarr | Fixed |
 | 8000 | Restic REST | NAS / VPS |
-| 8080 | qBittorrent / Pi-hole alt | Fixed / VPS |
+| 8053 | Pi-hole Web (VPS) | VPS |
+| 8080 | qBittorrent | Fixed |
 | 8096 | Jellyfin | Fixed |
 | 8123 | Home Assistant | Fixed |
 | 8384 | Syncthing Web | NAS |

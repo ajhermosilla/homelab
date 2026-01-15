@@ -39,23 +39,26 @@ Comprehensive codebase review after completing hardware documentation.
 
 ## Medium Priority
 
-- [ ] **5. Resolve port 8080 conflict**
+- [x] **5. Resolve port 8080 conflict**
   - File: `docs/services.md:121`
   - Issue: qBittorrent and Pi-hole alt both use 8080
   - Decision needed: qBittorrent→6881 or Pi-hole alt→8053
   - Note: VPS already uses 8053 for Pi-hole
+  - **DONE**: No conflict - VPS Pi-hole already uses 8053, updated docs
 
-- [ ] **6. Document NUT (UPS graceful shutdown)**
+- [x] **6. Document NUT (UPS graceful shutdown)**
   - Files: `hardware.md:292`, `fixed-homelab.md:474`
   - Issue: Marked TODO, not implemented
   - Action: Add NUT configuration to NAS docker-compose or system config
+  - **DONE**: Created docs/nut-config.md with full NUT setup
 
-- [ ] **7. Create monitoring strategy document**
+- [x] **7. Create monitoring strategy document**
   - Missing: Uptime Kuma checks + ntfy notifications
   - Content needed:
     - Service monitor list
     - ntfy topic configuration
     - Alert thresholds
+  - **DONE**: Created docs/monitoring-strategy.md
 
 - [ ] **8. Create VLAN documentation**
   - Missing: OPNsense IoT isolation strategy
@@ -96,9 +99,9 @@ Comprehensive codebase review after completing hardware documentation.
 | 2 | Fix Frigate location in services.md | Done | ef92139 |
 | 3 | Docker VM docker-compose files | Done | bc86158 |
 | 4 | NAS docker-compose files | Done | bc86158 |
-| 5 | Port 8080 conflict | Pending | |
-| 6 | NUT configuration | Pending | |
-| 7 | Monitoring strategy | Pending | |
+| 5 | Port 8080 conflict | Done | (pending) |
+| 6 | NUT configuration | Done | (pending) |
+| 7 | Monitoring strategy | Done | (pending) |
 | 8 | VLAN documentation | Pending | |
 | 9 | Backup test procedure | Pending | |
 | 10 | Certificate strategy | Pending | |
