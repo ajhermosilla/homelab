@@ -8,9 +8,11 @@ services:
   # https://github.com/dani-garcia/vaultwarden
   # =========================================================================
   vaultwarden:
-    image: vaultwarden/server:latest
+    image: vaultwarden/server:1.32.0
     container_name: vaultwarden
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8843:80"
     volumes:
@@ -33,7 +35,8 @@ services:
     image: ghcr.io/blakeblackshear/frigate:stable
     container_name: frigate
     restart: unless-stopped
-    privileged: true
+    security_opt:
+      - no-new-privileges:true
     shm_size: "256mb"
     ports:
       - "5000:5000"     # Web UI

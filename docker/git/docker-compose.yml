@@ -1,8 +1,10 @@
 services:
   soft-serve:
-    image: charmcli/soft-serve:latest
+    image: charmcli/soft-serve:0.8
     container_name: soft-serve
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - soft-serve-data:/soft-serve
     ports:

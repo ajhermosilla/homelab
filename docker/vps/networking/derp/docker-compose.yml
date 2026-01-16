@@ -4,9 +4,11 @@
 
 services:
   derp:
-    image: fredliang/derper:latest
+    image: fredliang/derper:1.0
     container_name: derp
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "3478:3478/udp"  # STUN
       - "8443:443"       # HTTPS (DERP) - mapped to 8443, Caddy handles 443

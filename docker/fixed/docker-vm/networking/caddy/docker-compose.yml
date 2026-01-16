@@ -4,9 +4,11 @@
 
 services:
   caddy:
-    image: caddy:latest
+    image: caddy:2.8
     container_name: caddy
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "80:80/tcp"     # HTTP (redirect to HTTPS)
       - "443:443/tcp"   # HTTPS

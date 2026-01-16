@@ -67,10 +67,12 @@ objects:
 # CAMERAS
 # =============================================================================
 #
-# Update RTSP URLs with actual camera credentials.
+# ⚠️  IMPORTANT: Replace ALL credential placeholders before deploying!
+#     Search for: {REOLINK_USER}, {REOLINK_PASS}, {TAPO_USER}, {TAPO_PASS}
+#
 # Reolink RLC-520A streams:
-#   Main: rtsp://admin:password@ip:554/h264Preview_01_main (5MP)
-#   Sub:  rtsp://admin:password@ip:554/h264Preview_01_sub (lower res)
+#   Main: rtsp://user:pass@ip:554/h264Preview_01_main (5MP)
+#   Sub:  rtsp://user:pass@ip:554/h264Preview_01_sub (lower res)
 #
 # Use sub stream for detect (faster), main stream for record (quality).
 
@@ -81,10 +83,10 @@ cameras:
   front_door:
     ffmpeg:
       inputs:
-        - path: rtsp://USER:PASS@192.168.10.101:554/h264Preview_01_sub
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.101:554/h264Preview_01_sub
           roles:
             - detect
-        - path: rtsp://USER:PASS@192.168.10.101:554/h264Preview_01_main
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.101:554/h264Preview_01_main
           roles:
             - record
     detect:
@@ -106,10 +108,10 @@ cameras:
   back_yard:
     ffmpeg:
       inputs:
-        - path: rtsp://USER:PASS@192.168.10.102:554/h264Preview_01_sub
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.102:554/h264Preview_01_sub
           roles:
             - detect
-        - path: rtsp://USER:PASS@192.168.10.102:554/h264Preview_01_main
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.102:554/h264Preview_01_main
           roles:
             - record
     detect:
@@ -132,7 +134,7 @@ cameras:
   indoor:
     ffmpeg:
       inputs:
-        - path: rtsp://USER:PASS@192.168.10.103:554/stream1
+        - path: rtsp://{TAPO_USER}:{TAPO_PASS}@192.168.10.103:554/stream1
           roles:
             - detect
             - record
@@ -154,10 +156,10 @@ cameras:
 # SETUP NOTES
 # =============================================================================
 #
-# 1. Replace placeholder credentials:
-#    - {FRIGATE_MQTT_PASSWORD} - MQTT password (match mosquitto config)
-#    - {FRIGATE_CAM_USER} / {FRIGATE_CAM_PASSWORD} - Reolink credentials
-#    - {FRIGATE_TAPO_USER} / {FRIGATE_TAPO_PASSWORD} - Tapo credentials
+# 1. Replace placeholder credentials (DO NOT deploy with placeholders):
+#    - {REOLINK_USER} / {REOLINK_PASS} - Reolink camera credentials
+#    - {TAPO_USER} / {TAPO_PASS} - Tapo camera credentials
+#    - MQTT password in mqtt section above
 #
 # 2. Camera IPs are on VLAN 10 (IoT):
 #    - 192.168.10.101 - Front door (Reolink)
