@@ -60,6 +60,7 @@ On-demand                 24/7                         24/7
 | [monitoring-strategy.md](docs/monitoring-strategy.md) | Alerting and metrics |
 | [disaster-recovery.md](docs/disaster-recovery.md) | Backup and restore |
 | [secrets-management.md](docs/secrets-management.md) | Credential handling |
+| [security-hardening.md](docs/security-hardening.md) | 2FA, firewall, fail2ban |
 
 ### Operations
 
