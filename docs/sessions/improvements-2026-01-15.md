@@ -60,12 +60,13 @@ Comprehensive codebase review after completing hardware documentation.
     - Alert thresholds
   - **DONE**: Created docs/monitoring-strategy.md
 
-- [ ] **8. Create VLAN documentation**
+- [x] **8. Create VLAN documentation**
   - Missing: OPNsense IoT isolation strategy
   - Content needed:
     - VLAN design (IoT, Guest, Management)
     - Firewall rules between VLANs
     - Camera isolation
+  - **DONE**: Created docs/vlan-design.md
 
 - [ ] **9. Create backup test procedure**
   - Missing: Validation that DR runbook works
@@ -102,7 +103,7 @@ Comprehensive codebase review after completing hardware documentation.
 | 5 | Port 8080 conflict | Done | (pending) |
 | 6 | NUT configuration | Done | (pending) |
 | 7 | Monitoring strategy | Done | (pending) |
-| 8 | VLAN documentation | Pending | |
+| 8 | VLAN documentation | Done | (pending) |
 | 9 | Backup test procedure | Pending | |
 | 10 | Certificate strategy | Pending | |
 | 11 | Archive domain-research.md | Pending | |
