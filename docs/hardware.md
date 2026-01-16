@@ -142,14 +142,14 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 | Motherboard | ASUS P8H77-I | Intel H77, LGA 1155 |
 | CPU | Intel Core i3-3220T | Dual-Core 2.8GHz, 35W TDP |
 | RAM | Kingston HyperX 8GB | 2x4GB DDR3-1600 |
-| PSU | TBD (2013) | Solid state, verify model |
+| PSU | picoPSU-160-XT + 220W brick | 192W DC-DC, 2013 vintage |
 | OS | Debian 12 | Docker, no mergerfs/snapraid initially |
 
 **NAS Services:**
-- Frigate (NVR)
 - Samba (network shares)
 - Syncthing (file sync)
 - Restic REST (backup target)
+- NFS (exports Purple 2TB for Frigate on Docker VM)
 
 ### NAS Storage Strategy
 
