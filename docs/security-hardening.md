@@ -69,13 +69,20 @@ All traffic filtered through OPNsense VM:
 
 ## Two-Factor Authentication (2FA)
 
+### Hardware Key
+
+**YubiKey 5C NFC** available for hardware-based 2FA:
+- USB-C + NFC for phone/laptop
+- Supports FIDO2, WebAuthn, TOTP
+- Use for most critical accounts (Vaultwarden master, Cloudflare, GitHub)
+
 ### Service 2FA Matrix
 
 | Service | 2FA Method | Priority |
 |---------|------------|----------|
-| Vaultwarden | TOTP (built-in) | Critical |
+| Vaultwarden | TOTP or YubiKey | Critical |
 | Headscale | OIDC + 2FA | Critical |
-| Proxmox | TOTP | Critical |
+| Proxmox | TOTP or YubiKey | Critical |
 | Home Assistant | TOTP | High |
 | OPNsense | TOTP | High |
 | Start9 | TOTP | High |
