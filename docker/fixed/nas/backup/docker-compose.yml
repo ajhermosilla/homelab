@@ -124,7 +124,7 @@ networks:
 # # On Docker VM or any Tailscale-connected device
 #
 # # Environment setup
-# export RESTIC_REPOSITORY="rest:http://augusto:pass@192.168.1.12:8000/homelab"
+# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
 # export RESTIC_PASSWORD_FILE=/root/.restic-password
 #
 # # Backup Headscale
@@ -152,7 +152,7 @@ networks:
 # #!/bin/bash
 # # /usr/local/bin/backup-homelab.sh
 #
-# export RESTIC_REPOSITORY="rest:http://augusto:pass@192.168.1.12:8000/homelab"
+# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
 # export RESTIC_PASSWORD_FILE=/root/.restic-password
 #
 # echo "$(date) - Starting backup..."

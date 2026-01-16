@@ -8,8 +8,8 @@ Security audit findings and remediation plan.
 |----------|-------|--------|
 | Critical | 2 | **2 Done** |
 | High | 8 | **8 Done** |
-| Medium | 12 | **9 Done** |
-| **Total** | **22** | **19 done** |
+| Medium | 12 | **11 Done** |
+| **Total** | **22** | **21 done** |
 
 ---
 
@@ -49,10 +49,10 @@ Security audit findings and remediation plan.
 | 16 | No health checks on services | Multiple docker-compose files | [x] |
 | 17 | SOPS age key placeholder | `.sops.yaml` | [x] |
 | 18 | NFS security options not documented | `docs/nfs-setup.md` | [x] |
-| 19 | Credential examples in comments | Multiple files | [ ] |
+| 19 | Credential examples in comments | Multiple files | [x] |
 | 20 | Containers running as root | Multiple services | [ ] |
 | 21 | Missing cap_drop on containers | All docker-compose files | [x] |
-| 22 | Network topology in public docs | `docs/fixed-homelab.md`, `docs/hardware.md` | [ ] |
+| 22 | Network topology in public docs | `docs/fixed-homelab.md`, `docs/hardware.md` | [x] |
 
 ---
 

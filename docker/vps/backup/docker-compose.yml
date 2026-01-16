@@ -79,7 +79,7 @@ networks:
 # =============================================================================
 #
 # # Environment setup
-# export RESTIC_REPOSITORY="rest:http://augusto:pass@100.64.0.20:8000/homelab"
+# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@100.64.0.20:8000/homelab"
 # export RESTIC_PASSWORD_FILE=/root/.restic-password
 #
 # # Backup

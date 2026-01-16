@@ -42,19 +42,16 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 ```
             [Internet]
                  |
-          [Samsung A13]
+          [Mobile Phone]
            USB Tether
                  |
-         [Beryl AX Router]
-          192.168.8.1
+         [Travel Router]
            /         \
           /           \
    [MacBook Air]    [RPi 5]
-   192.168.8.10    192.168.8.5
          \           /
           \         /
         [Tailscale Mesh]
-         100.64.0.1-2
 ```
 
 ### Mobile Kit Services
@@ -206,22 +203,17 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
                            |
                     [OPNsense VM - WAN]
                            |
-                  [MokerLink 2.5G Switch]
-                    8x 2.5G + 10G SFP+
+                  [Managed 2.5G Switch]
                            |
      +----------+----------+-----------+----------+
      |          |          |           |          |
-[Docker VM] [RPi 4]     [NAS]    [TP-Link AP] [PoE Switch]
-192.168.1.10  .11        .12      AX3000      TL-SG1005P
-                                  (WiFi 6)    4x PoE+
-                                     |            |
-                               [Tapo C110]   +----+----+
-                                 (WiFi)      |         |
-                                        [RLC-520A] [RLC-520A]
-                                         Cam 1      Cam 2
+[Docker VM] [Bitcoin]   [NAS]    [WiFi AP]  [PoE Switch]
+              Node                              |
+                                          +----+----+
+                                          |         |
+                                     [PoE Cam]  [PoE Cam]
 
                     [Tailscale Mesh]
-                     100.64.0.10-12
 ```
 
 ### Fixed Homelab Services
@@ -254,33 +246,23 @@ Cloud helper node (not critical infrastructure).
 
 ### IP Ranges
 
-| Range | Purpose | Notes |
-|-------|---------|-------|
-| 100.64.0.1-9 | Mobile devices | Phones, laptops, portable |
-| 100.64.0.10-19 | Fixed homelab | Servers, NAS |
-| 100.64.0.20-29 | Client devices | Desktops, TVs, family |
-| 100.64.0.100-109 | Cloud/VPS | External infrastructure |
-| 100.64.0.200-254 | Reserved | Future expansion |
+| Range | Purpose |
+|-------|---------|
+| x.x.x.1-9 | Mobile devices |
+| x.x.x.10-19 | Fixed homelab servers |
+| x.x.x.20-29 | Client devices |
+| x.x.x.100-109 | Cloud/VPS |
+| x.x.x.200-254 | Reserved |
 
-### Current Allocations
+### Allocation Strategy
 
-| Device | Tailscale IP | Hostname | Environment | Owner |
-|--------|--------------|----------|-------------|-------|
-| RPi 5 | 100.64.0.1 | rpi5 | Mobile | Augusto |
-| MacBook Air | 100.64.0.2 | macbook | Mobile | Augusto |
-| Samsung A16 (Aug) | 100.64.0.3 | phone-augusto | Mobile | Augusto |
-| Samsung A16 (Lore) | 100.64.0.4 | phone-lorena | Mobile | Lorena |
-| Pixel 6 | 100.64.0.5 | phone-mama | Mobile | Mama |
-| Mini PC (Proxmox) | 100.64.0.10 | minipc | Fixed | Server |
-| RPi 4 (Start9) | 100.64.0.11 | rpi4 | Fixed | Server |
-| NAS | 100.64.0.12 | nas | Fixed | Server |
-| Docker VM | 100.64.0.13 | docker | Fixed | Server |
-| OPNsense | 100.64.0.14 | opnsense | Fixed | Server |
-| MacBook Pro 2012 | 100.64.0.20 | macbook-lorena | Client | Lorena |
-| ThinkPad X240 | 100.64.0.21 | thinkpad | Client | Augusto |
-| VPS | 100.64.0.100 | vps | Cloud | Server |
+Devices are organized by role:
+- **Mobile**: Phones, laptops, portable devices
+- **Fixed**: Servers, NAS, infrastructure
+- **Clients**: Family desktops, media devices
+- **Cloud**: VPS and external infrastructure
 
-*IPs assigned by Headscale on VPS.*
+*Actual allocations managed in Headscale admin.*
 
 ### Hostname Convention
 
@@ -289,46 +271,34 @@ Cloud helper node (not critical infrastructure).
 
 Examples:
 - rpi5 (device type only)
-- phone-augusto (device + owner)
-- macbook-lorena (device + owner)
+- phone-user (device + owner)
+- laptop-user (device + owner)
 ```
 
 ### MagicDNS
 
-Tailscale MagicDNS provides automatic DNS for all devices:
+Tailscale MagicDNS provides automatic DNS:
 
 ```
-<hostname>.tail → 100.64.0.x
-
-Examples:
-- docker.tail → 100.64.0.13
-- nas.tail → 100.64.0.12
-- vps.tail → 100.64.0.100
+<hostname>.tail → Tailscale IP
 ```
 
 ### ACL Policy (Headscale)
 
 ```yaml
-# Simplified ACL - all devices can reach all devices
-# More restrictive ACLs can be added later
+# Example ACL structure - customize for your needs
 
 groups:
   servers:
-    - minipc
     - docker
     - nas
-    - rpi4
-    - opnsense
     - vps
+    # Add server hostnames
 
-  family:
-    - phone-augusto
-    - phone-lorena
-    - phone-mama
-    - macbook
-    - macbook-lorena
-    - thinkpad
-    - rpi5
+  users:
+    - phone-*
+    - laptop-*
+    # Add user device patterns
 
 acls:
   # Servers can reach each other
@@ -336,24 +306,19 @@ acls:
     src: ["group:servers"]
     dst: ["group:servers:*"]
 
-  # Family can reach servers
+  # Users can reach servers
   - action: accept
-    src: ["group:family"]
+    src: ["group:users"]
     dst: ["group:servers:*"]
-
-  # Family can reach each other (for AirDrop alternatives)
-  - action: accept
-    src: ["group:family"]
-    dst: ["group:family:*"]
 ```
 
 ### Adding New Devices
 
 1. Generate auth key in Headscale
 2. Install Tailscale on device
-3. Connect with: `tailscale up --login-server=https://hs.cronova.dev --authkey=<key>`
-4. Assign IP from appropriate range in Headscale admin
-5. Update this document
+3. Connect with: `tailscale up --login-server=https://<your-domain> --authkey=<key>`
+4. Assign IP from appropriate range
+5. Update internal documentation
 
 ---
 

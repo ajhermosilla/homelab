@@ -15,7 +15,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-RESTIC_REPOSITORY="${RESTIC_REPOSITORY:-rest:http://augusto:pass@192.168.1.12:8000/homelab}"
+RESTIC_REPOSITORY="${RESTIC_REPOSITORY:?RESTIC_REPOSITORY required - see scripts/README.md for setup}"
 RESTIC_PASSWORD_FILE="${RESTIC_PASSWORD_FILE:-/root/.restic-password}"
 RESTORE_DIR="/tmp/backup-verify-$$"
 NTFY_URL="${NTFY_URL:-https://notify.cronova.dev}"
