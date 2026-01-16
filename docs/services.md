@@ -48,8 +48,8 @@
 
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
-| **Pi-hole** | 53, 80 | DNS ad-blocking |
-| **Caddy** | 443 | Reverse proxy, auto-SSL |
+| **Pi-hole** | 53, 8053 | DNS ad-blocking |
+| **Caddy** | 80, 443 | Reverse proxy, auto-SSL |
 | **Jellyfin** | 8096 | Media streaming |
 | **Sonarr** | 8989 | TV show management |
 | **Radarr** | 7878 | Movie management |
