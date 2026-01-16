@@ -1,0 +1,112 @@
+# Improvement Plan - 2026-01-16
+
+Comprehensive codebase review findings and action plan.
+
+## Summary
+
+| Priority | Count | Status |
+|----------|-------|--------|
+| Critical | 7 | **Complete** |
+| High | 5 | Pending |
+| Medium | 12 | Pending |
+| **Total** | **24** | 7 done |
+
+---
+
+## Critical Priority (Blocks Deployment)
+
+Must be fixed before any deployment attempt.
+
+| # | Issue | Location | Status |
+|---|-------|----------|--------|
+| 1 | Missing `frigate.yml` config | `docker/fixed/docker-vm/security/` | [x] |
+| 2 | Missing `mosquitto.conf` | `docker/fixed/docker-vm/automation/` | [x] |
+| 3 | Missing Caddyfile (fixed homelab) | `docker/fixed/docker-vm/networking/caddy/` | [x] |
+| 4 | Missing `htpasswd` for Restic REST (NAS) | `docker/fixed/nas/backup/` | [x] |
+| 5 | Missing `htpasswd` for Restic REST (VPS) | `docker/vps/backup/` | [x] |
+| 6 | Mobile Headscale deprecated | `docker/mobile/rpi5/networking/headscale/` | [x] |
+| 7 | Port 80 conflict: Pi-hole → 8053 | `docker/fixed/docker-vm/networking/` | [x] |
+
+---
+
+## High Priority (Incomplete Setup)
+
+Complete before testing services.
+
+| # | Issue | Location | Status |
+|---|-------|----------|--------|
+| 8 | Missing `.env.example` files | All docker directories (16 missing) | [ ] |
+| 9 | Docker network isolation undefined | Services can't communicate across compose files | [ ] |
+| 10 | Headscale `config/config.yaml` template | `docker/vps/networking/headscale/` | [ ] |
+| 11 | NFS mount procedure not documented | Docker VM → NAS for Frigate | [ ] |
+| 12 | OPNsense setup guide missing | `docs/opnsense-setup.md` | [ ] |
+
+---
+
+## Medium Priority (Documentation Gaps)
+
+Complete before production use.
+
+| # | Issue | Location | Status |
+|---|-------|----------|--------|
+| 13 | qBittorrent port conflict (8080 vs 6881) | `docs/services.md` | [ ] |
+| 14 | NAS symlink creation not documented | `docs/fixed-homelab.md` | [ ] |
+| 15 | Uptime Kuma monitors not seeded | `docker/vps/monitoring/` | [ ] |
+| 16 | Backup verification script not deployed | `scripts/` | [ ] |
+| 17 | Service matrix (what runs where) missing | `docs/services.md` | [ ] |
+| 18 | Setup runbook for fresh deployment | `docs/setup-runbook.md` | [ ] |
+| 19 | Proxmox setup guide missing | `docs/proxmox-setup.md` | [ ] |
+| 20 | TLS/SSL strategy in compose vs docs | Multiple files | [ ] |
+| 21 | Tailscale IP allocation policy | `docs/hardware.md` | [ ] |
+| 22 | Ansible playbooks referenced but empty | `ansible/` | [ ] |
+| 23 | Top-level README needs navigation | `README.md` | [ ] |
+| 24 | Docker directory README missing | `docker/README.md` | [ ] |
+
+---
+
+## Action Plan
+
+### Phase 1: Critical Config Files (Complete)
+
+1. ~~Create `frigate.yml` - camera configuration template~~
+2. ~~Create `mosquitto.conf` - MQTT broker config~~
+3. ~~Create Caddyfile for fixed homelab~~
+4. ~~Document htpasswd creation for Restic REST~~
+5. ~~Deprecate mobile Headscale (moved to VPS)~~
+6. ~~Resolve port 80 conflict (Pi-hole → 8053)~~
+
+### Phase 2: Environment Templates (Next Session)
+
+1. Create `.env.example` for all 16 docker directories
+2. Document Docker network strategy
+3. Create Headscale config.yaml template
+
+### Phase 3: Setup Guides (Future)
+
+1. OPNsense setup guide
+2. Proxmox setup guide
+3. NFS mount procedure
+4. Setup runbook
+
+### Phase 4: Polish (Future)
+
+1. Service matrix
+2. Uptime Kuma monitor seeding
+3. Backup verification scripts
+4. README improvements
+
+---
+
+## Notes
+
+- VPS Headscale docker-compose and backup.sh already created (2026-01-16)
+- Network diagram with both switches completed (2026-01-16)
+- VLAN design documented with port assignments
+- Mobile kit now on-demand operation (Headscale moved to VPS)
+
+---
+
+## Related Documents
+
+- `docs/sessions/2026-01-16.md` - Session summary
+- `docs/sessions/improvements-2026-01-15.md` - Previous improvements (all complete)

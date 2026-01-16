@@ -8,7 +8,8 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "443:443/tcp"
+      - "80:80/tcp"     # HTTP (redirect to HTTPS)
+      - "443:443/tcp"   # HTTPS
       - "443:443/udp"   # HTTP/3
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro

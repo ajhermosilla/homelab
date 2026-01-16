@@ -1,5 +1,17 @@
+# =============================================================================
+# DEPRECATED - Headscale moved to VPS (2026-01-16)
+# =============================================================================
+#
+# Headscale now runs on VPS for 24/7 availability.
+# Mobile kit operates on-demand (7AM-7PM) and doesn't need Headscale.
+#
+# See: docker/vps/networking/headscale/docker-compose.yml
+#
+# This file is kept for reference only. Do not deploy.
+# =============================================================================
+
 # Headscale - Self-hosted Tailscale coordination server
-# Mobile Kit - RPi 5
+# Mobile Kit - RPi 5 (DEPRECATED)
 # https://headscale.net/
 
 services:
