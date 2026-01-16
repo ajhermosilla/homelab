@@ -190,7 +190,7 @@ Virtualization host running network gateway and Docker services.
 | Sonarr | Media | 8989 | TV show management |
 | Radarr | Media | 7878 | Movie management |
 | Prowlarr | Media | 9696 | Indexer management |
-| qBittorrent | Media | 6881 | Torrent client |
+| qBittorrent | Media | 8080, 6881 | Torrent client (Web UI, protocol) |
 | Home Assistant | Automation | 8123 | Home automation |
 | Mosquitto | Automation | 1883 | MQTT broker (HA ↔ Frigate) |
 | Frigate | Security | 5000 | NVR (recordings via NFS to NAS) |

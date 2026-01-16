@@ -252,16 +252,108 @@ Cloud helper node (not critical infrastructure).
 
 ## Tailscale IP Allocation
 
-| Device | Tailscale IP | Hostname | Environment |
-|--------|--------------|----------|-------------|
-| RPi 5 | 100.64.0.1 | rpi5 | Mobile |
-| MacBook Air | 100.64.0.2 | macbook | Mobile |
-| Mini PC | 100.64.0.10 | minipc | Fixed |
-| RPi 4 | 100.64.0.11 | rpi4 | Fixed |
-| NAS | 100.64.0.12 | nas | Fixed |
-| VPS | 100.64.0.100 | vps | Cloud |
+### IP Ranges
 
-*IPs assigned by Headscale on RPi 5.*
+| Range | Purpose | Notes |
+|-------|---------|-------|
+| 100.64.0.1-9 | Mobile devices | Phones, laptops, portable |
+| 100.64.0.10-19 | Fixed homelab | Servers, NAS |
+| 100.64.0.20-29 | Client devices | Desktops, TVs, family |
+| 100.64.0.100-109 | Cloud/VPS | External infrastructure |
+| 100.64.0.200-254 | Reserved | Future expansion |
+
+### Current Allocations
+
+| Device | Tailscale IP | Hostname | Environment | Owner |
+|--------|--------------|----------|-------------|-------|
+| RPi 5 | 100.64.0.1 | rpi5 | Mobile | Augusto |
+| MacBook Air | 100.64.0.2 | macbook | Mobile | Augusto |
+| Samsung A16 (Aug) | 100.64.0.3 | phone-augusto | Mobile | Augusto |
+| Samsung A16 (Lore) | 100.64.0.4 | phone-lorena | Mobile | Lorena |
+| Pixel 6 | 100.64.0.5 | phone-mama | Mobile | Mama |
+| Mini PC (Proxmox) | 100.64.0.10 | minipc | Fixed | Server |
+| RPi 4 (Start9) | 100.64.0.11 | rpi4 | Fixed | Server |
+| NAS | 100.64.0.12 | nas | Fixed | Server |
+| Docker VM | 100.64.0.13 | docker | Fixed | Server |
+| OPNsense | 100.64.0.14 | opnsense | Fixed | Server |
+| MacBook Pro 2012 | 100.64.0.20 | macbook-lorena | Client | Lorena |
+| ThinkPad X240 | 100.64.0.21 | thinkpad | Client | Augusto |
+| VPS | 100.64.0.100 | vps | Cloud | Server |
+
+*IPs assigned by Headscale on VPS.*
+
+### Hostname Convention
+
+```
+<device-type>[-owner]
+
+Examples:
+- rpi5 (device type only)
+- phone-augusto (device + owner)
+- macbook-lorena (device + owner)
+```
+
+### MagicDNS
+
+Tailscale MagicDNS provides automatic DNS for all devices:
+
+```
+<hostname>.tail → 100.64.0.x
+
+Examples:
+- docker.tail → 100.64.0.13
+- nas.tail → 100.64.0.12
+- vps.tail → 100.64.0.100
+```
+
+### ACL Policy (Headscale)
+
+```yaml
+# Simplified ACL - all devices can reach all devices
+# More restrictive ACLs can be added later
+
+groups:
+  servers:
+    - minipc
+    - docker
+    - nas
+    - rpi4
+    - opnsense
+    - vps
+
+  family:
+    - phone-augusto
+    - phone-lorena
+    - phone-mama
+    - macbook
+    - macbook-lorena
+    - thinkpad
+    - rpi5
+
+acls:
+  # Servers can reach each other
+  - action: accept
+    src: ["group:servers"]
+    dst: ["group:servers:*"]
+
+  # Family can reach servers
+  - action: accept
+    src: ["group:family"]
+    dst: ["group:servers:*"]
+
+  # Family can reach each other (for AirDrop alternatives)
+  - action: accept
+    src: ["group:family"]
+    dst: ["group:family:*"]
+```
+
+### Adding New Devices
+
+1. Generate auth key in Headscale
+2. Install Tailscale on device
+3. Connect with: `tailscale up --login-server=https://hs.cronova.dev --authkey=<key>`
+4. Assign IP from appropriate range in Headscale admin
+5. Update this document
 
 ---
 

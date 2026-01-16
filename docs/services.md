@@ -54,7 +54,7 @@
 | **Sonarr** | 8989 | TV show management |
 | **Radarr** | 7878 | Movie management |
 | **Prowlarr** | 9696 | Indexer management |
-| **qBittorrent** | 8080 | Torrent client |
+| **qBittorrent** | 8080, 6881 | Torrent client (Web UI, protocol) |
 | **Home Assistant** | 8123 | Home automation |
 | **Mosquitto** | 1883 | MQTT broker (HA ↔ Frigate) |
 | **Vaultwarden** | 8843 | Password manager |
@@ -121,8 +121,9 @@
 | 5353 | Unbound (OPNsense) | Fixed |
 | 7878 | Radarr | Fixed |
 | 8000 | Restic REST | NAS / VPS |
-| 8053 | Pi-hole Web (VPS) | VPS |
-| 8080 | qBittorrent | Fixed |
+| 8053 | Pi-hole Web | Fixed / VPS |
+| 8080 | qBittorrent / ntfy | Fixed / VPS |
+| 6881 | qBittorrent (torrent) | Fixed |
 | 8096 | Jellyfin | Fixed |
 | 8123 | Home Assistant | Fixed |
 | 8384 | Syncthing Web | NAS |
@@ -218,6 +219,126 @@ docker/
 | Git | soft-serve | 1 |
 
 **Unique services:** 23 | **Total deployments:** 26
+
+## Service Dependencies
+
+Services and their required dependencies for operation.
+
+```
+Headscale (VPS)          ← Required first (enables mesh)
+    │
+    ├── DERP Relay       ← NAT traversal
+    │
+    └── All other services (Tailscale clients)
+
+Pi-hole (any)            ← DNS resolution
+    │
+    └── All local services
+
+Mosquitto               ← MQTT broker
+    │
+    ├── Frigate          → Publishes events
+    └── Home Assistant   → Subscribes to events
+
+NFS (NAS)               ← Storage backend
+    │
+    └── Frigate          → Stores recordings
+
+Prowlarr                ← Indexer management
+    │
+    ├── Sonarr           → TV indexers
+    └── Radarr           → Movie indexers
+
+qBittorrent             ← Download client
+    │
+    ├── Sonarr           → TV downloads
+    └── Radarr           → Movie downloads
+```
+
+### Startup Order
+
+**VPS (deploy first):**
+1. Headscale → enables mesh network
+2. DERP Relay → improves connectivity
+3. Pi-hole → DNS fallback
+4. Uptime Kuma → external monitoring
+5. ntfy → notifications
+6. Restic REST → backup target
+
+**Fixed Homelab - NAS:**
+1. NFS → storage for Frigate
+2. Samba → file shares
+3. Syncthing → file sync
+4. Restic REST → backup target
+
+**Fixed Homelab - Docker VM:**
+1. Pi-hole → local DNS
+2. Caddy → reverse proxy
+3. Mosquitto → MQTT broker
+4. Frigate → NVR (needs NFS, MQTT)
+5. Home Assistant → automation (needs MQTT)
+6. Vaultwarden → passwords
+7. Media stack (Prowlarr → Sonarr/Radarr → qBittorrent → Jellyfin)
+
+## Access Matrix
+
+How services are accessed based on location.
+
+| Service | Local Access | Tailscale Access | Public Access |
+|---------|--------------|------------------|---------------|
+| **Headscale** | - | - | hs.cronova.dev |
+| **Pi-hole** | 192.168.1.10:8053 | pihole.tail:8053 | - |
+| **Caddy** | 192.168.1.10:443 | - | - |
+| **Jellyfin** | media.cronova.dev | media.cronova.dev | - |
+| **Home Assistant** | home.cronova.dev | home.cronova.dev | - |
+| **Vaultwarden** | vault.cronova.dev | vault.cronova.dev | - |
+| **Frigate** | 192.168.1.10:5000 | frigate.tail:5000 | - |
+| **Sonarr** | 192.168.1.10:8989 | sonarr.tail:8989 | - |
+| **Radarr** | 192.168.1.10:7878 | radarr.tail:7878 | - |
+| **Prowlarr** | 192.168.1.10:9696 | prowlarr.tail:9696 | - |
+| **qBittorrent** | 192.168.1.10:8080 | qbit.tail:8080 | - |
+| **Uptime Kuma** | - | status.tail:3001 | - |
+| **ntfy** | - | ntfy.tail:80 | - |
+| **Syncthing** | 192.168.1.12:8384 | nas.tail:8384 | - |
+
+*Note: `.tail` = Tailscale MagicDNS hostname*
+
+## Service Criticality
+
+### Critical (24/7 Required)
+
+Services that must always be available.
+
+| Service | Location | Impact if Down |
+|---------|----------|----------------|
+| Headscale | VPS | Mesh network offline |
+| Pi-hole (VPS) | VPS | DNS fallback lost |
+| Uptime Kuma | VPS | No external monitoring |
+| ntfy | VPS | No push notifications |
+| Vaultwarden | Docker VM | Password access lost |
+
+### Important (Business Hours)
+
+Services needed during active use.
+
+| Service | Location | Impact if Down |
+|---------|----------|----------------|
+| Pi-hole (Fixed) | Docker VM | Local DNS lost |
+| Home Assistant | Docker VM | Automation offline |
+| Frigate | Docker VM | No camera recording |
+| Samba | NAS | File shares unavailable |
+
+### Optional (On-Demand)
+
+Services used occasionally.
+
+| Service | Location | Impact if Down |
+|---------|----------|----------------|
+| Jellyfin | Docker VM | Media streaming unavailable |
+| Sonarr/Radarr | Docker VM | No auto-downloads |
+| qBittorrent | Docker VM | Manual downloads only |
+| Syncthing | NAS | Sync paused |
+| soft-serve | Mobile | Git server offline |
 
 ## References
 
