@@ -11,13 +11,17 @@ services:
     image: homeassistant/home-assistant:stable
     container_name: homeassistant
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8123:8123"
     volumes:
       - homeassistant-config:/config
     environment:
       TZ: ${TZ:-America/Asuncion}
-    privileged: true
+    # Note: Add device mounts if USB Zigbee/Z-Wave sticks are used:
+    # devices:
+    #   - /dev/ttyUSB0:/dev/ttyUSB0
     networks:
       - automation-net
     depends_on:
@@ -28,9 +32,11 @@ services:
   # https://mosquitto.org/
   # =========================================================================
   mosquitto:
-    image: eclipse-mosquitto:latest
+    image: eclipse-mosquitto:2.0
     container_name: mosquitto
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "1883:1883"     # MQTT
       - "9001:9001"     # WebSocket (optional)

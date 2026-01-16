@@ -4,9 +4,11 @@
 
 services:
   pihole:
-    image: pihole/pihole:latest
+    image: pihole/pihole:2024.07.0
     container_name: pihole
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     hostname: pihole-vps
     ports:
       - "53:53/tcp"
@@ -14,7 +16,7 @@ services:
       - "8053:80/tcp"  # Web UI on 8053 (Caddy uses 80)
     environment:
       TZ: ${TZ:-America/Asuncion}
-      WEBPASSWORD: ${PIHOLE_PASSWORD}
+      WEBPASSWORD: ${PIHOLE_PASSWORD:?PIHOLE_PASSWORD required in .env}
       FTLCONF_LOCAL_IPV4: ${VPS_IP}
       PIHOLE_DNS_: "1.1.1.1;9.9.9.9"
       DNSSEC: "true"

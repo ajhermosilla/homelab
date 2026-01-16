@@ -8,9 +8,11 @@ services:
   # https://www.samba.org/
   # =========================================================================
   samba:
-    image: dperson/samba:latest
+    image: dperson/samba:amd64
     container_name: samba
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "139:139"
       - "445:445"
@@ -38,9 +40,11 @@ services:
   # https://syncthing.net/
   # =========================================================================
   syncthing:
-    image: lscr.io/linuxserver/syncthing:latest
+    image: lscr.io/linuxserver/syncthing:1.27
     container_name: syncthing
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8384:8384"     # Web UI
       - "22000:22000/tcp"  # Transfer

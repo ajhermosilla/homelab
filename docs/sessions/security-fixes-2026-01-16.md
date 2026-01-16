@@ -6,10 +6,10 @@ Security audit findings and remediation plan.
 
 | Severity | Count | Status |
 |----------|-------|--------|
-| Critical | 2 | Pending |
-| High | 8 | Pending |
+| Critical | 2 | **2 Done** |
+| High | 8 | **8 Done** |
 | Medium | 12 | Pending |
-| **Total** | **22** | 0 done |
+| **Total** | **22** | 10 done |
 
 ---
 
@@ -17,8 +17,8 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-| 1 | Default password `changeme` fallback | `docker/mobile/rpi5/networking/pihole/docker-compose.yml` | [ ] |
-| 2 | Placeholder creds `USER:PASS` in frigate config | `docker/fixed/docker-vm/security/frigate.yml` | [ ] |
+| 1 | Default password `changeme` fallback | `docker/mobile/rpi5/networking/pihole/docker-compose.yml` | [x] |
+| 2 | Placeholder creds `USER:PASS` in frigate config | `docker/fixed/docker-vm/security/frigate.yml` | [x] |
 
 ---
 
@@ -26,14 +26,14 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-| 3 | `privileged: true` on Home Assistant | `docker/fixed/docker-vm/automation/docker-compose.yml` | [ ] |
-| 4 | `privileged: true` on Frigate | `docker/fixed/docker-vm/security/docker-compose.yml` | [ ] |
-| 5 | No `security_opt: no-new-privileges` | All docker-compose files (14 files) | [ ] |
-| 6 | No resource limits on media stack | `docker/fixed/docker-vm/media/docker-compose.yml` | [ ] |
-| 7 | No resource limits on changedetection | `docker/vps/scraping/docker-compose.yml` | [ ] |
-| 8 | Using `:latest` image tags | Multiple docker-compose files | [ ] |
-| 9 | qBittorrent default creds in comments | `docker/fixed/docker-vm/media/docker-compose.yml` | [ ] |
-| 10 | changedetection no auth enforcement | `docker/vps/scraping/docker-compose.yml` | [ ] |
+| 3 | `privileged: true` on Home Assistant | `docker/fixed/docker-vm/automation/docker-compose.yml` | [x] |
+| 4 | `privileged: true` on Frigate | `docker/fixed/docker-vm/security/docker-compose.yml` | [x] |
+| 5 | No `security_opt: no-new-privileges` | All docker-compose files (14 files) | [x] |
+| 6 | No resource limits on media stack | `docker/fixed/docker-vm/media/docker-compose.yml` | [x] |
+| 7 | No resource limits on changedetection | `docker/vps/scraping/docker-compose.yml` | [x] |
+| 8 | Using `:latest` image tags | Multiple docker-compose files | [x] |
+| 9 | qBittorrent default creds in comments | `docker/fixed/docker-vm/media/docker-compose.yml` | [x] |
+| 10 | changedetection no auth enforcement | `docker/vps/scraping/docker-compose.yml` | [x] |
 
 ---
 

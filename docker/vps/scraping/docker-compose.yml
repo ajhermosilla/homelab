@@ -7,6 +7,13 @@ services:
     image: ghcr.io/dgtlmoon/changedetection.io:latest
     container_name: changedetection
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
     ports:
       - "5000:5000"
     volumes:
@@ -27,6 +34,13 @@ services:
     image: dgtlmoon/sockpuppetbrowser:latest
     container_name: playwright
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
     environment:
       - SCREEN_WIDTH=1920
       - SCREEN_HEIGHT=1080
@@ -53,7 +67,9 @@ networks:
 # 2. Access web interface:
 #    http://vps-ip:5000 (or via Caddy at watch.cronova.dev)
 #
-# 3. Set password on first visit
+# 3. ⚠️  SECURITY: Set password IMMEDIATELY on first visit
+#    Settings → Security → Set Password
+#    This service has NO AUTH by default - password is REQUIRED
 #
 # 4. Configure ntfy notifications:
 #    Settings > Notifications > Add

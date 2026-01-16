@@ -4,9 +4,11 @@
 
 services:
   headscale:
-    image: headscale/headscale:latest
+    image: headscale/headscale:0.23.0
     container_name: headscale
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     command: serve
     ports:
       - "443:443"       # HTTPS (coordination)
@@ -26,6 +28,8 @@ services:
     image: alpine:latest
     container_name: headscale-backup
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     entrypoint: /bin/sh
     command:
       - -c

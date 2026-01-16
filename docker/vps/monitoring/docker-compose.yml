@@ -8,9 +8,11 @@ services:
   # https://github.com/louislam/uptime-kuma
   # =========================================================================
   uptime-kuma:
-    image: louislam/uptime-kuma:latest
+    image: louislam/uptime-kuma:1.23
     container_name: uptime-kuma
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "3001:3001"
     volumes:
@@ -25,9 +27,11 @@ services:
   # https://ntfy.sh/
   # =========================================================================
   ntfy:
-    image: binwiederhier/ntfy:latest
+    image: binwiederhier/ntfy:v2.8
     container_name: ntfy
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     command:
       - serve
     ports:

@@ -8,9 +8,11 @@ services:
   # https://github.com/restic/rest-server
   # =========================================================================
   restic-rest:
-    image: restic/rest-server:latest
+    image: restic/rest-server:0.12
     container_name: restic-rest
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8000:8000"
     volumes:
