@@ -1,5 +1,16 @@
 # Domain Research
 
+> **ARCHIVED**: This document is superseded by [`domain-strategy.md`](domain-strategy.md).
+>
+> **Final decision:** Use `cronova.dev` (already owned) + `verava.ai` (to purchase).
+> The domains below (nanduti.io, verava.net) were not purchased.
+
+---
+
+*Original research from 2026-01-14 preserved below for reference.*
+
+---
+
 Domain name options for homelab infrastructure and business. Researched 2026-01-14.
 
 ## Candidates
