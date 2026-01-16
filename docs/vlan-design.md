@@ -43,14 +43,18 @@ OPNsense VLAN configuration for network segmentation and IoT isolation.
 
 Trusted devices with full network access.
 
-| Device | IP | Notes |
-|--------|-----|-------|
-| OPNsense | .1 | Router/gateway |
-| Docker VM | .10 | Pi-hole, services |
-| RPi 4 (Start9) | .11 | Bitcoin node |
-| NAS | .12 | Storage, backups |
-| MacBook | DHCP | Admin workstation |
-| TP-Link AP | .20 | Management VLAN trunk |
+| Device | IP | Connection | Notes |
+|--------|-----|------------|-------|
+| OPNsense | .1 | MokerLink P1 | Router/gateway |
+| Docker VM | .10 | MokerLink P2 | Pi-hole, Jellyfin, etc |
+| RPi 4 (Start9) | .11 | MokerLink P3 | Bitcoin node |
+| NAS | .12 | MokerLink P4 | Storage, backups |
+| TP-Link AP | - | MokerLink P7 | VLAN trunk |
+| Yamaha RX-V671 | .30 | MokerLink P5 | AV Receiver (Ethernet) |
+| Apple TV | .31 | WiFi (HomeNet) | Jellyfin client |
+| LG Smart TV | .32 | WiFi (HomeNet) | Jellyfin client |
+| MacBook | DHCP | MokerLink P8 | Admin workstation |
+| Phones | DHCP | WiFi (HomeNet) | Family devices |
 
 ### VLAN 10 - IoT (192.168.10.0/24)
 
@@ -152,23 +156,29 @@ For each interface:
 
 Configure for VLAN trunking:
 
-| Port | Mode | VLAN | Connected Device |
-|------|------|------|------------------|
-| 1 | Trunk | 1,10,20 | OPNsense LAN |
-| 2 | Access | 1 | Docker VM |
-| 3 | Access | 1 | RPi 4 |
-| 4 | Access | 1 | NAS |
-| 5 | Trunk | 1,10,20 | TP-Link PoE Switch |
-| 6 | Trunk | 1,10,20 | TP-Link AP |
-| 7-8 | Access | 1 | Reserved |
+| Port | Mode | VLAN | Device | Speed |
+|------|------|------|--------|-------|
+| 1 | Trunk | 1,10,20 | Mini PC (OPNsense) | 2.5G |
+| 2 | Access | 1 | Docker VM | 2.5G |
+| 3 | Access | 1 | RPi 4 (Start9) | 1G |
+| 4 | Access | 1 | NAS | 2.5G |
+| 5 | Access | 1 | Yamaha RX-V671 | 1G |
+| 6 | Access | 10 | TP-Link PoE Switch | 1G |
+| 7 | Trunk | 1,10,20 | TP-Link AP | 1G |
+| 8 | Access | 1 | Reserved (MacBook) | 2.5G |
 
 ### TP-Link PoE Switch (TL-SG1005P)
 
-Simple unmanaged switch - all ports on same VLAN.
+**Unmanaged switch** - all ports share same VLAN (10, inherited from MokerLink P6).
 
-**Option A:** Connect to MokerLink port configured as VLAN 10 access (all cameras on IoT).
+| Port | Device | IP |
+|------|--------|-----|
+| 1 | Uplink to MokerLink P6 | - |
+| 2 | Reolink Cam 1 | 192.168.10.101 |
+| 3 | Reolink Cam 2 | 192.168.10.102 |
+| 4-5 | Reserved | - |
 
-**Option B:** Use managed PoE switch for per-port VLAN assignment.
+All cameras automatically on VLAN 10 (IoT) without per-port config.
 
 ---
 
