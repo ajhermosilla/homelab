@@ -8,8 +8,8 @@ Comprehensive codebase review findings and action plan.
 |----------|-------|--------|
 | Critical | 7 | **Complete** |
 | High | 5 | **Complete** |
-| Medium | 12 | **6 done** |
-| **Total** | **24** | 18 done |
+| Medium | 12 | **Complete** |
+| **Total** | **24** | **24 done** |
 
 ---
 
@@ -50,15 +50,15 @@ Complete before production use.
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
 | 13 | qBittorrent port conflict (8080 vs 6881) | `docs/services.md` | [x] |
-| 14 | NAS symlink creation not documented | `docs/fixed-homelab.md` | [ ] |
-| 15 | Uptime Kuma monitors not seeded | `docker/vps/monitoring/` | [ ] |
-| 16 | Backup verification script not deployed | `scripts/` | [ ] |
+| 14 | NAS symlink creation not documented | `docs/fixed-homelab.md` | [x] |
+| 15 | Uptime Kuma monitors not seeded | `docker/vps/monitoring/monitors.md` | [x] |
+| 16 | Backup verification script not deployed | `scripts/backup-verify.sh` | [x] |
 | 17 | Service matrix (what runs where) missing | `docs/services.md` | [x] |
-| 18 | Setup runbook for fresh deployment | `docs/setup-runbook.md` | [ ] |
+| 18 | Setup runbook for fresh deployment | `docs/setup-runbook.md` | [x] |
 | 19 | Proxmox setup guide missing | `docs/proxmox-setup.md` | [x] |
-| 20 | TLS/SSL strategy in compose vs docs | Multiple files | [ ] |
+| 20 | TLS/SSL strategy in compose vs docs | `Caddyfile` updated | [x] |
 | 21 | Tailscale IP allocation policy | `docs/hardware.md` | [x] |
-| 22 | Ansible playbooks referenced but empty | `ansible/` | [ ] |
+| 22 | Ansible playbooks referenced but empty | `ansible/` | [x] |
 | 23 | Top-level README needs navigation | `README.md` | [x] |
 | 24 | Docker directory README missing | `docker/README.md` | [x] |
 

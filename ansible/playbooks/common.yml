@@ -1,0 +1,105 @@
+# Common setup tasks for all hosts
+# Usage: ansible-playbook -i inventory.yml playbooks/common.yml
+
+---
+- name: Common setup for all hosts
+  hosts: all
+  become: true
+  vars:
+    common_packages:
+      - vim
+      - git
+      - htop
+      - curl
+      - wget
+      - jq
+      - ncdu
+
+  tasks:
+    # =========================================================================
+    # System Updates
+    # =========================================================================
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: safe
+      when: ansible_os_family == "Debian"
+      tags: upgrade
+
+    # =========================================================================
+    # Common Packages
+    # =========================================================================
+    - name: Install common packages
+      apt:
+        name: "{{ common_packages }}"
+        state: present
+      when: ansible_os_family == "Debian"
+
+    # =========================================================================
+    # Timezone
+    # =========================================================================
+    - name: Set timezone
+      timezone:
+        name: "{{ timezone }}"
+      when: timezone is defined
+
+    # =========================================================================
+    # SSH Hardening
+    # =========================================================================
+    - name: Disable password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+      notify: Restart SSH
+      tags: ssh
+
+    - name: Disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+      notify: Restart SSH
+      tags: ssh
+
+    # =========================================================================
+    # Firewall (UFW)
+    # =========================================================================
+    - name: Install UFW
+      apt:
+        name: ufw
+        state: present
+      when: ansible_os_family == "Debian"
+      tags: firewall
+
+    - name: Allow SSH
+      ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+      tags: firewall
+
+    - name: Allow Tailscale
+      ufw:
+        rule: allow
+        interface: tailscale0
+        direction: in
+      tags: firewall
+      ignore_errors: true  # May fail if Tailscale not installed
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: deny
+      tags: firewall
+
+  handlers:
+    - name: Restart SSH
+      service:
+        name: sshd
+        state: restarted

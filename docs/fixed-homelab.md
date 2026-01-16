@@ -339,7 +339,7 @@ No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instea
 
 ```
 /mnt/
-├── ssd/                # Crucial MX500 1TB
+├── ssd/                # Lexar NQ110 240GB (boot)
 │   ├── docker/         # Docker data
 │   └── configs/        # Service configs
 ├── purple/             # WD Purple 2TB (dedicated)
@@ -351,6 +351,49 @@ No mergerfs/snapraid initially - using dedicated drives with 3-2-1 backup instea
 │   └── photos/         # Photo archive
 └── external/           # Sabrent dock mount point
     └── backup/         # Local backup target (3TB)
+```
+
+### Symlink Setup
+
+Create convenience symlinks for common paths:
+
+```bash
+# Create symlinks in home directory
+ln -s /mnt/data/media ~/media
+ln -s /mnt/data/photos ~/photos
+ln -s /mnt/data/family ~/family
+ln -s /mnt/data/backups ~/backups
+
+# Docker data symlink (if using default Docker location)
+sudo ln -s /mnt/ssd/docker /var/lib/docker
+
+# Verify symlinks
+ls -la ~/ | grep "^l"
+```
+
+**fstab entries** (add to `/etc/fstab`):
+
+```
+# SSD - Boot drive (already mounted as /)
+# Purple - Frigate dedicated
+UUID=<purple-uuid>  /mnt/purple  ext4  defaults,noatime  0  2
+
+# Red Plus - Main data
+UUID=<data-uuid>    /mnt/data    ext4  defaults,noatime  0  2
+
+# External backup (mount on demand)
+UUID=<ext-uuid>     /mnt/external  ext4  noauto,user  0  0
+```
+
+**Get UUIDs:**
+```bash
+sudo blkid
+```
+
+**Create mount points:**
+```bash
+sudo mkdir -p /mnt/{purple,data,external}
+sudo chown $USER:$USER /mnt/{purple,data,external}
 ```
 
 ### NFS Export for Frigate
