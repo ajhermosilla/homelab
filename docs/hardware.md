@@ -395,6 +395,8 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | Card Reader | UGREEN SD/MicroSD | USB-C/USB 3.0, for RPi SD cards |
 | USB-C Cables | UGREEN 100W 6.6ft (2-pack) | Device charging/data |
 | HDD Dock | Sabrent EC-DFLT | USB 3.0 SATA dock for backup drives |
+| YubiKey | 5C NFC | 2FA hardware key (USB-C + NFC) |
+| E-Reader | Kindle Paperwhite (2018) | Waterproof, 8GB, ad-supported |
 
 ---
 
@@ -408,10 +410,12 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | Mini PC (N150) | ? | Owned |
 | RPi 4 4GB | ? | Owned |
 | NAS components | 2013 | Owned |
+| Kindle Paperwhite (2018) | 2020 | Owned |
+| YubiKey 5C NFC | 2021 | Owned |
 | WD Red Plus 8TB | 2021 | Owned |
-| WD Purple 2TB | 2026 | Owned |
 | Sabrent HDD Dock | 2021 | Owned |
 | TP-Link AX3000 AP | 2021 | Owned |
+| WD Purple 2TB | 2026 | Owned |
 | MokerLink 2.5G Switch | 2026 | Owned |
 | TP-Link PoE Switch | 2026 | Owned |
 | Forza UPS 1000VA | 2026 | Owned |
