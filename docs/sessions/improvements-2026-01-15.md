@@ -76,10 +76,11 @@ Comprehensive codebase review after completing hardware documentation.
     - Test result documentation
   - **DONE**: Created docs/backup-test-procedure.md
 
-- [ ] **10. Document certificate strategy**
+- [x] **10. Document certificate strategy**
   - File: `docs/caddy-config.md:402-421`
   - Issue: Two options listed, no decision made
   - Decision needed: Tailscale HTTPS vs Internal CA
+  - **DONE**: Created docs/certificate-strategy.md (chose Tailscale HTTPS)
 
 ## Low Priority
 
@@ -106,7 +107,7 @@ Comprehensive codebase review after completing hardware documentation.
 | 7 | Monitoring strategy | Done | (pending) |
 | 8 | VLAN documentation | Done | (pending) |
 | 9 | Backup test procedure | Done | (pending) |
-| 10 | Certificate strategy | Pending | |
+| 10 | Certificate strategy | Done | (pending) |
 | 11 | Archive domain-research.md | Pending | |
 | 12 | NAS PSU model | Pending | |
 
