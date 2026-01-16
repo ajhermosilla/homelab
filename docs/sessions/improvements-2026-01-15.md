@@ -84,10 +84,11 @@ Comprehensive codebase review after completing hardware documentation.
 
 ## Low Priority
 
-- [ ] **11. Archive or update domain-research.md**
+- [x] **11. Archive or update domain-research.md**
   - File: `docs/domain-research.md`
   - Issue: References superseded domains (nanduti.io, verava.net)
   - Action: Add notice that it's superseded by domain-strategy.md
+  - **DONE**: Added archive notice at top of file
 
 - [ ] **12. Document NAS PSU model**
   - File: `docs/hardware.md:145`
@@ -108,7 +109,7 @@ Comprehensive codebase review after completing hardware documentation.
 | 8 | VLAN documentation | Done | (pending) |
 | 9 | Backup test procedure | Done | (pending) |
 | 10 | Certificate strategy | Done | (pending) |
-| 11 | Archive domain-research.md | Pending | |
+| 11 | Archive domain-research.md | Done | (pending) |
 | 12 | NAS PSU model | Pending | |
 
 ## Session Notes
