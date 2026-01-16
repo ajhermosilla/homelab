@@ -6,8 +6,8 @@
 
 | Service | Category | Environment | Host | Status |
 |---------|----------|-------------|------|--------|
-| Headscale | Networking | Mobile | RPi 5 | Planned |
 | Pi-hole | Networking | Mobile | RPi 5 | Planned |
+| Headscale | Networking | VPS | Vultr | Planned |
 | soft-serve | Git | Mobile | MacBook | Active |
 | Pi-hole | Networking | Fixed | Docker VM | Planned |
 | Caddy | Networking | Fixed | Docker VM | Planned |
@@ -35,12 +35,13 @@
 
 ## By Environment
 
-### Mobile Kit
+### Mobile Kit (On-Demand)
+
+*Operates 7AM-7PM or when traveling. Not 24/7.*
 
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
-| **Headscale** | 443, 3478 | Tailscale coordination server |
-| **Pi-hole** | 53, 80 | DNS ad-blocking |
+| **Pi-hole** | 53, 80 | DNS ad-blocking (mobile) |
 | **soft-serve** | 23231-23233 | Git server (on MacBook) |
 
 ### Fixed Homelab - Docker VM
@@ -78,10 +79,11 @@
 | **Restic REST** | 8000 | Backup target |
 | **NFS** | 2049 | Exports Purple 2TB for Frigate |
 
-### VPS (Vultr)
+### VPS (Vultr) - 24/7
 
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
+| **Headscale** | 443, 3478 | Tailscale coordination (PRIMARY) |
 | **DERP Relay** | 443, 3478 | Tailscale NAT traversal |
 | **Pi-hole** | 53, 8053 | DNS (US-based fallback) |
 | **Uptime Kuma** | 3001 | External monitoring |
@@ -110,11 +112,11 @@
 |------|---------|-------------|
 | 53 | Pi-hole DNS | All |
 | 80 | Pi-hole Web / ntfy | All |
-| 443 | Caddy / Headscale | Fixed / Mobile |
+| 443 | Caddy / Headscale | Fixed / VPS |
 | 445 | Samba | NAS |
 | 1883 | Mosquitto MQTT | Fixed |
 | 3001 | Uptime Kuma | VPS |
-| 3478 | STUN (Headscale/DERP) | Mobile / VPS |
+| 3478 | STUN (Headscale/DERP) | VPS |
 | 5000 | Frigate / changedetection | Fixed / VPS |
 | 5353 | Unbound (OPNsense) | Fixed |
 | 7878 | Radarr | Fixed |
