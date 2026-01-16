@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     ports:
       - "8000:8000"
     volumes:
@@ -40,8 +42,8 @@ networks:
 #    docker compose up -d
 #
 # 3. Initialize repository from client:
-#    export RESTIC_REPOSITORY="rest:http://augusto:password@vps-ip:8000/homelab"
-#    export RESTIC_PASSWORD="your-encryption-password"
+#    export RESTIC_REPOSITORY="rest:http://augusto:$HTPASSWD_PASSWORD@vps-ip:8000/homelab"
+#    export RESTIC_PASSWORD_FILE=/root/.restic-password
 #    restic init
 #
 # 4. Test backup:

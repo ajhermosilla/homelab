@@ -25,8 +25,9 @@ services:
       TZ: ${TZ:-America/Asuncion}
       USERID: ${PUID:-1000}
       GROUPID: ${PGID:-1000}
+    # NOTE: Password visible in docker inspect. Use strong password from .env
     command: >
-      -u "${SAMBA_USER:-augusto};${SAMBA_PASSWORD}"
+      -u "${SAMBA_USER:-augusto};${SAMBA_PASSWORD:?SAMBA_PASSWORD required in .env}"
       -s "media;/media;yes;no;no;augusto"
       -s "data;/data;yes;no;no;augusto"
       -s "downloads;/downloads;yes;no;no;augusto"
