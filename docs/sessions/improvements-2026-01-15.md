@@ -90,10 +90,11 @@ Comprehensive codebase review after completing hardware documentation.
   - Action: Add notice that it's superseded by domain-strategy.md
   - **DONE**: Added archive notice at top of file
 
-- [ ] **12. Document NAS PSU model**
+- [x] **12. Document NAS PSU model**
   - File: `docs/hardware.md:145`
   - Issue: Still TBD
   - Action: Verify and document actual PSU model
+  - **DONE**: picoPSU-160-XT + 220W brick (192W DC-DC, 2013)
 
 ## Progress Tracking
 
@@ -110,7 +111,7 @@ Comprehensive codebase review after completing hardware documentation.
 | 9 | Backup test procedure | Done | (pending) |
 | 10 | Certificate strategy | Done | (pending) |
 | 11 | Archive domain-research.md | Done | (pending) |
-| 12 | NAS PSU model | Pending | |
+| 12 | NAS PSU model | Done | (pending) |
 
 ## Session Notes
 
