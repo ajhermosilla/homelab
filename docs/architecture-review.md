@@ -53,9 +53,9 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Environment | Hardware | Role | Key Services |
 |-------------|----------|------|--------------|
-| **Mobile Kit** | RPi 5, MacBook, Beryl AX | Sovereign, portable | Headscale, Pi-hole, soft-serve |
-| **Fixed Homelab** | Mini PC, RPi 4, NAS | Always-on, home | Media, Bitcoin, storage, automation |
-| **VPS** | Vultr US ($6/mo) | Helper only | DERP, monitoring, scraping |
+| **Mobile Kit** | RPi 5, MacBook, Beryl AX | On-demand, portable | Pi-hole, soft-serve |
+| **Fixed Homelab** | Mini PC, RPi 4, NAS | Always-on (24/7) | Media, Bitcoin, storage, automation |
+| **VPS** | Vultr US ($6/mo) | Always-on (24/7) | Headscale, DERP, monitoring |
 
 ---
 
@@ -67,15 +67,15 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 |----------|-------------|
 | **Three-tier redundancy** | Mobile, Fixed, VPS operate independently |
 | **Privacy-first model** | Data stays home, VPS is helper-only |
-| **Mesh sovereignty** | Headscale on RPi 5, not vendor lock-in |
+| **Mesh sovereignty** | Headscale self-hosted on VPS, not vendor lock-in |
 | **Service diversity** | Good balance: media, automation, bitcoin, storage |
 | **Hardware selection** | Appropriate specs for each role |
 | **Documentation** | Comprehensive diagrams and references |
 
 ### Key Design Wins
 
-1. **Headscale on RPi 5** - Carry your mesh in your backpack
-2. **VPS as helper** - If VPS dies, mesh keeps working
+1. **Headscale on VPS** - 24/7 mesh coordination, mobile kit can be off
+2. **Mobile kit on-demand** - Saves energy/heat, mesh still works when off
 3. **Pi-hole everywhere** - Consistent DNS/ad-blocking across environments
 4. **Start9 for Bitcoin** - Maximum sovereignty, privacy-first
 5. **Syncthing over Nextcloud** - Peer-to-peer, no central server
@@ -156,7 +156,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 ```
 cronova.dev
-├── hs.cronova.dev        → Headscale (RPi 5)
+├── hs.cronova.dev        → Headscale (VPS)
 ├── dns.cronova.dev       → Pi-hole (all environments)
 ├── git.cronova.dev       → soft-serve (MacBook)
 ├── home.cronova.dev      → Home Assistant (Docker VM)

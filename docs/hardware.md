@@ -3,11 +3,11 @@
 ## Overview
 
 ```
-[Mobile Kit]                    [Fixed Homelab]                 [VPS]
-├── RPi 5 (Headscale)          ├── Mini PC (Proxmox)           └── Vultr US
-├── MacBook Air M1             ├── RPi 4 (Start9)                  ~$6/mo
-├── Beryl AX Router            ├── NAS (DIY Mini-ITX)
-└── Samsung A13                ├── MokerLink 2.5G Switch
+[Mobile Kit - On Demand]        [Fixed Homelab - 24/7]          [VPS - 24/7]
+├── RPi 5 (Pi-hole)            ├── Mini PC (Proxmox)           ├── Headscale
+├── MacBook Air M1             ├── RPi 4 (Start9)              ├── DERP Relay
+├── Beryl AX Router            ├── NAS (DIY Mini-ITX)          ├── Uptime Kuma
+└── Samsung A13                ├── MokerLink 2.5G Switch       └── ~$6/mo
                                ├── TP-Link PoE Switch
                                ├── TP-Link AX3000 AP
                                ├── 3x IP Cameras
@@ -16,13 +16,13 @@
 
 ---
 
-## Mobile Homelab
+## Mobile Homelab (On-Demand)
 
-Portable, self-contained infrastructure. Carry your mesh in your backpack.
+Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | **Headscale (PRIMARY)** + Pi-hole | PSU in transit |
+| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | Pi-hole (mobile DNS) | PSU in transit |
 | MacBook Air M1 | 16GB RAM, 1TB SSD, macOS Sonoma | Workstation, soft-serve, Docker dev | Active |
 | Beryl AX | GL-MT3000 | Network gateway, DHCP, VPN | Active |
 | Samsung A13 | Android | USB tethering for internet | Active |
@@ -31,7 +31,7 @@ Portable, self-contained infrastructure. Carry your mesh in your backpack.
 
 | Component | Model | Notes |
 |-----------|-------|-------|
-| Board | Raspberry Pi 5 8GB | Primary coordination server |
+| Board | Raspberry Pi 5 8GB | Mobile DNS server |
 | Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
 | PSU | Official 27W USB-C | In transit (Miami → Asunción) |
@@ -61,8 +61,10 @@ Portable, self-contained infrastructure. Carry your mesh in your backpack.
 
 | Device | Services |
 |--------|----------|
-| RPi 5 | Headscale, Pi-hole |
+| RPi 5 | Pi-hole (mobile DNS) |
 | MacBook | soft-serve, Docker workloads |
+
+*Note: Headscale moved to VPS for 24/7 availability.*
 
 ---
 

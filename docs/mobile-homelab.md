@@ -1,16 +1,30 @@
 # Mobile Homelab Architecture
 
-Self-contained portable infrastructure for dev, self-hosting, and demos.
+Portable infrastructure for dev, self-hosting, and travel.
 
-**Key principle:** The mobile kit is fully sovereign. Headscale runs here, not on VPS. Your mesh network travels with you.
+**Key principle:** Mobile kit operates on-demand (7AM-7PM or travel). Headscale runs on VPS for 24/7 mesh availability. Mobile kit can be off without breaking the mesh.
+
+## Operating Model
+
+| Mode | Schedule | Notes |
+|------|----------|-------|
+| On-demand | 7AM-7PM | Daily use |
+| Travel | As needed | Full kit portable |
+| Off | Night/hot days | Saves energy, reduces heat |
+
+**Why on-demand?**
+- Paraguay heat: reduce active equipment
+- Energy savings: RPi 5 + Beryl AX off when not needed
+- Fire safety: fewer devices running 24/7
+- Mesh still works: Headscale on VPS handles coordination
 
 ## Hardware
 
 | Device | Role | Power |
 |--------|------|-------|
-| Raspberry Pi 5 (8GB) | Core server - Headscale, DNS, containers | USB-C PSU |
+| Raspberry Pi 5 (8GB) | Pi-hole DNS (mobile) | USB-C PSU |
 | MacBook Air M1 | Workstation, Docker dev, soft-serve | Battery |
-| Beryl AX (GL-MT3000) | Network gateway, DHCP, VPN endpoint | USB-C |
+| Beryl AX (GL-MT3000) | Network gateway, DHCP | USB-C |
 | Samsung A13 | Internet via USB tethering | Battery |
 
 ## Network Topology
@@ -31,24 +45,21 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
           \         /
         [Tailscale Mesh]
           100.x.x.x
+              |
+         [VPS - Headscale]
+          100.64.0.100
 ```
 
 ## Services
 
-### Raspberry Pi 5 (Always-On Core)
+### Raspberry Pi 5 (On-Demand)
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Headscale | 443, 3478 | **Primary** Tailscale coordination server |
-| Pi-hole | 53, 80 | DNS sinkhole + ad blocking |
-| Tailscale | - | Exit node (optional) |
-| Future containers | - | TBD |
+| Pi-hole | 53, 80 | DNS ad-blocking (mobile) |
+| Tailscale | - | Mesh client |
 
-**Why Headscale lives here:**
-- Mobile kit is self-contained (works offline/air-gapped)
-- You carry your coordination server in your backpack
-- No dependency on VPS or external services
-- True digital nomad infrastructure
+*Headscale moved to VPS for 24/7 availability.*
 
 ### MacBook Air M1 (Workstation)
 
@@ -71,13 +82,14 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 
 | Device | Tailscale IP | Hostname |
 |--------|--------------|----------|
+| VPS | 100.64.0.100 | vps |
 | RPi 5 | 100.64.0.1 | rpi5 |
 | MacBook Air | 100.64.0.2 | macbook |
 | Mini PC (home) | 100.64.0.10 | minipc |
 | RPi 4 (home) | 100.64.0.11 | rpi4 |
 | NAS (home) | 100.64.0.12 | nas |
 
-*IPs are examples - Headscale assigns them.*
+*Headscale on VPS assigns and coordinates all IPs.*
 
 ## Scenarios
 
@@ -88,39 +100,43 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
                                            ↓
                                     [Tailscale Mesh]
                                            ↓
-                                  [Home devices online?]
-                                     If yes: connected
-                                     If no: don't care
+                                    [VPS - Headscale]
+                                           ↓
+                                  [Home devices: connected]
 ```
 
-- Mobile kit is self-contained
-- MacBook ↔ RPi 5 always works (local + Tailscale)
-- Home devices connect when available
+- Mobile kit provides local DNS (Pi-hole)
+- MacBook ↔ RPi 5 works locally
+- Tailscale mesh connects to home via VPS
 
 ### At Home
 
 ```
-[Home Router] → [Beryl AX in bridge/AP mode] → [RPi 5 + MacBook]
+[Home Router] → [Beryl AX optional] → [RPi 5 + MacBook]
                          ↓
                  [All devices on Tailscale]
+                         ↓
+                   [VPS coordinates]
 ```
 
-- Everything on same mesh
-- RPi 5 still coordinates
-- Can access home services from MacBook
+- RPi 5 optional at home (Fixed homelab Pi-hole available)
+- MacBook connects directly to home network or via Tailscale
 
-### Offline / Air-Gapped
+### Mobile Kit Off
 
 ```
-[Beryl AX as AP] → [RPi 5 + MacBook]
-      (no internet)
+[MacBook only on home WiFi]
+         ↓
+   [Tailscale Mesh]
+         ↓
+  [VPS - Headscale] ← Still running 24/7
+         ↓
+  [Home devices: connected]
 ```
 
-- Local network still works
-- Pi-hole DNS resolves local names
-- Tailscale mesh works for cached keys
-- Headscale coordination works locally
-- Demos work without internet
+- RPi 5 and Beryl AX powered off
+- Mesh still works (VPS handles coordination)
+- MacBook connects via home network + Tailscale
 
 ## Deployment Order
 
@@ -128,55 +144,66 @@ Self-contained portable infrastructure for dev, self-hosting, and demos.
 |-------|------|--------|
 | 1 | Wait for RPi 5 PSU | In transit |
 | 2 | Flash RPi OS, install Docker | Pending |
-| 3 | Deploy Headscale on RPi 5 | Pending |
-| 4 | Deploy Pi-hole on RPi 5 | Pending |
-| 5 | Configure Beryl AX DHCP reservations | Pending |
-| 6 | Join MacBook to Headscale | Pending |
-| 7 | Join home devices to Headscale | Pending |
-| 8 | Test all scenarios | Pending |
+| 3 | Deploy Pi-hole on RPi 5 | Pending |
+| 4 | Configure Beryl AX DHCP reservations | Pending |
+| 5 | Join RPi 5 to Headscale (VPS) | Pending |
+| 6 | Test on-demand operation | Pending |
 
 ## Docker Structure (RPi 5)
 
 ```
-docker/
-├── networking/
-│   ├── headscale/
-│   │   ├── docker-compose.yml
-│   │   └── config/
-│   └── pihole/
-│       └── docker-compose.yml
+docker/mobile/rpi5/
+└── networking/
+    └── pihole/
+        └── docker-compose.yml
 ```
+
+*Headscale docker-compose is now in `docker/vps/networking/headscale/`*
 
 ## Backup Strategy
 
 | Source | Destination | Method | Frequency |
 |--------|-------------|--------|-----------|
-| Headscale DB | NAS (home) | Restic over Tailscale | Daily |
-| Headscale config | Git repo | age-encrypted | On change |
 | Pi-hole config | Git repo | Teleporter export | On change |
 
-**Critical:** Headscale DB contains all mesh coordination data. Losing it means re-registering all devices.
+*Headscale backup handled by VPS (see `docker/vps/networking/headscale/backup.sh`).*
 
 ## Security Considerations
 
-- Headscale API key stored in `.env` (gitignored)
 - Pi-hole web password in `.env` (set via `pihole -a -p`)
 - Beryl AX admin password: change from default
 - Enable Beryl AX firewall, disable WAN access to admin
-- Consider age + SOPS for encrypted secrets in git
+
+## Power Management
+
+### Daily Operation (7AM-7PM)
+
+```bash
+# Morning: Power on
+# - Plug in RPi 5
+# - Power on Beryl AX
+# - Wait ~2 minutes for boot
+
+# Evening: Power off
+# - Safe to unplug (Pi-hole is stateless)
+# - Mesh continues via VPS
+```
+
+### Hot Days
+
+On extremely hot days, keep mobile kit off entirely:
+- MacBook uses home WiFi + Tailscale
+- Mesh works via VPS
+- No impact on homelab operation
 
 ## Future Enhancements
 
-- [ ] Tailscale exit node on RPi 5 (route all traffic through it)
+- [ ] Tailscale exit node on RPi 5
 - [ ] Syncthing between MacBook and RPi 5
 - [ ] Ansible playbooks for declarative deployment
-- [ ] age + SOPS for encrypted secrets in git
 
 ## References
 
-- [Headscale Docs](https://headscale.net/)
 - [Pi-hole](https://pi-hole.net/)
 - [GL-MT3000 Docs](https://docs.gl-inet.com/router/en/4/user_guide/gl-mt3000/)
-- [Restic](https://restic.net/)
-- [age encryption](https://age-encryption.org/)
-- [SOPS](https://github.com/getsops/sops)
+- [Headscale Docs](https://headscale.net/) (now on VPS)

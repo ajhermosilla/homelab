@@ -1,0 +1,201 @@
+# Headscale - Self-hosted Tailscale coordination server
+# VPS - Vultr (24/7 operation)
+# https://headscale.net/
+
+services:
+  headscale:
+    image: headscale/headscale:latest
+    container_name: headscale
+    restart: unless-stopped
+    command: serve
+    ports:
+      - "443:443"       # HTTPS (coordination)
+      - "3478:3478/udp" # STUN
+    volumes:
+      - ./config:/etc/headscale
+      - headscale-data:/var/lib/headscale
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - headscale-net
+
+  # Hourly backup sidecar
+  headscale-backup:
+    image: alpine:latest
+    container_name: headscale-backup
+    restart: unless-stopped
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache sqlite
+        echo "0 * * * * /backup.sh" | crontab -
+        crond -f -l 2
+    volumes:
+      - ./config:/etc/headscale:ro
+      - headscale-data:/var/lib/headscale:ro
+      - ${BACKUP_PATH:-./backups}:/backups
+      - ./backup.sh:/backup.sh:ro
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+      - BACKUP_RETENTION_HOURS=${BACKUP_RETENTION_HOURS:-720}
+    networks:
+      - headscale-net
+    depends_on:
+      - headscale
+
+volumes:
+  headscale-data:
+    name: headscale-data
+
+networks:
+  headscale-net:
+    name: headscale-net
+
+# =============================================================================
+# VPS HEADSCALE - 24/7 OPERATION
+# =============================================================================
+#
+# This is the PRIMARY Headscale instance for the entire homelab mesh.
+# It runs on VPS for 24/7 availability, allowing mobile kit to be powered
+# off without breaking mesh connectivity.
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create config directory and copy template:
+#    mkdir -p config
+#    cp config.yaml.example config/config.yaml
+#
+# 2. Generate private key:
+#    docker run --rm headscale/headscale:latest headscale generate private-key > config/private.key
+#
+# 3. Edit config/config.yaml:
+#    server_url: https://hs.cronova.dev
+#    listen_addr: 0.0.0.0:443
+#    metrics_listen_addr: 127.0.0.1:9090
+#    private_key_path: /etc/headscale/private.key
+#    noise:
+#      private_key_path: /var/lib/headscale/noise_private.key
+#    ip_prefixes:
+#      - 100.64.0.0/10
+#    dns_config:
+#      magic_dns: true
+#      base_domain: cronova.dev
+#      nameservers:
+#        - 1.1.1.1
+#        - 9.9.9.9
+#
+# 4. Create .env file:
+#    TZ=America/Asuncion
+#    BACKUP_PATH=./backups
+#    BACKUP_RETENTION_HOURS=720
+#
+# 5. Copy backup script:
+#    cp backup.sh.example backup.sh
+#    chmod +x backup.sh
+#
+# 6. Start the service:
+#    docker compose up -d
+#
+# 7. Create a user:
+#    docker exec headscale headscale users create augusto
+#
+# 8. Generate auth key for devices:
+#    docker exec headscale headscale preauthkeys create --user augusto --reusable --expiration 720h
+#
+# 9. Connect devices:
+#    tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
+#
+# =============================================================================
+# DNS SETUP (CLOUDFLARE)
+# =============================================================================
+#
+# Add DNS record:
+#   Type: A
+#   Name: hs
+#   Content: <VPS-IP>
+#   Proxy: OFF (grey cloud - direct connection needed)
+#
+# =============================================================================
+# CADDY INTEGRATION (OPTIONAL)
+# =============================================================================
+#
+# If using Caddy for reverse proxy on port 443, change Headscale port:
+#   ports:
+#     - "8080:8080"
+#
+# And update config.yaml:
+#   listen_addr: 0.0.0.0:8080
+#
+# Then add to Caddyfile:
+#   hs.cronova.dev {
+#       reverse_proxy localhost:8080
+#   }
+#
+# =============================================================================
+# BACKUP STRATEGY
+# =============================================================================
+#
+# Hourly backups via sidecar container.
+#
+# For offsite backup to NAS (via Tailscale):
+#   1. Mount NAS via sshfs or similar
+#   2. Set BACKUP_PATH=/mnt/nas/backups/headscale
+#
+# Or use restic to push to NAS:
+#   restic -r rest:http://100.64.0.12:8000/headscale backup /backups
+#
+# =============================================================================
+# USEFUL COMMANDS
+# =============================================================================
+#
+# List nodes:
+#   docker exec headscale headscale nodes list
+#
+# List users:
+#   docker exec headscale headscale users list
+#
+# Generate auth key (30 days):
+#   docker exec headscale headscale preauthkeys create --user augusto --reusable --expiration 720h
+#
+# View routes:
+#   docker exec headscale headscale routes list
+#
+# Enable route (for exit node):
+#   docker exec headscale headscale routes enable -r <route-id>
+#
+# View logs:
+#   docker logs -f headscale
+#
+# Manual backup:
+#   docker exec headscale-backup /backup.sh
+#
+# =============================================================================
+# MONITORING
+# =============================================================================
+#
+# Add to Uptime Kuma:
+#   - HTTPS check: https://hs.cronova.dev/health
+#   - TCP check: <VPS-IP>:3478 (STUN)
+#
+# Prometheus metrics (if enabled):
+#   http://localhost:9090/metrics
+#
+# =============================================================================
+# DEVICE REGISTRATION
+# =============================================================================
+#
+# Mobile Kit (RPi 5):
+#   tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
+#
+# MacBook:
+#   tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
+#
+# Fixed Homelab (Mini PC, NAS, RPi 4):
+#   tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
+#
+# =============================================================================

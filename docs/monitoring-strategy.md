@@ -6,11 +6,11 @@ Uptime Kuma + ntfy for homelab monitoring and alerting.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     VPS (Vultr)                              │
-│  ┌─────────────┐    ┌─────────┐                             │
-│  │ Uptime Kuma │───▶│  ntfy   │───▶ Phone/Desktop           │
-│  │ :3001       │    │ :80     │     Notifications           │
-│  └──────┬──────┘    └─────────┘                             │
+│                     VPS (Vultr) - 24/7                       │
+│  ┌─────────────┐    ┌─────────┐    ┌───────────┐           │
+│  │ Uptime Kuma │───▶│  ntfy   │    │ Headscale │           │
+│  │ :3001       │    │ :80     │    │ :443      │           │
+│  └──────┬──────┘    └─────────┘    └───────────┘           │
 │         │                                                    │
 │         │ Monitor                                            │
 └─────────┼───────────────────────────────────────────────────┘
@@ -22,8 +22,9 @@ Uptime Kuma + ntfy for homelab monitoring and alerting.
     ▼                                               ▼
 ┌───────────────┐                          ┌───────────────┐
 │  Mobile Kit   │                          │ Fixed Homelab │
+│  (On-Demand)  │                          │ (24/7)        │
 │  RPi 5        │                          │ Mini PC, NAS  │
-│  Headscale    │                          │ RPi 4         │
+│  Pi-hole      │                          │ RPi 4         │
 └───────────────┘                          └───────────────┘
 ```
 
@@ -37,9 +38,8 @@ Must be online 24/7. Alert immediately on failure.
 
 | Service | Type | Target | Expected |
 |---------|------|--------|----------|
-| Headscale | HTTPS | `https://hs.cronova.dev/health` | 200 OK |
+| Headscale (VPS) | HTTPS | `https://hs.cronova.dev/health` | 200 OK |
 | Vaultwarden | HTTPS | `https://vault.cronova.dev/alive` | 200 OK |
-| Pi-hole (RPi 5) | TCP | `100.64.0.1:53` | Open |
 | Pi-hole (Fixed) | TCP | `100.64.0.10:53` | Open |
 | NUT Server | TCP | `100.64.0.12:3493` | Open |
 
@@ -67,6 +67,20 @@ Running on VPS. Alert after 2 failures.
 | Pi-hole (VPS) | TCP | `localhost:53` | Open |
 | changedetection | HTTP | `http://localhost:5000` | 200 OK |
 | Restic REST (VPS) | TCP | `localhost:8000` | Open |
+
+### Mobile Kit - On-Demand (15m interval)
+
+**These services are NOT 24/7.** Expected to be offline nights and hot days.
+Alert level: **info** (not critical). Just for awareness.
+
+| Service | Type | Target | Expected |
+|---------|------|--------|----------|
+| Pi-hole (RPi 5) | TCP | `100.64.0.1:53` | Open when on |
+
+**Configure in Uptime Kuma:**
+- Notification: `cronova-info` topic (not critical)
+- Retries: 5 (allow time for expected downtime)
+- Description: "On-demand - expected offline nights/hot days"
 
 ### External Checks (15m interval)
 
