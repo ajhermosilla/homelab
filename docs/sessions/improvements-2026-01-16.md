@@ -7,9 +7,9 @@ Comprehensive codebase review findings and action plan.
 | Priority | Count | Status |
 |----------|-------|--------|
 | Critical | 7 | **Complete** |
-| High | 5 | Pending |
+| High | 5 | **Complete** |
 | Medium | 12 | Pending |
-| **Total** | **24** | 7 done |
+| **Total** | **24** | 12 done |
 
 ---
 
@@ -35,11 +35,11 @@ Complete before testing services.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-| 8 | Missing `.env.example` files | All docker directories (16 missing) | [ ] |
-| 9 | Docker network isolation undefined | Services can't communicate across compose files | [ ] |
-| 10 | Headscale `config/config.yaml` template | `docker/vps/networking/headscale/` | [ ] |
-| 11 | NFS mount procedure not documented | Docker VM → NAS for Frigate | [ ] |
-| 12 | OPNsense setup guide missing | `docs/opnsense-setup.md` | [ ] |
+| 8 | Missing `.env.example` files | All docker directories | [x] |
+| 9 | Docker network isolation undefined | `docker/README.md` | [x] |
+| 10 | Headscale `config/config.yaml` template | `docker/vps/networking/headscale/config/` | [x] |
+| 11 | NFS mount procedure not documented | `docs/nfs-setup.md` | [x] |
+| 12 | OPNsense setup guide missing | `docs/opnsense-setup.md` | [x] |
 
 ---
 
@@ -75,25 +75,29 @@ Complete before production use.
 5. ~~Deprecate mobile Headscale (moved to VPS)~~
 6. ~~Resolve port 80 conflict (Pi-hole → 8053)~~
 
-### Phase 2: Environment Templates (Next Session)
+### Phase 2: Environment Templates (Complete)
 
-1. Create `.env.example` for all 16 docker directories
-2. Document Docker network strategy
-3. Create Headscale config.yaml template
+1. ~~Create `.env.example` for all docker directories~~ (14 files)
+2. ~~Document Docker network strategy~~ (`docker/README.md`)
+3. ~~Create Headscale config.yaml template~~ (`config/config.yaml.example`)
+4. ~~Create NFS setup guide~~ (`docs/nfs-setup.md`)
+5. ~~Create OPNsense setup guide~~ (`docs/opnsense-setup.md`)
 
-### Phase 3: Setup Guides (Future)
+### Phase 3: Remaining Medium Priority (Future)
 
-1. OPNsense setup guide
-2. Proxmox setup guide
-3. NFS mount procedure
-4. Setup runbook
+1. Proxmox setup guide
+2. Setup runbook (full deployment)
+3. qBittorrent port conflict resolution
+4. Service matrix documentation
+5. Uptime Kuma monitor seeding
+6. Backup verification scripts
 
 ### Phase 4: Polish (Future)
 
-1. Service matrix
-2. Uptime Kuma monitor seeding
-3. Backup verification scripts
-4. README improvements
+1. Tailscale IP allocation policy
+2. Ansible playbooks
+3. Top-level README improvements
+4. Docker directory README
 
 ---
 

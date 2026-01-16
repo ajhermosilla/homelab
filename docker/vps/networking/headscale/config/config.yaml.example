@@ -1,0 +1,181 @@
+# Headscale Configuration
+# VPS - Vultr (24/7 Operation)
+# https://headscale.net/ref/configuration/
+
+# =============================================================================
+# Server Configuration
+# =============================================================================
+
+# Public URL for clients to connect
+server_url: https://hs.cronova.dev
+
+# Listen addresses
+listen_addr: 0.0.0.0:443
+
+# Metrics (for Prometheus/Grafana)
+metrics_listen_addr: 127.0.0.1:9090
+
+# =============================================================================
+# Noise Protocol Keys
+# =============================================================================
+
+# Private key for Noise protocol (auto-generated if not exists)
+noise:
+  private_key_path: /var/lib/headscale/noise_private.key
+
+# =============================================================================
+# Database
+# =============================================================================
+
+database:
+  type: sqlite
+  sqlite:
+    path: /var/lib/headscale/db.sqlite
+
+# =============================================================================
+# DERP (Relay Servers)
+# =============================================================================
+
+derp:
+  server:
+    # Enable embedded DERP server on VPS
+    enabled: true
+    region_id: 999
+    region_code: "cronova"
+    region_name: "Cronova VPS"
+    stun_listen_addr: 0.0.0.0:3478
+
+  # Use Tailscale's public DERP servers as fallback
+  urls:
+    - https://controlplane.tailscale.com/derpmap/default
+
+  # Auto-update DERP map
+  auto_update_enabled: true
+  update_frequency: 24h
+
+# =============================================================================
+# DNS Configuration
+# =============================================================================
+
+dns:
+  # Enable MagicDNS
+  magic_dns: true
+
+  # Base domain for MagicDNS (devices accessible as hostname.cronova.dev)
+  base_domain: cronova.dev
+
+  # Nameservers for Tailscale clients
+  nameservers:
+    global:
+      - 1.1.1.1      # Cloudflare (public fallback)
+      - 9.9.9.9      # Quad9 (public fallback)
+
+  # Override DNS for specific domains (route to Pi-hole when available)
+  # restricted_nameservers:
+  #   cronova.dev:
+  #     - 100.64.0.10  # Fixed homelab Pi-hole
+
+  # Extra DNS records (optional)
+  extra_records:
+    - name: "nas"
+      type: "A"
+      value: "100.64.0.12"
+    - name: "minipc"
+      type: "A"
+      value: "100.64.0.10"
+
+# =============================================================================
+# IP Allocation
+# =============================================================================
+
+prefixes:
+  v4: 100.64.0.0/10    # IPv4 (Tailscale default range)
+  v6: fd7a:115c:a1e0::/48  # IPv6 (optional)
+
+# Allocation strategy
+prefixes:
+  allocation: random
+
+# =============================================================================
+# Node Settings
+# =============================================================================
+
+# Ephemeral nodes timeout (0 = never expire)
+ephemeral_node_inactivity_timeout: 30m
+
+# Allow routes to be advertised by nodes
+# (e.g., for exit nodes or subnet routing)
+
+# =============================================================================
+# Security
+# =============================================================================
+
+# Disable anonymous telemetry
+disable_check_updates: false
+
+# =============================================================================
+# Logging
+# =============================================================================
+
+log:
+  level: info
+  format: text
+
+# =============================================================================
+# TLS Configuration
+# =============================================================================
+
+# Let Headscale handle TLS via ACME (Let's Encrypt)
+# Requires port 443 and valid DNS pointing to VPS
+acme_url: https://acme-v02.api.letsencrypt.org/directory
+acme_email: augusto@cronova.dev
+
+# Or use pre-existing certificates:
+# tls_cert_path: /etc/headscale/cert.pem
+# tls_key_path: /etc/headscale/key.pem
+
+# =============================================================================
+# Access Control (ACLs) - Optional
+# =============================================================================
+
+# ACL policy file for fine-grained access control
+# policy:
+#   path: /etc/headscale/acl.yaml
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Copy this file:
+#    cp config.yaml.example config.yaml
+#
+# 2. Update server_url to your domain
+#
+# 3. Ensure DNS A record points to VPS IP:
+#    hs.cronova.dev -> VPS_IP (Cloudflare proxy OFF)
+#
+# 4. Start Headscale:
+#    docker compose up -d
+#
+# 5. Create user:
+#    docker exec headscale headscale users create augusto
+#
+# 6. Generate auth key:
+#    docker exec headscale headscale preauthkeys create \
+#      --user augusto --reusable --expiration 720h
+#
+# 7. Connect devices:
+#    tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
+#
+# =============================================================================
+# IP ALLOCATION PLAN
+# =============================================================================
+#
+# | Range          | Purpose              |
+# |----------------|----------------------|
+# | 100.64.0.1-9   | Mobile Kit           |
+# | 100.64.0.10-49 | Fixed Homelab        |
+# | 100.64.0.50-99 | Reserved             |
+# | 100.64.0.100+  | VPS/Cloud            |
+#
+# =============================================================================
