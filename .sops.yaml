@@ -1,6 +1,8 @@
 # SOPS configuration for homelab secrets
 # https://github.com/getsops/sops
-
+#
+# ⚠️  SETUP REQUIRED: Replace AGE_PUBLIC_KEY placeholders below
+#
 # Before using, generate your age key:
 #   age-keygen -o ~/.config/sops/age/keys.txt
 #

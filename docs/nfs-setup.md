@@ -286,8 +286,54 @@ This allows Frigate to access NAS recordings even when not on local network.
 
 ---
 
+## Security Considerations
+
+### Network Isolation
+
+NFS is **only accessible on the local LAN** (192.168.1.0/24):
+- Firewall restricts access to specific IPs
+- NFS ports not exposed to internet
+- OPNsense blocks NFS traffic from IoT/Guest VLANs
+
+### Export Options
+
+```
+/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
+```
+
+| Option | Security Impact |
+|--------|-----------------|
+| `192.168.1.10` | Only Docker VM can access (not subnet wildcard) |
+| `sync` | Data integrity - writes confirmed before reply |
+| `no_root_squash` | Needed for Docker, but limits to specific IP |
+
+### Hardening (Optional)
+
+For additional security, consider:
+
+```bash
+# Use sec=krb5p for Kerberos encryption (complex setup)
+/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash,sec=krb5p)
+
+# Or use NFSv4 with stronger authentication
+/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash,fsid=0)
+```
+
+### Monitoring
+
+```bash
+# Check who's connected
+sudo showmount -a
+
+# Monitor NFS access
+sudo cat /var/lib/nfs/etab
+```
+
+---
+
 ## Related Documentation
 
 - `docs/hardware.md` - NAS drive layout (Purple 2TB for Frigate)
 - `docs/fixed-homelab.md` - Docker VM and NAS setup
+- `docs/security-hardening.md` - General security practices
 - `docker/fixed/docker-vm/security/docker-compose.yml` - Frigate config

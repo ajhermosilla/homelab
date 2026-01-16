@@ -51,12 +51,13 @@ notify.cronova.dev {
 }
 
 # API - Public developer APIs (future)
+# NOTE: CORS allows cronova.dev origins only. Update when API goes live.
 api.cronova.dev {
     reverse_proxy localhost:8081
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         X-Content-Type-Options "nosniff"
-        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Origin "https://cronova.dev"
         Access-Control-Allow-Methods "GET, POST, OPTIONS"
         Access-Control-Allow-Headers "Content-Type, Authorization"
     }

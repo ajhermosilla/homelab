@@ -8,8 +8,8 @@ Security audit findings and remediation plan.
 |----------|-------|--------|
 | Critical | 2 | **2 Done** |
 | High | 8 | **8 Done** |
-| Medium | 12 | Pending |
-| **Total** | **22** | 10 done |
+| Medium | 12 | **9 Done** |
+| **Total** | **22** | **19 done** |
 
 ---
 
@@ -41,17 +41,17 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-| 11 | CORS wildcard `*` | `docker/vps/networking/caddy/Caddyfile` | [ ] |
-| 12 | Samba credentials in command | `docker/fixed/nas/storage/docker-compose.yml` | [ ] |
-| 13 | Pi-hole default password (fixed) | `docker/fixed/docker-vm/networking/pihole/docker-compose.yml` | [ ] |
-| 14 | Pi-hole default password (VPS) | `docker/vps/networking/pihole/docker-compose.yml` | [ ] |
-| 15 | Restic REST example with plaintext creds | `docker/vps/backup/docker-compose.yml` | [ ] |
-| 16 | No health checks on services | Multiple docker-compose files | [ ] |
-| 17 | SOPS age key placeholder | `.sops.yaml` | [ ] |
-| 18 | NFS security options not documented | `docs/nfs-setup.md` | [ ] |
+| 11 | CORS wildcard `*` | `docker/vps/networking/caddy/Caddyfile` | [x] |
+| 12 | Samba credentials in command | `docker/fixed/nas/storage/docker-compose.yml` | [x] |
+| 13 | Pi-hole default password (fixed) | `docker/fixed/docker-vm/networking/pihole/docker-compose.yml` | [x] |
+| 14 | Pi-hole default password (VPS) | `docker/vps/networking/pihole/docker-compose.yml` | [x] |
+| 15 | Restic REST example with plaintext creds | `docker/vps/backup/docker-compose.yml` | [x] |
+| 16 | No health checks on services | Multiple docker-compose files | [x] |
+| 17 | SOPS age key placeholder | `.sops.yaml` | [x] |
+| 18 | NFS security options not documented | `docs/nfs-setup.md` | [x] |
 | 19 | Credential examples in comments | Multiple files | [ ] |
 | 20 | Containers running as root | Multiple services | [ ] |
-| 21 | Missing cap_drop on containers | All docker-compose files | [ ] |
+| 21 | Missing cap_drop on containers | All docker-compose files | [x] |
 | 22 | Network topology in public docs | `docs/fixed-homelab.md`, `docs/hardware.md` | [ ] |
 
 ---
