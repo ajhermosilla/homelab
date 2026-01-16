@@ -6,16 +6,19 @@
 # Internal reverse proxy for services on Docker VM.
 # Accessed via Tailscale mesh (100.64.0.10) or local network (192.168.1.10).
 #
+# TLS Strategy: Tailscale HTTPS certificates (see docs/certificate-strategy.md)
+# - Certs stored in /var/lib/tailscale/certs/
+# - Auto-generated with: tailscale cert <domain>
+# - Renew monthly with cron (90-day validity)
+#
 # Services are proxied from host.docker.internal (Docker VM localhost).
 
 # Global options
 {
-    # Email for ACME (if using Let's Encrypt for internal domains)
     email augusto@cronova.dev
 
-    # For internal-only services, use local/self-signed certs
-    # Uncomment for production with real domains:
-    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+    # Disable auto HTTPS - we use Tailscale certs
+    auto_https off
 }
 
 # =============================================================================
@@ -31,18 +34,21 @@
 # Home Assistant - Automation
 # Access: https://home.cronova.dev (Tailscale) or http://192.168.1.10:8123
 home.cronova.dev {
+    tls /var/lib/tailscale/certs/home.cronova.dev.crt /var/lib/tailscale/certs/home.cronova.dev.key
     reverse_proxy host.docker.internal:8123
 }
 
 # Jellyfin - Media Server
 # Access: https://media.cronova.dev (Tailscale) or http://192.168.1.10:8096
 media.cronova.dev {
+    tls /var/lib/tailscale/certs/media.cronova.dev.crt /var/lib/tailscale/certs/media.cronova.dev.key
     reverse_proxy host.docker.internal:8096
 }
 
 # Frigate - NVR
 # Access: https://frigate.cronova.dev (Tailscale) or http://192.168.1.10:5000
 frigate.cronova.dev {
+    tls /var/lib/tailscale/certs/frigate.cronova.dev.crt /var/lib/tailscale/certs/frigate.cronova.dev.key
     reverse_proxy host.docker.internal:5000
 
     # WebSocket support for live view
@@ -64,16 +70,19 @@ frigate.cronova.dev {
 
 # Sonarr
 sonarr.cronova.dev {
+    tls /var/lib/tailscale/certs/sonarr.cronova.dev.crt /var/lib/tailscale/certs/sonarr.cronova.dev.key
     reverse_proxy host.docker.internal:8989
 }
 
 # Radarr
 radarr.cronova.dev {
+    tls /var/lib/tailscale/certs/radarr.cronova.dev.crt /var/lib/tailscale/certs/radarr.cronova.dev.key
     reverse_proxy host.docker.internal:7878
 }
 
 # Prowlarr
 prowlarr.cronova.dev {
+    tls /var/lib/tailscale/certs/prowlarr.cronova.dev.crt /var/lib/tailscale/certs/prowlarr.cronova.dev.key
     reverse_proxy host.docker.internal:9696
 }
 
@@ -81,25 +90,40 @@ prowlarr.cronova.dev {
 # SETUP NOTES
 # =============================================================================
 #
-# 1. Tailscale MagicDNS:
-#    Enable HTTPS certificates in Tailscale admin console:
-#    https://login.tailscale.com/admin/dns
-#    → Enable MagicDNS
-#    → Enable HTTPS Certificates
+# 1. Generate Tailscale certificates:
+#    Run these commands on the Docker VM host (not in container):
 #
-# 2. DNS Configuration:
-#    For *.cronova.dev subdomains to work internally:
-#    - Add DNS records pointing to Tailscale IP (100.64.0.10)
-#    - Or use Pi-hole local DNS to resolve internally
+#    tailscale cert home.cronova.dev
+#    tailscale cert media.cronova.dev
+#    tailscale cert frigate.cronova.dev
+#    tailscale cert sonarr.cronova.dev
+#    tailscale cert radarr.cronova.dev
+#    tailscale cert prowlarr.cronova.dev
 #
-# 3. Alternative: Direct HTTP Access
+#    Certs are stored in /var/lib/tailscale/certs/
+#
+# 2. Mount certs in Caddy container:
+#    volumes:
+#      - /var/lib/tailscale/certs:/var/lib/tailscale/certs:ro
+#
+# 3. Renew certs monthly (90-day validity):
+#    Add to crontab: 0 3 1 * * /usr/local/bin/renew-tailscale-certs.sh
+#    See docs/certificate-strategy.md for renewal script.
+#
+# 4. DNS Configuration:
+#    For *.cronova.dev subdomains to work:
+#    - Configure Headscale MagicDNS, OR
+#    - Add Pi-hole local DNS entries, OR
+#    - Add Cloudflare DNS pointing to Tailscale IP (100.64.0.13)
+#
+# 5. Alternative: Direct HTTP Access (no HTTPS)
 #    Most services work fine over HTTP on local network:
 #    - Home Assistant: http://192.168.1.10:8123
 #    - Jellyfin: http://192.168.1.10:8096
 #    - Frigate: http://192.168.1.10:5000
 #
-# 4. Docker Network:
+# 6. Docker Network:
 #    Caddy uses host.docker.internal to reach services on Docker VM.
-#    This requires: extra_hosts: ["host.docker.internal:host-gateway"]
+#    Requires: extra_hosts: ["host.docker.internal:host-gateway"]
 #
 # =============================================================================

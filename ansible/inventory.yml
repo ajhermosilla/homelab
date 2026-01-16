@@ -1,0 +1,112 @@
+# Homelab Ansible Inventory
+# Usage: ansible-playbook -i inventory.yml playbooks/<playbook>.yml
+
+all:
+  vars:
+    ansible_user: augusto
+    ansible_python_interpreter: /usr/bin/python3
+    # Use Tailscale IPs for remote access
+    use_tailscale: true
+
+  children:
+    # ==========================================================================
+    # VPS (Cloud)
+    # ==========================================================================
+    vps:
+      hosts:
+        vultr:
+          ansible_host: 100.64.0.100  # Tailscale IP
+          # ansible_host: <public-ip>  # Direct access
+          ansible_user: root
+      vars:
+        environment_type: vps
+        timezone: America/New_York
+
+    # ==========================================================================
+    # Fixed Homelab
+    # ==========================================================================
+    fixed:
+      children:
+        proxmox:
+          hosts:
+            minipc:
+              ansible_host: 100.64.0.10
+              # ansible_host: 192.168.1.100  # Local access
+          vars:
+            proxmox_host: true
+
+        docker_vm:
+          hosts:
+            docker:
+              ansible_host: 100.64.0.13
+              # ansible_host: 192.168.1.10  # Local access
+          vars:
+            docker_host: true
+
+        nas:
+          hosts:
+            nas:
+              ansible_host: 100.64.0.12
+              # ansible_host: 192.168.1.12  # Local access
+          vars:
+            storage_host: true
+
+        start9:
+          hosts:
+            rpi4:
+              ansible_host: 100.64.0.11
+              # ansible_host: 192.168.1.11  # Local access
+          vars:
+            bitcoin_host: true
+            # Start9 uses a different user
+            ansible_user: start9
+
+      vars:
+        environment_type: fixed
+        timezone: America/Asuncion
+        local_network: 192.168.1.0/24
+
+    # ==========================================================================
+    # Mobile Kit
+    # ==========================================================================
+    mobile:
+      hosts:
+        rpi5:
+          ansible_host: 100.64.0.1
+          # ansible_host: 192.168.8.5  # Beryl AX network
+      vars:
+        environment_type: mobile
+        timezone: America/Asuncion
+        # Mobile kit may not always be online
+        ansible_connection_timeout: 10
+
+    # ==========================================================================
+    # Logical Groups
+    # ==========================================================================
+    docker_hosts:
+      hosts:
+        vultr:
+        docker:
+        nas:
+      vars:
+        docker_compose_version: "2"
+
+    pihole_hosts:
+      hosts:
+        vultr:
+        docker:
+        rpi5:
+
+    backup_targets:
+      hosts:
+        nas:
+        vultr:
+
+    tailscale_clients:
+      hosts:
+        vultr:
+        docker:
+        nas:
+        rpi4:
+        rpi5:
+        minipc:

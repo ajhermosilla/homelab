@@ -1,0 +1,97 @@
+# Tailscale installation and configuration
+# Usage: ansible-playbook -i inventory.yml playbooks/tailscale.yml -e "authkey=tskey-xxx"
+
+---
+- name: Install and configure Tailscale
+  hosts: tailscale_clients
+  become: true
+
+  vars:
+    headscale_url: "https://hs.cronova.dev"
+    # Pass authkey via command line: -e "authkey=tskey-xxx"
+    # authkey: ""
+
+  tasks:
+    # =========================================================================
+    # Installation
+    # =========================================================================
+    - name: Check if Tailscale is installed
+      command: which tailscale
+      register: tailscale_installed
+      ignore_errors: true
+      changed_when: false
+
+    - name: Download Tailscale install script
+      get_url:
+        url: https://tailscale.com/install.sh
+        dest: /tmp/tailscale-install.sh
+        mode: '0755'
+      when: tailscale_installed.rc != 0
+
+    - name: Install Tailscale
+      command: /tmp/tailscale-install.sh
+      when: tailscale_installed.rc != 0
+
+    - name: Clean up install script
+      file:
+        path: /tmp/tailscale-install.sh
+        state: absent
+
+    # =========================================================================
+    # Service Configuration
+    # =========================================================================
+    - name: Ensure Tailscale service is running
+      service:
+        name: tailscaled
+        state: started
+        enabled: yes
+
+    # =========================================================================
+    # Connect to Headscale
+    # =========================================================================
+    - name: Check Tailscale status
+      command: tailscale status --json
+      register: tailscale_status
+      changed_when: false
+      ignore_errors: true
+
+    - name: Connect to Headscale
+      command: >
+        tailscale up
+        --login-server={{ headscale_url }}
+        --authkey={{ authkey }}
+        --accept-dns=true
+        --accept-routes=true
+      when:
+        - authkey is defined
+        - authkey | length > 0
+        - tailscale_status.rc != 0 or (tailscale_status.stdout | from_json).BackendState != "Running"
+      register: tailscale_connect
+
+    - name: Display connection result
+      debug:
+        msg: "Tailscale connected successfully"
+      when: tailscale_connect is changed
+
+    # =========================================================================
+    # Firewall Rules
+    # =========================================================================
+    - name: Allow Tailscale traffic through UFW
+      ufw:
+        rule: allow
+        interface: tailscale0
+        direction: in
+      tags: firewall
+      ignore_errors: true
+
+    # =========================================================================
+    # Verify Connection
+    # =========================================================================
+    - name: Get Tailscale IP
+      command: tailscale ip -4
+      register: tailscale_ip
+      changed_when: false
+
+    - name: Display Tailscale IP
+      debug:
+        msg: "Tailscale IP: {{ tailscale_ip.stdout }}"
