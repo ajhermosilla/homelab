@@ -68,12 +68,13 @@ Comprehensive codebase review after completing hardware documentation.
     - Camera isolation
   - **DONE**: Created docs/vlan-design.md
 
-- [ ] **9. Create backup test procedure**
+- [x] **9. Create backup test procedure**
   - Missing: Validation that DR runbook works
   - Content needed:
     - Monthly restore test checklist
     - Backup verification steps
     - Test result documentation
+  - **DONE**: Created docs/backup-test-procedure.md
 
 - [ ] **10. Document certificate strategy**
   - File: `docs/caddy-config.md:402-421`
@@ -104,7 +105,7 @@ Comprehensive codebase review after completing hardware documentation.
 | 6 | NUT configuration | Done | (pending) |
 | 7 | Monitoring strategy | Done | (pending) |
 | 8 | VLAN documentation | Done | (pending) |
-| 9 | Backup test procedure | Pending | |
+| 9 | Backup test procedure | Done | (pending) |
 | 10 | Certificate strategy | Pending | |
 | 11 | Archive domain-research.md | Pending | |
 | 12 | NAS PSU model | Pending | |
