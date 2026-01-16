@@ -71,8 +71,8 @@ objects:
 #     Search for: {REOLINK_USER}, {REOLINK_PASS}, {TAPO_USER}, {TAPO_PASS}
 #
 # Reolink RLC-520A streams:
-#   Main: rtsp://user:pass@ip:554/h264Preview_01_main (5MP)
-#   Sub:  rtsp://user:pass@ip:554/h264Preview_01_sub (lower res)
+#   Main: rtsp://{USER}:{PASS}@ip:554/h264Preview_01_main (5MP)
+#   Sub:  rtsp://{USER}:{PASS}@ip:554/h264Preview_01_sub (lower res)
 #
 # Use sub stream for detect (faster), main stream for record (quality).
 

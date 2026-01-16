@@ -32,6 +32,8 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
 
 ## Architecture Diagram
 
+> **Note:** IPs shown are examples. Actual deployment uses different addresses.
+
 ```
                            [ISP Modem]
                                 │
@@ -41,70 +43,52 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
                     │   NIC2: LAN → Switch  │
                     └───────────┬───────────┘
                                 │
-                          VLAN Trunk (1,10,20)
+                          VLAN Trunk
                                 │
                     ┌───────────┴───────────┐
-                    │  MokerLink 2.5G Switch │
-                    │     8x 2.5G Ports      │
+                    │   Managed 2.5G Switch  │
                     └───────────┬───────────┘
                                 │
-    ┌────────┬────────┬────────┼────────┬────────┬────────┬────────┐
-    │        │        │        │        │        │        │        │
-  Port 1   Port 2   Port 3   Port 4   Port 5   Port 6   Port 7   Port 8
-  Trunk    Access   Access   Access   Access   Access   Trunk    Access
- 1,10,20   VLAN 1   VLAN 1   VLAN 1   VLAN 1   VLAN 10  1,10,20  VLAN 1
-    │        │        │        │        │        │        │        │
- [Mini PC] [Docker] [RPi 4]  [NAS]  [Yamaha]  [PoE   [TP-Link] [Reserved]
- OPNsense    VM     Start9          RX-V671  Switch]   AP       MacBook
-              │       │        │        │        │        │
-            .10      .11      .12      .30      │      SSIDs:
-                                                │   ┌──────────┐
-                                     ┌──────────┘   │ HomeNet ─┼─► VLAN 1
-                                     │              │ IoT ─────┼─► VLAN 10
-                               ┌─────┴─────┐        │ Guest ───┼─► VLAN 20
-                               │ PoE Switch│        └──────────┘
-                               │TL-SG1005P │             │
-                               └─────┬─────┘        WiFi Clients:
-                                     │              ┌────┴────┐
-                               ┌─────┴─────┐        │         │
-                               │           │    [Apple TV] [LG TV]
-                            [Cam 1]    [Cam 2]     .31       .32
-                             .101       .102     (HomeNet) (HomeNet)
-                                                      │
-                                                [Tapo C110]
-                                                   .103
-                                                (IoT SSID)
+    ┌────────┬────────┬────────┼────────┬────────┬────────┐
+    │        │        │        │        │        │        │
+  Trunk    Access   Access   Access   Access   Trunk    Access
+  Main     VLAN 1   VLAN 1   VLAN 1   VLAN 10  IoT      Reserved
+    │        │        │        │        │        │
+ [OPNsense] [Docker] [Bitcoin] [NAS]  [PoE    [WiFi AP]
+    VM        VM      Node           Switch]
+                                       │
+                               ┌───────┴───────┐
+                               │               │
+                            [Cameras]     [IoT Devices]
 
-                         [Tailscale Mesh - 100.64.0.x]
-                                     │
-                    ┌────────────────┼────────────────┐
-                    │                │                │
-              [Mobile Kit]     [Fixed Homelab]    [VPS - US]
-              RPi 5 + MacBook  .10, .11, .12     100.64.0.100
-              100.64.0.1-2
+                         [Tailscale Mesh]
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+        [Mobile Kit]   [Fixed Homelab]     [VPS]
 ```
 
-### MokerLink Port Assignment
+### Switch Port Assignment
 
 | Port | Mode | VLAN | Device | Speed |
 |------|------|------|--------|-------|
-| 1 | Trunk | 1,10,20 | Mini PC (OPNsense) | 2.5G |
-| 2 | Access | 1 | Docker VM | 2.5G |
-| 3 | Access | 1 | RPi 4 (Start9) | 1G |
-| 4 | Access | 1 | NAS | 2.5G |
-| 5 | Access | 1 | Yamaha RX-V671 | 1G |
-| 6 | Access | 10 | PoE Switch (Cameras) | 1G |
-| 7 | Trunk | 1,10,20 | TP-Link AP | 1G |
-| 8 | Access | 1 | Reserved (MacBook) | 2.5G |
+| 1 | Trunk | All | OPNsense VM | 2.5G |
+| 2 | Access | Main | Docker VM | 2.5G |
+| 3 | Access | Main | Bitcoin Node | 1G |
+| 4 | Access | Main | NAS | 2.5G |
+| 5 | Access | Main | AV Receiver | 1G |
+| 6 | Access | IoT | PoE Switch | 1G |
+| 7 | Trunk | All | WiFi AP | 1G |
+| 8 | Access | Main | Reserved | 2.5G |
 
-### Entertainment Devices
+### Client Devices
 
-| Device | Connection | IP | VLAN |
-|--------|------------|-----|------|
-| Yamaha RX-V671 | Ethernet (Port 5) | .30 | 1 |
-| Apple TV 4th Gen | WiFi (HomeNet) | .31 | 1 |
-| LG Smart TV | WiFi (HomeNet) | .32 | 1 |
-| Tapo C110 | WiFi (IoT) | .103 | 10 |
+| Device | Connection | VLAN |
+|--------|------------|------|
+| AV Receiver | Ethernet | Main |
+| Streaming Box | WiFi | Main |
+| Smart TV | WiFi | Main |
+| WiFi Camera | WiFi | IoT |
 
 ## Mini PC - Proxmox VE Hypervisor
 
@@ -142,8 +126,7 @@ Virtualization host running network gateway and Docker services.
                                     |
               +─────────────────────+─────────────────────+
               |                     |                     |
-       [Docker Host VM]        [RPi 4]              [NAS]
-        192.168.1.10         192.168.1.11          192.168.1.12
+       [Docker Host VM]      [Bitcoin Node]          [NAS]
               |                                          |
     +---------+---------+---------+              +-------+-------+
     |         |         |         |              |       |       |
@@ -437,21 +420,16 @@ Docker VM: /mnt/frigate   →  NFS mount (rw, sync, no_subtree_check)
 
 ## Network Configuration
 
-### Static IPs (DHCP Reservation)
+### IP Addressing
 
-| Device | IP | MAC |
-|--------|----|----|
-| Mini PC | 192.168.1.10 | Reserve |
-| RPi 4 | 192.168.1.11 | Reserve |
-| Old PC/NAS | 192.168.1.12 | Reserve |
+Use DHCP reservations for all infrastructure devices:
+- Docker VM
+- Bitcoin Node
+- NAS
+- OPNsense
 
-### Tailscale IPs
-
-| Device | Tailscale IP | Hostname |
-|--------|--------------|----------|
-| Mini PC | 100.64.0.10 | minipc |
-| RPi 4 | 100.64.0.11 | rpi4 |
-| NAS | 100.64.0.12 | nas |
+Tailscale provides overlay network for secure remote access.
+See Headscale admin for current allocations.
 
 ### Firewall Rules (OPNsense)
 

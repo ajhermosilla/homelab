@@ -34,7 +34,7 @@ Monthly backup verification script. Tests backup integrity and restore capabilit
 
 **Environment variables:**
 ```bash
-export RESTIC_REPOSITORY="rest:http://user:pass@192.168.1.12:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
 export RESTIC_PASSWORD_FILE="/root/.restic-password"
 export NTFY_URL="https://notify.cronova.dev"
 export NTFY_TOPIC="cronova-info"

@@ -162,7 +162,7 @@ Docker volumes are backed up via Restic:
 ```bash
 # Backup all volumes
 docker run --rm -v volume_name:/data alpine tar -czf - /data | \
-  restic -r rest:http://user:pass@nas:8000/docker backup --stdin
+  restic -r rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@nas:8000/docker backup --stdin
 
 # Or backup specific paths
 restic backup /var/lib/docker/volumes/

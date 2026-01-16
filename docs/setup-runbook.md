@@ -409,7 +409,7 @@ cameras:
   front_door:
     ffmpeg:
       inputs:
-        - path: rtsp://user:pass@192.168.10.101:554/stream
+        - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.10.101:554/stream
 ```
 
 Restart Frigate:
@@ -434,7 +434,7 @@ docker compose restart frigate
 apt install restic
 
 # Initialize repository
-export RESTIC_REPOSITORY="rest:http://augusto:pass@192.168.1.12:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
 # Set your restic encryption password
 export RESTIC_PASSWORD_FILE=/root/.restic-password
 restic init
