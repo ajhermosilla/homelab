@@ -33,35 +33,78 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
 ## Architecture Diagram
 
 ```
-                        [ISP Modem]
-                             |
-                      [Mini PC - Proxmox]
-                             |
-                      [OPNsense VM - WAN]
-                             |
-                    [MokerLink 2.5G Switch]
-                      8x 2.5G + 10G SFP+
-                             |
-     +------------+----------+-----------+------------+
-     |            |          |           |            |
-[Docker VM]   [RPi 4]     [NAS]    [TP-Link AP]  [PoE Switch]
-192.168.1.10  .11         .12      AX3000        TL-SG1005P
-                                   (WiFi 6)      4x PoE+
-                                      |              |
-                                [Tapo C110]    +-----+-----+
-                                  (WiFi)       |           |
-                                          [RLC-520A] [RLC-520A]
-                                           Cam 1      Cam 2
+                           [ISP Modem]
+                                │
+                    ┌───────────┴───────────┐
+                    │   Mini PC (Proxmox)   │
+                    │   NIC1: WAN → ISP     │
+                    │   NIC2: LAN → Switch  │
+                    └───────────┬───────────┘
+                                │
+                          VLAN Trunk (1,10,20)
+                                │
+                    ┌───────────┴───────────┐
+                    │  MokerLink 2.5G Switch │
+                    │     8x 2.5G Ports      │
+                    └───────────┬───────────┘
+                                │
+    ┌────────┬────────┬────────┼────────┬────────┬────────┬────────┐
+    │        │        │        │        │        │        │        │
+  Port 1   Port 2   Port 3   Port 4   Port 5   Port 6   Port 7   Port 8
+  Trunk    Access   Access   Access   Access   Access   Trunk    Access
+ 1,10,20   VLAN 1   VLAN 1   VLAN 1   VLAN 1   VLAN 10  1,10,20  VLAN 1
+    │        │        │        │        │        │        │        │
+ [Mini PC] [Docker] [RPi 4]  [NAS]  [Yamaha]  [PoE   [TP-Link] [Reserved]
+ OPNsense    VM     Start9          RX-V671  Switch]   AP       MacBook
+              │       │        │        │        │        │
+            .10      .11      .12      .30      │      SSIDs:
+                                                │   ┌──────────┐
+                                     ┌──────────┘   │ HomeNet ─┼─► VLAN 1
+                                     │              │ IoT ─────┼─► VLAN 10
+                               ┌─────┴─────┐        │ Guest ───┼─► VLAN 20
+                               │ PoE Switch│        └──────────┘
+                               │TL-SG1005P │             │
+                               └─────┬─────┘        WiFi Clients:
+                                     │              ┌────┴────┐
+                               ┌─────┴─────┐        │         │
+                               │           │    [Apple TV] [LG TV]
+                            [Cam 1]    [Cam 2]     .31       .32
+                             .101       .102     (HomeNet) (HomeNet)
+                                                      │
+                                                [Tapo C110]
+                                                   .103
+                                                (IoT SSID)
 
-                    [Tailscale Mesh]
-                     100.64.0.10-12
-                           |
-              +------------+------------+
-              |                         |
-         [Mobile Kit]              [VPS - US]
-         RPi 5 + MacBook           Helper Node
-         100.64.0.1-2              100.64.0.100
+                         [Tailscale Mesh - 100.64.0.x]
+                                     │
+                    ┌────────────────┼────────────────┐
+                    │                │                │
+              [Mobile Kit]     [Fixed Homelab]    [VPS - US]
+              RPi 5 + MacBook  .10, .11, .12     100.64.0.100
+              100.64.0.1-2
 ```
+
+### MokerLink Port Assignment
+
+| Port | Mode | VLAN | Device | Speed |
+|------|------|------|--------|-------|
+| 1 | Trunk | 1,10,20 | Mini PC (OPNsense) | 2.5G |
+| 2 | Access | 1 | Docker VM | 2.5G |
+| 3 | Access | 1 | RPi 4 (Start9) | 1G |
+| 4 | Access | 1 | NAS | 2.5G |
+| 5 | Access | 1 | Yamaha RX-V671 | 1G |
+| 6 | Access | 10 | PoE Switch (Cameras) | 1G |
+| 7 | Trunk | 1,10,20 | TP-Link AP | 1G |
+| 8 | Access | 1 | Reserved (MacBook) | 2.5G |
+
+### Entertainment Devices
+
+| Device | Connection | IP | VLAN |
+|--------|------------|-----|------|
+| Yamaha RX-V671 | Ethernet (Port 5) | .30 | 1 |
+| Apple TV 4th Gen | WiFi (HomeNet) | .31 | 1 |
+| LG Smart TV | WiFi (HomeNet) | .32 | 1 |
+| Tapo C110 | WiFi (IoT) | .103 | 10 |
 
 ## Mini PC - Proxmox VE Hypervisor
 
@@ -239,7 +282,7 @@ Debian-based storage server. Repurposed 2013 build, compact and low-power.
 | Motherboard | ASUS P8H77-I | Intel H77, LGA 1155 |
 | CPU | Intel Core i3-3220T | Dual-Core 2.8GHz, 35W TDP |
 | RAM | Kingston HyperX 8GB | 2x4GB DDR3-1600 |
-| PSU | TBD (2013) | Solid state, verify model |
+| PSU | picoPSU-160-XT + 220W brick | 192W DC-DC, 2013 vintage |
 | OS | Debian 12 | Docker-based services |
 
 ### Storage Strategy
@@ -484,9 +527,9 @@ All critical devices connected to **Forza NT-1012U 1000VA UPS**.
 - [ ] Replace NAS PSU (2013, aging)
 
 ### Infrastructure
-- [ ] VLANs for IoT/camera isolation (OPNsense)
+- [x] VLANs for IoT/camera isolation (see `docs/vlan-design.md`)
 - [ ] Proxmox Backup Server on NAS
-- [ ] NUT for UPS graceful shutdown
+- [x] NUT for UPS graceful shutdown (see `docs/nut-config.md`)
 - [ ] HA cluster (second Proxmox node)
 
 ### Automation

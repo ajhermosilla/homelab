@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:www.namecheap.com)",
+      "WebFetch(domain:domainr.com)",
+      "WebFetch(domain:www.whois.com)",
+      "Bash(grep:*)"
     ]
   }
 }
