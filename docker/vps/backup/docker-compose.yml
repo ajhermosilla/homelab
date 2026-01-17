@@ -17,6 +17,9 @@ services:
       - "com.cronova.critical=true"
     cap_drop:
       - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/"]
       interval: 30s
