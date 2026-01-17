@@ -17,6 +17,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=storage"
       - "com.cronova.critical=true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
     ports:
       - "139:139"
       - "445:445"
@@ -69,6 +74,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
     ports:
       - "8384:8384"     # Web UI
       - "22000:22000/tcp"  # Transfer

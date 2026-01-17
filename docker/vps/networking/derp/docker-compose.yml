@@ -17,6 +17,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
     ports:
       - "3478:3478/udp"  # STUN
       - "8443:443"       # HTTPS (DERP) - mapped to 8443, Caddy handles 443
