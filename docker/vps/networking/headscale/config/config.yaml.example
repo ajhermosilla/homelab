@@ -9,8 +9,8 @@
 # Public URL for clients to connect
 server_url: https://hs.cronova.dev
 
-# Listen addresses
-listen_addr: 0.0.0.0:443
+# Listen addresses (Caddy handles TLS on 443, Headscale listens on 8080)
+listen_addr: 0.0.0.0:8080
 
 # Metrics (for Prometheus/Grafana)
 metrics_listen_addr: 127.0.0.1:9090
@@ -44,6 +44,7 @@ derp:
     region_code: "cronova"
     region_name: "Cronova VPS"
     stun_listen_addr: 0.0.0.0:3478
+    private_key_path: /var/lib/headscale/derp_server_private.key
 
   # Use Tailscale's public DERP servers as fallback
   urls:
@@ -61,8 +62,9 @@ dns:
   # Enable MagicDNS
   magic_dns: true
 
-  # Base domain for MagicDNS (devices accessible as hostname.cronova.dev)
-  base_domain: cronova.dev
+  # Base domain for MagicDNS (must NOT overlap with server_url domain)
+  # Devices accessible as hostname.hs.net internally
+  base_domain: hs.net
 
   # Nameservers for Tailscale clients
   nameservers:
@@ -89,11 +91,8 @@ dns:
 # =============================================================================
 
 prefixes:
-  v4: 100.64.0.0/10    # IPv4 (Tailscale default range)
-  v6: fd7a:115c:a1e0::/48  # IPv6 (optional)
-
-# Allocation strategy
-prefixes:
+  v4: 100.64.0.0/10         # IPv4 (Tailscale default range)
+  v6: fd7a:115c:a1e0::/48   # IPv6 (optional)
   allocation: random
 
 # =============================================================================
@@ -125,14 +124,13 @@ log:
 # TLS Configuration
 # =============================================================================
 
-# Let Headscale handle TLS via ACME (Let's Encrypt)
-# Requires port 443 and valid DNS pointing to VPS
-acme_url: https://acme-v02.api.letsencrypt.org/directory
-acme_email: augusto@cronova.dev
-
-# Or use pre-existing certificates:
-# tls_cert_path: /etc/headscale/cert.pem
-# tls_key_path: /etc/headscale/key.pem
+# TLS is handled by Caddy reverse proxy (recommended)
+# Headscale listens on HTTP port 8080, Caddy terminates TLS on 443
+#
+# If running Headscale standalone without Caddy, uncomment:
+# tls_letsencrypt_hostname: hs.cronova.dev
+# tls_letsencrypt_cache_dir: /var/lib/headscale/cache
+# tls_letsencrypt_challenge_type: HTTP-01
 
 # =============================================================================
 # Access Control (ACLs) - Optional
