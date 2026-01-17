@@ -1,0 +1,142 @@
+# Maintenance Stack - Watchtower
+# Fixed Homelab - Docker VM
+# Automatic container updates with scheduling
+
+services:
+  # =========================================================================
+  # Watchtower - Automatic Container Updates
+  # https://containrrr.dev/watchtower/
+  # =========================================================================
+  watchtower:
+    image: containrrr/watchtower:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: watchtower
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=maintenance"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      # Schedule: 4 AM on Sundays (cron format)
+      WATCHTOWER_SCHEDULE: "0 0 4 * * 0"
+      # Only update containers with enable label
+      WATCHTOWER_LABEL_ENABLE: "true"
+      # Remove old images after update
+      WATCHTOWER_CLEANUP: "true"
+      # Don't restart containers, just pull new images
+      # Set to false to enable full auto-update
+      WATCHTOWER_MONITOR_ONLY: ${WATCHTOWER_MONITOR_ONLY:-false}
+      # Notification settings (optional)
+      WATCHTOWER_NOTIFICATIONS: ${WATCHTOWER_NOTIFICATIONS:-}
+      WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL:-}
+      # Rolling restarts (one at a time)
+      WATCHTOWER_ROLLING_RESTART: "true"
+      # Timeout for stopping containers
+      WATCHTOWER_TIMEOUT: "60s"
+      # Include stopped containers
+      WATCHTOWER_INCLUDE_STOPPED: "false"
+      # Revive stopped containers after update
+      WATCHTOWER_REVIVE_STOPPED: "false"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+# =============================================================================
+# CONTAINER LABELS FOR WATCHTOWER
+# =============================================================================
+#
+# Add this label to containers you want Watchtower to update:
+#
+#   labels:
+#     - "com.centurylinklabs.watchtower.enable=true"
+#
+# Containers WITHOUT this label will NOT be updated (opt-in mode).
+#
+# =============================================================================
+# SCHEDULE OPTIONS
+# =============================================================================
+#
+# Default: 4 AM every Sunday (low-traffic time)
+#
+# Cron format: second minute hour day month weekday
+#   "0 0 4 * * 0"   - 4:00 AM every Sunday
+#   "0 0 4 * * *"   - 4:00 AM every day
+#   "0 0 4 * * 1-5" - 4:00 AM weekdays only
+#   "0 0 */6 * * *" - Every 6 hours
+#
+# =============================================================================
+# NOTIFICATION OPTIONS
+# =============================================================================
+#
+# For ntfy notifications:
+#   WATCHTOWER_NOTIFICATIONS=shoutrrr
+#   WATCHTOWER_NOTIFICATION_URL=ntfy://notify.cronova.dev/cronova-updates
+#
+# For Slack:
+#   WATCHTOWER_NOTIFICATION_URL=slack://token@channel
+#
+# For Email:
+#   WATCHTOWER_NOTIFICATION_URL=smtp://user:pass@host:port/?from=x&to=y
+#
+# =============================================================================
+# MONITOR-ONLY MODE
+# =============================================================================
+#
+# Set WATCHTOWER_MONITOR_ONLY=true in .env to:
+#   - Check for updates without applying them
+#   - Send notifications about available updates
+#   - Useful for manual update approval workflow
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Add watchtower.enable label to containers you want updated:
+#    docker-compose.yml:
+#      labels:
+#        - "com.centurylinklabs.watchtower.enable=true"
+#
+# 2. Optional: Create .env for notifications:
+#    WATCHTOWER_NOTIFICATIONS=shoutrrr
+#    WATCHTOWER_NOTIFICATION_URL=ntfy://notify.cronova.dev/cronova-updates
+#
+# 3. Start Watchtower:
+#    docker compose up -d
+#
+# 4. Check logs:
+#    docker logs watchtower
+#
+# =============================================================================
+# MANUAL UPDATE
+# =============================================================================
+#
+# Force immediate update check:
+#   docker exec watchtower /watchtower --run-once
+#
+# Update specific container:
+#   docker exec watchtower /watchtower --run-once jellyfin
+#
+# =============================================================================
+# EXCLUDED FROM AUTO-UPDATE (by default)
+# =============================================================================
+#
+# Critical services that should be manually updated:
+#   - vaultwarden (password manager - test updates first)
+#   - headscale (mesh coordinator - coordinate with all nodes)
+#   - frigate (NVR - may have breaking changes)
+#
+# These don't have the watchtower.enable label.
+#
+# =============================================================================

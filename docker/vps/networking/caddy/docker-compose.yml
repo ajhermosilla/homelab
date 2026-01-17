@@ -15,6 +15,7 @@ services:
       - "com.cronova.environment=vps"
       - "com.cronova.category=networking"
       - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     cap_drop:
       - ALL
     cap_add:

@@ -14,6 +14,7 @@ services:
     labels:
       - "com.cronova.environment=vps"
       - "com.cronova.category=networking"
+      - "com.centurylinklabs.watchtower.enable=true"
     read_only: true
     tmpfs:
       - /tmp:size=64M

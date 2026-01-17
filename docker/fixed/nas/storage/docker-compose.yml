@@ -19,6 +19,7 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=storage"
       - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     deploy:
       resources:
         limits:
@@ -73,6 +74,7 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=storage"
       - "com.cronova.backup=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8384/rest/noauth/health"]
       interval: 30s
