@@ -11,6 +11,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -26,8 +31,14 @@ services:
       - PGID=1000
       - BASE_URL=https://watch.cronova.dev
       - PLAYWRIGHT_DRIVER_URL=ws://playwright:3000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
-      - playwright
+      playwright:
+        condition: service_started
     networks:
       - scraping-net
 
@@ -48,6 +59,11 @@ services:
       - SCREEN_HEIGHT=1080
       - SCREEN_DEPTH=24
       - MAX_CONCURRENT_CHROME_PROCESSES=4
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - scraping-net
 

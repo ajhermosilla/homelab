@@ -9,6 +9,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "443"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     ports:
       - "3478:3478/udp"  # STUN
       - "8443:443"       # HTTPS (DERP) - mapped to 8443, Caddy handles 443
@@ -23,6 +28,11 @@ services:
       - DERP_VERIFY_CLIENTS=false
     volumes:
       - derp-certs:/certs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - derp-net
 

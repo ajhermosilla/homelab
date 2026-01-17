@@ -31,6 +31,11 @@ services:
       ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
       WEBSOCKET_ENABLED: "true"
       LOG_LEVEL: info
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - security-net
 
@@ -44,6 +49,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     shm_size: "256mb"
     ports:
       - "5000:5000"     # Web UI
@@ -64,6 +74,13 @@ services:
     environment:
       TZ: ${TZ:-America/Asuncion}
       FRIGATE_RTSP_PASSWORD: ${FRIGATE_RTSP_PASSWORD}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    # Note: Frigate depends on Mosquitto (automation stack) for MQTT.
+    # Start automation stack before security stack.
     networks:
       - security-net
 
