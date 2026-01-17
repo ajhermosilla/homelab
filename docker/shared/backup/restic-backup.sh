@@ -3,10 +3,11 @@
 # Usage: Set environment variables and run
 #
 # Required env vars:
-#   RESTIC_REPOSITORY - restic repo URL (rest:http://user:pass@host:8000/repo)
-#   RESTIC_PASSWORD   - encryption password
-#   BACKUP_PATH       - path to backup (e.g., /data)
-#   BACKUP_TAG        - tag for snapshots (e.g., vaultwarden)
+#   RESTIC_REPOSITORY      - restic repo URL (rest:http://user:pass@host:8000/repo)
+#   RESTIC_PASSWORD        - encryption password
+#     OR RESTIC_PASSWORD_FILE - path to file containing password (Docker secrets)
+#   BACKUP_PATH            - path to backup (e.g., /data)
+#   BACKUP_TAG             - tag for snapshots (e.g., vaultwarden)
 #
 # Optional env vars:
 #   BACKUP_EXCLUDE    - exclude pattern (comma-separated)
@@ -26,9 +27,15 @@ log() {
 }
 
 # Validate required variables
-if [ -z "$RESTIC_REPOSITORY" ] || [ -z "$RESTIC_PASSWORD" ] || [ -z "$BACKUP_PATH" ] || [ -z "$BACKUP_TAG" ]; then
+if [ -z "$RESTIC_REPOSITORY" ] || [ -z "$BACKUP_PATH" ] || [ -z "$BACKUP_TAG" ]; then
     log "ERROR: Missing required environment variables"
-    log "Required: RESTIC_REPOSITORY, RESTIC_PASSWORD, BACKUP_PATH, BACKUP_TAG"
+    log "Required: RESTIC_REPOSITORY, BACKUP_PATH, BACKUP_TAG"
+    exit 1
+fi
+
+# Check for password (either direct or file-based)
+if [ -z "$RESTIC_PASSWORD" ] && [ -z "$RESTIC_PASSWORD_FILE" ]; then
+    log "ERROR: Missing password - set RESTIC_PASSWORD or RESTIC_PASSWORD_FILE"
     exit 1
 fi
 
