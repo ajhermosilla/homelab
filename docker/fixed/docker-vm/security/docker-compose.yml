@@ -108,6 +108,54 @@ services:
     networks:
       - security-net
 
+  # =========================================================================
+  # Vaultwarden Backup Sidecar
+  # Daily encrypted backups to NAS via restic
+  # =========================================================================
+  vaultwarden-backup:
+    image: restic/restic:0.16.4
+    env_file:
+      - ../../../shared/common.env
+    container_name: vaultwarden-backup
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=backup"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "0 2 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+        crond -f -l 2
+    volumes:
+      - vaultwarden-data:/data:ro
+      - ../../../shared/backup/restic-backup.sh:/backup.sh:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.1.12:8000/vaultwarden}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      BACKUP_PATH: /data
+      BACKUP_TAG: vaultwarden
+      KEEP_DAILY: "7"
+      KEEP_WEEKLY: "4"
+      KEEP_MONTHLY: "12"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - security-net
+    depends_on:
+      - vaultwarden
+
 volumes:
   vaultwarden-data:
     name: vaultwarden-data

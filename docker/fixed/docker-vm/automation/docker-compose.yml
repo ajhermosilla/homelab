@@ -94,6 +94,55 @@ services:
     networks:
       - automation-net
 
+  # =========================================================================
+  # Home Assistant Backup Sidecar
+  # Daily encrypted backups to NAS via restic
+  # =========================================================================
+  homeassistant-backup:
+    image: restic/restic:0.16.4
+    env_file:
+      - ../../../shared/common.env
+    container_name: homeassistant-backup
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=backup"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "0 3 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+        crond -f -l 2
+    volumes:
+      - homeassistant-config:/data:ro
+      - ../../../shared/backup/restic-backup.sh:/backup.sh:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.1.12:8000/homeassistant}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      BACKUP_PATH: /data
+      BACKUP_TAG: homeassistant
+      BACKUP_EXCLUDE: "*.log,*.db-shm,*.db-wal,home-assistant_v2.db"
+      KEEP_DAILY: "7"
+      KEEP_WEEKLY: "4"
+      KEEP_MONTHLY: "12"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - automation-net
+    depends_on:
+      - homeassistant
+
 volumes:
   homeassistant-config:
     name: homeassistant-config
