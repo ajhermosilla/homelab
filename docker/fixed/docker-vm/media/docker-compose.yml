@@ -18,6 +18,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
+      - "com.centurylinklabs.watchtower.enable=true"
       - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
@@ -67,6 +68,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
+      - "com.centurylinklabs.watchtower.enable=true"
       - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
@@ -114,6 +116,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
+      - "com.centurylinklabs.watchtower.enable=true"
       - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
@@ -161,6 +164,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
+      - "com.centurylinklabs.watchtower.enable=true"
       - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
@@ -203,6 +207,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s

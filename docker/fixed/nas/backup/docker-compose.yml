@@ -19,6 +19,7 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=backup"
       - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     cap_drop:
       - ALL
     read_only: true

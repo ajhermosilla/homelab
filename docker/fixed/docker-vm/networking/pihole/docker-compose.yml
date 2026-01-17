@@ -17,6 +17,7 @@ services:
       - "com.cronova.category=networking"
       - "com.cronova.critical=true"
       - "com.cronova.backup=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD", "dig", "+norecurse", "+retry=0", "@127.0.0.1", "pi.hole"]
       interval: 30s

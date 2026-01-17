@@ -66,6 +66,7 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=automation"
       - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
       interval: 30s
