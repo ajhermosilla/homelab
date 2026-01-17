@@ -9,6 +9,10 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=scraping"
+      - "com.cronova.backup=true"
     cap_drop:
       - ALL
     healthcheck:
@@ -49,6 +53,9 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=scraping"
     deploy:
       resources:
         limits:

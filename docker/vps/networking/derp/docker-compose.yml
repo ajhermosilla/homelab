@@ -9,6 +9,9 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=networking"
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "443"]
       interval: 30s
