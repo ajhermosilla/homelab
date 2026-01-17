@@ -20,6 +20,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
     ports:
       - "53:53/tcp"
       - "53:53/udp"

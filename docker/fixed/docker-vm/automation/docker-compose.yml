@@ -23,6 +23,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '2'
     ports:
       - "8123:8123"
     volumes:
@@ -62,6 +67,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
     ports:
       - "1883:1883"     # MQTT
       - "9001:9001"     # WebSocket (optional)
