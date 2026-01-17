@@ -1,43 +1,16 @@
 # Caddy - Reverse proxy with automatic HTTPS
-# VPS - Vultr
+# VPS - Vultr (24/7 operation)
 # https://caddyserver.com/
 
 services:
   caddy:
-    image: caddy:2.8
-    env_file:
-      - ../../../shared/common.env
+    image: caddy:2-alpine
     container_name: caddy
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    labels:
-      - "com.cronova.environment=vps"
-      - "com.cronova.category=networking"
-      - "com.cronova.critical=true"
-      - "com.centurylinklabs.watchtower.enable=true"
-    cap_drop:
-      - ALL
-    cap_add:
-      - NET_BIND_SERVICE
-    read_only: true
-    tmpfs:
-      - /tmp:size=64M
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"  # HTTP/3 QUIC
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-      - /var/www:/var/www:ro
-    environment:
-      - TZ=${TZ:-America/Asuncion}
-    networks:
-      - proxy-net
     healthcheck:
-      test: ["CMD", "caddy", "validate", "--config", "/etc/caddy/Caddyfile"]
+      test: ["CMD", "caddy", "version"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -46,11 +19,23 @@ services:
         limits:
           memory: 256M
           cpus: '0.5'
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    ports:
+      - "80:80"       # HTTP (redirect to HTTPS)
+      - "443:443"     # HTTPS
+      - "443:443/udp" # HTTP/3 (QUIC)
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+    networks:
+      - headscale-net
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=networking"
+      - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
 
 volumes:
   caddy-data:
@@ -59,34 +44,56 @@ volumes:
     name: caddy-config
 
 networks:
-  proxy-net:
-    name: proxy-net
+  headscale-net:
+    external: true
 
+# =============================================================================
+# VPS CADDY - REVERSE PROXY
+# =============================================================================
+#
+# Caddy provides automatic HTTPS via Let's Encrypt for all VPS services.
+# It terminates TLS and reverse proxies to internal services.
+#
 # =============================================================================
 # SETUP INSTRUCTIONS
 # =============================================================================
 #
-# 1. Copy Caddyfile from docs:
-#    cp /path/to/docs/caddy-config.md ./Caddyfile
-#    # Extract the VPS Caddyfile section
+# 1. Ensure headscale-net network exists (created by Headscale):
+#    docker network create headscale-net
 #
-# 2. Create web directories:
-#    sudo mkdir -p /var/www/verava /var/www/verava-docs
-#
-# 3. Start the service:
+# 2. Start Caddy:
 #    docker compose up -d
 #
-# 4. Verify certificates:
-#    docker logs caddy
-#    curl -I https://status.cronova.dev
+# 3. Add more services by editing Caddyfile and running:
+#    docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 #
 # =============================================================================
-# NOTES
+# ADDING NEW SERVICES
 # =============================================================================
 #
-# - Caddy handles SSL automatically via Let's Encrypt
-# - All services should connect to proxy-net network
-# - Caddyfile references localhost ports for local services
-# - For Tailscale services (vault), use 100.64.x.x IPs
+# Edit Caddyfile to add new reverse proxy entries:
+#
+#   newservice.cronova.dev {
+#       reverse_proxy service-container:port
+#   }
+#
+# Then reload Caddy:
+#   docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+#
+# =============================================================================
+# USEFUL COMMANDS
+# =============================================================================
+#
+# Reload config:
+#   docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+#
+# Validate config:
+#   docker exec caddy caddy validate --config /etc/caddy/Caddyfile
+#
+# View logs:
+#   docker logs -f caddy
+#
+# List certificates:
+#   docker exec caddy caddy list-modules | grep tls
 #
 # =============================================================================

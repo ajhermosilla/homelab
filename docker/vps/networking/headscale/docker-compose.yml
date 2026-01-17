@@ -23,7 +23,7 @@ services:
           cpus: '0.5'
     command: serve
     ports:
-      - "443:443"       # HTTPS (coordination)
+      - "8080:8080"     # HTTP (Caddy handles TLS on 443)
       - "3478:3478/udp" # STUN
     volumes:
       - ./config:/etc/headscale
@@ -89,48 +89,29 @@ networks:
 # SETUP INSTRUCTIONS
 # =============================================================================
 #
-# 1. Create config directory and copy template:
-#    mkdir -p config
-#    cp config.yaml.example config/config.yaml
+# 1. Copy config template:
+#    cp config/config.yaml.example config/config.yaml
 #
-# 2. Generate private key:
-#    docker run --rm headscale/headscale:latest headscale generate private-key > config/private.key
+# 2. Create .env file:
+#    cp .env.example .env
 #
-# 3. Edit config/config.yaml:
-#    server_url: https://hs.cronova.dev
-#    listen_addr: 0.0.0.0:443
-#    metrics_listen_addr: 127.0.0.1:9090
-#    private_key_path: /etc/headscale/private.key
-#    noise:
-#      private_key_path: /var/lib/headscale/noise_private.key
-#    ip_prefixes:
-#      - 100.64.0.0/10
-#    dns_config:
-#      magic_dns: true
-#      base_domain: cronova.dev
-#      nameservers:
-#        - 1.1.1.1
-#        - 9.9.9.9
-#
-# 4. Create .env file:
-#    TZ=America/Asuncion
-#    BACKUP_PATH=./backups
-#    BACKUP_RETENTION_HOURS=720
-#
-# 5. Copy backup script:
-#    cp backup.sh.example backup.sh
+# 3. Create backups directory and make backup script executable:
+#    mkdir -p backups
 #    chmod +x backup.sh
 #
-# 6. Start the service:
+# 4. Start Headscale:
 #    docker compose up -d
 #
-# 7. Create a user:
+# 5. Start Caddy (for TLS) - see ../caddy/
+#    cd ../caddy && docker compose up -d
+#
+# 6. Create a user:
 #    docker exec headscale headscale users create augusto
 #
-# 8. Generate auth key for devices:
+# 7. Generate auth key for devices (30 days):
 #    docker exec headscale headscale preauthkeys create --user augusto --reusable --expiration 720h
 #
-# 9. Connect devices:
+# 8. Connect devices:
 #    tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 #
 # =============================================================================
@@ -144,19 +125,15 @@ networks:
 #   Proxy: OFF (grey cloud - direct connection needed)
 #
 # =============================================================================
-# CADDY INTEGRATION (OPTIONAL)
+# CADDY INTEGRATION (REQUIRED)
 # =============================================================================
 #
-# If using Caddy for reverse proxy on port 443, change Headscale port:
-#   ports:
-#     - "8080:8080"
+# Caddy handles TLS termination on port 443. Headscale listens on 8080.
+# See ../caddy/ for Caddy configuration.
 #
-# And update config.yaml:
-#   listen_addr: 0.0.0.0:8080
-#
-# Then add to Caddyfile:
+# Caddyfile entry:
 #   hs.cronova.dev {
-#       reverse_proxy localhost:8080
+#       reverse_proxy headscale:8080
 #   }
 #
 # =============================================================================
