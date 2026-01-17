@@ -38,6 +38,11 @@ services:
     group_add:
       - "render"
       - "video"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
     networks:
       - media-net
 
@@ -51,6 +56,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -66,6 +76,14 @@ services:
       TZ: ${TZ:-America/Asuncion}
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      prowlarr:
+        condition: service_healthy
     networks:
       - media-net
 
@@ -79,6 +97,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -94,6 +117,14 @@ services:
       TZ: ${TZ:-America/Asuncion}
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      prowlarr:
+        condition: service_healthy
     networks:
       - media-net
 
@@ -107,6 +138,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -120,6 +156,11 @@ services:
       TZ: ${TZ:-America/Asuncion}
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - media-net
 
@@ -133,6 +174,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -150,6 +196,11 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       WEBUI_PORT: 8080
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - media-net
 

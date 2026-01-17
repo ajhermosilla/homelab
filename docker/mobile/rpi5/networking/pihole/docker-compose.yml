@@ -31,6 +31,11 @@ services:
       - pihole-dnsmasq:/etc/dnsmasq.d
     cap_add:
       - NET_ADMIN
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - pihole-net
 

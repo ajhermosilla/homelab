@@ -24,13 +24,19 @@ services:
       - homeassistant-config:/config
     environment:
       TZ: ${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
     # Note: Add device mounts if USB Zigbee/Z-Wave sticks are used:
     # devices:
     #   - /dev/ttyUSB0:/dev/ttyUSB0
     networks:
       - automation-net
     depends_on:
-      - mosquitto
+      mosquitto:
+        condition: service_healthy
 
   # =========================================================================
   # Mosquitto - MQTT Broker
@@ -42,6 +48,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     ports:
       - "1883:1883"     # MQTT
       - "9001:9001"     # WebSocket (optional)
@@ -52,6 +63,11 @@ services:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     environment:
       TZ: ${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - automation-net
 
