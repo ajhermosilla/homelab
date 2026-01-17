@@ -5,6 +5,8 @@
 services:
   pihole:
     image: pihole/pihole:2024.07.0
+    env_file:
+      - ../../../../shared/common.env
     container_name: pihole
     hostname: pihole-fixed
     restart: unless-stopped

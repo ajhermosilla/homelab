@@ -5,6 +5,8 @@
 services:
   headscale:
     image: headscale/headscale:0.23.0
+    env_file:
+      - ../../../shared/common.env
     container_name: headscale
     restart: unless-stopped
     security_opt:
@@ -36,6 +38,8 @@ services:
   # Hourly backup sidecar
   headscale-backup:
     image: alpine:latest
+    env_file:
+      - ../../../shared/common.env
     container_name: headscale-backup
     restart: unless-stopped
     security_opt:

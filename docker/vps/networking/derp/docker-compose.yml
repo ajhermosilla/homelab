@@ -5,6 +5,8 @@
 services:
   derp:
     image: fredliang/derper:1.0
+    env_file:
+      - ../../../shared/common.env
     container_name: derp
     restart: unless-stopped
     security_opt:
