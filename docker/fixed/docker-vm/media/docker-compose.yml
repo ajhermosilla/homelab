@@ -13,6 +13,10 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=media"
+      - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
       interval: 30s
@@ -56,6 +60,10 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=media"
+      - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
       interval: 30s
@@ -97,6 +105,10 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=media"
+      - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
       interval: 30s
@@ -138,6 +150,10 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=media"
+      - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
       interval: 30s
@@ -174,6 +190,9 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=media"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s

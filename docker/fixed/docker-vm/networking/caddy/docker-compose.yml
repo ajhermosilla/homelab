@@ -9,6 +9,10 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=networking"
+      - "com.cronova.critical=true"
     cap_drop:
       - ALL
     cap_add:

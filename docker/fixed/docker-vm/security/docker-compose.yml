@@ -13,6 +13,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=security"
+      - "com.cronova.critical=true"
+      - "com.cronova.backup=true"
     cap_drop:
       - ALL
     healthcheck:
@@ -49,6 +54,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=security"
+      - "com.cronova.critical=true"
+      - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/version"]
       interval: 30s
