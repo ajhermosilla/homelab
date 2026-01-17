@@ -5,6 +5,8 @@
 services:
   changedetection:
     image: ghcr.io/dgtlmoon/changedetection.io:latest
+    env_file:
+      - ../../shared/common.env
     container_name: changedetection
     restart: unless-stopped
     security_opt:
@@ -49,6 +51,8 @@ services:
   # Playwright for JavaScript rendering
   playwright:
     image: dgtlmoon/sockpuppetbrowser:latest
+    env_file:
+      - ../../shared/common.env
     container_name: playwright
     restart: unless-stopped
     security_opt:

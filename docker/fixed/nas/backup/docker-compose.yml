@@ -9,6 +9,8 @@ services:
   # =========================================================================
   restic-rest:
     image: restic/rest-server:0.12
+    env_file:
+      - ../../../shared/common.env
     container_name: restic-rest
     restart: unless-stopped
     security_opt:

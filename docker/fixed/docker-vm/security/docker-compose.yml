@@ -9,6 +9,8 @@ services:
   # =========================================================================
   vaultwarden:
     image: vaultwarden/server:1.32.0
+    env_file:
+      - ../../../shared/common.env
     container_name: vaultwarden
     restart: unless-stopped
     security_opt:
@@ -55,6 +57,8 @@ services:
   # =========================================================================
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable
+    env_file:
+      - ../../../shared/common.env
     container_name: frigate
     restart: unless-stopped
     security_opt:

@@ -9,6 +9,8 @@ services:
   # =========================================================================
   homeassistant:
     image: homeassistant/home-assistant:stable
+    env_file:
+      - ../../../shared/common.env
     container_name: homeassistant
     restart: unless-stopped
     security_opt:
@@ -54,6 +56,8 @@ services:
   # =========================================================================
   mosquitto:
     image: eclipse-mosquitto:2.0
+    env_file:
+      - ../../../shared/common.env
     container_name: mosquitto
     restart: unless-stopped
     security_opt:
