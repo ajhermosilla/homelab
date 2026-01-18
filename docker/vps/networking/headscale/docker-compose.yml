@@ -4,7 +4,7 @@
 
 services:
   headscale:
-    image: headscale/headscale:0.23.0
+    image: headscale/headscale:0.27.0
     env_file:
       - ../../../shared/common.env
     container_name: headscale
@@ -167,6 +167,13 @@ networks:
 #
 # Enable route (for exit node):
 #   docker exec headscale headscale routes enable -r <route-id>
+#
+# EXIT NODE SETUP (VPS):
+#   1. Install Tailscale on VPS: curl -fsSL https://tailscale.com/install.sh | sh
+#   2. Enable IP forwarding: echo 'net.ipv4.ip_forward = 1' >> /etc/sysctl.conf && sysctl -p
+#   3. Generate auth key: docker exec headscale headscale preauthkeys create --user augusto --expiration 1h
+#   4. Connect: tailscale up --login-server=https://hs.cronova.dev --authkey=<key> --advertise-exit-node --hostname=vps-vultr
+#   5. Enable routes: docker exec headscale headscale routes enable -r 1 && docker exec headscale headscale routes enable -r 2
 #
 # View logs:
 #   docker logs -f headscale
