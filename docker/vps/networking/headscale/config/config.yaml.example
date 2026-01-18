@@ -137,8 +137,10 @@ log:
 # =============================================================================
 
 # ACL policy file for fine-grained access control
-# policy:
-#   path: /etc/headscale/acl.yaml
+# Uses HuJSON format (JSON with comments)
+# See acl.json.example for template
+policy:
+  path: /etc/headscale/acl.json
 
 # =============================================================================
 # SETUP INSTRUCTIONS
