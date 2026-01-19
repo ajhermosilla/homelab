@@ -27,9 +27,9 @@ hs.cronova.dev {
 # =============================================================================
 
 # Uptime Kuma - Status monitoring
-# status.cronova.dev {
-#     reverse_proxy uptime-kuma:3001
-# }
+status.cronova.dev {
+    reverse_proxy uptime-kuma:3001
+}
 
 # ntfy - Push notifications
 # notify.cronova.dev {

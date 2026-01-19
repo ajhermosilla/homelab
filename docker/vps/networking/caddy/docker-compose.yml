@@ -31,6 +31,7 @@ services:
       - TZ=${TZ:-America/Asuncion}
     networks:
       - headscale-net
+      - monitoring-net
     labels:
       - "com.cronova.environment=vps"
       - "com.cronova.category=networking"
@@ -45,6 +46,8 @@ volumes:
 
 networks:
   headscale-net:
+    external: true
+  monitoring-net:
     external: true
 
 # =============================================================================
