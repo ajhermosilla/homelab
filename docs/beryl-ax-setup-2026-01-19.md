@@ -191,6 +191,82 @@ wg show
 | Phone (mombeu) | Mobile client | DHCP |
 | RPi 5 | Pi-hole (secondary DNS), tinkering | 192.168.8.5 |
 
+## Security Baseline
+
+**Hardened:** 2026-01-19
+
+### Access Control
+
+| Service | Port | Bind Address | WAN Access | Status |
+|---------|------|--------------|------------|--------|
+| SSH | 22 | 192.168.8.1 | Blocked | ✓ LAN-only |
+| Admin UI | 80, 443 | 0.0.0.0 | Blocked (firewall) | ✓ Secured |
+| Admin UI | 8080, 8443 | 127.0.0.1 | N/A | ✓ Localhost |
+| AdGuard Home | 3000 | 192.168.8.1 | Blocked | ✓ LAN-only |
+| AdGuard DNS | 3053 | 0.0.0.0 | Blocked (firewall) | ✓ Secured |
+
+### Firewall Rules
+
+```
+WAN → Default DROP policy
+LAN → ACCEPT (trusted)
+Tailscale → ACCEPT (trusted)
+```
+
+**Critical:** All WAN traffic hits `zone_wan_src_DROP` - default deny.
+
+### Authentication
+
+| Component | Method | Status |
+|-----------|--------|--------|
+| Admin UI | Password | Set (KeepassXC) |
+| SSH | Password | Active (LAN-only, Tailscale OK) |
+| AdGuard Home | None | No login configured |
+
+**TODO:** Add SSH key authentication, disable password.
+
+### Firmware
+
+| Component | Version | Date |
+|-----------|---------|------|
+| GL.iNet Firmware | 4.8.1 | Unknown |
+| OpenWrt | (bundled) | Unknown |
+
+**Check for updates:** System > Upgrade in web UI
+
+### Security Commands Reference
+
+```bash
+# Verify SSH is LAN-only
+netstat -tuln | grep :22
+# Should show: 192.168.8.1:22
+
+# Verify AdGuard is LAN-only
+netstat -tuln | grep :3000
+# Should show: 192.168.8.1:3000
+
+# Check WAN firewall (should DROP all)
+iptables -L zone_wan_input -n -v
+
+# Check Tailscale auto-start
+/etc/init.d/tailscale enabled && echo "OK" || echo "FAILED"
+```
+
+### Threat Model
+
+**Trusted networks:**
+- LAN (192.168.8.0/24) - your devices
+- Tailscale mesh (100.x.x.x) - your homelab
+
+**Untrusted networks:**
+- WAN (hotel WiFi, cafe, tethering) - hostile
+
+**Defense in depth:**
+1. Firewall blocks all WAN ports by default
+2. Services bind to LAN IP only (SSH, AdGuard)
+3. Localhost-only for sensitive services (uhttpd)
+4. Tailscale provides secure remote access
+
 ## Resources
 
 - [GL.iNet Product Page](https://www.gl-inet.com/products/gl-mt3000/)
