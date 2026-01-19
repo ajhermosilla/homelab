@@ -38,7 +38,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 ### Features Tested
 
 - [x] **Repeater mode** - Extend hotel/cafe WiFi securely
-- [ ] **WireGuard VPN client** - Connect to VPS exit node
+- [~] **WireGuard VPN client** - Optional, use Tailscale exit node instead
 - [x] **Tailscale** - Joined Headscale mesh as `beryl-ax`
 - [x] **AdGuard Home** - Primary DNS ad-blocking for mobile kit
 - [ ] **USB storage** - File sharing via USB 3.0
@@ -114,13 +114,26 @@ Verify:
 tailscale status
 ```
 
-### WireGuard to VPS
+### Exit Node (On-Demand VPN)
 
-Route all traffic through VPS exit node:
+Use Tailscale exit node instead of WireGuard - easier to toggle, same benefit.
 
-1. Applications > VPN > WireGuard Client
-2. Import VPS WireGuard config
-3. Enable "Use VPN for all traffic"
+```bash
+# Enable exit node (route all traffic through VPS)
+tailscale set --exit-node=vps-vultr
+
+# Disable exit node (direct connection)
+tailscale set --exit-node=
+```
+
+**When to use:**
+- Untrusted WiFi (hotels, cafes)
+- Need US IP for geo-restricted content
+
+**When NOT to use:**
+- Local banking (homebanking rejects VPS IPs)
+- Local streaming services
+- Normal browsing (adds latency)
 
 ### DNS Strategy (Dual-DNS)
 
@@ -194,4 +207,3 @@ wg show
 - [x] Join Headscale mesh as `beryl-ax`
 - [x] Test repeater mode
 - [x] Configure AdGuard Home
-- [ ] Test WireGuard to VPS
