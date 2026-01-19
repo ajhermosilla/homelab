@@ -87,19 +87,26 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 ### Tailscale on Beryl (Completed)
 
-GL.iNet UI doesn't expose custom server option. Use SSH instead:
+GL.iNet UI doesn't expose custom server option. Use SSH instead.
+
+**Important:** Use a pre-auth key to avoid ephemeral node timeout (30min idle = disconnect).
 
 ```bash
-# SSH to Beryl
+# 1. Create pre-auth key on VPS (1 year expiration)
+ssh vps 'sudo docker exec headscale headscale preauthkeys create --user 1 --reusable --expiration 8760h'
+
+# 2. SSH to Beryl
 ssh root@192.168.8.1
 
-# Connect to Headscale
-tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --accept-routes --accept-dns=false
+# 3. Connect with authkey (persistent registration)
+tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --authkey=<KEY> --accept-routes --accept-dns=false
 ```
 
-Then register on VPS:
+**If disconnected/logged out**, reset and re-register:
 ```bash
-ssh vps 'sudo docker exec headscale headscale nodes register --key <KEY> --user augusto'
+tailscale down
+tailscale logout
+tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --authkey=<KEY> --accept-routes --accept-dns=false
 ```
 
 Verify:
