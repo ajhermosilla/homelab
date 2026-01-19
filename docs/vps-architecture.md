@@ -1,54 +1,48 @@
 # VPS Architecture
 
-Cloud helper node for NAT traversal, monitoring, and scraping - no personal data at rest.
+Cloud node for Tailscale coordination, monitoring, and external services - minimal personal data at rest.
 
-**Key principle:** Headscale runs on RPi 5 (mobile kit). VPS is a helper, not critical infrastructure. If VPS dies, your mesh still works.
+**Key principle:** Headscale runs on VPS for 24/7 mesh availability. Mobile kit operates on-demand (7AM-7PM). If VPS dies, mesh clients still work with cached keys but can't add new nodes.
 
 ## Goals
 
-- Multiple points of failure (redundancy)
+- 24/7 Tailscale mesh coordination
+- External monitoring of homelab
 - Privacy/sovereignty preserved (data stays at home)
 - US IP for web scraping
-- External monitoring of homelab
 - ~$6/month budget
 
-## Provider Comparison
+## Provider
 
-| Provider | Plan | Specs | Price | Notes |
-|----------|------|-------|-------|-------|
-| **Vultr** | High Frequency | 1 vCPU, 1GB RAM, 32GB NVMe | $6/mo | Faster CPU, recommended |
-| Vultr | Regular Cloud | 1 vCPU, 1GB RAM, 25GB SSD | $6/mo | Standard option |
-| DigitalOcean | Basic Droplet | 1 vCPU, 1GB RAM, 25GB SSD | $6/mo | Better docs/community |
-| Vultr | IPv6 only | 1 vCPU, 512MB RAM, 10GB | $2.50/mo | If IPv6-only works |
+| Provider | Plan | Specs | Price |
+|----------|------|-------|-------|
+| **Vultr** | High Frequency | 1 vCPU, 1GB RAM, 32GB NVMe | $6/mo |
 
-**Decision:** Vultr US (burn credits first, better price/performance)
+**Location:** USA (for web scraping and low latency)
 
 ## Services
 
-### Tier 1: Network Helpers (No Personal Data)
+### Tier 1: Network Infrastructure
 
-| Service | Port | Purpose | RAM |
-|---------|------|---------|-----|
-| DERP Relay | 443, 3478 | Tailscale NAT traversal relay | ~30MB |
-| Pi-hole | 53, 8080 | DNS sinkhole (US-based, fallback) | ~30MB |
-| Uptime Kuma | 3001 | Monitor homelab externally | ~100MB |
-| ntfy | 80 | Push notifications | ~50MB |
+| Service | Port | Purpose | Status |
+|---------|------|---------|--------|
+| Headscale | 8080 | Tailscale coordination server | Active |
+| Caddy | 80, 443 | Reverse proxy, auto-SSL | Active |
 
-*Note: Headscale runs on RPi 5 (mobile kit), not here.*
+### Tier 2: Monitoring
 
-### Tier 2: Web Scraping (US IP)
+| Service | Port | Purpose | Status |
+|---------|------|---------|--------|
+| Uptime Kuma | 3001 | Status monitoring | Active |
+| ntfy | 80 | Push notifications | Active |
 
-| Service | Port | Purpose | RAM |
-|---------|------|---------|-----|
-| changedetection.io | 5000 | Website change monitoring | ~100MB |
+### Tier 3: Future Services
 
-*Note: changedetection.io has built-in Playwright support. No need for separate Browserless (saves ~500MB RAM).*
-
-### Tier 3: Backup Relay (Encrypted)
-
-| Service | Port | Purpose | RAM |
-|---------|------|---------|-----|
-| Restic REST Server | 8000 | Encrypted backup target | ~50MB |
+| Service | Port | Purpose | Status |
+|---------|------|---------|--------|
+| changedetection.io | 5000 | Website change monitoring | Planned |
+| DERP Relay | 3478/udp | Tailscale NAT traversal | Planned |
+| Restic REST Server | 8000 | Encrypted backup target | Planned |
 
 ## Architecture Diagram
 
@@ -56,98 +50,84 @@ Cloud helper node for NAT traversal, monitoring, and scraping - no personal data
                         [Internet]
                             |
                      [Vultr VPS - US]
-                      100.64.0.100
+                      104.207.144.195
+                      100.77.172.46 (TS)
                             |
-    +------------+------------+------------+
-    |            |            |            |
-[DERP Relay] [Pi-hole]  [Uptime Kuma] [changedetection]
-(NAT helper) (US DNS)      [ntfy]     [Restic REST]
+    +------------+----------+----------+------------+
+    |            |          |          |            |
+[Headscale]  [Caddy]  [Uptime Kuma]  [ntfy]    [Future]
+(TS coord)  (proxy)   (monitoring) (alerts)  (DERP, etc)
                             |
                      [Tailscale Mesh]
                             |
         +-------------------+-------------------+
-        |                                       |
-   [Mobile Kit]                          [Fixed Homelab]
-   RPi 5 (HEADSCALE) + MacBook           Mini PC + RPi 4
-   100.64.0.1-2                          100.64.0.10-11
+        |                   |                   |
+   [Mobile Kit]        [Devices]         [Fixed Homelab]
+   Beryl AX + RPi 5    MacBook, Phone    (Future)
 ```
 
-**Flow:** RPi 5 runs Headscale (coordination). VPS DERP relay helps when direct connections fail (NAT/firewall).
+**Flow:** VPS Headscale coordinates mesh. All devices connect via Tailscale. VPS acts as exit node when needed.
 
-**RAM Budget (~1GB VPS):**
-- DERP: ~30MB
-- Pi-hole: ~30MB
-- Uptime Kuma: ~100MB
-- ntfy: ~50MB
-- changedetection: ~100MB
-- Restic REST: ~50MB
-- **Total:** ~360MB (plenty of headroom)
+## Endpoints
+
+| Subdomain | Service | Notes |
+|-----------|---------|-------|
+| hs.cronova.dev | Headscale | Tailscale coordination |
+| status.cronova.dev | Uptime Kuma | Public status page |
+| notify.cronova.dev | ntfy | Push notifications |
+| cronova.dev | Landing page | Static HTML |
 
 ## Privacy Model
 
-### What VPS Sees (Helper Only)
+### What VPS Sees
 
-- DERP relay traffic (encrypted, can't read contents)
-- Which websites you monitor for changes
-- Encrypted backup blobs (client-side encryption)
-- Uptime check results (is X online?)
+- Tailscale mesh metadata (which devices are online)
+- Which websites you monitor for uptime
+- Notification content (you control what's sent)
 
 ### What VPS Never Sees
 
-- Actual file contents
-- Passwords, documents, media
+- Actual file contents from home
 - Traffic between mesh devices (WireGuard encrypted)
-- Backup contents (you hold the keys)
-- Mesh coordination metadata (that's on RPi 5)
+- Passwords, documents, media
 
 ### Trust Level: Moderate
 
 - VPS is assumed potentially compromised
 - No sensitive data at rest
-- All backups encrypted before leaving home
-- Coordination metadata is acceptable risk
-
-## Redundancy Matrix
-
-| Failure | Impact | Recovery |
-|---------|--------|----------|
-| VPS down | Mesh keeps working (cached keys), no external monitoring | Wait or rebuild VPS |
-| Home down | Mobile kit self-contained | Nothing to do |
-| Mobile down | Home still works | Nothing to do |
-| All down | Rebuild from any node | Restore from backups |
+- Mesh traffic is end-to-end encrypted
 
 ## Docker Structure
 
 ```
-docker/
-└── vps/
-    ├── networking/
-    │   ├── derp/
-    │   │   └── docker-compose.yml
-    │   └── pihole/
-    │       └── docker-compose.yml
-    ├── monitoring/
-    │   └── docker-compose.yml  # uptime-kuma + ntfy
-    ├── scraping/
-    │   └── docker-compose.yml  # changedetection
-    └── backup/
-        └── docker-compose.yml  # restic-rest-server
+docker/vps/
+├── networking/
+│   ├── headscale/
+│   │   ├── docker-compose.yml
+│   │   ├── backup.sh
+│   │   └── config/
+│   └── caddy/
+│       ├── docker-compose.yml
+│       ├── Caddyfile
+│       └── www/
+└── monitoring/
+    ├── uptime-kuma (via docker run)
+    └── ntfy (via docker run)
 ```
 
-## Deployment Order
+## Deployment Status
 
 | Phase | Task | Status |
 |-------|------|--------|
-| 1 | Create Vultr account, deploy VPS | Pending |
-| 2 | Basic hardening (SSH keys, firewall) | Pending |
-| 3 | Install Docker | Pending |
-| 4 | Deploy DERP relay | Pending |
-| 5 | Deploy Pi-hole | Pending |
-| 6 | Deploy Uptime Kuma + ntfy | Pending |
-| 7 | Deploy changedetection.io | Pending |
-| 8 | Configure Restic REST server | Pending |
-| 9 | Join VPS to Tailscale (RPi 5 Headscale) | Pending |
-| 10 | Configure DERP in Headscale | Pending |
+| 1 | Create Vultr account, deploy VPS | Done |
+| 2 | Basic hardening (SSH keys, firewall) | Done |
+| 3 | Install Docker | Done |
+| 4 | Deploy Headscale | Done |
+| 5 | Deploy Caddy reverse proxy | Done |
+| 6 | Deploy Uptime Kuma | Done |
+| 7 | Deploy ntfy | Done |
+| 8 | Deploy changedetection.io | Pending |
+| 9 | Configure DERP relay | Pending |
 
 ## Security Hardening
 
@@ -156,29 +136,33 @@ docker/
 - Fail2ban for SSH
 - Automatic security updates
 - No root login
-- Tailscale ACLs for service access
+- Tailscale for private service access
 
-## Cost Breakdown
+## Backup Strategy
+
+- Headscale: Hourly backup via sidecar container
+- Backup location: `/home/linuxuser/backups/headscale/`
+- See `docker/vps/networking/headscale/backup.sh`
+
+## Cost
 
 | Item | Monthly |
 |------|---------|
 | Vultr VPS (1GB) | $6.00 |
-| Domain (optional) | ~$1.00 |
+| Domain (cronova.dev) | ~$1.00 |
 | **Total** | ~$7.00 |
 
 ## Future Enhancements
 
-- [ ] Add Caddy as reverse proxy with auto-SSL
+- [ ] Deploy changedetection.io for website monitoring
+- [ ] Add DERP relay for better NAT traversal
 - [ ] Grafana for VPS metrics
-- [ ] n8n for advanced automation workflows
-- [ ] Additional DERP relays in other regions
+- [ ] Restic REST server for encrypted backups
 
 ## References
 
-- [Tailscale DERP](https://tailscale.com/kb/1118/custom-derp-servers/)
-- [Pi-hole](https://pi-hole.net/)
+- [Headscale Documentation](https://headscale.net/)
+- [Caddy Documentation](https://caddyserver.com/docs/)
 - [Uptime Kuma](https://github.com/louislam/uptime-kuma)
 - [ntfy](https://ntfy.sh/)
-- [changedetection.io](https://changedetection.io/)
-- [Restic REST Server](https://github.com/restic/rest-server)
 - [Vultr](https://www.vultr.com/)
