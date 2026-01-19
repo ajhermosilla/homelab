@@ -267,6 +267,79 @@ iptables -L zone_wan_input -n -v
 3. Localhost-only for sensitive services (uhttpd)
 4. Tailscale provides secure remote access
 
+## Backup & Recovery
+
+### Create Backup
+
+**Via SSH (recommended):**
+
+```bash
+# 1. SSH to Beryl AX
+ssh root@192.168.8.1
+
+# 2. Create backup with timestamp
+sysupgrade -b /tmp/beryl-ax-backup-$(date +%Y%m%d-%H%M).tar.gz
+
+# 3. Exit SSH
+exit
+
+# 4. Copy to MacBook (from MacBook terminal)
+mkdir -p ~/homelab/backups/beryl-ax
+scp -O root@192.168.8.1:/tmp/beryl-ax-backup-*.tar.gz ~/homelab/backups/beryl-ax/
+
+# 5. Verify backup
+ls -lh ~/homelab/backups/beryl-ax/
+tar -tzf ~/homelab/backups/beryl-ax/beryl-ax-backup-*.tar.gz | head -10
+```
+
+**What's backed up:**
+- Network settings (WiFi, DHCP, DNS)
+- Firewall rules
+- Tailscale configuration
+- AdGuard Home settings
+- Admin passwords
+- SSH configuration
+
+**NOT backed up:**
+- Firmware itself
+- AdGuard Home logs/statistics
+- DHCP leases
+
+### Restore from Backup
+
+**If router is reset or bricked:**
+
+```bash
+# 1. Copy backup to router
+scp -O ~/homelab/backups/beryl-ax/beryl-ax-backup-*.tar.gz root@192.168.8.1:/tmp/
+
+# 2. SSH and restore
+ssh root@192.168.8.1
+sysupgrade -r /tmp/beryl-ax-backup-*.tar.gz
+
+# Router will reboot with restored settings
+```
+
+**After restore:**
+- Verify Tailscale: `tailscale status`
+- Verify AdGuard: `netstat -tuln | grep 3000`
+- Verify SSH: `netstat -tuln | grep :22`
+
+### Backup Schedule
+
+| When | Why |
+|------|-----|
+| Before travel | Pre-trip safety net |
+| After config changes | Capture new settings |
+| Weekly during heavy use | Prevent data loss |
+
+**Storage:**
+- Local: `~/homelab/backups/beryl-ax/`
+- Optional: Commit to git (contains passwords - use SOPS if sharing)
+- Optional: Upload to Vaultwarden as attachment
+
+**Latest backup:** `beryl-ax-backup-20260119-1538.tar.gz` (40KB)
+
 ## Resources
 
 - [GL.iNet Product Page](https://www.gl-inet.com/products/gl-mt3000/)
