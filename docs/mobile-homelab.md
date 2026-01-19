@@ -174,12 +174,16 @@ Portable infrastructure for dev, self-hosting, and travel.
 
 | Phase | Task | Status |
 |-------|------|--------|
-| 1 | Wait for RPi 5 PSU | In transit |
-| 2 | Flash RPi OS, install Docker | Pending |
-| 3 | Deploy Pi-hole on RPi 5 | Pending |
-| 4 | Configure Beryl AX DHCP reservations | Pending |
-| 5 | Join RPi 5 to Headscale (VPS) | Pending |
-| 6 | Test on-demand operation | Pending |
+| 1 | Configure Beryl AX (WiFi, admin) | Done |
+| 2 | Join Beryl AX to Tailscale mesh | Done |
+| 3 | Test USB tethering | Done |
+| 4 | Test repeater mode | Done |
+| 5 | Wait for RPi 5 PSU | In transit |
+| 6 | Flash RPi OS, install Docker | Pending |
+| 7 | Deploy Pi-hole on RPi 5 | Pending |
+| 8 | Configure Beryl AX DHCP (use RPi 5 DNS) | Pending |
+| 9 | Join RPi 5 to Headscale (VPS) | Pending |
+| 10 | Test on-demand operation | Pending |
 
 ## Docker Structure (RPi 5)
 
