@@ -21,7 +21,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 1. Unbox, connect USB-C power
 2. Connect to `GL-MT3000-xxx` WiFi (password on device label)
-3. Access admin panel: http://192.168.8.1
+3. Access admin panel: https://192.168.8.1 (accept self-signed cert warning)
 4. Set admin password
 5. Configure WiFi SSID and password
 
@@ -58,9 +58,11 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 ### Default Settings
 
-- Admin panel: `192.168.8.1`
+- Admin panel: https://192.168.8.1 (HTTP also works)
 - LAN subnet: `192.168.8.0/24`
 - DHCP range: `192.168.8.100-200`
+
+**Note:** HTTPS uses self-signed certificate - browser warning is normal and safe to accept on LAN
 
 ## Phase 2: Firmware Options
 
