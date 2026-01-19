@@ -100,6 +100,9 @@ ssh root@192.168.8.1
 
 # 3. Connect with authkey (persistent registration)
 tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --authkey=<KEY> --accept-routes --accept-dns=false
+
+# 4. Enable auto-start (survives reboots)
+/etc/init.d/tailscale enable
 ```
 
 **If disconnected/logged out**, reset and re-register:
@@ -107,11 +110,13 @@ tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --authkey
 tailscale down
 tailscale logout
 tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --authkey=<KEY> --accept-routes --accept-dns=false
+/etc/init.d/tailscale enable
 ```
 
 Verify:
 ```bash
 tailscale status
+/etc/init.d/tailscale enabled && echo "Auto-start enabled" || echo "Not enabled"
 ```
 
 ### Exit Node (On-Demand VPN)
