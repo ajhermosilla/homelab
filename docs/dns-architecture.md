@@ -17,18 +17,32 @@ How DNS resolution works across all homelab environments.
    [Internet]
 ```
 
-**Principle:** Pi-hole is always the client-facing DNS. What happens upstream varies by environment.
+**Principle:** DNS ad-blocking is always client-facing. Implementation varies by environment (AdGuard Home or Pi-hole).
 
 ## Environment DNS Flows
 
-### Mobile Kit
+### Mobile Kit (Dual-DNS)
+
+Mobile kit uses two DNS ad-blockers for redundancy:
 
 ```
 [MacBook/Devices]
        |
-       | DNS: 192.168.8.5
+       | DNS: 192.168.8.1 (primary)
        v
-[Pi-hole on RPi 5]
+[AdGuard Home on Beryl AX]  ← Built-in, lightweight, always on
+       |
+       | Upstream: 1.1.1.1, 9.9.9.9
+       v
+[Cloudflare/Quad9]
+
+       --- Fallback (when RPi 5 available) ---
+
+[MacBook/Devices]
+       |
+       | DNS: 192.168.8.5 (secondary)
+       v
+[Pi-hole on RPi 5]  ← Full-featured, but RPi 5 may be tinkering
        |
        | Upstream: 1.1.1.1, 9.9.9.9
        v
@@ -37,9 +51,14 @@ How DNS resolution works across all homelab environments.
 
 | Component | Role | IP |
 |-----------|------|-----|
-| Beryl AX | DHCP, gives Pi-hole as DNS | 192.168.8.1 |
-| Pi-hole (RPi 5) | Ad-blocking, DNS server | 192.168.8.5 |
+| Beryl AX | AdGuard Home (primary DNS), DHCP | 192.168.8.1 |
+| RPi 5 | Pi-hole (secondary DNS), tinkering device | 192.168.8.5 |
 | Upstream | Public recursive DNS | 1.1.1.1, 9.9.9.9 |
+
+**Why dual-DNS:**
+- AdGuard Home on Beryl AX is lightweight (~30MB), always on with router
+- RPi 5 is a tinkering device - can be reassigned to other projects
+- Redundancy: DNS ad-blocking works even when RPi 5 is busy/off
 
 **Why public upstream:** Mobile kit travels. Running Unbound adds complexity for minimal benefit on the go.
 
