@@ -40,7 +40,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 - [x] **Repeater mode** - Extend hotel/cafe WiFi securely
 - [ ] **WireGuard VPN client** - Connect to VPS exit node
 - [x] **Tailscale** - Joined Headscale mesh as `beryl-ax`
-- [ ] **AdGuard Home** - Primary DNS ad-blocking for mobile kit
+- [x] **AdGuard Home** - Primary DNS ad-blocking for mobile kit
 - [ ] **USB storage** - File sharing via USB 3.0
 - [ ] **LuCI interface** - Advanced OpenWrt settings
 - [ ] **Toggle switch** - Hardware VPN on/off
@@ -193,5 +193,5 @@ wg show
 - [x] Install and configure Tailscale via SSH
 - [x] Join Headscale mesh as `beryl-ax`
 - [x] Test repeater mode
+- [x] Configure AdGuard Home
 - [ ] Test WireGuard to VPS
-- [ ] Configure AdGuard Home
