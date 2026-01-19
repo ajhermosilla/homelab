@@ -25,15 +25,26 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 4. Set admin password
 5. Configure WiFi SSID and password
 
-### Features to Test
+### Configured Settings
+
+| Setting | Value |
+|---------|-------|
+| SSID 2.4GHz | `mbohapy` |
+| SSID 5GHz | `mbohapy-5G` |
+| WiFi Password | (stored in KeepassXC) |
+| Admin Password | (stored in KeepassXC) |
+| SSH | Enabled |
+
+### Features Tested
 
 - [ ] **Repeater mode** - Extend hotel/cafe WiFi securely
 - [ ] **WireGuard VPN client** - Connect to VPS exit node
-- [ ] **Tailscale** - Join homelab mesh (available as plugin)
+- [x] **Tailscale** - Joined Headscale mesh as `beryl-ax`
 - [ ] **AdGuard Home** - Built-in ad blocking
 - [ ] **USB storage** - File sharing via USB 3.0
 - [ ] **LuCI interface** - Advanced OpenWrt settings
 - [ ] **Toggle switch** - Hardware VPN on/off
+- [x] **USB tethering** - Tested with Redmi A5, works (slow but functional)
 
 ### Network Modes
 
@@ -74,14 +85,27 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 ## Phase 3: Homelab Integration
 
-### Tailscale on Beryl
+### Tailscale on Beryl (Completed)
 
-Connect Beryl to your Headscale mesh:
+GL.iNet UI doesn't expose custom server option. Use SSH instead:
 
-1. Install Tailscale plugin (GL.iNet App Center)
-2. Configure custom control server: `https://hs.cronova.dev`
-3. Authenticate device
-4. Access homelab services from anywhere
+```bash
+# SSH to Beryl
+ssh root@192.168.8.1
+
+# Connect to Headscale
+tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --accept-routes --accept-dns=false
+```
+
+Then register on VPS:
+```bash
+ssh vps 'sudo docker exec headscale headscale nodes register --key <KEY> --user augusto'
+```
+
+Verify:
+```bash
+tailscale status
+```
 
 ### WireGuard to VPS
 
@@ -146,8 +170,13 @@ wg show
 
 ### 2026-01-19
 
-- [ ] Unbox and initial setup
-- [ ] Configure WiFi SSID/password
+- [x] Unbox and initial setup
+- [x] Configure WiFi SSID (`mbohapy` / `mbohapy-5G`)
+- [x] Set admin password (passphrase style)
+- [x] Enable SSH access
+- [x] Test USB tethering (Redmi A5 - works)
+- [x] Install and configure Tailscale via SSH
+- [x] Join Headscale mesh as `beryl-ax`
 - [ ] Test repeater mode
-- [ ] Install Tailscale
 - [ ] Test WireGuard to VPS
+- [ ] Configure AdGuard Home
