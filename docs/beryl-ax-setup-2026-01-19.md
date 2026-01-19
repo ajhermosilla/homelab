@@ -40,7 +40,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 - [x] **Repeater mode** - Extend hotel/cafe WiFi securely
 - [ ] **WireGuard VPN client** - Connect to VPS exit node
 - [x] **Tailscale** - Joined Headscale mesh as `beryl-ax`
-- [ ] **AdGuard Home** - Built-in ad blocking
+- [ ] **AdGuard Home** - Primary DNS ad-blocking for mobile kit
 - [ ] **USB storage** - File sharing via USB 3.0
 - [ ] **LuCI interface** - Advanced OpenWrt settings
 - [ ] **Toggle switch** - Hardware VPN on/off
@@ -122,21 +122,29 @@ Route all traffic through VPS exit node:
 2. Import VPS WireGuard config
 3. Enable "Use VPN for all traffic"
 
-### Pi-hole Integration
+### DNS Strategy (Dual-DNS)
 
-When on Tailscale, use homelab Pi-hole:
+Mobile kit uses two DNS ad-blockers for redundancy:
 
-1. Network > DNS
-2. Manual DNS: `100.64.0.1` (RPi 5 Pi-hole)
+| Device | Role | Why |
+|--------|------|-----|
+| Beryl AX | AdGuard Home (primary) | Built-in, lightweight, always on with router |
+| RPi 5 | Pi-hole (secondary) | Full-featured, but RPi 5 may be used for tinkering |
+
+**Setup:**
+1. Enable AdGuard Home: Applications > AdGuard Home
+2. Configure upstream DNS (Cloudflare/Quad9)
+3. Optional: Add RPi 5 Pi-hole as fallback DNS in DHCP settings
 
 ### Travel Kit Configuration
 
 ```
 [Hotel WiFi] --> [Beryl AX (Repeater)] --> [Your Devices]
                       |
-                      +--> WireGuard to VPS (encrypted)
+                      +--> AdGuard Home (primary DNS, ad blocking)
                       +--> Tailscale mesh (homelab access)
-                      +--> AdGuard (ad blocking)
+                      +--> WireGuard to VPS (optional, encrypted exit)
+                      +--> RPi 5 Pi-hole (fallback DNS, when available)
 ```
 
 ## Useful Commands
@@ -160,10 +168,10 @@ wg show
 
 | Device | Role | IP |
 |--------|------|-----|
-| Beryl AX | Travel router, VPN gateway | 192.168.8.1 |
+| Beryl AX | Travel router, AdGuard Home (primary DNS) | 192.168.8.1 |
 | MacBook | Primary workstation | DHCP |
 | Phone (mombeu) | Mobile client | DHCP |
-| RPi 5 | Pi-hole, Headscale (when traveling) | 192.168.8.5 |
+| RPi 5 | Pi-hole (secondary DNS), tinkering | 192.168.8.5 |
 
 ## Resources
 

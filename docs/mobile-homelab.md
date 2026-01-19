@@ -85,14 +85,24 @@ Portable infrastructure for dev, self-hosting, and travel.
 
 ## Services
 
-### Raspberry Pi 5 (On-Demand)
+### Beryl AX (Always-On When Kit Running)
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Pi-hole | 53, 80 | DNS ad-blocking (mobile) |
+| AdGuard Home | 53, 3000 | DNS ad-blocking (primary) |
+| Tailscale | - | Mesh client |
+| DHCP | 67 | LAN IP assignment |
+
+*AdGuard Home is built into GL.iNet firmware - lightweight (~30MB), perfect for router.*
+
+### Raspberry Pi 5 (On-Demand / Tinkering)
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| Pi-hole | 53, 80 | DNS ad-blocking (secondary) |
 | Tailscale | - | Mesh client |
 
-*Headscale moved to VPS for 24/7 availability.*
+*RPi 5 is a tinkering device - can be reassigned to other projects. Beryl AX AdGuard provides DNS when RPi 5 is busy/off.*
 
 ### MacBook Air M1 (Workstation)
 
@@ -100,6 +110,22 @@ Portable infrastructure for dev, self-hosting, and travel.
 |---------|------|---------|
 | soft-serve | 23231-23233 | Git server |
 | Docker workloads | Various | Dev containers |
+
+### DNS Strategy (Dual-DNS)
+
+```
+[Devices] → [Beryl AX AdGuard Home] → [Upstream DNS]
+                    ↓ (fallback)
+            [RPi 5 Pi-hole] → [Upstream DNS]
+```
+
+| Scenario | Primary DNS | Fallback |
+|----------|-------------|----------|
+| Normal operation | Beryl AX (AdGuard) | RPi 5 (Pi-hole) |
+| RPi 5 tinkering/off | Beryl AX (AdGuard) | Public DNS |
+| Beryl AX issues | RPi 5 (Pi-hole) | Public DNS |
+
+*Both provide ad-blocking. Redundancy without complexity.*
 
 ## IP Addressing
 
