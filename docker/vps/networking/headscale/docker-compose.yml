@@ -23,7 +23,7 @@ services:
           cpus: '0.5'
     command: serve
     ports:
-      - "8080:8080"     # HTTP (Caddy handles TLS on 443)
+      # NOTE: Port 8080 NOT exposed publicly - Caddy uses internal Docker network
       - "3478:3478/udp" # STUN
     volumes:
       - ./config:/etc/headscale
@@ -191,6 +191,37 @@ networks:
 #
 # Prometheus metrics (if enabled):
 #   http://localhost:9090/metrics
+#
+# =============================================================================
+# VPS SECURITY HARDENING
+# =============================================================================
+#
+# SSH Hardening (/etc/ssh/sshd_config.d/hardening.conf):
+#   PermitRootLogin no
+#   PasswordAuthentication no
+#   PubkeyAuthentication yes
+#   MaxAuthTries 3
+#
+# Fail2ban (/etc/fail2ban/jail.local):
+#   [sshd]
+#   enabled = true
+#   backend = systemd
+#   maxretry = 3
+#   bantime = 1h
+#   banaction = ufw
+#
+# Auto-updates (/etc/apt/apt.conf.d/52unattended-upgrades-local):
+#   Unattended-Upgrade::Automatic-Reboot "true";
+#   Unattended-Upgrade::Automatic-Reboot-Time "04:00";
+#
+# Passwordless sudo for deploy user:
+#   echo 'linuxuser ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/linuxuser
+#
+# Firewall (UFW):
+#   22/tcp   - SSH
+#   443/tcp  - HTTPS
+#   443/udp  - HTTP/3
+#   3478/udp - STUN
 #
 # =============================================================================
 # DEVICE REGISTRATION
