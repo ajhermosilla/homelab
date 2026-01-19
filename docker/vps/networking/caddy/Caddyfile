@@ -32,9 +32,9 @@ status.cronova.dev {
 }
 
 # ntfy - Push notifications
-# notify.cronova.dev {
-#     reverse_proxy ntfy:80
-# }
+notify.cronova.dev {
+    reverse_proxy ntfy:80
+}
 
 # changedetection.io - Website monitoring
 # watch.cronova.dev {
