@@ -20,12 +20,45 @@ Portable infrastructure for dev, self-hosting, and travel.
 
 ## Hardware
 
-| Device | Role | Power |
-|--------|------|-------|
-| Raspberry Pi 5 (8GB) | Pi-hole DNS (mobile) | USB-C PSU |
-| MacBook Air M1 | Workstation, Docker dev, soft-serve | Battery |
-| Beryl AX (GL-MT3000) | Network gateway, DHCP | USB-C |
-| Samsung A13 | Internet via USB tethering | Battery |
+| Device | Role | Power | Status |
+|--------|------|-------|--------|
+| Beryl AX (GL-MT3000) | Network gateway, DHCP, Tailscale | USB-C | Configured |
+| Samsung A13 | Dedicated tethering (Claro prepaid) | USB-C (always plugged) | Ready |
+| MacBook Air M1 | Workstation, Docker dev, soft-serve | Battery | Active |
+| Raspberry Pi 5 (8GB) | Pi-hole DNS (mobile) | USB-C PSU | Pending PSU |
+| Samsung A16 (mombeu) | Personal phone, Tailscale client | Battery | Active |
+
+### Phone Roles
+
+| Phone | Role | Carrier | Connection |
+|-------|------|---------|------------|
+| Samsung A13 | Homelab internet | Claro prepaid (data only) | USB tethered to Beryl AX |
+| Samsung A16 (mombeu) | Personal | Tigo | WiFi to mbohapy, Tailscale mesh |
+
+*A13 stays plugged in and tethered when mobile kit is running. A16 is personal phone, not part of homelab infrastructure.*
+
+### Claro Prepaid Data (Samsung A13)
+
+**SIM:** PYG 10,000 prepaid from local store
+
+| Pack | Duration | Notes |
+|------|----------|-------|
+| 2 GB | 7 days | Good for testing |
+| 6 GB | 30 days | Monthly usage |
+
+**Features:**
+- WhatsApp free (1GB daily limit, no calls/video)
+- Data doesn't roll over
+- Prices include IVA
+- Dial `*123#` to see available packs
+
+**To verify:**
+- Tethering allowed (test before buying big pack)
+- Check [simple.claro.com.py](https://simple.claro.com.py/inicio) for current prices
+
+**References:**
+- [Claro Paraguay Prepago](https://www.claro.com.py/personas/planes-prepago)
+- [Términos Prepago](https://www.claro.com.py/personas/planes-prepago-pospago/terminos-condiciones-prepago)
 
 ## Network Topology
 
@@ -78,18 +111,17 @@ Portable infrastructure for dev, self-hosting, and travel.
 | RPi 5 | 192.168.8.5 | Yes |
 | MacBook Air | 192.168.8.10 | Yes |
 
-### Tailscale Network
+### Tailscale Network (Headscale Mesh)
 
-| Device | Tailscale IP | Hostname |
-|--------|--------------|----------|
-| VPS | 100.64.0.100 | vps |
-| RPi 5 | 100.64.0.1 | rpi5 |
-| MacBook Air | 100.64.0.2 | macbook |
-| Mini PC (home) | 100.64.0.10 | minipc |
-| RPi 4 (home) | 100.64.0.11 | rpi4 |
-| NAS (home) | 100.64.0.12 | nas |
+| Device | Tailscale IP | Hostname | Role |
+|--------|--------------|----------|------|
+| VPS | 100.77.172.46 | vps-vultr | Exit node, Headscale |
+| MacBook Air | 100.86.220.9 | augustos-macbook-air | Workstation |
+| Samsung A16 | 100.110.253.126 | mombeu | Personal phone |
+| Beryl AX | (assigned) | beryl-ax | Travel router |
+| RPi 5 | (pending) | rpi5 | Pi-hole (when deployed) |
 
-*Headscale on VPS assigns and coordinates all IPs.*
+*Headscale on VPS assigns and coordinates all IPs. Run `tailscale status` to see current mesh.*
 
 ## Scenarios
 
