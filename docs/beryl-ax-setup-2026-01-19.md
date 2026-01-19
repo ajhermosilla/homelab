@@ -227,12 +227,16 @@ Tailscale → ACCEPT (trusted)
 
 ### Firmware
 
-| Component | Version | Date |
-|-----------|---------|------|
-| GL.iNet Firmware | 4.8.1 | Unknown |
-| OpenWrt | (bundled) | Unknown |
+| Component | Version | Date Checked |
+|-----------|---------|--------------|
+| GL.iNet Firmware | 4.8.1 | 2026-01-19 |
+| OpenWrt | 21.02-SNAPSHOT | 2026-01-19 |
 
-**Check for updates:** System > Upgrade in web UI
+**Status:** Up to date (no updates available)
+
+**Check for updates:**
+- Web UI: System > Upgrade > Online Upgrade
+- Or: https://dl.gl-inet.com/firmware/mt3000/release/
 
 ### Security Commands Reference
 
