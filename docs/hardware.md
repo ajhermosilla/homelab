@@ -356,6 +356,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 | Item | Model | Purpose |
 |------|-------|---------|
+| Keyboard | Keychron K2C3 | 75% mechanical keyboard, home workstation |
 | Flash Drive | Lexar D40E 128GB | USB-C/USB-A dual, portable transfers |
 | Card Reader | UGREEN SD/MicroSD | USB-C/USB 3.0, for RPi SD cards |
 | USB-C Cables | UGREEN 100W 6.6ft (2-pack) | Device charging/data |
