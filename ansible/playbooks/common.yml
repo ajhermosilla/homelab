@@ -63,7 +63,7 @@
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin prohibit-password'
+        line: 'PermitRootLogin no'
       notify: Restart SSH
       tags: ssh
 
