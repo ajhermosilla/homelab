@@ -9,18 +9,41 @@ services:
   # =========================================================================
   uptime-kuma:
     image: louislam/uptime-kuma:1.23
+    env_file:
+      - ../../shared/common.env
     container_name: uptime-kuma
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=monitoring"
+      - "com.cronova.critical=true"
+      - "com.cronova.backup=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     cap_drop:
       - ALL
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
     ports:
       - "3001:3001"
     volumes:
       - uptime-kuma-data:/app/data
     environment:
       - TZ=${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - monitoring-net
 
@@ -30,12 +53,29 @@ services:
   # =========================================================================
   ntfy:
     image: binwiederhier/ntfy:v2.8
+    env_file:
+      - ../../shared/common.env
     container_name: ntfy
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=monitoring"
+      - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     cap_drop:
       - ALL
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
     command:
       - serve
     ports:
@@ -50,6 +90,11 @@ services:
       - NTFY_BEHIND_PROXY=true
       - NTFY_AUTH_DEFAULT_ACCESS=deny-all
       - NTFY_ENABLE_LOGIN=true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - monitoring-net
 

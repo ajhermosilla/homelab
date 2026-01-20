@@ -11,6 +11,11 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=networking"
+      - "com.cronova.critical=true"
+      - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "headscale", "health"]
       interval: 30s
@@ -32,6 +37,11 @@ services:
       - TZ=${TZ:-America/Asuncion}
     cap_add:
       - NET_ADMIN
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - headscale-net
 
@@ -44,6 +54,9 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=backup"
     deploy:
       resources:
         limits:
@@ -64,6 +77,11 @@ services:
     environment:
       - TZ=${TZ:-America/Asuncion}
       - BACKUP_RETENTION_HOURS=${BACKUP_RETENTION_HOURS:-720}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
     networks:
       - headscale-net
     depends_on:

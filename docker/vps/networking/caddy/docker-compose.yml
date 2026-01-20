@@ -5,10 +5,17 @@
 services:
   caddy:
     image: caddy:2-alpine
+    env_file:
+      - ../../../shared/common.env
     container_name: caddy
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=networking"
+      - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD", "caddy", "version"]
       interval: 30s
@@ -25,18 +32,19 @@ services:
       - "443:443/udp" # HTTP/3 (QUIC)
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./www:/srv/www:ro
       - caddy-data:/data
       - caddy-config:/config
     environment:
       - TZ=${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - headscale-net
       - monitoring-net
-    labels:
-      - "com.cronova.environment=vps"
-      - "com.cronova.category=networking"
-      - "com.cronova.critical=true"
-      - "com.centurylinklabs.watchtower.enable=true"
 
 volumes:
   caddy-data:

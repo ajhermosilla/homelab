@@ -1,12 +1,32 @@
+# Soft Serve - Self-hosted Git server
+# Local - MacBook (development)
+# https://github.com/charmbracelet/soft-serve
+
 services:
   soft-serve:
     image: charmcli/soft-serve:0.8
+    env_file:
+      - ../shared/common.env
     container_name: soft-serve
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=local"
+      - "com.cronova.category=git"
+      - "com.cronova.backup=true"
     cap_drop:
       - ALL
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "23231"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
     volumes:
       - soft-serve-data:/soft-serve
     ports:
@@ -14,7 +34,32 @@ services:
       - "23232:23232"  # HTTP (for cloning)
       - "23233:23233"  # Stats
     environment:
+      - TZ=${TZ:-America/Asuncion}
       - SOFT_SERVE_INITIAL_ADMIN_KEYS=${SOFT_SERVE_INITIAL_ADMIN_KEYS}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   soft-serve-data:
+    name: soft-serve-data
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Set your SSH public key:
+#    export SOFT_SERVE_INITIAL_ADMIN_KEYS="$(cat ~/.ssh/id_ed25519.pub)"
+#
+# 2. Start the service:
+#    docker compose up -d
+#
+# 3. Clone a repo:
+#    git clone ssh://localhost:23231/repo-name
+#
+# 4. Access web UI:
+#    http://localhost:23232
+#
+# =============================================================================
