@@ -69,7 +69,7 @@
     - name: Set stacks for NAS
       set_fact:
         deploy_stacks: "{{ [stack] if stack is defined else nas_stacks }}"
-      when: "'nas' in group_names"
+      when: "'storage' in group_names"
 
     # =========================================================================
     # Pull Images

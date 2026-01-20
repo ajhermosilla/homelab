@@ -44,7 +44,7 @@ all:
           vars:
             docker_host: true
 
-        nas:
+        storage:
           hosts:
             nas:
               ansible_host: 100.64.0.12
