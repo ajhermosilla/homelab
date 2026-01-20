@@ -53,13 +53,97 @@ Install Tailscale and connect to Headscale.
 
 ```bash
 # Generate auth key in Headscale first:
-# docker exec headscale headscale preauthkeys create --user augusto --reusable --expiration 1h
+# docker exec headscale headscale preauthkeys create --user 1 --reusable --expiration 90d
 
 # Run playbook with auth key
 ansible-playbook -i inventory.yml playbooks/tailscale.yml -e "authkey=tskey-xxx"
 
 # Single host
 ansible-playbook -i inventory.yml playbooks/tailscale.yml -e "authkey=tskey-xxx" --limit docker
+```
+
+### backup.yml
+
+Configure Restic backups to NAS or VPS.
+
+```bash
+# Deploy with credentials
+ansible-playbook -i inventory.yml playbooks/backup.yml \
+  -e "restic_user=augusto" \
+  -e "restic_pass=xxx" \
+  -e "restic_password=xxx"
+
+# Initialize repository only
+ansible-playbook -i inventory.yml playbooks/backup.yml --tags init
+```
+
+### monitoring.yml
+
+Deploy Uptime Kuma + ntfy monitoring stack.
+
+```bash
+ansible-playbook -i inventory.yml playbooks/monitoring.yml -l vps
+```
+
+### update.yml
+
+System and container updates.
+
+```bash
+# Update all systems
+ansible-playbook -i inventory.yml playbooks/update.yml
+
+# Update with reboot if required
+ansible-playbook -i inventory.yml playbooks/update.yml -e "reboot=true"
+
+# Update Docker containers too
+ansible-playbook -i inventory.yml playbooks/update.yml -e "containers=true"
+
+# Docker hosts only
+ansible-playbook -i inventory.yml playbooks/update.yml -l docker_hosts -e "containers=true"
+```
+
+### pihole.yml
+
+Deploy Pi-hole DNS ad-blocker.
+
+```bash
+# Deploy with web password
+ansible-playbook -i inventory.yml playbooks/pihole.yml -l pihole_hosts -e "webpassword=xxx"
+```
+
+### caddy.yml
+
+Deploy Caddy reverse proxy with automatic HTTPS.
+
+```bash
+ansible-playbook -i inventory.yml playbooks/caddy.yml -l vps
+```
+
+### nfs-server.yml
+
+Configure NFS exports on NAS.
+
+```bash
+ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
+```
+
+### docker-compose-deploy.yml
+
+Deploy Docker Compose stacks from homelab repo.
+
+```bash
+# Deploy all stacks for a host
+ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker
+
+# Deploy specific stack
+ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "stack=media"
+
+# Stop a stack
+ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "stack=media" -e "action=down"
+
+# Pull latest images
+ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "action=pull"
 ```
 
 ## Usage Examples
@@ -130,20 +214,18 @@ ansible-playbook -i inventory.yml playbooks/common.yml --check --diff
 ansible/
 ├── inventory.yml        # Host inventory
 ├── playbooks/
-│   ├── common.yml      # Common setup
-│   ├── docker.yml      # Docker installation
-│   └── tailscale.yml   # Tailscale setup
+│   ├── common.yml               # Common setup
+│   ├── docker.yml               # Docker installation
+│   ├── tailscale.yml            # Tailscale setup
+│   ├── backup.yml               # Restic backup configuration
+│   ├── monitoring.yml           # Uptime Kuma + ntfy
+│   ├── update.yml               # System/container updates
+│   ├── pihole.yml               # Pi-hole deployment
+│   ├── caddy.yml                # Caddy reverse proxy
+│   ├── nfs-server.yml           # NFS exports
+│   └── docker-compose-deploy.yml # Stack deployment
 └── README.md           # This file
 ```
-
-## Future Playbooks
-
-Planned additions:
-- `backup.yml` - Configure restic backups
-- `monitoring.yml` - Deploy monitoring stack
-- `update.yml` - System and container updates
-- `pihole.yml` - Pi-hole deployment
-- `caddy.yml` - Caddy reverse proxy setup
 
 ## Tips
 

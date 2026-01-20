@@ -1,0 +1,219 @@
+# Caddy reverse proxy deployment
+# Usage: ansible-playbook -i inventory.yml playbooks/caddy.yml -l vps
+
+---
+- name: Deploy Caddy reverse proxy
+  hosts: vps
+  become: true
+
+  vars:
+    caddy_compose_dir: /opt/homelab/caddy
+    caddy_domains:
+      - name: cronova.dev
+        upstream: ""  # Static files
+      - name: hs.cronova.dev
+        upstream: "headscale:8080"
+      - name: status.cronova.dev
+        upstream: "uptime-kuma:3001"
+      - name: notify.cronova.dev
+        upstream: "ntfy:80"
+
+  tasks:
+    # =========================================================================
+    # Prerequisites
+    # =========================================================================
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+
+    - name: Create Caddy directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ caddy_compose_dir }}"
+        - "{{ caddy_compose_dir }}/www"
+
+    # =========================================================================
+    # Caddyfile
+    # =========================================================================
+    - name: Create Caddyfile
+      copy:
+        dest: "{{ caddy_compose_dir }}/Caddyfile"
+        content: |
+          # Caddyfile - Managed by Ansible
+          # Auto-HTTPS for all domains
+
+          {
+              email augusto@cronova.dev
+          }
+
+          {% for domain in caddy_domains %}
+          {% if domain.upstream %}
+          {{ domain.name }} {
+              reverse_proxy {{ domain.upstream }}
+              encode gzip
+              log {
+                  output stdout
+                  format console
+              }
+          }
+          {% else %}
+          {{ domain.name }} {
+              root * /srv/www
+              file_server
+              encode gzip
+          }
+          {% endif %}
+
+          {% endfor %}
+        mode: '0644'
+      notify: Reload Caddy
+
+    - name: Create landing page
+      copy:
+        dest: "{{ caddy_compose_dir }}/www/index.html"
+        content: |
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>cronova.dev</title>
+              <style>
+                  body { font-family: system-ui; max-width: 600px; margin: 100px auto; padding: 20px; }
+                  a { color: #0066cc; }
+              </style>
+          </head>
+          <body>
+              <h1>cronova.dev</h1>
+              <ul>
+                  <li><a href="https://status.cronova.dev">Status</a></li>
+                  <li><a href="https://hermosilla.me">About</a></li>
+                  <li><a href="https://github.com/ajhermosilla">GitHub</a></li>
+              </ul>
+          </body>
+          </html>
+        mode: '0644'
+
+    # =========================================================================
+    # Docker Compose
+    # =========================================================================
+    - name: Create docker-compose.yml
+      copy:
+        dest: "{{ caddy_compose_dir }}/docker-compose.yml"
+        content: |
+          # Caddy reverse proxy
+          # Deployed by Ansible
+
+          services:
+            caddy:
+              image: caddy:2-alpine
+              container_name: caddy
+              restart: unless-stopped
+              security_opt:
+                - no-new-privileges:true
+              labels:
+                - "com.cronova.environment=vps"
+                - "com.cronova.category=networking"
+                - "com.cronova.critical=true"
+              healthcheck:
+                test: ["CMD", "caddy", "version"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+              deploy:
+                resources:
+                  limits:
+                    memory: 256M
+                    cpus: '0.5'
+              ports:
+                - "80:80"
+                - "443:443"
+                - "443:443/udp"
+              volumes:
+                - ./Caddyfile:/etc/caddy/Caddyfile:ro
+                - ./www:/srv/www:ro
+                - caddy-data:/data
+                - caddy-config:/config
+              environment:
+                - TZ=America/Asuncion
+              logging:
+                driver: "json-file"
+                options:
+                  max-size: "10m"
+                  max-file: "3"
+              networks:
+                - headscale-net
+                - monitoring-net
+
+          volumes:
+            caddy-data:
+              name: caddy-data
+            caddy-config:
+              name: caddy-config
+
+          networks:
+            headscale-net:
+              external: true
+            monitoring-net:
+              external: true
+        mode: '0644'
+
+    # =========================================================================
+    # Firewall
+    # =========================================================================
+    - name: Allow HTTP/HTTPS traffic
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "80"
+        - "443"
+      tags: firewall
+
+    # =========================================================================
+    # Deploy
+    # =========================================================================
+    - name: Pull Caddy image
+      command: docker compose pull
+      args:
+        chdir: "{{ caddy_compose_dir }}"
+      changed_when: true
+      tags: pull
+
+    - name: Start Caddy
+      command: docker compose up -d
+      args:
+        chdir: "{{ caddy_compose_dir }}"
+      register: caddy_up
+
+    # =========================================================================
+    # Verification
+    # =========================================================================
+    - name: Wait for Caddy to be ready
+      uri:
+        url: "http://localhost:80/"
+        status_code: [200, 301, 308]
+      register: caddy_health
+      until: caddy_health.status in [200, 301, 308]
+      retries: 10
+      delay: 3
+      tags: verify
+
+    - name: Display status
+      debug:
+        msg: |
+          Caddy deployed successfully!
+          Domains configured:
+          {% for domain in caddy_domains %}
+          - https://{{ domain.name }}
+          {% endfor %}
+
+  handlers:
+    - name: Reload Caddy
+      command: docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+      ignore_errors: true
