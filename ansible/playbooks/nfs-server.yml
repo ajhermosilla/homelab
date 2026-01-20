@@ -1,0 +1,134 @@
+# NFS server configuration
+# Usage: ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
+
+---
+- name: Configure NFS server
+  hosts: nas
+  become: true
+
+  vars:
+    nfs_exports:
+      - path: /srv/media
+        clients: "192.168.1.0/24"
+        options: "ro,sync,no_subtree_check"
+      - path: /srv/downloads
+        clients: "192.168.1.0/24"
+        options: "rw,sync,no_subtree_check"
+      - path: /srv/frigate
+        clients: "192.168.1.10"
+        options: "rw,sync,no_subtree_check,no_root_squash"
+      - path: /srv/backup
+        clients: "192.168.1.0/24"
+        options: "rw,sync,no_subtree_check"
+
+  tasks:
+    # =========================================================================
+    # Installation
+    # =========================================================================
+    - name: Install NFS server packages
+      apt:
+        name:
+          - nfs-kernel-server
+          - nfs-common
+        state: present
+        update_cache: yes
+
+    # =========================================================================
+    # Directory Setup
+    # =========================================================================
+    - name: Create export directories
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        mode: '0755'
+        owner: "{{ nfs_owner | default('1000') }}"
+        group: "{{ nfs_group | default('1000') }}"
+      loop: "{{ nfs_exports }}"
+      tags: directories
+
+    # =========================================================================
+    # NFS Configuration
+    # =========================================================================
+    - name: Configure NFS exports
+      template:
+        dest: /etc/exports
+        content: |
+          # NFS Exports - Managed by Ansible
+          # Run 'exportfs -ra' after manual changes
+
+          {% for export in nfs_exports %}
+          {{ export.path }} {{ export.clients }}({{ export.options }})
+          {% endfor %}
+        mode: '0644'
+        backup: yes
+      notify: Reload NFS exports
+
+    # =========================================================================
+    # Service
+    # =========================================================================
+    - name: Enable and start NFS server
+      service:
+        name: nfs-kernel-server
+        state: started
+        enabled: yes
+
+    # =========================================================================
+    # Firewall
+    # =========================================================================
+    - name: Allow NFS traffic from local network
+      ufw:
+        rule: allow
+        from_ip: "192.168.1.0/24"
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "111"   # rpcbind
+        - "2049"  # NFS
+      tags: firewall
+
+    - name: Allow NFS UDP traffic
+      ufw:
+        rule: allow
+        from_ip: "192.168.1.0/24"
+        port: "{{ item }}"
+        proto: udp
+      loop:
+        - "111"
+        - "2049"
+      tags: firewall
+
+    # =========================================================================
+    # Verification
+    # =========================================================================
+    - name: Verify exports
+      command: exportfs -v
+      register: exports_output
+      changed_when: false
+      tags: verify
+
+    - name: Display configured exports
+      debug:
+        msg: "{{ exports_output.stdout_lines }}"
+      tags: verify
+
+    - name: Check NFS server status
+      command: systemctl status nfs-kernel-server
+      register: nfs_status
+      changed_when: false
+      tags: verify
+
+    - name: Display status
+      debug:
+        msg: |
+          NFS server configured successfully!
+          Exports:
+          {% for export in nfs_exports %}
+          - {{ export.path }} -> {{ export.clients }}
+          {% endfor %}
+
+          Mount from client:
+            sudo mount -t nfs {{ ansible_host }}:/srv/media /mnt/media
+
+  handlers:
+    - name: Reload NFS exports
+      command: exportfs -ra

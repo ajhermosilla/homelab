@@ -1,0 +1,140 @@
+# System and container updates
+# Usage: ansible-playbook -i inventory.yml playbooks/update.yml
+# Options:
+#   -e "reboot=true" - Reboot if required
+#   -e "containers=true" - Update Docker containers
+#   -l docker_hosts - Limit to specific hosts
+
+---
+- name: Update systems and containers
+  hosts: all
+  become: true
+
+  vars:
+    reboot_if_required: "{{ reboot | default(false) }}"
+    update_containers: "{{ containers | default(false) }}"
+
+  tasks:
+    # =========================================================================
+    # System Updates (Debian/Ubuntu)
+    # =========================================================================
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+      tags: system
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: safe
+      register: apt_upgrade
+      when: ansible_os_family == "Debian"
+      tags: system
+
+    - name: Display upgraded packages
+      debug:
+        msg: "{{ apt_upgrade.stdout_lines | default(['No packages upgraded']) }}"
+      when: ansible_os_family == "Debian"
+      tags: system
+
+    - name: Check if reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+      when: ansible_os_family == "Debian"
+      tags: system
+
+    - name: Display reboot status
+      debug:
+        msg: "Reboot is {{ 'required' if reboot_required.stat.exists else 'not required' }}"
+      when: ansible_os_family == "Debian"
+      tags: system
+
+    - name: Reboot if required and allowed
+      reboot:
+        reboot_timeout: 300
+        msg: "Rebooting for system updates"
+      when:
+        - ansible_os_family == "Debian"
+        - reboot_required.stat.exists | default(false)
+        - reboot_if_required | bool
+      tags: reboot
+
+    # =========================================================================
+    # Docker Container Updates
+    # =========================================================================
+    - name: Find docker-compose directories
+      find:
+        paths:
+          - /opt/homelab
+          - /opt/docker
+        patterns: "docker-compose.yml,docker-compose.yaml,compose.yml,compose.yaml"
+        recurse: yes
+      register: compose_files
+      when: update_containers | bool
+      tags: containers
+
+    - name: Pull latest images
+      command: docker compose pull
+      args:
+        chdir: "{{ item.path | dirname }}"
+      loop: "{{ compose_files.files | default([]) }}"
+      register: docker_pull
+      changed_when: "'Downloaded' in docker_pull.stdout"
+      when: update_containers | bool
+      tags: containers
+
+    - name: Recreate containers with new images
+      command: docker compose up -d --remove-orphans
+      args:
+        chdir: "{{ item.path | dirname }}"
+      loop: "{{ compose_files.files | default([]) }}"
+      when: update_containers | bool
+      tags: containers
+
+    # =========================================================================
+    # Docker Cleanup
+    # =========================================================================
+    - name: Remove unused Docker images
+      command: docker image prune -af
+      register: image_prune
+      changed_when: "'Total reclaimed space' in image_prune.stdout"
+      when: update_containers | bool
+      tags: cleanup
+
+    - name: Remove unused Docker volumes
+      command: docker volume prune -f
+      register: volume_prune
+      changed_when: "'Total reclaimed space' in volume_prune.stdout"
+      when: update_containers | bool
+      tags: cleanup
+
+    - name: Display cleanup results
+      debug:
+        msg: |
+          Images cleaned: {{ image_prune.stdout_lines[-1] | default('none') }}
+          Volumes cleaned: {{ volume_prune.stdout_lines[-1] | default('none') }}
+      when: update_containers | bool
+      tags: cleanup
+
+    # =========================================================================
+    # Security Updates Only
+    # =========================================================================
+    - name: Install unattended-upgrades
+      apt:
+        name: unattended-upgrades
+        state: present
+      when: ansible_os_family == "Debian"
+      tags: security
+
+    - name: Enable automatic security updates
+      copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+          APT::Periodic::AutocleanInterval "7";
+        mode: '0644'
+      when: ansible_os_family == "Debian"
+      tags: security

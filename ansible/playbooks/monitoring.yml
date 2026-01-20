@@ -1,0 +1,180 @@
+# Monitoring stack deployment (Uptime Kuma + ntfy)
+# Usage: ansible-playbook -i inventory.yml playbooks/monitoring.yml -l vps
+
+---
+- name: Deploy monitoring stack
+  hosts: vps
+  become: true
+
+  vars:
+    monitoring_compose_dir: /opt/homelab/monitoring
+    ntfy_base_url: "https://notify.cronova.dev"
+    # Clone from homelab repo or copy files
+    homelab_repo: "https://github.com/ajhermosilla/homelab.git"
+
+  tasks:
+    # =========================================================================
+    # Prerequisites
+    # =========================================================================
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+
+    - name: Create monitoring directory
+      file:
+        path: "{{ monitoring_compose_dir }}"
+        state: directory
+        mode: '0755'
+
+    # =========================================================================
+    # Docker Compose Files
+    # =========================================================================
+    - name: Copy docker-compose.yml
+      copy:
+        dest: "{{ monitoring_compose_dir }}/docker-compose.yml"
+        content: |
+          # Monitoring Stack - Uptime Kuma + ntfy
+          # Deployed by Ansible
+
+          services:
+            uptime-kuma:
+              image: louislam/uptime-kuma:1.23
+              container_name: uptime-kuma
+              restart: unless-stopped
+              security_opt:
+                - no-new-privileges:true
+              labels:
+                - "com.cronova.environment=vps"
+                - "com.cronova.category=monitoring"
+                - "com.cronova.critical=true"
+              cap_drop:
+                - ALL
+              healthcheck:
+                test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+              deploy:
+                resources:
+                  limits:
+                    memory: 256M
+                    cpus: '0.5'
+              ports:
+                - "3001:3001"
+              volumes:
+                - uptime-kuma-data:/app/data
+              environment:
+                - TZ=America/Asuncion
+              logging:
+                driver: "json-file"
+                options:
+                  max-size: "10m"
+                  max-file: "3"
+              networks:
+                - monitoring-net
+
+            ntfy:
+              image: binwiederhier/ntfy:v2.8
+              container_name: ntfy
+              restart: unless-stopped
+              security_opt:
+                - no-new-privileges:true
+              labels:
+                - "com.cronova.environment=vps"
+                - "com.cronova.category=monitoring"
+                - "com.cronova.critical=true"
+              cap_drop:
+                - ALL
+              healthcheck:
+                test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+              deploy:
+                resources:
+                  limits:
+                    memory: 128M
+                    cpus: '0.25'
+              command:
+                - serve
+              ports:
+                - "8080:80"
+              volumes:
+                - ntfy-cache:/var/cache/ntfy
+                - ntfy-config:/etc/ntfy
+              environment:
+                - TZ=America/Asuncion
+                - NTFY_BASE_URL={{ ntfy_base_url }}
+                - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+                - NTFY_BEHIND_PROXY=true
+                - NTFY_AUTH_DEFAULT_ACCESS=deny-all
+                - NTFY_ENABLE_LOGIN=true
+              logging:
+                driver: "json-file"
+                options:
+                  max-size: "10m"
+                  max-file: "3"
+              networks:
+                - monitoring-net
+
+          volumes:
+            uptime-kuma-data:
+              name: uptime-kuma-data
+            ntfy-cache:
+              name: ntfy-cache
+            ntfy-config:
+              name: ntfy-config
+
+          networks:
+            monitoring-net:
+              name: monitoring-net
+        mode: '0644'
+
+    # =========================================================================
+    # Deploy Stack
+    # =========================================================================
+    - name: Pull latest images
+      command: docker compose pull
+      args:
+        chdir: "{{ monitoring_compose_dir }}"
+      changed_when: true
+      tags: pull
+
+    - name: Start monitoring stack
+      command: docker compose up -d
+      args:
+        chdir: "{{ monitoring_compose_dir }}"
+      register: compose_up
+      changed_when: "'Started' in compose_up.stdout or 'Created' in compose_up.stdout"
+
+    # =========================================================================
+    # Verification
+    # =========================================================================
+    - name: Wait for Uptime Kuma to be healthy
+      uri:
+        url: "http://localhost:3001/"
+        status_code: 200
+      register: uptime_kuma_health
+      until: uptime_kuma_health.status == 200
+      retries: 10
+      delay: 5
+      tags: verify
+
+    - name: Wait for ntfy to be healthy
+      uri:
+        url: "http://localhost:8080/"
+        status_code: 200
+      register: ntfy_health
+      until: ntfy_health.status == 200
+      retries: 10
+      delay: 5
+      tags: verify
+
+    - name: Display status
+      debug:
+        msg: |
+          Monitoring stack deployed successfully!
+          - Uptime Kuma: http://localhost:3001
+          - ntfy: http://localhost:8080
+          Configure Caddy to expose via HTTPS.

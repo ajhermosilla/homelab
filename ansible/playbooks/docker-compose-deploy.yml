@@ -1,0 +1,167 @@
+# Deploy Docker Compose stacks from homelab repo
+# Usage: ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker
+# Options:
+#   -e "stack=media" - Deploy specific stack
+#   -e "action=down" - Stop stack
+#   -e "action=restart" - Restart stack
+
+---
+- name: Deploy Docker Compose stacks
+  hosts: docker_hosts
+  become: true
+
+  vars:
+    homelab_base: /opt/homelab
+    homelab_repo: "https://github.com/ajhermosilla/homelab.git"
+    action: "up"  # up, down, restart, pull
+    # Available stacks per host type:
+    vps_stacks:
+      - networking/headscale
+      - networking/caddy
+      - networking/derp
+      - networking/pihole
+      - monitoring
+      - scraping
+      - backup
+    fixed_stacks:
+      - networking/pihole
+      - networking/caddy
+      - media
+      - automation
+      - security
+      - maintenance
+    nas_stacks:
+      - storage
+      - backup
+
+  tasks:
+    # =========================================================================
+    # Setup
+    # =========================================================================
+    - name: Create homelab directory
+      file:
+        path: "{{ homelab_base }}"
+        state: directory
+        mode: '0755'
+
+    - name: Clone/update homelab repository
+      git:
+        repo: "{{ homelab_repo }}"
+        dest: "{{ homelab_base }}/repo"
+        version: main
+        force: yes
+      tags: clone
+      ignore_errors: true  # May fail if repo is private
+
+    # =========================================================================
+    # Determine stacks to deploy
+    # =========================================================================
+    - name: Set stacks for VPS
+      set_fact:
+        deploy_stacks: "{{ [stack] if stack is defined else vps_stacks }}"
+      when: "'vps' in group_names"
+
+    - name: Set stacks for Docker VM
+      set_fact:
+        deploy_stacks: "{{ [stack] if stack is defined else fixed_stacks }}"
+      when: "'docker_vm' in group_names"
+
+    - name: Set stacks for NAS
+      set_fact:
+        deploy_stacks: "{{ [stack] if stack is defined else nas_stacks }}"
+      when: "'nas' in group_names"
+
+    # =========================================================================
+    # Pull Images
+    # =========================================================================
+    - name: Pull images for stacks
+      command: docker compose pull
+      args:
+        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+      loop: "{{ deploy_stacks | default([]) }}"
+      when: action in ['up', 'pull']
+      ignore_errors: true
+      tags: pull
+
+    # =========================================================================
+    # Deploy Stacks
+    # =========================================================================
+    - name: Start stacks (up)
+      command: docker compose up -d --remove-orphans
+      args:
+        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+      loop: "{{ deploy_stacks | default([]) }}"
+      when: action == 'up'
+      register: compose_up
+      tags: deploy
+
+    - name: Stop stacks (down)
+      command: docker compose down
+      args:
+        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+      loop: "{{ deploy_stacks | default([]) }}"
+      when: action == 'down'
+      tags: deploy
+
+    - name: Restart stacks
+      command: docker compose restart
+      args:
+        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+      loop: "{{ deploy_stacks | default([]) }}"
+      when: action == 'restart'
+      tags: deploy
+
+    # =========================================================================
+    # Copy Environment Files
+    # =========================================================================
+    - name: Check for .env.example files
+      find:
+        paths: "{{ homelab_base }}/repo/docker/{{ environment_type }}"
+        patterns: ".env.example"
+        recurse: yes
+      register: env_examples
+      tags: env
+
+    - name: Create .env from .env.example (if not exists)
+      copy:
+        src: "{{ item.path }}"
+        dest: "{{ item.path | dirname }}/.env"
+        remote_src: yes
+        force: no  # Don't overwrite existing
+      loop: "{{ env_examples.files }}"
+      tags: env
+
+    # =========================================================================
+    # Status
+    # =========================================================================
+    - name: Get container status
+      command: docker ps --format "table {% raw %}{{.Names}}\t{{.Status}}\t{{.Ports}}{% endraw %}"
+      register: docker_ps
+      changed_when: false
+      tags: status
+
+    - name: Display container status
+      debug:
+        msg: "{{ docker_ps.stdout_lines }}"
+      tags: status
+
+    # =========================================================================
+    # Health Checks
+    # =========================================================================
+    - name: Check container health
+      command: docker ps --filter "health=unhealthy" --format "{% raw %}{{.Names}}{% endraw %}"
+      register: unhealthy
+      changed_when: false
+      tags: health
+
+    - name: Report unhealthy containers
+      debug:
+        msg: "WARNING: Unhealthy containers: {{ unhealthy.stdout_lines }}"
+      when: unhealthy.stdout_lines | length > 0
+      tags: health
+
+    - name: All containers healthy
+      debug:
+        msg: "All containers are healthy"
+      when: unhealthy.stdout_lines | length == 0
+      tags: health
