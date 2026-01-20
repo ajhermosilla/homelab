@@ -2,8 +2,8 @@
 # Usage: ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker
 # Options:
 #   -e "stack=media" - Deploy specific stack
-#   -e "action=down" - Stop stack
-#   -e "action=restart" - Restart stack
+#   -e "compose_action=down" - Stop stack
+#   -e "compose_action=restart" - Restart stack
 
 ---
 - name: Deploy Docker Compose stacks
@@ -13,7 +13,7 @@
   vars:
     homelab_base: /opt/homelab
     homelab_repo: "https://github.com/ajhermosilla/homelab.git"
-    action: "up"  # up, down, restart, pull
+    compose_action: "up"  # up, down, restart, pull
     # Available stacks per host type:
     vps_stacks:
       - networking/headscale
@@ -79,7 +79,7 @@
       args:
         chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: action in ['up', 'pull']
+      when: compose_action in ['up', 'pull']
       ignore_errors: true
       tags: pull
 
@@ -91,7 +91,7 @@
       args:
         chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: action == 'up'
+      when: compose_action == 'up'
       register: compose_up
       tags: deploy
 
@@ -100,7 +100,7 @@
       args:
         chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: action == 'down'
+      when: compose_action == 'down'
       tags: deploy
 
     - name: Restart stacks
@@ -108,7 +108,7 @@
       args:
         chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: action == 'restart'
+      when: compose_action == 'restart'
       tags: deploy
 
     # =========================================================================
