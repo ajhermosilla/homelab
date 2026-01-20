@@ -140,10 +140,10 @@ ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker
 ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "stack=media"
 
 # Stop a stack
-ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "stack=media" -e "action=down"
+ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "stack=media" -e "compose_action=down"
 
 # Pull latest images
-ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "action=pull"
+ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker -e "compose_action=pull"
 ```
 
 ## Usage Examples
