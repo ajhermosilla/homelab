@@ -1,7 +1,8 @@
 # Beryl AX - Tailscale Persistence Fix
 
 **Date:** 2026-01-19
-**Status:** Documented, pending implementation
+**Implemented:** 2026-01-20
+**Status:** Complete - tested and working
 **Device:** GL.iNet Beryl AX (GL-MT3000)
 **Issue:** Tailscale logs out after router reboot
 
@@ -177,9 +178,25 @@ After successful implementation:
 - [Tailscale on OpenWrt](https://tailscale.com/kb/1114/openwrt/)
 - This homelab: `docs/hardware.md`, `docker/mobile/rpi5/README.md`
 
-## Next Steps
+## Implementation Notes (2026-01-20)
 
-- [ ] Implement fix (2026-01-20)
-- [ ] Test reboot persistence
-- [ ] Document actual pre-auth key creation date in private notes (not in git)
-- [ ] Set calendar reminder to regenerate key before 90-day expiration
+**Actual script location:** `/usr/bin/gl_tailscale` (not `/usr/sbin/` as initially documented)
+
+**Backup created:** `/usr/bin/gl_tailscale.backup`
+
+**Line modified:** Near end of script, the `tailscale up` command:
+```bash
+timeout 10 /usr/sbin/tailscale up --reset --accept-routes $param --timeout 3s --accept-dns=false --login-server=https://hs.cronova.dev --authkey=<KEY> --hostname=beryl-ax > /dev/null
+```
+
+**Pre-auth key:** Created 2026-01-20, expires ~2026-04-20 (90 days, reusable)
+
+**Beryl Tailscale IP:** 100.102.244.131
+
+**Test result:** Reboot persistence confirmed - Beryl reconnects automatically to Headscale mesh.
+
+## Completed
+
+- [x] Implement fix (2026-01-20)
+- [x] Test reboot persistence
+- [ ] Set calendar reminder to regenerate key before 90-day expiration (~April 2026)
