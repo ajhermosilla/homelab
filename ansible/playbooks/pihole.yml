@@ -40,13 +40,15 @@
       register: resolved_status
       ignore_errors: true
       changed_when: false
+      check_mode: no
 
     - name: Stop systemd-resolved
       service:
         name: systemd-resolved
         state: stopped
         enabled: no
-      when: resolved_status.rc == 0
+      when: resolved_status.rc is defined and resolved_status.rc == 0
+      ignore_errors: true
       tags: resolved
 
     - name: Update resolv.conf
@@ -57,7 +59,7 @@
           nameserver 1.1.1.1
           nameserver 9.9.9.9
         mode: '0644'
-      when: resolved_status.rc == 0
+      when: resolved_status.rc is defined and resolved_status.rc == 0
       tags: resolved
 
     # =========================================================================
