@@ -15,9 +15,10 @@ all:
     vps:
       hosts:
         vultr:
-          ansible_host: 100.64.0.100  # Tailscale IP
-          # ansible_host: <public-ip>  # Direct access
-          ansible_user: root
+          ansible_host: 100.77.172.46  # Tailscale IP
+          # ansible_host: 104.207.144.195  # Public IP
+          ansible_user: linuxuser
+          ansible_become: true
       vars:
         environment_type: vps
         timezone: America/New_York
