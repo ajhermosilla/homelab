@@ -1,8 +1,237 @@
 # Network Topology
 
-Docker network architecture and inter-service communication.
+Complete infrastructure diagram: physical, logical, and overlay networks.
 
-## Overview
+## High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                   INTERNET                                       │
+└────────────────────────────────────┬────────────────────────────────────────────┘
+                                     │
+         ┌───────────────────────────┼───────────────────────────┐
+         │                           │                           │
+         ▼                           ▼                           ▼
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│   VPS (Vultr)   │       │  Fixed Homelab  │       │   Mobile Kit    │
+│   24/7 Cloud    │       │   Home Server   │       │   On-Demand     │
+│                 │       │                 │       │                 │
+│ • Headscale     │       │ • Proxmox       │       │ • Beryl AX      │
+│ • Caddy         │       │ • Docker VM     │       │ • RPi 5         │
+│ • Pi-hole       │       │ • NAS           │       │ • MacBook       │
+│ • Uptime Kuma   │       │ • Start9/RPi4   │       │                 │
+│                 │       │                 │       │                 │
+│ 100.77.172.46   │       │ 100.64.0.10-13  │       │ 100.64.0.1      │
+└────────┬────────┘       └────────┬────────┘       └────────┬────────┘
+         │                         │                         │
+         └─────────────────────────┼─────────────────────────┘
+                                   │
+                    ┌──────────────┴──────────────┐
+                    │     TAILSCALE MESH          │
+                    │   100.64.0.0/10 overlay     │
+                    │   Coordinated by Headscale  │
+                    └─────────────────────────────┘
+```
+
+## Tailscale Mesh Network
+
+**Coordination:** Headscale on VPS (hs.cronova.dev)
+**Network:** 100.64.0.0/10 (CGNAT range)
+
+```
+                              ┌─────────────────────────┐
+                              │       HEADSCALE         │
+                              │    hs.cronova.dev       │
+                              │    100.77.172.46        │
+                              └───────────┬─────────────┘
+                                          │
+          ┌───────────────┬───────────────┼───────────────┬───────────────┐
+          │               │               │               │               │
+          ▼               ▼               ▼               ▼               ▼
+   ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐
+   │  minipc    │  │   docker   │  │    nas     │  │   rpi4     │  │   rpi5     │
+   │ 100.64.0.10│  │ 100.64.0.13│  │ 100.64.0.12│  │ 100.64.0.11│  │ 100.64.0.1 │
+   │  Proxmox   │  │ Docker VM  │  │  Storage   │  │  Start9    │  │  Mobile    │
+   └────────────┘  └────────────┘  └────────────┘  └────────────┘  └────────────┘
+                                          │
+          ┌───────────────────────────────┼───────────────────────────────┐
+          │                               │                               │
+          ▼                               ▼                               ▼
+   ┌────────────┐                  ┌────────────┐                  ┌────────────┐
+   │  macbook   │                  │  mombeu    │                  │  beryl-ax  │
+   │100.86.220.9│                  │100.110.253 │                  │100.102.244 │
+   │ Workstation│                  │Samsung A16 │                  │Trav Router │
+   └────────────┘                  └────────────┘                  └────────────┘
+```
+
+### Tailscale IP Allocation
+
+| Device | Tailscale IP | Role | Location |
+|--------|-------------|------|----------|
+| rpi5 | 100.64.0.1 | Mobile DNS | Mobile |
+| minipc | 100.64.0.10 | Proxmox host | Fixed |
+| rpi4 | 100.64.0.11 | Start9 Bitcoin | Fixed |
+| nas | 100.64.0.12 | Storage server | Fixed |
+| docker | 100.64.0.13 | Container host | Fixed |
+| vultr | 100.77.172.46 | VPS / Exit node | Cloud |
+| macbook | 100.86.220.9 | Workstation | Mobile |
+| beryl-ax | 100.102.244.131 | Travel router | Mobile |
+| mombeu | 100.110.253.126 | Phone | Mobile |
+
+## Fixed Homelab - Physical Topology
+
+```
+                              ┌─────────────┐
+                              │ ISP Modem   │
+                              │ Bridge Mode │
+                              └──────┬──────┘
+                                     │ WAN
+                              ┌──────┴──────┐
+                              │   Mini PC   │
+                              │  (Proxmox)  │
+                              │             │
+                              │ ┌─────────┐ │
+                              │ │OPNsense │ │ ← Firewall/Router VM
+                              │ │   VM    │ │
+                              │ └─────────┘ │
+                              └──────┬──────┘
+                                     │ LAN (192.168.1.1)
+                                     │
+                    ┌────────────────┴────────────────┐
+                    │   MokerLink 8-Port 2.5G Switch  │
+                    │         (VLAN Trunk)            │
+                    └─┬────┬────┬────┬────┬────┬────┬─┘
+                      │    │    │    │    │    │    │
+     ┌────────────────┘    │    │    │    │    │    └────────────────┐
+     │                     │    │    │    │    │                     │
+     ▼                     ▼    ▼    ▼    ▼    ▼                     ▼
+┌─────────┐          ┌─────────┐  ┌───┐  ┌─────────┐          ┌─────────┐
+│Docker VM│          │  RPi 4  │  │NAS│  │PoE Sw.  │          │ WiFi AP │
+│(Proxmox)│          │ Start9  │  │   │  │TP-Link  │          │ AX3000  │
+│.1.10    │          │ .1.11   │  │.12│  │         │          │         │
+└─────────┘          └─────────┘  └───┘  └────┬────┘          └─────────┘
+                                              │
+                                    ┌─────────┴─────────┐
+                                    │                   │
+                                    ▼                   ▼
+                              ┌──────────┐        ┌──────────┐
+                              │ Reolink  │        │ Reolink  │
+                              │ Camera 1 │        │ Camera 2 │
+                              │ (PoE)    │        │ (PoE)    │
+                              └──────────┘        └──────────┘
+```
+
+### Fixed Hardware Summary
+
+| Device | Model | Specs | IP | Role |
+|--------|-------|-------|-----|------|
+| Mini PC | N150 | 12GB RAM, 512GB SSD | 192.168.1.1 (WAN) | Proxmox host |
+| Docker VM | Ubuntu | 8GB RAM, 200GB | 192.168.1.10 | Containers |
+| NAS | i3-3220T | 8GB RAM, 10TB total | 192.168.1.12 | Storage |
+| RPi 4 | 4GB | 1TB ext SSD | 192.168.1.11 | Start9 Bitcoin |
+| Switch | MokerLink | 8-port 2.5G | - | Backbone |
+| PoE Switch | TP-Link | 5-port 1G, 4xPoE | - | Camera power |
+| WiFi AP | TP-Link | AX3000 WiFi 6 | - | Wireless |
+| UPS | Forza | 1000VA | - | Power backup |
+
+## Mobile Kit - Physical Topology
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    MOBILE KIT BACKPACK                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│    ┌───────────────┐         USB-C Tethering                │
+│    │  Samsung A13  │◄────────────────────┐                  │
+│    │ (Claro SIM)   │                     │                  │
+│    └───────────────┘                     │                  │
+│                                          │                  │
+│    ┌───────────────┐              ┌──────┴──────┐          │
+│    │   Beryl AX    │◄─────WiFi────│  MacBook    │          │
+│    │  GL-MT3000    │   mbohapy    │   Air M1    │          │
+│    │  192.168.8.1  │              │ 192.168.8.10│          │
+│    │               │              └─────────────┘          │
+│    │ • AdGuard DNS │                                        │
+│    │ • Tailscale   │                                        │
+│    └───────┬───────┘                                        │
+│            │ WiFi/Ethernet                                  │
+│            │                                                │
+│    ┌───────┴───────┐                                        │
+│    │    RPi 5      │  (Future: USB-C powered from Beryl)   │
+│    │  192.168.8.5  │                                        │
+│    │               │                                        │
+│    │ • Pi-hole DNS │                                        │
+│    │ • Tailscale   │                                        │
+│    └───────────────┘                                        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Mobile Network Flow
+
+```
+[4G/LTE Internet]
+        │
+        ▼
+┌───────────────┐
+│  Samsung A13  │  USB Tethering
+│  Claro SIM    │
+└───────┬───────┘
+        │
+        ▼
+┌───────────────┐      ┌───────────────┐
+│   Beryl AX    │─────►│   MacBook     │
+│  192.168.8.1  │ WiFi │  192.168.8.10 │
+│               │      │               │
+│  AdGuard Home │      │  soft-serve   │
+│  (Primary DNS)│      │  Tailscale    │
+└───────┬───────┘      └───────────────┘
+        │
+        ▼
+┌───────────────┐
+│    RPi 5      │
+│  192.168.8.5  │
+│               │
+│   Pi-hole     │
+│  (Backup DNS) │
+│   Tailscale   │
+└───────────────┘
+```
+
+## DNS Resolution Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           DNS RESOLUTION PATHS                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  MOBILE KIT                                                                  │
+│  ──────────                                                                  │
+│  [Device] ──► AdGuard (Beryl 192.168.8.1) ──► Cloudflare/Quad9              │
+│                    │                                                         │
+│                    └──► Pi-hole (RPi5 192.168.8.5) ──► Cloudflare/Quad9     │
+│                         (fallback)                                           │
+│                                                                              │
+│  FIXED HOMELAB                                                               │
+│  ─────────────                                                               │
+│  [Device] ──► Pi-hole (Docker 192.168.1.10) ──► Unbound (OPNsense)          │
+│                                                      │                       │
+│                                                      └──► Root DNS Servers   │
+│                                                                              │
+│  VPS                                                                         │
+│  ───                                                                         │
+│  [Container] ──► Pi-hole (127.0.0.1) ──► Cloudflare/Quad9                   │
+│                                                                              │
+│  TAILSCALE MESH (Fallback Chain)                                            │
+│  ───────────────────────────────                                            │
+│  Primary:  RPi 5      (100.64.0.1)                                          │
+│  Fallback: Docker VM  (100.64.0.13)                                         │
+│  Fallback: VPS        (100.77.172.46)                                       │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Docker Service Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -15,11 +244,11 @@ Docker network architecture and inter-service communication.
 │  │    :53,:8053 │  │    :80,:443  │  │    :8080     │  │ :3478,:8443  │    │
 │  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘    │
 │                                                                              │
-│  ┌──────────────┐  ┌──────────────┐                                         │
-│  │ Restic REST  │  │changedetect. │                                         │
-│  │  backup-net  │  │ scraping-net │                                         │
-│  │    :8000     │  │    :5000     │                                         │
-│  └──────────────┘  └──────────────┘                                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │ Uptime Kuma  │  │     ntfy     │  │ Restic REST  │  │changedetect. │    │
+│  │  monitoring  │  │  monitoring  │  │  backup-net  │  │ scraping-net │    │
+│  │    :3001     │  │     :80      │  │    :8000     │  │    :5000     │    │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘    │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
