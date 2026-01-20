@@ -22,6 +22,7 @@
       register: restic_installed
       ignore_errors: true
       changed_when: false
+      check_mode: no
 
     - name: Download Restic binary
       get_url:
@@ -148,6 +149,7 @@
       command: restic version
       register: restic_version_output
       changed_when: false
+      check_mode: no
 
     - name: Display Restic version
       debug:
