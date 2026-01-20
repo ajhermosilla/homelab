@@ -21,7 +21,7 @@ all:
           ansible_become: true
       vars:
         environment_type: vps
-        timezone: America/New_York
+        timezone: UTC
 
     # ==========================================================================
     # Fixed Homelab
