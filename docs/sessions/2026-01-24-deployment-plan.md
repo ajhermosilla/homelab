@@ -38,14 +38,23 @@ TARGET:
 ### Downloads (do on MacBook, save to USB)
 - [ ] Proxmox VE ISO: https://www.proxmox.com/en/downloads
 - [ ] OPNsense ISO: https://opnsense.org/download/ (amd64, dvd)
+- [ ] Debian 12 netinst ISO: https://www.debian.org/download (for NAS)
 - [ ] Ventoy (multi-boot USB): https://www.ventoy.net/
 
-### Hardware prep
+### Hardware prep - Mini PC
 - [ ] Find/label all Ethernet cables needed
 - [ ] Locate HDMI cable + USB keyboard for Mini PC install
 - [ ] Verify Mini PC boots (enter BIOS, check dual NIC visible)
 - [ ] Verify Beryl AX works (test as backup router)
 - [ ] Charge phone (for tethering if things go wrong)
+
+### Hardware prep - NAS (do BEFORE Jan 24)
+- [ ] Open NAS case
+- [ ] Install SSD (240GB Lexar) - boot drive
+- [ ] Install WD Purple 2TB - Frigate recordings
+- [ ] Install WD Red Plus 8TB - media/data
+- [ ] Verify all drives detected in BIOS
+- [ ] Close case, connect power + Ethernet cable ready
 
 ### Network planning
 - [ ] Decide IP scheme:
@@ -331,8 +340,184 @@ These are nice-to-have, not required for day 1:
 ```
 OPNsense → Services → DHCPv4 → LAN → Static mappings
 - Docker VM: 192.168.1.10
-- NAS (future): 192.168.1.12
+- NAS: 192.168.1.12
 ```
+
+---
+
+### Phase 6: NAS Deployment (1.5-2 hours)
+*Optional - only if Mini PC + OPNsense done in under 2.5 hours*
+
+**Decision point after Phase 4:**
+- Check time remaining
+- If 1.5+ hours left AND internet stable → proceed with NAS
+- If tight on time → defer NAS to another day
+
+#### 6.1 Connect NAS to network
+```
+[ ] Connect NAS to Switch Port 4
+[ ] Power on NAS
+[ ] Move keyboard/HDMI from Mini PC to NAS
+```
+
+#### 6.2 Install Debian 12
+```
+[ ] Boot from Ventoy USB, select Debian ISO
+[ ] Graphical install or text install
+
+Partitioning (SSD 240GB only - will mount HDDs manually):
+- /boot: 512MB (ext4)
+- swap: 4GB
+- /: remaining space (ext4)
+
+DO NOT partition the Purple or Red Plus drives during install!
+
+Network:
+- Hostname: nas
+- Domain: home.local
+- IP: Will get DHCP initially, set static later
+
+User:
+- Root password: [your password]
+- User: augusto
+- User password: [your password]
+
+Software:
+- SSH server: YES
+- Standard system utilities: YES
+- Desktop: NO (server only)
+```
+
+#### 6.3 Post-install: Static IP
+```bash
+# SSH to NAS (find IP from OPNsense DHCP leases)
+ssh augusto@192.168.1.1xx
+
+# Set static IP
+sudo nano /etc/network/interfaces
+```
+
+```
+auto enp0s31f6  # or your interface name
+iface enp0s31f6 inet static
+    address 192.168.1.12
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+    dns-nameservers 192.168.1.1
+```
+
+```bash
+# Apply (will disconnect SSH - reconnect to .12)
+sudo systemctl restart networking
+
+# Verify
+ip addr show
+ping google.com
+```
+
+#### 6.4 Mount data drives
+```bash
+# Identify drives
+lsblk
+sudo blkid
+
+# Create mount points
+sudo mkdir -p /mnt/{purple,data}
+
+# Format drives (CAREFUL - destructive!)
+# Purple 2TB for Frigate
+sudo mkfs.ext4 -L purple /dev/sdX
+
+# Red Plus 8TB for data
+sudo mkfs.ext4 -L data /dev/sdY
+
+# Get UUIDs
+sudo blkid | grep -E "purple|data"
+
+# Add to fstab
+sudo nano /etc/fstab
+```
+
+Add these lines:
+```
+UUID=<purple-uuid>  /mnt/purple  ext4  defaults,noatime  0  2
+UUID=<data-uuid>    /mnt/data    ext4  defaults,noatime  0  2
+```
+
+```bash
+# Mount all
+sudo mount -a
+
+# Verify
+df -h
+```
+
+#### 6.5 Create Frigate directory
+```bash
+# Create directory for Frigate recordings
+sudo mkdir -p /mnt/purple/frigate
+sudo chown -R 1000:1000 /mnt/purple/frigate
+sudo chmod 755 /mnt/purple/frigate
+```
+
+#### 6.6 Install and configure NFS
+```bash
+# Install NFS server
+sudo apt update
+sudo apt install -y nfs-kernel-server
+
+# Create export symlink
+sudo mkdir -p /srv/frigate
+sudo ln -s /mnt/purple/frigate /srv/frigate
+
+# Configure export (for Docker VM)
+echo '/srv/frigate 192.168.1.10(rw,sync,no_subtree_check,no_root_squash)' | sudo tee -a /etc/exports
+
+# Apply exports
+sudo exportfs -ra
+
+# Verify
+sudo exportfs -v
+
+# Enable and start NFS
+sudo systemctl enable nfs-kernel-server
+sudo systemctl start nfs-kernel-server
+```
+
+#### 6.7 Test NFS from Docker VM (if created)
+```bash
+# SSH to Docker VM
+ssh user@192.168.1.10
+
+# Install NFS client
+sudo apt update
+sudo apt install -y nfs-common
+
+# Create mount point
+sudo mkdir -p /mnt/nas/frigate
+
+# Test mount
+sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+
+# Verify
+df -h /mnt/nas/frigate
+
+# Test write
+touch /mnt/nas/frigate/test.txt
+rm /mnt/nas/frigate/test.txt
+
+# Add to fstab for persistence
+echo '192.168.1.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0' | sudo tee -a /etc/fstab
+```
+
+#### 6.8 Join NAS to Tailscale (optional)
+```bash
+# On NAS
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up --login-server=https://hs.cronova.dev --authkey=YOUR_KEY
+```
+
+**Checkpoint:** NAS running, NFS exporting, Docker VM can mount. ~5-5.5 hours total.
 
 ---
 
@@ -343,31 +528,39 @@ OPNsense → Services → DHCPv4 → LAN → Static mappings
 - [ ] Family devices can browse/stream
 - [ ] OPNsense accessible for management
 
-**Nice to have:**
+**Nice to have (if time permits):**
 - [ ] Docker VM created
 - [ ] Pi-hole running (ad-blocking)
 - [ ] Tailscale working on Proxmox
+- [ ] NAS running with Debian
+- [ ] NFS export configured for Frigate
 
 **Defer to later:**
-- NAS setup
-- Frigate/cameras
+- Frigate deployment + cameras
 - Home Assistant
-- Media stack
-- Backups
+- Media stack (*arr, Jellyfin)
+- Full backup automation
+- Start9 on RPi 4
 
 ---
 
 ## Post-Deployment Tasks (after Jan 24)
 
-| Task | Priority |
-|------|----------|
-| Install Debian on NAS | High |
-| Set up NFS export for Frigate | High |
-| Deploy full Docker stack | Medium |
-| Configure VLANs for IoT | Medium |
-| Set up cameras in Frigate | Medium |
-| Configure UPS/NUT | Low |
-| Start9 on RPi 4 | Low |
+*Skip NAS tasks if completed on Day 1*
+
+| Task | Priority | Notes |
+|------|----------|-------|
+| Install Debian on NAS | High | Skip if done Day 1 |
+| Set up NFS export for Frigate | High | Skip if done Day 1 |
+| Deploy Frigate on Docker VM | High | Needs NFS ready |
+| Configure cameras in Frigate | High | After Frigate deployed |
+| Deploy Pi-hole (if not done) | Medium | Ad-blocking |
+| Deploy Mosquitto + Home Assistant | Medium | Automation |
+| Deploy media stack (*arr, Jellyfin) | Medium | Entertainment |
+| Configure VLANs for IoT | Medium | Camera isolation |
+| Configure UPS/NUT | Low | Graceful shutdown |
+| Set up backup automation | Low | Restic to NAS + cloud |
+| Start9 on RPi 4 | Low | Bitcoin node |
 
 ---
 
@@ -388,9 +581,10 @@ OPNsense → Services → DHCPv4 → LAN → Static mappings
 | Device | IP | Role |
 |--------|-----|------|
 | OPNsense LAN | 192.168.1.1 | Gateway, DHCP, DNS |
+| AX3000 (AP mode) | 192.168.1.2 | WiFi only |
 | Proxmox | 192.168.1.5 | Hypervisor management |
 | Docker VM | 192.168.1.10 | Container host |
-| AX3000 (AP mode) | 192.168.1.2 | WiFi only |
+| NAS | 192.168.1.12 | Storage, NFS server |
 | DHCP range | .100-.199 | Client devices |
 
 ---
