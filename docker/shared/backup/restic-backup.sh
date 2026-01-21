@@ -54,20 +54,38 @@ fi
 
 # Run backup
 log "Backing up $BACKUP_PATH"
-restic backup "$BACKUP_PATH" --tag "$BACKUP_TAG" $EXCLUDE_ARGS
+if ! restic backup "$BACKUP_PATH" --tag "$BACKUP_TAG" $EXCLUDE_ARGS; then
+    log "ERROR: Backup failed for $BACKUP_TAG"
+    exit 1
+fi
+
+# Verify backup was created successfully
+log "Verifying backup snapshot exists"
+LATEST_SNAPSHOT=$(restic snapshots --tag "$BACKUP_TAG" --latest 1 --json 2>/dev/null | grep -o '"short_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+if [ -z "$LATEST_SNAPSHOT" ]; then
+    log "ERROR: Could not verify backup snapshot for $BACKUP_TAG"
+    exit 1
+fi
+log "Verified: Latest snapshot $LATEST_SNAPSHOT"
 
 # Prune old snapshots
 log "Pruning old snapshots (keep: $KEEP_DAILY daily, $KEEP_WEEKLY weekly, $KEEP_MONTHLY monthly)"
-restic forget --tag "$BACKUP_TAG" \
+if ! restic forget --tag "$BACKUP_TAG" \
     --keep-daily "$KEEP_DAILY" \
     --keep-weekly "$KEEP_WEEKLY" \
     --keep-monthly "$KEEP_MONTHLY" \
-    --prune
+    --prune; then
+    log "WARNING: Prune failed, but backup succeeded"
+fi
 
 # Verify integrity (weekly - check if day of week is Sunday)
 if [ "$(date +%u)" = "7" ]; then
     log "Running weekly integrity check"
-    restic check
+    if ! restic check; then
+        log "WARNING: Integrity check failed - investigate manually"
+    fi
 fi
 
-log "Backup complete: $BACKUP_TAG"
+# Print backup stats
+SNAPSHOT_COUNT=$(restic snapshots --tag "$BACKUP_TAG" --json 2>/dev/null | grep -c '"short_id"' || echo "0")
+log "Backup complete: $BACKUP_TAG (Total snapshots: $SNAPSHOT_COUNT)"

@@ -39,6 +39,7 @@ services:
     logging:
       driver: "json-file"
       options:
+        # Larger log size for Home Assistant - integrations and automations generate verbose logs
         max-size: "20m"
         max-file: "3"
     # Note: Add device mounts if USB Zigbee/Z-Wave sticks are used:
@@ -115,6 +116,7 @@ services:
         limits:
           memory: 128M
           cpus: '0.25'
+    init: true  # Proper signal handling for cron daemon
     entrypoint: /bin/sh
     command:
       - -c

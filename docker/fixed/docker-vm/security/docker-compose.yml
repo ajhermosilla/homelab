@@ -120,6 +120,7 @@ services:
     logging:
       driver: "json-file"
       options:
+        # Larger log size for NVR - continuous video processing generates more logs
         max-size: "50m"
         max-file: "3"
     # Note: Frigate depends on Mosquitto (automation stack) for MQTT.
@@ -147,6 +148,7 @@ services:
         limits:
           memory: 128M
           cpus: '0.25'
+    init: true  # Proper signal handling for cron daemon
     entrypoint: /bin/sh
     command:
       - -c
