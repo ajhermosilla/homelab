@@ -93,11 +93,11 @@ networks:
 #
 # Domain                    IP
 # ------                    --
-# home.cronova.dev          100.64.0.10
-# media.cronova.dev         100.64.0.10
-# vault.cronova.dev         100.64.0.10
-# nas.cronova.dev           100.64.0.12
-# btc.cronova.dev           100.64.0.11
+# home.cronova.dev          100.64.0.13  # Docker VM
+# media.cronova.dev         100.64.0.13  # Docker VM
+# vault.cronova.dev         100.64.0.13  # Docker VM
+# nas.cronova.dev           100.64.0.12  # NAS
+# btc.cronova.dev           100.64.0.11  # RPi 4 (Start9)
 #
 # =============================================================================
 # AD LISTS

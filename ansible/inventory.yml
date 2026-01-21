@@ -89,8 +89,6 @@ all:
         vultr:
         docker:
         nas:
-      vars:
-        docker_compose_version: "2"
 
     pihole_hosts:
       hosts:
