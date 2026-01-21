@@ -4,7 +4,7 @@
 # =============================================================================
 #
 # Internal reverse proxy for services on Docker VM.
-# Accessed via Tailscale mesh (100.64.0.10) or local network (192.168.1.10).
+# Accessed via Tailscale mesh (100.64.0.13) or local network (192.168.1.10).
 #
 # TLS Strategy: Tailscale HTTPS certificates (see docs/certificate-strategy.md)
 # - Certs stored in /var/lib/tailscale/certs/

@@ -42,23 +42,37 @@ Codebase review identified issues in Ansible playbooks, Docker Compose files, an
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-| 11 | Hardcoded IPs should use environment variables or container names | Multiple docker-compose files | - | Pending |
-| 12 | Dead code: `docker_compose_version: "2"` variable defined but never used | `ansible/inventory.yml` | 93 | Pending |
-| 13 | Inconsistent Tailscale IP addressing between docs and configs | `docs/services.md` | - | Pending |
+| 11 | Hardcoded IPs should use environment variables or container names | Multiple docker-compose files | - | **Acceptable** (defaults with env var override) |
+| 12 | Dead code: `docker_compose_version: "2"` variable defined but never used | `ansible/inventory.yml` | 93 | **Fixed** |
+| 13 | Inconsistent Tailscale IP addressing between docs and configs | Multiple files | - | **Fixed** |
+
+### Fixes Applied
+
+11. **Hardcoded IPs**: Reviewed - IPs are used as sensible defaults with `${VAR:-default}` pattern allowing override via .env files. Acceptable design.
+12. **inventory.yml**: Removed unused `docker_compose_version: "2"` variable from `docker_hosts` group
+13. **Tailscale IPs**: Fixed Docker VM IP references from 100.64.0.10 to 100.64.0.13 in:
+    - `docker/fixed/docker-vm/networking/pihole/docker-compose.yml` (DNS records comments)
+    - `docker/fixed/docker-vm/networking/caddy/Caddyfile` (header comment)
 
 ## Low Priority Issues
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-| 14 | Relative paths in docker-compose assume specific working directories | Multiple files | - | Pending |
-| 15 | Session docs in README may reference deleted files | `README.md` | 85 | Pending |
+| 14 | Relative paths in docker-compose assume specific working directories | Multiple files | - | **Fixed** |
+| 15 | Session docs in README may reference deleted files | `README.md` | 85 | **Verified OK** |
 
-## Fix Order
+### Fixes Applied
 
-1. **Critical issues first** (1-5) - These will cause deployment failures
-2. **High priority** (6-10) - Security and reliability concerns
-3. **Medium priority** (11-13) - Maintainability improvements
-4. **Low priority** (14-15) - Code quality and documentation cleanup
+14. **Relative paths**: Fixed backup script mount in `docker/fixed/docker-vm/automation/docker-compose.yml` to use `${HOMELAB_ROOT:-/opt/homelab/repo}` pattern (same as security stack fix)
+15. **README references**: Verified all referenced session files exist (`2026-01-16.md`, `improvements-2026-01-16.md`)
+
+## Summary
+
+All 15 issues have been addressed:
+- **5 Critical**: Fixed
+- **5 High Priority**: Fixed (1 N/A - already handled)
+- **3 Medium Priority**: Fixed (1 acceptable as-is)
+- **2 Low Priority**: Fixed (1 verified OK)
 
 ## Notes
 
