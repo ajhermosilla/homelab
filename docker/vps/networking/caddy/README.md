@@ -14,8 +14,9 @@ Automatic HTTPS reverse proxy for all VPS services.
 ## Quick Start
 
 ```bash
-# Ensure network exists
+# Create required external networks
 docker network create headscale-net || true
+docker network create monitoring-net || true
 
 # Start Caddy
 docker compose up -d

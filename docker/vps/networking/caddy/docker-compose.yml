@@ -69,8 +69,9 @@ networks:
 # SETUP INSTRUCTIONS
 # =============================================================================
 #
-# 1. Ensure headscale-net network exists (created by Headscale):
+# 1. Create required external networks:
 #    docker network create headscale-net
+#    docker network create monitoring-net
 #
 # 2. Start Caddy:
 #    docker compose up -d

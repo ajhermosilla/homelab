@@ -2,8 +2,12 @@
 # https://docs.frigate.video/configuration/
 #
 # Cameras:
-#   - 2x Reolink RLC-520A (5MP PoE) on VLAN 10
-#   - 1x TP-Link Tapo C110 (3MP WiFi) on VLAN 10
+#   - 2x Reolink RLC-520A (5MP PoE)
+#   - 1x TP-Link Tapo C110 (3MP WiFi)
+#
+# Network:
+#   - Day 1: Main LAN (192.168.1.x)
+#   - Future: VLAN 10 (192.168.10.x) for IoT isolation
 #
 # Hardware:
 #   - Intel N150 QuickSync for video decode (VA-API)
@@ -70,9 +74,20 @@ objects:
 # ⚠️  IMPORTANT: Replace ALL credential placeholders before deploying!
 #     Search for: {REOLINK_USER}, {REOLINK_PASS}, {TAPO_USER}, {TAPO_PASS}
 #
-# Reolink RLC-520A streams:
-#   Main: rtsp://{USER}:{PASS}@ip:554/h264Preview_01_main (5MP)
-#   Sub:  rtsp://{USER}:{PASS}@ip:554/h264Preview_01_sub (lower res)
+# -----------------------------------------------------------------------------
+# RTSP URL Formats by Camera Model
+# -----------------------------------------------------------------------------
+#
+# Reolink RLC-520A (PoE):
+#   Main: rtsp://{USER}:{PASS}@ip:554/h264Preview_01_main (5MP, recording)
+#   Sub:  rtsp://{USER}:{PASS}@ip:554/h264Preview_01_sub (640x480, detection)
+#   Default credentials: admin / (set during camera setup)
+#   Enable RTSP: Device Settings → Network → Advanced → Port Settings
+#
+# TP-Link Tapo C110 (WiFi):
+#   Stream: rtsp://{USER}:{PASS}@ip:554/stream1 (1080p)
+#   Create RTSP account in Tapo app: Camera Settings → Advanced → Device Account
+#   Note: Uses single stream for both detection and recording
 #
 # Use sub stream for detect (faster), main stream for record (quality).
 
@@ -83,10 +98,10 @@ cameras:
   front_door:
     ffmpeg:
       inputs:
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.101:554/h264Preview_01_sub
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.101:554/h264Preview_01_sub
           roles:
             - detect
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.101:554/h264Preview_01_main
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.101:554/h264Preview_01_main
           roles:
             - record
     detect:
@@ -108,10 +123,10 @@ cameras:
   back_yard:
     ffmpeg:
       inputs:
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.102:554/h264Preview_01_sub
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.102:554/h264Preview_01_sub
           roles:
             - detect
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.10.102:554/h264Preview_01_main
+        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.102:554/h264Preview_01_main
           roles:
             - record
     detect:
@@ -134,7 +149,7 @@ cameras:
   indoor:
     ffmpeg:
       inputs:
-        - path: rtsp://{TAPO_USER}:{TAPO_PASS}@192.168.10.103:554/stream1
+        - path: rtsp://{TAPO_USER}:{TAPO_PASS}@192.168.1.103:554/stream1
           roles:
             - detect
             - record
@@ -161,10 +176,11 @@ cameras:
 #    - {TAPO_USER} / {TAPO_PASS} - Tapo camera credentials
 #    - MQTT password in mqtt section above
 #
-# 2. Camera IPs are on VLAN 10 (IoT):
-#    - 192.168.10.101 - Front door (Reolink)
-#    - 192.168.10.102 - Back yard (Reolink)
-#    - 192.168.10.103 - Indoor (Tapo)
+# 2. Camera IPs (Day 1 - Main LAN):
+#    - 192.168.1.101 - Front door (Reolink)
+#    - 192.168.1.102 - Back yard (Reolink)
+#    - 192.168.1.103 - Indoor (Tapo)
+#    Future: Move to VLAN 10 (192.168.10.x) for IoT isolation
 #
 # 3. Enable RTSP on cameras:
 #    - Reolink: Device Settings → Network → Advanced → Port Settings
