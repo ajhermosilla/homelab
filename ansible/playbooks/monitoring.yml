@@ -8,9 +8,8 @@
 
   vars:
     monitoring_compose_dir: /opt/homelab/monitoring
-    ntfy_base_url: "https://notify.cronova.dev"
-    # Clone from homelab repo or copy files
     homelab_repo: "https://github.com/ajhermosilla/homelab.git"
+    homelab_base: /opt/homelab
 
   tasks:
     # =========================================================================
@@ -28,107 +27,50 @@
         mode: '0755'
 
     # =========================================================================
-    # Docker Compose Files
+    # Clone/Update Homelab Repo
     # =========================================================================
-    - name: Copy docker-compose.yml
+    - name: Clone/update homelab repository
+      git:
+        repo: "{{ homelab_repo }}"
+        dest: "{{ homelab_base }}/repo"
+        version: main
+        force: yes
+      tags: clone
+      ignore_errors: true
+
+    # =========================================================================
+    # Create Docker Network
+    # =========================================================================
+    - name: Create monitoring-net network
+      community.docker.docker_network:
+        name: monitoring-net
+        state: present
+      tags: networks
+
+    # =========================================================================
+    # Copy Docker Compose Files from Repo
+    # =========================================================================
+    - name: Copy docker-compose.yml from repo
       copy:
+        src: "{{ homelab_base }}/repo/docker/vps/monitoring/docker-compose.yml"
         dest: "{{ monitoring_compose_dir }}/docker-compose.yml"
+        remote_src: yes
+        mode: '0644'
+
+    - name: Copy shared common.env
+      copy:
+        src: "{{ homelab_base }}/repo/docker/shared/common.env"
+        dest: "{{ monitoring_compose_dir }}/common.env"
+        remote_src: yes
+        mode: '0644'
+      ignore_errors: true
+
+    - name: Create .env file
+      copy:
+        dest: "{{ monitoring_compose_dir }}/.env"
         content: |
-          # Monitoring Stack - Uptime Kuma + ntfy
-          # Deployed by Ansible
-
-          services:
-            uptime-kuma:
-              image: louislam/uptime-kuma:1.23
-              container_name: uptime-kuma
-              restart: unless-stopped
-              security_opt:
-                - no-new-privileges:true
-              labels:
-                - "com.cronova.environment=vps"
-                - "com.cronova.category=monitoring"
-                - "com.cronova.critical=true"
-              cap_drop:
-                - ALL
-              healthcheck:
-                test: ["CMD", "curl", "-f", "http://localhost:3001/"]
-                interval: 30s
-                timeout: 10s
-                retries: 3
-              deploy:
-                resources:
-                  limits:
-                    memory: 256M
-                    cpus: '0.5'
-              ports:
-                - "3001:3001"
-              volumes:
-                - uptime-kuma-data:/app/data
-              environment:
-                - TZ=America/Asuncion
-              logging:
-                driver: "json-file"
-                options:
-                  max-size: "10m"
-                  max-file: "3"
-              networks:
-                - monitoring-net
-
-            ntfy:
-              image: binwiederhier/ntfy:v2.8
-              container_name: ntfy
-              restart: unless-stopped
-              security_opt:
-                - no-new-privileges:true
-              labels:
-                - "com.cronova.environment=vps"
-                - "com.cronova.category=monitoring"
-                - "com.cronova.critical=true"
-              cap_drop:
-                - ALL
-              healthcheck:
-                test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/"]
-                interval: 30s
-                timeout: 10s
-                retries: 3
-              deploy:
-                resources:
-                  limits:
-                    memory: 128M
-                    cpus: '0.25'
-              command:
-                - serve
-              ports:
-                - "8080:80"
-              volumes:
-                - ntfy-cache:/var/cache/ntfy
-                - ntfy-config:/etc/ntfy
-              environment:
-                - TZ=America/Asuncion
-                - NTFY_BASE_URL={{ ntfy_base_url }}
-                - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
-                - NTFY_BEHIND_PROXY=true
-                - NTFY_AUTH_DEFAULT_ACCESS=deny-all
-                - NTFY_ENABLE_LOGIN=true
-              logging:
-                driver: "json-file"
-                options:
-                  max-size: "10m"
-                  max-file: "3"
-              networks:
-                - monitoring-net
-
-          volumes:
-            uptime-kuma-data:
-              name: uptime-kuma-data
-            ntfy-cache:
-              name: ntfy-cache
-            ntfy-config:
-              name: ntfy-config
-
-          networks:
-            monitoring-net:
-              name: monitoring-net
+          # Monitoring Configuration - Generated by Ansible
+          TZ={{ timezone | default('UTC') }}
         mode: '0644'
 
     # =========================================================================
@@ -146,7 +88,6 @@
       args:
         chdir: "{{ monitoring_compose_dir }}"
       register: compose_up
-      changed_when: "'Started' in compose_up.stdout or 'Created' in compose_up.stdout"
 
     # =========================================================================
     # Verification
@@ -175,6 +116,11 @@
       debug:
         msg: |
           Monitoring stack deployed successfully!
-          - Uptime Kuma: http://localhost:3001
-          - ntfy: http://localhost:8080
-          Configure Caddy to expose via HTTPS.
+          - Uptime Kuma: http://localhost:3001 (https://status.cronova.dev via Caddy)
+          - ntfy: http://localhost:8080 (https://notify.cronova.dev via Caddy)
+
+          Next steps:
+          1. Create admin account in Uptime Kuma on first visit
+          2. Configure ntfy user:
+             docker exec -it ntfy ntfy user add --role=admin augusto
+             docker exec -it ntfy ntfy access augusto '*' rw
