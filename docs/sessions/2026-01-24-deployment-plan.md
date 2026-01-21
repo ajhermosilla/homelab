@@ -56,14 +56,28 @@ TARGET:
 - [ ] Verify all drives detected in BIOS
 - [ ] Close case, connect power + Ethernet cable ready
 
+### Hardware prep - Cameras (do BEFORE Jan 24)
+- [ ] Unbox cameras, verify contents (mounts, screws included)
+- [ ] Plan exact mounting locations (front door, back yard)
+- [ ] Measure cable runs (should be <15m each)
+- [ ] Prepare PoE cables (2x for Reolink cameras)
+- [ ] Prepare drill, bits, screwdriver, ladder
+- [ ] Set up Tapo C110 on phone app (get credentials ready)
+- [ ] Note camera default credentials (printed on camera or box)
+
 ### Network planning
 - [ ] Decide IP scheme:
   - OPNsense LAN: `192.168.1.1`
   - DHCP range: `192.168.1.100-199`
   - Docker VM: `192.168.1.10`
-  - NAS (future): `192.168.1.12`
+  - NAS: `192.168.1.12`
+  - Camera front: `192.168.1.101` (PoE)
+  - Camera back: `192.168.1.102` (PoE)
+  - Camera indoor: `192.168.1.103` (WiFi)
 - [ ] Note current AX3000 settings (for reference)
 - [ ] Note ISP modem settings (bridge mode config)
+
+*Note: Cameras on main LAN for Day 1. Move to VLAN 10 (192.168.10.x) later for isolation.*
 
 ### Credentials ready
 - [ ] Proxmox root password (write down)
@@ -521,6 +535,236 @@ sudo tailscale up --login-server=https://hs.cronova.dev --authkey=YOUR_KEY
 
 ---
 
+### Phase 7: Cameras + Frigate (1.5-2 hours)
+*Can run in PARALLEL with Phases 5-6 if friend helps with physical*
+
+This phase has two parallel workstreams:
+- **You**: Deploy Frigate software (needs Docker VM + NFS ready)
+- **Friend**: Physical camera installation (can start earlier)
+
+#### Parallel Workstream Diagram
+
+```
+TIME    YOU (Software)                    FRIEND (Physical)
+─────────────────────────────────────────────────────────────
+T+0     Phase 1-4: Mini PC + OPNsense     Help with cabling
+        (critical path - needs focus)      Set up PoE switch
+
+T+3.5h  Phase 5: Docker VM ─────────────► Start camera mounting
+        Phase 6: NAS + NFS                 Run PoE cables
+                                          Mount front camera
+                                          Mount back camera
+
+T+5h    Phase 7: Frigate deploy ─────────► Connect cameras to PoE
+        Configure cameras                  Set up WiFi camera
+        Test detection                     Aim and adjust cameras
+
+T+6h    DONE - Family can come home!
+```
+
+---
+
+#### 7.1 Physical Camera Installation (Friend)
+*Can start after PoE switch is connected to main switch (Phase 1)*
+
+##### Front Door Camera (Reolink RLC-520A)
+```
+[ ] Choose mounting location (under eave, protected from rain)
+[ ] Mark drill holes using mount template
+[ ] Drill holes, insert anchors
+[ ] Run PoE cable from PoE switch location to camera
+[ ] Mount camera bracket
+[ ] Connect PoE cable to camera
+[ ] Attach camera to bracket, adjust angle
+[ ] Verify LED lights up (PoE power working)
+```
+
+##### Back Yard Camera (Reolink RLC-520A)
+```
+[ ] Same process as front door
+[ ] Consider sun position (avoid direct sunlight in lens)
+[ ] Ensure cable is protected from weather
+```
+
+##### Indoor Camera (TP-Link Tapo C110)
+```
+[ ] Position in living area (shelf, mount, or table)
+[ ] Plug into power outlet
+[ ] Connect to WiFi via Tapo app
+[ ] Note the RTSP credentials from Tapo app
+```
+
+---
+
+#### 7.2 Camera Network Configuration (You)
+*After OPNsense is working (Phase 4)*
+
+##### Configure DHCP Reservations
+```
+OPNsense → Services → DHCPv4 → LAN → Static Mappings
+
+Add each camera by MAC address:
+[ ] Front camera: 192.168.1.101 (get MAC from camera label or app)
+[ ] Back camera: 192.168.1.102
+[ ] Indoor camera: 192.168.1.103
+```
+
+##### Access Camera Web Interfaces
+```
+# After cameras get IPs, access web UI:
+[ ] http://192.168.1.101 - Front (default: admin/blank or admin/admin)
+[ ] http://192.168.1.102 - Back
+# Tapo C110 uses app only, no web UI
+
+# On each Reolink camera:
+[ ] Change default password
+[ ] Set static IP (or rely on DHCP reservation)
+[ ] Enable RTSP: Device Settings → Network → Advanced → Port Settings
+[ ] Note RTSP port (default 554)
+```
+
+---
+
+#### 7.3 Deploy Mosquitto MQTT (You)
+*Frigate needs MQTT for Home Assistant integration*
+
+```bash
+# SSH to Docker VM
+ssh user@192.168.1.10
+
+# Deploy automation stack (Mosquitto)
+cd /opt/homelab/repo/docker/fixed/docker-vm/automation
+
+# Create .env if needed
+cp .env.example .env
+nano .env  # Set MQTT passwords
+
+# Start Mosquitto
+docker compose up -d mosquitto
+
+# Verify
+docker logs mosquitto
+```
+
+---
+
+#### 7.4 Deploy Frigate (You)
+*Requires: Docker VM, NFS mount, Mosquitto running*
+
+##### Verify NFS Mount
+```bash
+# Check NFS is mounted
+df -h /mnt/nas/frigate
+
+# If not mounted:
+sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+```
+
+##### Update Frigate Config for Day 1 IPs
+```bash
+cd /opt/homelab/repo/docker/fixed/docker-vm/security
+
+# Edit frigate.yml - change VLAN 10 IPs to main LAN IPs:
+#   192.168.10.101 → 192.168.1.101
+#   192.168.10.102 → 192.168.1.102
+#   192.168.10.103 → 192.168.1.103
+nano frigate.yml
+
+# Replace credential placeholders:
+#   {REOLINK_USER} → admin (or your username)
+#   {REOLINK_PASS} → your-camera-password
+#   {TAPO_USER} → your-tapo-username
+#   {TAPO_PASS} → your-tapo-password
+```
+
+##### Create Secrets and Environment
+```bash
+# Create secrets directory
+mkdir -p secrets
+chmod 700 secrets
+
+# Generate secrets
+openssl rand -base64 32 > secrets/admin_token.txt
+openssl rand -base64 32 > secrets/restic_password.txt
+chmod 600 secrets/*.txt
+
+# Create .env
+cp .env.example .env
+nano .env
+
+# Set:
+# FRIGATE_RECORDINGS=/mnt/nas/frigate
+# FRIGATE_RTSP_PASSWORD=your-camera-password
+```
+
+##### Start Frigate
+```bash
+# Start Frigate (skip Vaultwarden for now if not needed)
+docker compose up -d frigate
+
+# Watch logs for errors
+docker logs -f frigate
+
+# Common issues:
+# - "No such file or directory: /media/frigate" → NFS not mounted
+# - "Connection refused" MQTT → Mosquitto not running
+# - RTSP timeout → Wrong camera IP or credentials
+```
+
+---
+
+#### 7.5 Verify Frigate (You + Friend)
+
+##### Access Frigate Web UI
+```
+[ ] Open http://192.168.1.10:5000 in browser
+[ ] Should see 3 camera feeds (may take 30s to connect)
+```
+
+##### Check Each Camera
+```
+[ ] Front door: Live feed visible, detection working
+[ ] Back yard: Live feed visible, detection working
+[ ] Indoor: Live feed visible, detection working
+```
+
+##### Test Detection
+```
+[ ] Walk in front of each camera
+[ ] Verify "person" detected (bounding box appears)
+[ ] Check Events tab shows detections
+```
+
+##### Verify Hardware Acceleration
+```bash
+docker exec frigate vainfo
+# Should show Intel QuickSync capabilities
+```
+
+##### Check Recordings
+```bash
+# On NAS, verify recordings are being written:
+ls -la /mnt/purple/frigate/
+# Should see camera directories with recordings
+```
+
+---
+
+#### 7.6 Camera Adjustments (Friend)
+
+After verifying feeds in Frigate:
+```
+[ ] Adjust front camera angle for optimal coverage
+[ ] Adjust back camera angle
+[ ] Position indoor camera for best view
+[ ] Tighten all mounts
+[ ] Clean up cable runs (zip ties, clips)
+```
+
+**Checkpoint:** All cameras streaming to Frigate, detection working. ~6-6.5 hours total.
+
+---
+
 ## Day 1 Success Criteria
 
 **Minimum (must have):**
@@ -528,16 +772,17 @@ sudo tailscale up --login-server=https://hs.cronova.dev --authkey=YOUR_KEY
 - [ ] Family devices can browse/stream
 - [ ] OPNsense accessible for management
 
-**Nice to have (if time permits):**
+**Nice to have (with friend's help):**
 - [ ] Docker VM created
+- [ ] NAS running with Debian + NFS export
+- [ ] Cameras physically installed
+- [ ] Frigate running with all 3 cameras
 - [ ] Pi-hole running (ad-blocking)
-- [ ] Tailscale working on Proxmox
-- [ ] NAS running with Debian
-- [ ] NFS export configured for Frigate
+- [ ] Tailscale working on Proxmox/NAS
 
 **Defer to later:**
-- Frigate deployment + cameras
-- Home Assistant
+- VLAN 10 for camera isolation
+- Home Assistant + automations
 - Media stack (*arr, Jellyfin)
 - Full backup automation
 - Start9 on RPi 4
@@ -546,18 +791,18 @@ sudo tailscale up --login-server=https://hs.cronova.dev --authkey=YOUR_KEY
 
 ## Post-Deployment Tasks (after Jan 24)
 
-*Skip NAS tasks if completed on Day 1*
+*Skip tasks if completed on Day 1*
 
 | Task | Priority | Notes |
 |------|----------|-------|
 | Install Debian on NAS | High | Skip if done Day 1 |
 | Set up NFS export for Frigate | High | Skip if done Day 1 |
-| Deploy Frigate on Docker VM | High | Needs NFS ready |
-| Configure cameras in Frigate | High | After Frigate deployed |
+| Deploy Frigate + cameras | High | Skip if done Day 1 |
+| Configure VLANs for IoT | High | Move cameras to 192.168.10.x |
 | Deploy Pi-hole (if not done) | Medium | Ad-blocking |
-| Deploy Mosquitto + Home Assistant | Medium | Automation |
+| Deploy Mosquitto + Home Assistant | Medium | Frigate → HA integration |
 | Deploy media stack (*arr, Jellyfin) | Medium | Entertainment |
-| Configure VLANs for IoT | Medium | Camera isolation |
+| Fine-tune Frigate zones/masks | Medium | Reduce false positives |
 | Configure UPS/NUT | Low | Graceful shutdown |
 | Set up backup automation | Low | Restic to NAS + cloud |
 | Start9 on RPi 4 | Low | Bitcoin node |
@@ -583,9 +828,22 @@ sudo tailscale up --login-server=https://hs.cronova.dev --authkey=YOUR_KEY
 | OPNsense LAN | 192.168.1.1 | Gateway, DHCP, DNS |
 | AX3000 (AP mode) | 192.168.1.2 | WiFi only |
 | Proxmox | 192.168.1.5 | Hypervisor management |
-| Docker VM | 192.168.1.10 | Container host |
+| Docker VM | 192.168.1.10 | Container host, Frigate |
 | NAS | 192.168.1.12 | Storage, NFS server |
+| Camera Front | 192.168.1.101 | Reolink PoE |
+| Camera Back | 192.168.1.102 | Reolink PoE |
+| Camera Indoor | 192.168.1.103 | Tapo WiFi |
 | DHCP range | .100-.199 | Client devices |
+
+### Service URLs
+
+| Service | URL |
+|---------|-----|
+| Proxmox | https://192.168.1.5:8006 |
+| OPNsense | https://192.168.1.1 |
+| Frigate | http://192.168.1.10:5000 |
+| Camera Front | http://192.168.1.101 |
+| Camera Back | http://192.168.1.102 |
 
 ---
 
