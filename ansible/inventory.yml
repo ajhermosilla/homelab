@@ -79,7 +79,7 @@ all:
         environment_type: mobile
         timezone: America/Asuncion
         # Mobile kit may not always be online
-        ansible_connection_timeout: 10
+        ansible_connect_timeout: 10
 
     # ==========================================================================
     # Logical Groups

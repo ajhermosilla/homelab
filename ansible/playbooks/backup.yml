@@ -1,5 +1,8 @@
 # Restic backup configuration
-# Usage: ansible-playbook -i inventory.yml playbooks/backup.yml
+# Usage: ansible-playbook -i inventory.yml playbooks/backup.yml \
+#   -e "restic_repo_user=augusto" \
+#   -e "restic_repo_pass=xxx" \
+#   -e "restic_password=xxx"
 
 ---
 - name: Configure Restic backups
@@ -8,12 +11,26 @@
 
   vars:
     restic_version: "0.16.4"
-    restic_repository: "rest:http://{{ restic_user }}:{{ restic_pass }}@{{ backup_server }}:8000/{{ inventory_hostname }}"
     backup_server: "192.168.1.12"  # NAS IP
-    # Pass credentials via command line or vault:
-    # -e "restic_user=augusto" -e "restic_pass=xxx" -e "restic_password=xxx"
+    # Repository URL built from components (requires restic_repo_user and restic_repo_pass)
+    restic_repository: "rest:http://{{ restic_repo_user }}:{{ restic_repo_pass }}@{{ backup_server }}:8000/{{ inventory_hostname }}"
 
   tasks:
+    # =========================================================================
+    # Variable Validation
+    # =========================================================================
+    - name: Validate required variables
+      assert:
+        that:
+          - restic_repo_user is defined
+          - restic_repo_pass is defined
+          - restic_password is defined
+        fail_msg: |
+          Missing required variables. Run with:
+            -e "restic_repo_user=<user>" -e "restic_repo_pass=<pass>" -e "restic_password=<encryption_password>"
+        success_msg: "All required variables are defined"
+      tags: always
+
     # =========================================================================
     # Restic Installation
     # =========================================================================
@@ -72,7 +89,7 @@
           export RESTIC_REPOSITORY="{{ restic_repository }}"
           export RESTIC_PASSWORD_FILE=/etc/restic/password
         mode: '0600'
-      when: restic_user is defined and restic_pass is defined
+      when: restic_repo_user is defined and restic_repo_pass is defined
       no_log: true
 
     # =========================================================================

@@ -1,7 +1,6 @@
 # Pi-hole deployment via Docker
-# Usage: ansible-playbook -i inventory.yml playbooks/pihole.yml -l pihole_hosts
-# Options:
-#   -e "webpassword=xxx" - Set admin password
+# Usage: ansible-playbook -i inventory.yml playbooks/pihole.yml -l pihole_hosts -e "webpassword=xxx"
+# REQUIRED: -e "webpassword=xxx" - Set admin password (will fail without it)
 
 ---
 - name: Deploy Pi-hole
@@ -15,9 +14,22 @@
     pihole_upstream_dns:
       - "1.1.1.1"
       - "9.9.9.9"
-    # Pass webpassword via command line: -e "webpassword=xxx"
 
   tasks:
+    # =========================================================================
+    # Variable Validation
+    # =========================================================================
+    - name: Validate webpassword is provided
+      assert:
+        that:
+          - webpassword is defined
+          - webpassword | length > 0
+        fail_msg: |
+          Pi-hole admin password is required for security.
+          Run with: -e "webpassword=<your-secure-password>"
+        success_msg: "Admin password provided"
+      tags: always
+
     # =========================================================================
     # Prerequisites
     # =========================================================================

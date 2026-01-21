@@ -176,6 +176,21 @@
       tags: firewall
 
     # =========================================================================
+    # Create External Networks
+    # =========================================================================
+    - name: Create headscale-net network
+      community.docker.docker_network:
+        name: headscale-net
+        state: present
+      tags: networks
+
+    - name: Create monitoring-net network
+      community.docker.docker_network:
+        name: monitoring-net
+        state: present
+      tags: networks
+
+    # =========================================================================
     # Deploy
     # =========================================================================
     - name: Pull Caddy image

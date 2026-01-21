@@ -1,5 +1,8 @@
 # NFS server configuration
 # Usage: ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
+# Options:
+#   -e "nfs_network=192.168.1.0/24" - Override allowed network
+#   -e "docker_vm_ip=192.168.1.10" - Override Docker VM IP for Frigate
 
 ---
 - name: Configure NFS server
@@ -7,21 +10,58 @@
   become: true
 
   vars:
+    # Base mount points on NAS (per docs/fixed-homelab.md)
+    nfs_data_root: "/mnt/data"      # WD Red Plus 8TB
+    nfs_purple_root: "/mnt/purple"  # WD Purple 2TB (Frigate)
+    # Network settings
+    nfs_network: "192.168.1.0/24"
+    docker_vm_ip: "192.168.1.10"
+    # Owner/group for directories (default: current user UID/GID)
+    nfs_owner: "1000"
+    nfs_group: "1000"
+    # Export definitions using base paths
     nfs_exports:
-      - path: /srv/media
-        clients: "192.168.1.0/24"
+      - path: "{{ nfs_data_root }}/media"
+        clients: "{{ nfs_network }}"
         options: "ro,sync,no_subtree_check"
-      - path: /srv/downloads
-        clients: "192.168.1.0/24"
+        ensure_exists: true
+      - path: "{{ nfs_data_root }}/downloads"
+        clients: "{{ nfs_network }}"
         options: "rw,sync,no_subtree_check"
-      - path: /srv/frigate
-        clients: "192.168.1.10"
+        ensure_exists: true
+      - path: "{{ nfs_purple_root }}/frigate"
+        clients: "{{ docker_vm_ip }}"
         options: "rw,sync,no_subtree_check,no_root_squash"
-      - path: /srv/backup
-        clients: "192.168.1.0/24"
+        ensure_exists: true
+      - path: "{{ nfs_data_root }}/backups"
+        clients: "{{ nfs_network }}"
         options: "rw,sync,no_subtree_check"
+        ensure_exists: true
 
   tasks:
+    # =========================================================================
+    # Validate Mount Points
+    # =========================================================================
+    - name: Check if data mount exists
+      stat:
+        path: "{{ nfs_data_root }}"
+      register: data_mount
+
+    - name: Check if purple mount exists
+      stat:
+        path: "{{ nfs_purple_root }}"
+      register: purple_mount
+
+    - name: Warn if mount points don't exist
+      debug:
+        msg: |
+          WARNING: Base mount points not found. Ensure drives are mounted:
+          - {{ nfs_data_root }}: {{ 'EXISTS' if data_mount.stat.exists else 'MISSING' }}
+          - {{ nfs_purple_root }}: {{ 'EXISTS' if purple_mount.stat.exists else 'MISSING' }}
+
+          Check /etc/fstab and run: sudo mount -a
+      when: not data_mount.stat.exists or not purple_mount.stat.exists
+
     # =========================================================================
     # Installation
     # =========================================================================
