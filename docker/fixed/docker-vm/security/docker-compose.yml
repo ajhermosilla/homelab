@@ -155,7 +155,7 @@ services:
         crond -f -l 2
     volumes:
       - vaultwarden-data:/data:ro
-      - ../../../shared/backup/restic-backup.sh:/backup.sh:ro
+      - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/restic-backup.sh:/backup.sh:ro
     secrets:
       - restic_password
     environment:

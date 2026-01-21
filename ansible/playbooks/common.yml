@@ -84,13 +84,25 @@
         proto: tcp
       tags: firewall
 
-    - name: Allow Tailscale
+    - name: Check if Tailscale interface exists
+      stat:
+        path: /sys/class/net/tailscale0
+      register: tailscale_interface
+      tags: firewall
+
+    - name: Allow Tailscale traffic
       ufw:
         rule: allow
         interface: tailscale0
         direction: in
+      when: tailscale_interface.stat.exists
       tags: firewall
-      ignore_errors: true  # May fail if Tailscale not installed
+
+    - name: Note about Tailscale firewall rule
+      debug:
+        msg: "Tailscale interface not found - skipping firewall rule. Run tailscale.yml first."
+      when: not tailscale_interface.stat.exists
+      tags: firewall
 
     - name: Enable UFW
       ufw:

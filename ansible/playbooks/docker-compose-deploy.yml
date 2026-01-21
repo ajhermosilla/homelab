@@ -14,6 +14,13 @@
     homelab_base: /opt/homelab
     homelab_repo: "https://github.com/ajhermosilla/homelab.git"
     compose_action: "up"  # up, down, restart, pull
+    # Stack base paths per environment
+    # Structure: docker/<environment>/<host_subdir>/<stack>
+    stack_paths:
+      vps: "vps"                    # docker/vps/<stack>
+      docker_vm: "fixed/docker-vm"  # docker/fixed/docker-vm/<stack>
+      storage: "fixed/nas"          # docker/fixed/nas/<stack>
+      mobile: "mobile/rpi5"         # docker/mobile/rpi5/<stack>
     # Available stacks per host type:
     vps_stacks:
       - networking/headscale
@@ -23,14 +30,14 @@
       - monitoring
       - scraping
       - backup
-    fixed_stacks:
+    docker_vm_stacks:
       - networking/pihole
       - networking/caddy
       - media
       - automation
       - security
       - maintenance
-    nas_stacks:
+    storage_stacks:
       - storage
       - backup
 
@@ -56,19 +63,22 @@
     # =========================================================================
     # Determine stacks to deploy
     # =========================================================================
-    - name: Set stacks for VPS
+    - name: Set stacks and path for VPS
       set_fact:
         deploy_stacks: "{{ [stack] if stack is defined else vps_stacks }}"
+        stack_base_path: "{{ stack_paths.vps }}"
       when: "'vps' in group_names"
 
-    - name: Set stacks for Docker VM
+    - name: Set stacks and path for Docker VM
       set_fact:
-        deploy_stacks: "{{ [stack] if stack is defined else fixed_stacks }}"
+        deploy_stacks: "{{ [stack] if stack is defined else docker_vm_stacks }}"
+        stack_base_path: "{{ stack_paths.docker_vm }}"
       when: "'docker_vm' in group_names"
 
-    - name: Set stacks for NAS
+    - name: Set stacks and path for NAS
       set_fact:
-        deploy_stacks: "{{ [stack] if stack is defined else nas_stacks }}"
+        deploy_stacks: "{{ [stack] if stack is defined else storage_stacks }}"
+        stack_base_path: "{{ stack_paths.storage }}"
       when: "'storage' in group_names"
 
     # =========================================================================
@@ -77,9 +87,9 @@
     - name: Pull images for stacks
       command: docker compose pull
       args:
-        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+        chdir: "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: compose_action in ['up', 'pull']
+      when: compose_action in ['up', 'pull'] and stack_base_path is defined
       ignore_errors: true
       tags: pull
 
@@ -89,26 +99,26 @@
     - name: Start stacks (up)
       command: docker compose up -d --remove-orphans
       args:
-        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+        chdir: "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: compose_action == 'up'
+      when: compose_action == 'up' and stack_base_path is defined
       register: compose_up
       tags: deploy
 
     - name: Stop stacks (down)
       command: docker compose down
       args:
-        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+        chdir: "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: compose_action == 'down'
+      when: compose_action == 'down' and stack_base_path is defined
       tags: deploy
 
     - name: Restart stacks
       command: docker compose restart
       args:
-        chdir: "{{ homelab_base }}/repo/docker/{{ environment_type }}/{{ item }}"
+        chdir: "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/{{ item }}"
       loop: "{{ deploy_stacks | default([]) }}"
-      when: compose_action == 'restart'
+      when: compose_action == 'restart' and stack_base_path is defined
       tags: deploy
 
     # =========================================================================
@@ -116,10 +126,11 @@
     # =========================================================================
     - name: Check for .env.example files
       find:
-        paths: "{{ homelab_base }}/repo/docker/{{ environment_type }}"
+        paths: "{{ homelab_base }}/repo/docker/{{ stack_base_path }}"
         patterns: ".env.example"
         recurse: yes
       register: env_examples
+      when: stack_base_path is defined
       tags: env
 
     - name: Create .env from .env.example (if not exists)

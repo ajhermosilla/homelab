@@ -1,0 +1,315 @@
+# Headscale deployment (Tailscale coordination server)
+# Usage: ansible-playbook -i inventory.yml playbooks/headscale.yml -l vps
+# Options:
+#   -e "headscale_domain=hs.cronova.dev" - Override domain
+#   -e "headscale_user=augusto" - Override default user
+
+---
+- name: Deploy Headscale
+  hosts: vps
+  become: true
+
+  vars:
+    headscale_compose_dir: /opt/homelab/headscale
+    headscale_domain: "hs.cronova.dev"
+    headscale_user: "augusto"
+    headscale_version: "0.27.0"
+    headscale_base_domain: "hs.net"
+
+  tasks:
+    # =========================================================================
+    # Prerequisites
+    # =========================================================================
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+
+    - name: Create Headscale directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ headscale_compose_dir }}"
+        - "{{ headscale_compose_dir }}/config"
+        - "{{ headscale_compose_dir }}/backups"
+
+    # =========================================================================
+    # Create Docker Network
+    # =========================================================================
+    - name: Create headscale-net network
+      community.docker.docker_network:
+        name: headscale-net
+        state: present
+      tags: networks
+
+    # =========================================================================
+    # Configuration
+    # =========================================================================
+    - name: Create Headscale config
+      copy:
+        dest: "{{ headscale_compose_dir }}/config/config.yaml"
+        content: |
+          # Headscale Configuration - Managed by Ansible
+          server_url: https://{{ headscale_domain }}
+          listen_addr: 0.0.0.0:8080
+          metrics_listen_addr: 127.0.0.1:9090
+
+          noise:
+            private_key_path: /var/lib/headscale/noise_private.key
+
+          database:
+            type: sqlite
+            sqlite:
+              path: /var/lib/headscale/db.sqlite
+
+          derp:
+            server:
+              enabled: true
+              region_id: 999
+              region_code: "cronova"
+              region_name: "Cronova VPS"
+              stun_listen_addr: 0.0.0.0:3478
+              private_key_path: /var/lib/headscale/derp_server_private.key
+            urls:
+              - https://controlplane.tailscale.com/derpmap/default
+            auto_update_enabled: true
+            update_frequency: 24h
+
+          dns:
+            magic_dns: true
+            base_domain: {{ headscale_base_domain }}
+            nameservers:
+              global:
+                - 1.1.1.1
+                - 9.9.9.9
+
+          prefixes:
+            v4: 100.64.0.0/10
+            v6: fd7a:115c:a1e0::/48
+            allocation: random
+
+          ephemeral_node_inactivity_timeout: 30m
+
+          log:
+            level: info
+            format: text
+
+          policy:
+            path: /etc/headscale/acl.json
+        mode: '0644'
+      notify: Restart Headscale
+
+    - name: Create ACL policy
+      copy:
+        dest: "{{ headscale_compose_dir }}/config/acl.json"
+        content: |
+          {
+            "acls": [
+              {
+                "action": "accept",
+                "src": ["*"],
+                "dst": ["*:*"]
+              }
+            ],
+            "tagOwners": {},
+            "autoApprovers": {
+              "routes": {
+                "0.0.0.0/0": ["{{ headscale_user }}"],
+                "::/0": ["{{ headscale_user }}"]
+              },
+              "exitNode": ["{{ headscale_user }}"]
+            }
+          }
+        mode: '0644'
+      notify: Restart Headscale
+
+    - name: Create backup script
+      copy:
+        dest: "{{ headscale_compose_dir }}/backup.sh"
+        content: |
+          #!/bin/sh
+          # Headscale backup script
+          BACKUP_DIR=/backups
+          RETENTION_HOURS=${BACKUP_RETENTION_HOURS:-720}
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+          # Backup database
+          sqlite3 /var/lib/headscale/db.sqlite ".backup $BACKUP_DIR/headscale_$TIMESTAMP.db"
+
+          # Backup config
+          cp /etc/headscale/config.yaml $BACKUP_DIR/config_$TIMESTAMP.yaml
+
+          # Cleanup old backups
+          find $BACKUP_DIR -name "headscale_*.db" -mmin +$((RETENTION_HOURS * 60)) -delete
+          find $BACKUP_DIR -name "config_*.yaml" -mmin +$((RETENTION_HOURS * 60)) -delete
+
+          echo "$(date) - Backup completed: headscale_$TIMESTAMP.db"
+        mode: '0755'
+
+    # =========================================================================
+    # Docker Compose
+    # =========================================================================
+    - name: Create docker-compose.yml
+      copy:
+        dest: "{{ headscale_compose_dir }}/docker-compose.yml"
+        content: |
+          # Headscale - Deployed by Ansible
+
+          services:
+            headscale:
+              image: headscale/headscale:{{ headscale_version }}
+              container_name: headscale
+              restart: unless-stopped
+              security_opt:
+                - no-new-privileges:true
+              labels:
+                - "com.cronova.environment=vps"
+                - "com.cronova.category=networking"
+                - "com.cronova.critical=true"
+              healthcheck:
+                test: ["CMD", "headscale", "health"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+              deploy:
+                resources:
+                  limits:
+                    memory: 256M
+                    cpus: '0.5'
+              command: serve
+              ports:
+                - "3478:3478/udp"
+              volumes:
+                - ./config:/etc/headscale
+                - headscale-data:/var/lib/headscale
+              environment:
+                - TZ={{ timezone | default('UTC') }}
+              cap_add:
+                - NET_ADMIN
+              logging:
+                driver: "json-file"
+                options:
+                  max-size: "10m"
+                  max-file: "3"
+              networks:
+                - headscale-net
+
+            headscale-backup:
+              image: alpine:latest
+              container_name: headscale-backup
+              restart: unless-stopped
+              security_opt:
+                - no-new-privileges:true
+              labels:
+                - "com.cronova.environment=vps"
+                - "com.cronova.category=backup"
+              deploy:
+                resources:
+                  limits:
+                    memory: 128M
+                    cpus: '0.25'
+              entrypoint: /bin/sh
+              command:
+                - -c
+                - |
+                  apk add --no-cache sqlite
+                  echo "0 * * * * /backup.sh" | crontab -
+                  crond -f -l 2
+              volumes:
+                - ./config:/etc/headscale:ro
+                - headscale-data:/var/lib/headscale:ro
+                - ./backups:/backups
+                - ./backup.sh:/backup.sh:ro
+              environment:
+                - TZ={{ timezone | default('UTC') }}
+                - BACKUP_RETENTION_HOURS=720
+              logging:
+                driver: "json-file"
+                options:
+                  max-size: "5m"
+                  max-file: "3"
+              networks:
+                - headscale-net
+              depends_on:
+                - headscale
+
+          volumes:
+            headscale-data:
+              name: headscale-data
+
+          networks:
+            headscale-net:
+              name: headscale-net
+              external: true
+        mode: '0644'
+
+    # =========================================================================
+    # Firewall
+    # =========================================================================
+    - name: Allow STUN traffic
+      ufw:
+        rule: allow
+        port: "3478"
+        proto: udp
+      tags: firewall
+
+    # =========================================================================
+    # Deploy
+    # =========================================================================
+    - name: Pull Headscale images
+      command: docker compose pull
+      args:
+        chdir: "{{ headscale_compose_dir }}"
+      changed_when: true
+      tags: pull
+
+    - name: Start Headscale
+      command: docker compose up -d
+      args:
+        chdir: "{{ headscale_compose_dir }}"
+      register: headscale_up
+
+    # =========================================================================
+    # Post-Deploy Setup
+    # =========================================================================
+    - name: Wait for Headscale to be ready
+      command: docker exec headscale headscale health
+      register: headscale_health
+      until: headscale_health.rc == 0
+      retries: 10
+      delay: 3
+      tags: verify
+
+    - name: Check if user exists
+      command: docker exec headscale headscale users list -o json
+      register: users_list
+      changed_when: false
+      tags: setup
+
+    - name: Create default user
+      command: docker exec headscale headscale users create {{ headscale_user }}
+      when: headscale_user not in users_list.stdout
+      tags: setup
+
+    - name: Display status
+      debug:
+        msg: |
+          Headscale deployed successfully!
+
+          Domain: https://{{ headscale_domain }}
+          STUN: {{ ansible_host }}:3478/udp
+
+          Next steps:
+          1. Deploy Caddy for TLS: ansible-playbook -i inventory.yml playbooks/caddy.yml -l vps
+          2. Generate auth key:
+             docker exec headscale headscale preauthkeys create --user {{ headscale_user }} --reusable --expiration 720h
+          3. Connect devices:
+             tailscale up --login-server=https://{{ headscale_domain }} --authkey=<key>
+
+  handlers:
+    - name: Restart Headscale
+      command: docker compose restart headscale
+      args:
+        chdir: "{{ headscale_compose_dir }}"
