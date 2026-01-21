@@ -26,35 +26,32 @@ Before doing anything, check these:
 
 ## What You Need
 
-The **Beryl AX** travel router (small white box) is your backup internet device.
+The **Mango** backup router (small orange box) is your emergency internet device.
 
 ```
-┌─────────────────────────────┐
-│                             │
-│      GL-MT3000              │
-│      (Beryl AX)             │
-│                             │
-│   [===]              [USB-C]│
-│   Ports              Power  │
-│                             │
-└─────────────────────────────┘
+┌───────────────────┐
+│   GL-MT300N-V2    │  ← Bright orange color
+│     (Mango)       │     58mm x 58mm
+│                   │     (smaller than a
+│ [WAN][LAN] [PWR]  │      deck of cards)
+└───────────────────┘
 
-Location: Mobile kit bag / office drawer
+Location: Office drawer (dedicated backup router)
 ```
 
 You also need:
 - 1x Ethernet cable (blue/gray cable with plastic clips on ends)
-- USB-C power cable (same as phone chargers)
+- Micro USB power cable (old Android phone charger works)
 
 ---
 
 ## Step-by-Step Recovery
 
-### Step 1: Find the Beryl AX
+### Step 1: Find the Mango
 
-Look in the mobile kit bag or ask where the "travel router" is stored.
+Look in the **office drawer** where the backup router is kept.
 
-It's a small white box about the size of a deck of cards with "GL-iNet" on it.
+It's a **small bright orange box** (hard to miss!) about the size of a matchbox with "GL-iNet" on it.
 
 ---
 
@@ -75,25 +72,25 @@ BEFORE (not working):
 
 ---
 
-### Step 3: Connect the Beryl AX
+### Step 3: Connect the Mango
 
-1. **Plug the cable from ISP modem into Beryl AX "WAN" port**
-   - It's the port closest to the USB-C power port
+1. **Plug the cable from ISP modem into Mango "WAN" port**
+   - It's the port on the left side
    - Should click when inserted
 
-2. **Connect Beryl AX to the switch**
+2. **Connect Mango to the switch**
    - Use another Ethernet cable
-   - Plug one end into Beryl AX "LAN" port
+   - Plug one end into Mango "LAN" port (middle port)
    - Plug other end into any free port on the big switch
 
-3. **Power on the Beryl AX**
-   - Plug in USB-C power cable
+3. **Power on the Mango**
+   - Plug in Micro USB power cable (old Android charger)
    - Wait for lights to turn solid (about 1 minute)
 
 ```
 AFTER (working):
 
-[ISP Modem] ----cable----> [Beryl AX] ----> [Switch] ----> [WiFi]
+[ISP Modem] ----cable----> [Mango] ----> [Switch] ----> [WiFi]
                               ^
                               |
                          BACKUP ROUTER
@@ -107,13 +104,13 @@ The WiFi network name might change. Look for:
 
 | Network Name | Password |
 |--------------|----------|
-| `GL-MT3000-xxx` | On sticker under Beryl AX |
+| `GL-MT300N-V2-xxx` | On sticker under Mango |
 | Or same as before | Same password |
 
 **On your phone/laptop:**
 1. Go to WiFi settings
 2. Forget the old network if it's not connecting
-3. Connect to the Beryl AX network
+3. Connect to the Mango network (look for GL-MT300N)
 4. Enter password from sticker
 
 ---
@@ -125,7 +122,7 @@ Open a browser and go to any website (google.com).
 **If it works:** You're done! Netflix and YouTube should work now.
 
 **If it doesn't work:**
-- Wait 2 more minutes for Beryl AX to get internet from ISP
+- Wait 2 more minutes for Mango to get internet from ISP
 - Try restarting the ISP modem (unplug for 10 seconds, plug back in)
 - Check that all cables are clicked in firmly
 
@@ -133,7 +130,7 @@ Open a browser and go to any website (google.com).
 
 ## What Works / What Doesn't Work
 
-### Works with Beryl AX (backup)
+### Works with Mango (backup)
 
 | Service | Status |
 |---------|--------|
@@ -164,7 +161,7 @@ Open a browser and go to any website (google.com).
                               │
                     ┌─────────▼───────────┐
     NORMALLY ───────│     Mini PC         │ ◄── If this is dead,
-                    │   (black box)       │     use Beryl AX instead
+                    │   (black box)       │     use Mango instead
                     └─────────┬───────────┘
                               │
                     ┌─────────▼───────────┐
@@ -186,13 +183,13 @@ Open a browser and go to any website (google.com).
 
 Let him know:
 1. The Mini PC stopped working
-2. You used the Beryl AX as backup
+2. You used the Mango as backup
 3. When it happened (date/time if you remember)
 
 He'll need to:
 - Fix the Mini PC / OPNsense
 - Reconnect everything properly
-- Put the Beryl AX back in the mobile kit
+- Put the Mango back in the drawer
 
 ---
 
@@ -214,17 +211,17 @@ Print this and keep near the router:
 │           EMERGENCY INTERNET - QUICK STEPS              │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│  1. Find Beryl AX (small white router in mobile kit)    │
+│  1. Find Mango (small ORANGE router in office drawer)   │
 │                                                         │
 │  2. Unplug cable from Mini PC (black box)               │
 │                                                         │
-│  3. Plug that cable into Beryl AX "WAN" port            │
+│  3. Plug that cable into Mango "WAN" port (left side)   │
 │                                                         │
-│  4. Connect Beryl AX "LAN" to Switch                    │
+│  4. Connect Mango "LAN" (middle) to Switch              │
 │                                                         │
-│  5. Power on Beryl AX (USB-C cable)                     │
+│  5. Power on Mango (Micro USB / old Android charger)    │
 │                                                         │
-│  6. Connect to WiFi: GL-MT3000-xxx                      │
+│  6. Connect to WiFi: GL-MT300N-V2-xxx                   │
 │     Password: (on sticker under router)                 │
 │                                                         │
 │  7. Wait 1-2 minutes, test google.com                   │
@@ -236,21 +233,21 @@ Print this and keep near the router:
 
 ## Troubleshooting
 
-### "No internet" after connecting to Beryl AX WiFi
+### "No internet" after connecting to Mango WiFi
 
 1. Wait 2 minutes - it takes time to connect to ISP
 2. Check ISP modem has lights on
 3. Unplug ISP modem for 10 seconds, plug back in
 4. Try again in 5 minutes
 
-### Can't find Beryl AX WiFi network
+### Can't find Mango WiFi network
 
-1. Make sure Beryl AX has power (lights on)
-2. Make sure USB-C cable is plugged in firmly
-3. Try moving closer to the Beryl AX
+1. Make sure Mango has power (lights on)
+2. Make sure Micro USB cable is plugged in firmly
+3. Try moving closer to the Mango
 4. Wait 2 minutes for it to boot up
 
-### Beryl AX lights are blinking but no internet
+### Mango lights are blinking but no internet
 
 1. Check the cable from ISP modem is in "WAN" port (not "LAN")
 2. Make sure cable clicks in firmly
@@ -263,6 +260,21 @@ Don't worry! Nothing is permanently broken.
 2. Put cables back where they were
 3. Wait for Augusto
 4. Use mobile data in the meantime
+
+---
+
+## Hardware Info
+
+| Item | Details |
+|------|---------|
+| **Backup Router** | GL-iNet GL-MT300N-V2 (Mango) |
+| **Color** | Bright orange |
+| **Size** | 58 x 58 x 25mm (smaller than deck of cards) |
+| **Power** | Micro USB (5V/1A - any old Android charger) |
+| **Ports** | WAN (left), LAN (middle), USB (right) |
+| **WiFi** | 2.4GHz only, 300Mbps (plenty for streaming) |
+
+*Note: The Beryl AX (white router) stays in the mobile kit for travel.*
 
 ---
 
