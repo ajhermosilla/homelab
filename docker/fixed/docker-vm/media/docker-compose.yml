@@ -48,6 +48,7 @@ services:
     logging:
       driver: "json-file"
       options:
+        # Larger log size for media server - transcoding operations generate verbose logs
         max-size: "20m"
         max-file: "3"
     networks:

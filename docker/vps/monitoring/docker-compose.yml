@@ -85,7 +85,7 @@ services:
       - ntfy-config:/etc/ntfy
     environment:
       - TZ=${TZ:-America/Asuncion}
-      - NTFY_BASE_URL=https://notify.cronova.dev
+      - NTFY_BASE_URL=${NTFY_BASE_URL:-https://notify.cronova.dev}
       - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
       - NTFY_BEHIND_PROXY=true
       - NTFY_AUTH_DEFAULT_ACCESS=deny-all

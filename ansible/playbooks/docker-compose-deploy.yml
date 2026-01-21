@@ -116,6 +116,66 @@
       when: deploying_automation | default(false)
 
     # =========================================================================
+    # NFS Mount Verification (for media/security stacks)
+    # =========================================================================
+    - name: Check if deploying media or security stack
+      set_fact:
+        deploying_nfs_dependent: "{{ ('media' in deploy_stacks | default([])) or ('security' in deploy_stacks | default([])) }}"
+      when: stack_base_path is defined and "'docker_vm' in group_names"
+
+    - name: Verify NFS mount points exist
+      stat:
+        path: "{{ item }}"
+      register: nfs_mounts
+      loop:
+        - /mnt/nas/media
+        - /mnt/nas/frigate
+      when: deploying_nfs_dependent | default(false)
+
+    - name: Warn if NFS mounts missing
+      debug:
+        msg: |
+          WARNING: NFS mount points may not be configured:
+          {% for result in nfs_mounts.results %}
+          - {{ result.item }}: {{ 'EXISTS' if result.stat.exists | default(false) else 'MISSING' }}
+          {% endfor %}
+
+          Ensure NFS is mounted before starting services:
+            sudo mount -t nfs 192.168.1.12:/mnt/data/media /mnt/nas/media
+            sudo mount -t nfs 192.168.1.12:/mnt/purple/frigate /mnt/nas/frigate
+
+          Or add to /etc/fstab for persistent mounts.
+      when:
+        - deploying_nfs_dependent | default(false)
+        - nfs_mounts.results | selectattr('stat.exists', 'undefined') | list | length > 0 or
+          nfs_mounts.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
+
+    # =========================================================================
+    # Secrets File Permissions (for security stack)
+    # =========================================================================
+    - name: Check if deploying security stack
+      set_fact:
+        deploying_security: "{{ 'security' in deploy_stacks | default([]) }}"
+      when: stack_base_path is defined
+
+    - name: Ensure secrets directory exists
+      file:
+        path: "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/security/secrets"
+        state: directory
+        mode: '0700'
+      when: deploying_security | default(false)
+
+    - name: Set secure permissions on secret files
+      file:
+        path: "{{ item }}"
+        mode: '0600'
+      loop:
+        - "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/security/secrets/admin_token.txt"
+        - "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/security/secrets/restic_password.txt"
+      when: deploying_security | default(false)
+      ignore_errors: true  # Files may not exist yet
+
+    # =========================================================================
     # Pull Images
     # =========================================================================
     - name: Pull images for stacks
