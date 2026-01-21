@@ -82,6 +82,40 @@
       when: "'storage' in group_names"
 
     # =========================================================================
+    # Stack-Specific Validation
+    # =========================================================================
+    - name: Check if deploying automation stack
+      set_fact:
+        deploying_automation: "{{ 'automation' in deploy_stacks | default([]) }}"
+      when: stack_base_path is defined
+
+    - name: Verify mosquitto.conf exists for automation stack
+      stat:
+        path: "{{ homelab_base }}/repo/docker/{{ stack_base_path }}/automation/mosquitto.conf"
+      register: mosquitto_conf
+      when: deploying_automation | default(false)
+
+    - name: Fail if mosquitto.conf missing
+      fail:
+        msg: |
+          ERROR: mosquitto.conf not found for automation stack.
+          Expected at: {{ homelab_base }}/repo/docker/{{ stack_base_path }}/automation/mosquitto.conf
+
+          Create mosquitto.conf from the repo or copy from example.
+      when:
+        - deploying_automation | default(false)
+        - not mosquitto_conf.stat.exists | default(false)
+
+    - name: Note about Mosquitto password setup
+      debug:
+        msg: |
+          NOTE: After deploying automation stack, create Mosquitto users:
+            docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/password.txt homeassistant
+            docker exec -it mosquitto mosquitto_passwd -b /mosquitto/config/password.txt frigate <password>
+            docker compose restart mosquitto
+      when: deploying_automation | default(false)
+
+    # =========================================================================
     # Pull Images
     # =========================================================================
     - name: Pull images for stacks
