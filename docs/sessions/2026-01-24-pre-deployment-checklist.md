@@ -8,10 +8,10 @@
 
 | Done | Task | Link |
 |:----:|------|------|
-| [ ] | Proxmox VE ISO | proxmox.com/en/downloads |
-| [ ] | OPNsense ISO (amd64, dvd) | opnsense.org/download |
-| [ ] | Debian 12 netinst ISO | debian.org/download |
-| [ ] | Ventoy installed on USB | ventoy.net |
+| [x] | Proxmox VE 9.1 ISO (1.8G) | proxmox.com/en/downloads |
+| [x] | OPNsense 25.7 ISO (amd64, dvd) | opnsense.org/download |
+| [x] | Debian 13 netinst ISO (791M) | debian.org/download |
+| [ ] | Ventoy installed on USB (8GB+ USB 3.0) | ventoy.net |
 | [ ] | All ISOs copied to Ventoy USB | |
 | [ ] | Test USB boots on Mini PC | |
 
