@@ -141,10 +141,12 @@
           {% endfor %}
 
           Ensure NFS is mounted before starting services:
-            sudo mount -t nfs 192.168.1.12:/mnt/data/media /mnt/nas/media
-            sudo mount -t nfs 192.168.1.12:/mnt/purple/frigate /mnt/nas/frigate
+            sudo mount -t nfs 192.168.1.12:/srv/media /mnt/nas/media
+            sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
 
-          Or add to /etc/fstab for persistent mounts.
+          Or add to /etc/fstab for persistent mounts:
+            192.168.1.12:/srv/media    /mnt/nas/media    nfs  defaults,_netdev,nofail  0  0
+            192.168.1.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
       when:
         - deploying_nfs_dependent | default(false)
         - nfs_mounts.results | selectattr('stat.exists', 'undefined') | list | length > 0 or

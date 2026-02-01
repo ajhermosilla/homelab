@@ -3,6 +3,11 @@
 # Options:
 #   -e "nfs_network=192.168.1.0/24" - Override allowed network
 #   -e "docker_vm_ip=192.168.1.10" - Override Docker VM IP for Frigate
+#
+# Prerequisites:
+#   1. Drives mounted at /mnt/red8 and /mnt/purple
+#   2. Symlinks created in /srv/ (see docs/nas-deployment-plan.md)
+#   3. Tailscale connected (run tailscale.yml first)
 
 ---
 - name: Configure NFS server
@@ -10,57 +15,73 @@
   become: true
 
   vars:
-    # Base mount points on NAS (per docs/fixed-homelab.md)
-    nfs_data_root: "/mnt/data"      # WD Red Plus 8TB
+    # Base mount points on NAS (per docs/nas-deployment-plan.md)
+    nfs_red8_root: "/mnt/red8"      # WD Red Plus 8TB
     nfs_purple_root: "/mnt/purple"  # WD Purple 2TB (Frigate)
+    # Symlink root (exports use /srv/ for cleaner paths)
+    nfs_srv_root: "/srv"
     # Network settings
     nfs_network: "192.168.1.0/24"
     docker_vm_ip: "192.168.1.10"
     # Owner/group for directories (default: current user UID/GID)
     nfs_owner: "1000"
     nfs_group: "1000"
-    # Export definitions using base paths
+    # Export definitions using /srv/ symlinks for cleaner client mounts
     nfs_exports:
-      - path: "{{ nfs_data_root }}/media"
+      - path: "{{ nfs_srv_root }}/media"
         clients: "{{ nfs_network }}"
         options: "ro,sync,no_subtree_check"
-        ensure_exists: true
-      - path: "{{ nfs_data_root }}/downloads"
+        ensure_exists: false  # symlink to /mnt/red8/media
+      - path: "{{ nfs_srv_root }}/downloads"
         clients: "{{ nfs_network }}"
         options: "rw,sync,no_subtree_check"
-        ensure_exists: true
-      - path: "{{ nfs_purple_root }}/frigate"
+        ensure_exists: false  # symlink to /mnt/red8/downloads
+      - path: "{{ nfs_srv_root }}/frigate"
         clients: "{{ docker_vm_ip }}"
         options: "rw,sync,no_subtree_check,no_root_squash"
-        ensure_exists: true
-      - path: "{{ nfs_data_root }}/backups"
+        ensure_exists: false  # symlink to /mnt/purple/frigate
+      - path: "{{ nfs_srv_root }}/backup"
         clients: "{{ nfs_network }}"
         options: "rw,sync,no_subtree_check"
-        ensure_exists: true
+        ensure_exists: false  # symlink to /mnt/red8/backup
 
   tasks:
     # =========================================================================
     # Validate Mount Points
     # =========================================================================
-    - name: Check if data mount exists
+    - name: Check if red8 mount exists
       stat:
-        path: "{{ nfs_data_root }}"
-      register: data_mount
+        path: "{{ nfs_red8_root }}"
+      register: red8_mount
 
     - name: Check if purple mount exists
       stat:
         path: "{{ nfs_purple_root }}"
       register: purple_mount
 
-    - name: Warn if mount points don't exist
-      debug:
-        msg: |
-          WARNING: Base mount points not found. Ensure drives are mounted:
-          - {{ nfs_data_root }}: {{ 'EXISTS' if data_mount.stat.exists else 'MISSING' }}
-          - {{ nfs_purple_root }}: {{ 'EXISTS' if purple_mount.stat.exists else 'MISSING' }}
+    - name: Check if /srv symlinks exist
+      stat:
+        path: "{{ nfs_srv_root }}"
+      register: srv_dir
 
-          Check /etc/fstab and run: sudo mount -a
-      when: not data_mount.stat.exists or not purple_mount.stat.exists
+    - name: Fail if mount points don't exist
+      fail:
+        msg: |
+          ERROR: Base mount points not found. Ensure drives are mounted:
+          - {{ nfs_red8_root }}: {{ 'EXISTS' if red8_mount.stat.exists else 'MISSING' }}
+          - {{ nfs_purple_root }}: {{ 'EXISTS' if purple_mount.stat.exists else 'MISSING' }}
+          - {{ nfs_srv_root }}: {{ 'EXISTS' if srv_dir.stat.exists else 'MISSING' }}
+
+          Setup steps:
+          1. Mount drives: sudo mount -a (check /etc/fstab)
+          2. Create symlinks:
+             sudo ln -s /mnt/red8/media /srv/media
+             sudo ln -s /mnt/red8/downloads /srv/downloads
+             sudo ln -s /mnt/red8/backup /srv/backup
+             sudo ln -s /mnt/purple/frigate /srv/frigate
+
+          See docs/nas-deployment-plan.md for full setup.
+      when: not red8_mount.stat.exists or not purple_mount.stat.exists
 
     # =========================================================================
     # Installation
@@ -76,14 +97,28 @@
     # =========================================================================
     # Directory Setup
     # =========================================================================
-    - name: Create export directories
+    - name: Verify export paths exist (symlinks or directories)
+      stat:
+        path: "{{ item.path }}"
+      loop: "{{ nfs_exports }}"
+      register: export_paths
+      tags: directories
+
+    - name: Warn about missing export paths
+      debug:
+        msg: "WARNING: Export path {{ item.item.path }} does not exist. Create symlink or directory first."
+      loop: "{{ export_paths.results }}"
+      when: not item.stat.exists
+      tags: directories
+
+    - name: Set ownership on export paths
       file:
         path: "{{ item.path }}"
-        state: directory
-        mode: '0755'
         owner: "{{ nfs_owner | default('1000') }}"
         group: "{{ nfs_group | default('1000') }}"
+        follow: yes  # Follow symlinks to set ownership on target
       loop: "{{ nfs_exports }}"
+      ignore_errors: true  # May fail if symlink target doesn't exist
       tags: directories
 
     # =========================================================================
@@ -166,8 +201,10 @@
           - {{ export.path }} -> {{ export.clients }}
           {% endfor %}
 
-          Mount from client:
-            sudo mount -t nfs {{ ansible_host }}:/srv/media /mnt/media
+          Mount from Docker VM (192.168.1.10):
+            sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+            sudo mount -t nfs 192.168.1.12:/srv/media /mnt/nas/media
+            sudo mount -t nfs 192.168.1.12:/srv/downloads /mnt/nas/downloads
 
   handlers:
     - name: Reload NFS exports

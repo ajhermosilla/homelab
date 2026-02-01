@@ -237,6 +237,22 @@ ansible/
 └── README.md           # This file
 ```
 
+## Playbook Run Order
+
+**Important:** Run playbooks in this order for new hosts to avoid lockout.
+
+```
+1. ssh-copy-id         → Copy SSH key (manual)
+2. tailscale.yml       → Connect to mesh (provides backup access)
+3. common.yml          → Basic setup (disables password auth!)
+4. docker.yml          → Docker installation
+5. nfs-server.yml      → NFS exports (NAS only)
+6. docker-compose-deploy.yml → Deploy stacks
+```
+
+The `common.yml` playbook disables SSH password authentication. Always ensure
+SSH keys and Tailscale are working before running it.
+
 ## Bootstrapping New VMs
 
 New VMs don't have Tailscale yet. Use local IPs for initial setup:
@@ -249,6 +265,7 @@ Manual step - create VM, install Debian, note the IP.
 
 ```bash
 ssh-copy-id augusto@192.168.1.10  # Docker VM
+ssh-copy-id augusto@192.168.1.12  # NAS
 ssh-copy-id augusto@192.168.1.20  # OpenClaw VM
 ```
 
