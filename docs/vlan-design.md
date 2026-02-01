@@ -247,11 +247,11 @@ Access from anywhere: `ssh 100.64.0.12` works regardless of VLAN.
 ## Implementation Checklist
 
 ### Phase 1: OPNsense
-- [ ] Create VLAN 10 (IoT)
-- [ ] Create VLAN 20 (Guest)
-- [ ] Assign interfaces
-- [ ] Configure DHCP per VLAN
-- [ ] Create firewall rules
+- [x] Create VLAN 10 (IoT)
+- [x] Create VLAN 20 (Guest)
+- [x] Assign interfaces
+- [x] Configure DHCP per VLAN
+- [x] Create firewall rules
 
 ### Phase 2: Switch
 - [x] Configure MokerLink VLAN trunks
