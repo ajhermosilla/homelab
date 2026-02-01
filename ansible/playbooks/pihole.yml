@@ -38,6 +38,11 @@
         name: docker
         state: started
 
+    - name: Install dnsutils for dig command
+      apt:
+        name: dnsutils
+        state: present
+
     - name: Create Pi-hole directory
       file:
         path: "{{ pihole_compose_dir }}"
@@ -82,33 +87,28 @@
         dest: "{{ pihole_compose_dir }}/docker-compose.yml"
         content: |
           # Pi-hole DNS ad-blocking
-          # Deployed by Ansible
+          # Deployed by Ansible (host network mode for LAN DNS access)
 
           services:
             pihole:
               image: pihole/pihole:latest
               container_name: pihole
               restart: unless-stopped
-              security_opt:
-                - no-new-privileges:true
+              network_mode: host
+              cap_add:
+                - NET_ADMIN
+                - NET_BIND_SERVICE
+                - NET_RAW
+                - CHOWN
               labels:
                 - "com.cronova.environment={{ environment_type | default('fixed') }}"
                 - "com.cronova.category=networking"
                 - "com.cronova.critical=true"
-              healthcheck:
-                test: ["CMD", "dig", "+norecurse", "+retry=0", "@127.0.0.1", "pi.hole"]
-                interval: 30s
-                timeout: 10s
-                retries: 3
               deploy:
                 resources:
                   limits:
                     memory: 256M
                     cpus: '0.5'
-              ports:
-                - "{{ pihole_dns_port }}:53/tcp"
-                - "{{ pihole_dns_port }}:53/udp"
-                - "{{ pihole_web_port }}:80/tcp"
               volumes:
                 - pihole-config:/etc/pihole
                 - pihole-dnsmasq:/etc/dnsmasq.d
@@ -117,23 +117,18 @@
                 - WEBPASSWORD={{ webpassword | default('') }}
                 - PIHOLE_DNS_={{ pihole_upstream_dns | join(';') }}
                 - DNSMASQ_LISTENING=all
+                - FTLCONF_webserver_port={{ pihole_web_port }}
               logging:
                 driver: "json-file"
                 options:
                   max-size: "10m"
                   max-file: "3"
-              networks:
-                - pihole-net
 
           volumes:
             pihole-config:
               name: pihole-config
             pihole-dnsmasq:
               name: pihole-dnsmasq
-
-          networks:
-            pihole-net:
-              name: pihole-net
         mode: '0644'
 
     # =========================================================================
@@ -177,10 +172,11 @@
     # =========================================================================
     - name: Wait for Pi-hole to be ready
       uri:
-        url: "http://localhost:{{ pihole_web_port }}/admin/"
-        status_code: 200
+        url: "http://localhost:{{ pihole_web_port }}/"
+        status_code: [200, 302]
+        follow_redirects: none
       register: pihole_health
-      until: pihole_health.status == 200
+      until: pihole_health.status in [200, 302]
       retries: 12
       delay: 5
       tags: verify

@@ -49,6 +49,7 @@ Trusted devices with full network access.
 | Docker VM | .10 | MokerLink P2 | Pi-hole, Jellyfin, etc |
 | RPi 4 (Start9) | .11 | MokerLink P3 | Bitcoin node |
 | NAS | .12 | MokerLink P4 | Storage, backups |
+| OpenClaw VM | .20 | (virtual) | AI assistant |
 | TP-Link AP | - | MokerLink P7 | VLAN trunk |
 | Yamaha RX-V671 | .30 | MokerLink P5 | AV Receiver (Ethernet) |
 | Apple TV | .31 | WiFi (HomeNet) | Jellyfin client |
@@ -253,9 +254,9 @@ Access from anywhere: `ssh 100.64.0.12` works regardless of VLAN.
 - [ ] Create firewall rules
 
 ### Phase 2: Switch
-- [ ] Configure MokerLink VLAN trunks
-- [ ] Configure access ports
-- [ ] Connect PoE switch to IoT VLAN
+- [x] Configure MokerLink VLAN trunks
+- [x] Configure access ports
+- [x] Connect PoE switch to IoT VLAN
 
 ### Phase 3: Cameras
 - [ ] Assign static IPs (.101-.103)

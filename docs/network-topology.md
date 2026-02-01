@@ -73,6 +73,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | rpi4 | 100.64.0.11 | Start9 Bitcoin | Fixed |
 | nas | 100.64.0.12 | Storage server | Fixed |
 | docker | 100.64.0.13 | Container host | Fixed |
+| openclaw | 100.64.0.14 | AI assistant | Fixed |
 | vultr | 100.77.172.46 | VPS / Exit node | Cloud |
 | macbook | 100.86.220.9 | Workstation | Mobile |
 | beryl-ax | 100.102.244.131 | Travel router | Mobile |
@@ -126,7 +127,8 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | Device | Model | Specs | IP | Role |
 |--------|-------|-------|-----|------|
 | Mini PC | N150 | 12GB RAM, 512GB SSD | 192.168.1.1 (WAN) | Proxmox host |
-| Docker VM | Ubuntu | 8GB RAM, 200GB | 192.168.1.10 | Containers |
+| Docker VM | Debian | 7GB RAM, 100GB | 192.168.1.10 | Containers |
+| OpenClaw VM | Debian | 2GB RAM, 20GB | 192.168.1.20 | AI assistant |
 | NAS | i3-3220T | 8GB RAM, 10TB total | 192.168.1.12 | Storage |
 | RPi 4 | 4GB | 1TB ext SSD | 192.168.1.11 | Start9 Bitcoin |
 | Switch | MokerLink | 8-port 2.5G | - | Backbone |

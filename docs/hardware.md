@@ -108,14 +108,23 @@ Always-on infrastructure at home.
 
 | Component | Spec | Notes |
 |-----------|------|-------|
+| Model | Aoostar N1 Pro | |
 | CPU | Intel N150 | VT-x/VT-d for passthrough |
-| RAM | 12GB | 2GB OPNsense + 8GB Docker VM |
+| RAM | 12GB | ~1GB host + 11GB VMs |
 | Storage | 512GB SSD | Proxmox + VMs |
 | NIC | Dual port required | WAN passthrough + LAN bridge |
+| BIOS | Restore on AC Power Loss | Set to "Power On" for auto-boot |
 
 **VMs:**
-- OPNsense (2 vCPU, 2GB RAM) - Router/firewall
-- Docker Host (2 vCPU, 8GB RAM) - All containers
+| VM | ID | vCPU | RAM | Disk | Start Order |
+|----|-----|------|-----|------|-------------|
+| OPNsense | 100 | 2 | 2GB | 20GB | 1 (delay: 0) |
+| Docker | 101 | 2 | 7GB | 100GB | 2 (delay: 30) |
+| OpenClaw | 102 | 2 | 2GB | 20GB | 3 (delay: 60) |
+
+- **OPNsense** - Router/firewall
+- **Docker** - Pi-hole, Jellyfin, Frigate, Home Assistant, *arr stack, etc.
+- **OpenClaw** - AI assistant experimentation (cloud APIs)
 
 ### RPi 4 Details
 

@@ -128,6 +128,14 @@ Configure NFS exports on NAS.
 ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
 ```
 
+### openclaw.yml
+
+Install OpenClaw AI assistant on dedicated VM.
+
+```bash
+ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw
+```
+
 ### docker-compose-deploy.yml
 
 Deploy Docker Compose stacks from homelab repo.
@@ -184,10 +192,11 @@ ansible-playbook -i inventory.yml playbooks/common.yml --check --diff
 |-------|-------|-------------|
 | `all` | All hosts | Every managed host |
 | `vps` | vultr | Cloud VPS |
-| `fixed` | minipc, docker, nas, rpi4 | Fixed homelab |
+| `fixed` | minipc, docker, openclaw, nas, rpi4 | Fixed homelab |
 | `mobile` | rpi5 | Mobile kit |
 | `docker_hosts` | vultr, docker, nas | Hosts running Docker |
 | `pihole_hosts` | vultr, docker, rpi5 | Hosts running Pi-hole |
+| `openclaw_vm` | openclaw | OpenClaw AI assistant |
 | `tailscale_clients` | All except control | Tailscale mesh members |
 
 ## Variables
@@ -223,9 +232,53 @@ ansible/
 │   ├── pihole.yml               # Pi-hole deployment
 │   ├── caddy.yml                # Caddy reverse proxy
 │   ├── nfs-server.yml           # NFS exports
+│   ├── openclaw.yml             # OpenClaw AI assistant
 │   └── docker-compose-deploy.yml # Stack deployment
 └── README.md           # This file
 ```
+
+## Bootstrapping New VMs
+
+New VMs don't have Tailscale yet. Use local IPs for initial setup:
+
+### 1. Create VM in Proxmox
+
+Manual step - create VM, install Debian, note the IP.
+
+### 2. Copy SSH key
+
+```bash
+ssh-copy-id augusto@192.168.1.10  # Docker VM
+ssh-copy-id augusto@192.168.1.20  # OpenClaw VM
+```
+
+### 3. Run playbooks with local IP override
+
+```bash
+# Docker VM bootstrap
+ansible-playbook -i inventory.yml playbooks/common.yml -l docker \
+  -e "ansible_host=192.168.1.10"
+
+ansible-playbook -i inventory.yml playbooks/docker.yml -l docker \
+  -e "ansible_host=192.168.1.10"
+
+ansible-playbook -i inventory.yml playbooks/tailscale.yml -l docker \
+  -e "ansible_host=192.168.1.10" -e "authkey=tskey-xxx"
+
+# OpenClaw VM bootstrap
+ansible-playbook -i inventory.yml playbooks/common.yml -l openclaw \
+  -e "ansible_host=192.168.1.20"
+
+ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw \
+  -e "ansible_host=192.168.1.20"
+
+ansible-playbook -i inventory.yml playbooks/tailscale.yml -l openclaw \
+  -e "ansible_host=192.168.1.20" -e "authkey=tskey-xxx"
+```
+
+### 4. After Tailscale is running
+
+Use Tailscale IPs (default in inventory) for all future runs.
 
 ## Tips
 
@@ -235,11 +288,15 @@ Add to `~/.ssh/config` for easier access:
 
 ```
 Host vultr
-    HostName 100.64.0.100
-    User root
+    HostName 100.77.172.46
+    User linuxuser
 
 Host docker
     HostName 100.64.0.13
+    User augusto
+
+Host openclaw
+    HostName 100.64.0.14
     User augusto
 
 Host nas

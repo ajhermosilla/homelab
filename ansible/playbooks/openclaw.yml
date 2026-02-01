@@ -1,0 +1,149 @@
+# OpenClaw AI assistant installation
+# Usage: ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw
+#
+# Prerequisites:
+#   - Debian 12 installed on VM
+#   - SSH access configured
+#   - Run common.yml first for base setup
+
+---
+- name: Install and configure OpenClaw
+  hosts: openclaw_vm
+  become: true
+
+  vars:
+    node_version: "22"
+    openclaw_user: "{{ ansible_user }}"
+    openclaw_port: "18789"
+
+  tasks:
+    # =========================================================================
+    # Node.js Installation
+    # =========================================================================
+    - name: Install Node.js prerequisites
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: yes
+
+    - name: Create keyrings directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download NodeSource GPG key
+      shell: |
+        curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+      args:
+        creates: /etc/apt/keyrings/nodesource.gpg
+
+    - name: Add NodeSource repository
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ node_version }}.x nodistro main"
+        state: present
+        filename: nodesource
+
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+        update_cache: yes
+
+    - name: Verify Node.js version
+      command: node --version
+      register: node_version_result
+      changed_when: false
+
+    - name: Display Node.js version
+      debug:
+        msg: "Node.js version: {{ node_version_result.stdout }}"
+
+    # =========================================================================
+    # OpenClaw Installation
+    # =========================================================================
+    - name: Install OpenClaw globally
+      npm:
+        name: openclaw
+        global: yes
+        state: latest
+      become_user: root
+
+    - name: Verify OpenClaw installation
+      command: openclaw --version
+      register: openclaw_version
+      changed_when: false
+      ignore_errors: true
+
+    - name: Display OpenClaw version
+      debug:
+        msg: "OpenClaw version: {{ openclaw_version.stdout | default('Not installed') }}"
+
+    # =========================================================================
+    # Firewall
+    # =========================================================================
+    - name: Allow OpenClaw gateway port
+      ufw:
+        rule: allow
+        port: "{{ openclaw_port }}"
+        proto: tcp
+      tags: firewall
+
+    # =========================================================================
+    # Systemd Service (Optional)
+    # =========================================================================
+    - name: Create OpenClaw systemd service
+      copy:
+        dest: /etc/systemd/system/openclaw.service
+        content: |
+          [Unit]
+          Description=OpenClaw AI Assistant Gateway
+          After=network.target
+
+          [Service]
+          Type=simple
+          User={{ openclaw_user }}
+          WorkingDirectory=/home/{{ openclaw_user }}
+          ExecStart=/usr/bin/openclaw gateway --port {{ openclaw_port }}
+          Restart=on-failure
+          RestartSec=10
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: '0644'
+      notify: Reload systemd
+      tags: service
+
+    # =========================================================================
+    # Post-Install Instructions
+    # =========================================================================
+    - name: Display next steps
+      debug:
+        msg: |
+          OpenClaw installed successfully!
+
+          Next steps (run as {{ openclaw_user }}):
+
+          1. Run initial setup:
+             openclaw onboard --install-daemon
+
+          2. Configure API keys (Anthropic, OpenAI, etc.)
+
+          3. Connect messaging channels:
+             openclaw channels login
+
+          4. Test the gateway:
+             openclaw gateway --port {{ openclaw_port }}
+
+          5. (Optional) Enable systemd service:
+             sudo systemctl enable --now openclaw
+
+          Documentation: https://docs.openclaw.ai/
+
+  handlers:
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes

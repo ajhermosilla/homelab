@@ -1,6 +1,6 @@
 # Services
 
-23 services across 3 environments. Organized by location and category.
+24 services across 3 environments. Organized by location and category.
 
 ## Service Matrix
 
@@ -10,6 +10,7 @@
 | Headscale | Networking | VPS | Vultr | Planned |
 | soft-serve | Git | Mobile | MacBook | Active |
 | Pi-hole | Networking | Fixed | Docker VM | Planned |
+| OpenClaw | AI | Fixed | OpenClaw VM | Planned |
 | Caddy | Networking | Fixed | Docker VM | Planned |
 | Jellyfin | Media | Fixed | Docker VM | Planned |
 | Sonarr | Media | Fixed | Docker VM | Planned |
@@ -59,6 +60,14 @@
 | **Mosquitto** | 1883 | MQTT broker (HA ↔ Frigate) |
 | **Vaultwarden** | 8843 | Password manager |
 | **Frigate** | 5000 | NVR with AI detection (NFS to NAS) |
+
+### Fixed Homelab - OpenClaw VM
+
+| Service | Port(s) | Purpose |
+|---------|---------|---------|
+| **OpenClaw** | 18789 | AI assistant (cloud APIs) |
+
+*Standalone Debian VM for AI experimentation, isolated from Docker host.*
 
 ### Fixed Homelab - Start9 (RPi 4)
 
@@ -131,6 +140,7 @@
 | 8989 | Sonarr | Fixed |
 | 9696 | Prowlarr | Fixed |
 | 22000 | Syncthing Sync | NAS |
+| 18789 | OpenClaw Gateway | Fixed |
 | 23231 | soft-serve SSH | Mobile |
 | 23232 | soft-serve HTTP | Mobile |
 | 23233 | soft-serve Stats | Mobile |
@@ -217,8 +227,9 @@ docker/
 | Backup | Restic REST (x2) | 2 |
 | Scraping | changedetection | 1 |
 | Git | soft-serve | 1 |
+| AI | OpenClaw | 1 |
 
-**Unique services:** 23 | **Total deployments:** 26
+**Unique services:** 24 | **Total deployments:** 27
 
 ## Service Dependencies
 

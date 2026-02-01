@@ -21,12 +21,13 @@
 
 | Done | Task |
 |:----:|------|
-| [ ] | USB keyboard works |
-| [ ] | HDMI cable works |
+| [x] | USB keyboard works |
+| [x] | HDMI cable works |
 | [ ] | Ethernet cables labeled |
-| [ ] | Mini PC boots to BIOS |
-| [ ] | Dual NIC visible in BIOS |
-| [ ] | VT-x/VT-d enabled in BIOS |
+| [x] | Mini PC boots to BIOS |
+| [x] | Dual NIC visible in BIOS |
+| [x] | VT-x/VT-d enabled in BIOS |
+| [x] | **Proxmox installed** (192.168.0.237) |
 
 ---
 
@@ -155,11 +156,12 @@ Auth key: `tskey-auth-________________________`
 
 ## Quick Reference
 
-| Service | URL |
-|---------|-----|
-| Proxmox | https://192.168.1.5:8006 |
-| OPNsense | https://192.168.1.1 |
-| Frigate | http://192.168.1.10:5000 |
+| Service | URL | Notes |
+|---------|-----|-------|
+| Proxmox | https://192.168.0.237:8006 | Current (pre-OPNsense) |
+| Proxmox | https://192.168.1.5:8006 | After OPNsense cutover |
+| OPNsense | https://192.168.1.1 | After cutover |
+| Frigate | http://192.168.1.10:5000 | After cutover |
 
 ---
 
