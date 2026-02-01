@@ -1,5 +1,17 @@
 # Common setup tasks for all hosts
 # Usage: ansible-playbook -i inventory.yml playbooks/common.yml
+#
+# WARNING: This playbook disables SSH password authentication!
+# Before running, ensure:
+#   1. SSH key is copied to target: ssh-copy-id user@host
+#   2. Tailscale is connected (run tailscale.yml first)
+#   3. You can SSH via key or Tailscale before disabling passwords
+#
+# Recommended run order for new hosts:
+#   1. Manual: ssh-copy-id augusto@<host>
+#   2. ansible-playbook -i inventory.yml playbooks/tailscale.yml -l <host> -e "authkey=..."
+#   3. ansible-playbook -i inventory.yml playbooks/common.yml -l <host>
+#   4. ansible-playbook -i inventory.yml playbooks/docker.yml -l <host>
 
 ---
 - name: Common setup for all hosts

@@ -49,10 +49,12 @@ sudo chmod 755 /srv/frigate
 sudo nano /etc/exports
 ```
 
-Add the following line:
+Add the following lines:
 
 ```
 /srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
+/srv/media      192.168.1.0/24(ro,sync,no_subtree_check)
+/srv/downloads  192.168.1.0/24(rw,sync,no_subtree_check)
 ```
 
 **Options explained:**
