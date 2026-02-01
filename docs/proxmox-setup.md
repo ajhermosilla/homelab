@@ -7,7 +7,7 @@ Mini PC configuration for running OPNsense router and Docker VM.
 | Component | Spec | Notes |
 |-----------|------|-------|
 | CPU | Intel N150 | VT-x/VT-d for passthrough |
-| RAM | 12GB | 2GB OPNsense + 8GB Docker VM + 2GB Proxmox |
+| RAM | 12GB | ~1GB host + 2GB OPNsense + 7GB Docker + 2GB OpenClaw |
 | Storage | 512GB SSD | VMs + ISO storage |
 | NIC | Dual port | WAN passthrough + LAN bridge |
 
@@ -291,7 +291,7 @@ See `docs/opnsense-setup.md` for installation steps.
 **Memory:**
 | Setting | Value |
 |---------|-------|
-| Memory | 8192 MB |
+| Memory | 7168 MB |
 | Ballooning | Disabled |
 
 **Network:**
@@ -359,6 +359,128 @@ apt install -y vim git htop ncdu nfs-common
 # Configure static IP (if not using DHCP reservation)
 # Edit /etc/network/interfaces
 ```
+
+---
+
+## Create OpenClaw VM
+
+Experimental VM for OpenClaw AI assistant (cloud APIs).
+
+### 1. Create VM
+
+**General:**
+| Setting | Value |
+|---------|-------|
+| VM ID | 102 |
+| Name | openclaw |
+
+**OS:**
+| Setting | Value |
+|---------|-------|
+| ISO | debian-12-amd64.iso |
+| Type | Linux |
+| Version | 6.x - 2.6 Kernel |
+
+**System:**
+| Setting | Value |
+|---------|-------|
+| Machine | q35 |
+| BIOS | OVMF (UEFI) |
+| Add EFI Disk | Yes |
+| SCSI Controller | VirtIO SCSI |
+
+**Disks:**
+| Setting | Value |
+|---------|-------|
+| Bus | SCSI |
+| Size | 20 GB |
+| Storage | local-lvm |
+| Discard | Enabled |
+
+**CPU:**
+| Setting | Value |
+|---------|-------|
+| Cores | 2 |
+| Type | host |
+
+**Memory:**
+| Setting | Value |
+|---------|-------|
+| Memory | 2048 MB |
+| Ballooning | Disabled |
+
+**Network:**
+| Setting | Value |
+|---------|-------|
+| Bridge | vmbr0 |
+| Model | VirtIO |
+
+### 2. VM Options
+
+**VM > Options:**
+| Setting | Value |
+|---------|-------|
+| Start at boot | Yes |
+| Start/Shutdown order | 3 |
+| Startup delay | 60 |
+
+### 3. Install Debian
+
+1. Boot from ISO
+2. Graphical install (or text)
+3. Hostname: `openclaw`
+4. Domain: `cronova.local`
+5. Root password: (set strong password)
+6. User: `augusto`
+7. Partitioning: Guided - entire disk
+8. Software: SSH server, standard system utilities only
+9. Install GRUB to disk
+
+### 4. Post-Install Configuration
+
+```bash
+# SSH into OpenClaw VM
+ssh augusto@192.168.1.20
+
+# Become root
+su -
+
+# Update system
+apt update && apt upgrade -y
+
+# Install Node.js 22 (required for OpenClaw)
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+apt install -y nodejs
+
+# Verify Node version
+node --version  # Should be >= 22
+
+# Install OpenClaw
+npm install -g openclaw@latest
+
+# Setup OpenClaw with daemon
+openclaw onboard --install-daemon
+
+# Login to messaging channels
+openclaw channels login
+
+# Install useful tools
+apt install -y vim git htop
+```
+
+### 5. OpenClaw Configuration
+
+```bash
+# Test OpenClaw gateway
+openclaw gateway --port 18789
+
+# Send test message
+openclaw message send --target +15555550123 --message "Hello from homelab"
+```
+
+**API Keys:** Configure your cloud API keys (Anthropic, OpenAI, etc.) during `openclaw onboard`.
+
+**Documentation:** https://docs.openclaw.ai/
 
 ---
 
@@ -490,12 +612,20 @@ Add Proxmox health check:
 
 ### Docker VM
 
-- [ ] VM created with 8GB RAM, 100GB disk
+- [ ] VM created with 7GB RAM, 100GB disk
 - [ ] Debian 12 installed
 - [ ] Docker and docker-compose installed
 - [ ] User added to docker group
 - [ ] NFS client installed
 - [ ] Intel QuickSync accessible (if needed)
+
+### OpenClaw VM
+
+- [ ] VM created with 2GB RAM, 20GB disk
+- [ ] Debian 12 installed
+- [ ] Node.js 22 installed
+- [ ] OpenClaw installed and configured
+- [ ] Messaging channels connected
 
 ### Backups
 
@@ -509,9 +639,10 @@ Add Proxmox health check:
 | VM | vCPU | RAM | Disk | Purpose |
 |----|------|-----|------|---------|
 | OPNsense | 2 | 2GB | 20GB | Router/Firewall |
-| Docker | 2 | 8GB | 100GB | All containers |
-| **Total** | 4 | 10GB | 120GB | |
-| **Host Reserve** | - | 2GB | 392GB | Proxmox + buffers |
+| Docker | 2 | 7GB | 100GB | All containers |
+| OpenClaw | 2 | 2GB | 20GB | AI assistant (experimental) |
+| **Total** | 6 | 11GB | 140GB | |
+| **Host Reserve** | - | ~1GB | 372GB | Proxmox + buffers |
 
 ---
 

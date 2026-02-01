@@ -39,10 +39,18 @@ all:
         docker_vm:
           hosts:
             docker:
-              ansible_host: 100.64.0.13
-              # ansible_host: 192.168.1.10  # Local access
+              ansible_host: 100.68.63.168
+              # ansible_host: 192.168.1.126  # Local access (bootstrap)
           vars:
             docker_host: true
+
+        openclaw_vm:
+          hosts:
+            openclaw:
+              ansible_host: 100.64.0.14
+              # ansible_host: 192.168.1.20  # Local access (bootstrap)
+          vars:
+            openclaw_host: true
 
         storage:
           hosts:
@@ -105,6 +113,7 @@ all:
       hosts:
         vultr:
         docker:
+        openclaw:
         nas:
         rpi4:
         rpi5:
