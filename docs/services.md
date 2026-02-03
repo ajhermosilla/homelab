@@ -55,7 +55,7 @@
 | **Sonarr** | 8989 | TV show management |
 | **Radarr** | 7878 | Movie management |
 | **Prowlarr** | 9696 | Indexer management |
-| **qBittorrent** | 8080, 6881 | Torrent client (Web UI, protocol) |
+| **qBittorrent** | 8081, 6881 | Torrent client (Web UI, protocol) |
 | **Home Assistant** | 8123 | Home automation |
 | **Mosquitto** | 1883 | MQTT broker (HA ↔ Frigate) |
 | **Vaultwarden** | 8843 | Password manager |
@@ -131,7 +131,8 @@
 | 7878 | Radarr | Fixed |
 | 8000 | Restic REST | NAS / VPS |
 | 8053 | Pi-hole Web | Fixed / VPS |
-| 8080 | qBittorrent / ntfy | Fixed / VPS |
+| 8080 | ntfy | VPS |
+| 8081 | qBittorrent | Fixed |
 | 6881 | qBittorrent (torrent) | Fixed |
 | 8096 | Jellyfin | Fixed |
 | 8123 | Home Assistant | Fixed |
@@ -307,7 +308,7 @@ How services are accessed based on location.
 | **Sonarr** | 192.168.1.10:8989 | sonarr.tail:8989 | - |
 | **Radarr** | 192.168.1.10:7878 | radarr.tail:7878 | - |
 | **Prowlarr** | 192.168.1.10:9696 | prowlarr.tail:9696 | - |
-| **qBittorrent** | 192.168.1.10:8080 | qbit.tail:8080 | - |
+| **qBittorrent** | 192.168.1.10:8081 | qbit.tail:8081 | - |
 | **Uptime Kuma** | - | status.tail:3001 | - |
 | **ntfy** | - | ntfy.tail:80 | - |
 | **Syncthing** | 192.168.1.12:8384 | nas.tail:8384 | - |

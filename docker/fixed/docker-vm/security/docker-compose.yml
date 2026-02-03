@@ -127,6 +127,7 @@ services:
     # Start automation stack before security stack.
     networks:
       - security-net
+      - mqtt-net  # For MQTT communication with Mosquitto
 
   # =========================================================================
   # Vaultwarden Backup Sidecar
@@ -188,7 +189,19 @@ volumes:
 networks:
   security-net:
     name: security-net
+  mqtt-net:
+    external: true  # Created by automation stack
 
+# =============================================================================
+# STARTUP ORDER
+# =============================================================================
+#
+# The automation stack MUST be started before the security stack:
+#   1. cd ../automation && docker compose up -d   # Creates mqtt-net
+#   2. cd ../security && docker compose up -d     # Joins mqtt-net
+#
+# This ensures the mqtt-net network exists before Frigate tries to join it.
+#
 # =============================================================================
 # ENVIRONMENT VARIABLES (.env)
 # =============================================================================

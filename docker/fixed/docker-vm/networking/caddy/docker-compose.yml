@@ -41,6 +41,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+      - /var/lib/tailscale/certs:/var/lib/tailscale/certs:ro  # Tailscale HTTPS certs
     environment:
       TZ: ${TZ:-America/Asuncion}
     logging:
@@ -107,13 +108,23 @@ networks:
 #
 # 1. Create Caddyfile in this directory
 #
-# 2. Start Caddy:
+# 2. Generate Tailscale certs on Docker VM host (not in container):
+#    sudo tailscale cert home.cronova.dev
+#    sudo tailscale cert media.cronova.dev
+#    sudo tailscale cert frigate.cronova.dev
+#    sudo tailscale cert sonarr.cronova.dev
+#    sudo tailscale cert radarr.cronova.dev
+#    sudo tailscale cert prowlarr.cronova.dev
+#
+#    Certs are stored in /var/lib/tailscale/certs/
+#
+# 3. Start Caddy:
 #    docker compose up -d
 #
-# 3. Check logs:
+# 4. Check logs:
 #    docker logs -f caddy
 #
-# 4. Test:
+# 5. Test:
 #    curl -k https://vault.cronova.dev
 #
 # =============================================================================

@@ -47,6 +47,7 @@ services:
     #   - /dev/ttyUSB0:/dev/ttyUSB0
     networks:
       - automation-net
+      - mqtt-net  # For MQTT communication
     depends_on:
       mosquitto:
         condition: service_healthy
@@ -95,6 +96,7 @@ services:
         max-file: "3"
     networks:
       - automation-net
+      - mqtt-net  # Shared network for Frigate and other MQTT clients
 
   # =========================================================================
   # Home Assistant Backup Sidecar
@@ -159,6 +161,8 @@ volumes:
 networks:
   automation-net:
     name: automation-net
+  mqtt-net:
+    name: mqtt-net
 
 # =============================================================================
 # MOSQUITTO CONFIGURATION
