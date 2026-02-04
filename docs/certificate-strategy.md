@@ -20,10 +20,12 @@ SSL/TLS certificate management for homelab services.
 |-----------|--------|-------|
 | VPS Caddy + Let's Encrypt | Deployed | cronova.dev, hs, status, notify |
 | Cloudflare Edge | Deployed | DNS proxied |
-| Docker VM Tailscale certs | Not deployed | Certs directory doesn't exist yet |
+| Docker VM Tailscale certs | Not available | Headscale doesn't support this feature |
 | Headscale MagicDNS | Partial | Enabled but name resolution unreliable |
 
-**Next steps:** Generate Tailscale certs on Docker VM, configure Caddy to use them.
+**Headscale limitation:** `tailscale cert` returns "your Tailscale account does not support getting TLS certs" - this feature requires Tailscale's commercial infrastructure and is not available with self-hosted Headscale.
+
+**Revised approach:** Use HTTP for internal services accessed via Tailscale. The WireGuard tunnel provides encryption, making HTTPS redundant for internal access.
 
 ---
 
@@ -97,16 +99,30 @@ vault.cronova.dev {
 
 ---
 
-## Internal Services (Tailscale HTTPS)
+## Internal Services (Tailscale Access)
 
-### Enable Tailscale HTTPS
+### Headscale Limitation
+
+**Important:** Tailscale HTTPS (`tailscale cert`) is NOT available with self-hosted Headscale. This feature requires Tailscale's commercial backend infrastructure.
 
 ```bash
-# On each server (Docker VM, NAS, etc.)
-tailscale up --accept-dns=true
+# This does NOT work with Headscale:
+tailscale cert docker.hs.net
+# Error: 500 Internal Server Error: your Tailscale account does not support getting TLS certs
+```
 
-# Enable HTTPS certificates
-tailscale cert home.cronova.dev
+### Recommended Approach: HTTP via Tailscale
+
+For internal services accessed only via Tailscale, use HTTP:
+- WireGuard tunnel provides end-to-end encryption
+- No certificate management overhead
+- Works with any Tailscale/Headscale setup
+
+Access internal services via Tailscale IPs:
+```
+http://100.68.63.168:8123  # Home Assistant
+http://100.68.63.168:8096  # Jellyfin
+http://100.68.63.168:5000  # Frigate
 ```
 
 ### Headscale Configuration
@@ -222,11 +238,11 @@ www.verava.ai {
 | vault.cronova.dev | Let's Encrypt | Caddy | 90 days | Yes |
 | www.cronova.dev | Edge | Cloudflare | N/A | Yes |
 | docs.cronova.dev | Edge | Cloudflare | N/A | Yes |
-| home.cronova.dev | Tailscale | MagicDNS | 90 days | Script |
-| media.cronova.dev | Tailscale | MagicDNS | 90 days | Script |
-| frigate.cronova.dev | Tailscale | MagicDNS | 90 days | Script |
-| nas.cronova.dev | Tailscale | MagicDNS | 90 days | Script |
-| btc.cronova.dev | Tailscale | MagicDNS | 90 days | Script |
+| home (100.68.63.168:8123) | HTTP | Tailscale tunnel | N/A | N/A |
+| media (100.68.63.168:8096) | HTTP | Tailscale tunnel | N/A | N/A |
+| frigate (100.68.63.168:5000) | HTTP | Tailscale tunnel | N/A | N/A |
+| nas (100.64.0.12) | HTTP | Tailscale tunnel | N/A | N/A |
+| btc (100.64.0.11) | HTTP | Tailscale tunnel | N/A | N/A |
 
 ---
 
@@ -305,12 +321,10 @@ openssl x509 -in /etc/ssl/cloudflare/verava.ai.pem -noout -dates
 - [x] Deploy Caddyfile
 - [x] Verify auto-cert: `curl -I https://status.cronova.dev`
 
-### Fixed Homelab (Tailscale)
+### Fixed Homelab (Internal Access)
 - [x] Enable MagicDNS in Headscale (partial - has limitations)
-- [ ] Generate certs: `tailscale cert home.cronova.dev`
-- [ ] Configure Caddy with Tailscale certs
-- [ ] Set up renewal cron job
-- [ ] Test: `curl -I https://home.cronova.dev` (from Tailscale device)
+- [x] Tailscale HTTPS: Not available with Headscale (use HTTP instead)
+- [x] Internal services accessible via HTTP over Tailscale tunnel (encrypted by WireGuard)
 
 ### Cloudflare
 - [x] Set SSL mode to Full (strict)
