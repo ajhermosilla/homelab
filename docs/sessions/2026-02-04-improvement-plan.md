@@ -6,18 +6,18 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-| 1 | VPS Restic IP mismatch (100.64.0.20 vs 100.64.0.100) | `docker/vps/backup/README.md` | 21, 40, 46 | Pending |
-| 2 | Mobile Pi-hole IP mismatch (.5 vs .10) | `docker/mobile/rpi5/.env.example` | 14, 18 | Pending |
-| 3 | Missing `mosquitto.conf` file | `docker/fixed/docker-vm/automation/` | - | Pending |
-| 4 | Missing/incomplete `frigate.yml` config | `docker/fixed/docker-vm/security/` | - | Pending |
-| 5 | HOMELAB_ROOT not documented in .env files | multiple .env.example files | - | Pending |
+| 1 | VPS Restic IP mismatch (100.64.0.20 vs 100.64.0.100) | `docker/vps/backup/README.md` | 21, 40, 46 | **Fixed** |
+| 2 | Mobile Pi-hole IP mismatch (.5 vs .10) | `docker/mobile/rpi5/.env.example` | 14, 18 | **Fixed** |
+| 3 | Missing `mosquitto.conf` file | `docker/fixed/docker-vm/automation/` | - | N/A (exists) |
+| 4 | Missing/incomplete `frigate.yml` config | `docker/fixed/docker-vm/security/` | - | N/A (exists) |
+| 5 | HOMELAB_ROOT not documented in .env files | multiple .env.example files | - | **Fixed** |
 
 ## High Priority Issues
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
 | 6 | Stack dependency not documented (automation → security) | `docker/fixed/docker-vm/security/docker-compose.yml` | 193 | Pending |
-| 7 | NFS mount IP hardcoded in playbook warning | `ansible/playbooks/docker-compose-deploy.yml` | 144-145 | Pending |
+| 7 | NFS mount IP hardcoded in playbook warning | `ansible/playbooks/docker-compose-deploy.yml` | 144-145 | **Fixed** |
 | 8 | Camera RTSP credentials in plaintext | `docker/fixed/docker-vm/security/frigate.yml` | 101-104 | Pending |
 | 9 | Restic password var inconsistency (PASSWORD vs PASSWORD_FILE) | multiple docker-compose files | - | Pending |
 | 10 | NAS download path symlink not in nfs-server playbook | `ansible/playbooks/nfs-server.yml` | 39 | Pending |
@@ -28,7 +28,7 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 |---|-------|------|------|--------|
 | 11 | Proxmox vs OPNsense IP ambiguity (.10 vs .14) | `docker/vps/monitoring/monitors.md` | 31 | Pending |
 | 12 | Missing certificate renewal cron example | `docker/fixed/docker-vm/networking/caddy/Caddyfile` | 110 | Pending |
-| 13 | Docker image version not pinned (watchtower:latest) | `docker/vps/maintenance/docker-compose.yml` | 11 | Pending |
+| 13 | Docker image version not pinned (watchtower:latest) | `docker/fixed/docker-vm/maintenance/docker-compose.yml` | 11 | **Fixed** |
 | 14 | Caddy loose version (2.8 vs specific) | multiple Caddyfiles | - | Pending |
 | 15 | Vaultwarden signups default could be clearer | `docker/fixed/docker-vm/security/docker-compose.yml` | 61 | Pending |
 | 16 | NFS media export missing no_root_squash | `ansible/playbooks/nfs-server.yml` | 33 | Pending |
@@ -50,15 +50,19 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 ### Critical
 
-*(To be filled as issues are resolved)*
+1. **VPS Restic IP**: Changed all references from 100.64.0.x to actual IP 100.77.172.46
+2. **Mobile Pi-hole IP**: Changed HOST_IP from 192.168.8.10 to 192.168.8.5, updated Tailscale IP references
+3. **mosquitto.conf**: Already exists with complete configuration (false positive)
+4. **frigate.yml**: Already exists with complete configuration (false positive)
+5. **HOMELAB_ROOT**: Added to security and automation .env.example files
 
 ### High Priority
 
-*(To be filled as issues are resolved)*
+7. **NFS IP configurable**: Added `nas_ip` variable to docker-compose-deploy.yml playbook
 
 ### Medium Priority
 
-*(To be filled as issues are resolved)*
+13. **Version pinning**: Pinned watchtower:1.7.1, alpine:3.19 for backup sidecars, documented changedetection:latest rationale
 
 ---
 
