@@ -18,7 +18,7 @@ htpasswd -B -c htpasswd augusto
 docker compose up -d
 
 # 3. Initialize repository (from client)
-export RESTIC_REPOSITORY="rest:http://augusto:$PASSWORD@100.64.0.100:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://augusto:$PASSWORD@100.77.172.46:8000/homelab"
 export RESTIC_PASSWORD_FILE=/root/.restic-password
 restic init
 ```
@@ -37,13 +37,13 @@ For extra security, bind to localhost only:
 ports:
   - "127.0.0.1:8000:8000"
 ```
-Access via Tailscale IP: `100.64.0.100:8000`
+Access via Tailscale IP: `100.77.172.46:8000`
 
 ## Client Usage
 
 ```bash
 # Environment
-export RESTIC_REPOSITORY="rest:http://$USER:$PASS@100.64.0.100:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://$USER:$PASS@100.77.172.46:8000/homelab"
 export RESTIC_PASSWORD_FILE=/root/.restic-password
 
 # Backup critical data
