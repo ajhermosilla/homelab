@@ -2,11 +2,16 @@
 # Restic Backup Script for Docker Sidecars
 # Usage: Set environment variables and run
 #
+# Variable Naming Convention:
+#   BACKUP_PATH  - Source path inside container to backup (e.g., /data)
+#   BACKUP_DATA  - Destination path where restic repository is stored (NAS config)
+#   Both serve different purposes; don't confuse source (what) vs destination (where).
+#
 # Required env vars:
 #   RESTIC_REPOSITORY      - restic repo URL (rest:http://user:pass@host:8000/repo)
 #   RESTIC_PASSWORD        - encryption password
 #     OR RESTIC_PASSWORD_FILE - path to file containing password (Docker secrets)
-#   BACKUP_PATH            - path to backup (e.g., /data)
+#   BACKUP_PATH            - source path to backup (e.g., /data)
 #   BACKUP_TAG             - tag for snapshots (e.g., vaultwarden)
 #
 # Optional env vars:

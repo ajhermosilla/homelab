@@ -39,10 +39,10 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-| 19 | Mobile Pi-hole uses port 8080 vs 8053 (inconsistent) | `docker/mobile/rpi5/networking/pihole/docker-compose.yml` | 32 | Pending |
-| 20 | Backup volume path naming (BACKUP_DATA vs BACKUP_PATH) | multiple | - | Pending |
-| 21 | Jellyfin cache not on tmpfs (slow transcoding) | `docker/fixed/docker-vm/media/docker-compose.yml` | 37 | Pending |
-| 22 | Network topology doc incomplete | `docs/network-topology.md` | 82+ | Pending |
+| 19 | Mobile Pi-hole uses port 8080 vs 8053 (inconsistent) | `docker/mobile/rpi5/networking/pihole/docker-compose.yml` | 32 | **Fixed** |
+| 20 | Backup volume path naming (BACKUP_DATA vs BACKUP_PATH) | multiple | - | **Fixed** |
+| 21 | Jellyfin cache not on tmpfs (slow transcoding) | `docker/fixed/docker-vm/media/docker-compose.yml` | 37 | **Fixed** |
+| 22 | Network topology doc incomplete | `docs/network-topology.md` | 82+ | N/A (complete) |
 
 ---
 
@@ -74,6 +74,13 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 16. **NFS no_root_squash**: Added comment explaining why media export doesn't need it (read-only)
 17. **Samba credentials**: Enhanced warning with mitigations and alternative image suggestion
 18. **OpenClaw local IP**: Already had comment (false positive)
+
+### Low Priority
+
+19. **Mobile Pi-hole port**: Added comment explaining 8080 vs 8053 difference (intentional)
+20. **Backup naming convention**: Documented BACKUP_PATH (source) vs BACKUP_DATA (destination) in restic-backup.sh
+21. **Jellyfin cache**: Added commented tmpfs option for faster transcoding
+22. **Network topology**: Already complete (487 lines, all sections present)
 
 ---
 

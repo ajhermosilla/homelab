@@ -34,6 +34,11 @@ services:
       - "8096:8096"
     volumes:
       - jellyfin-config:/config
+      # Cache on persistent volume. For faster transcoding with enough RAM, use tmpfs:
+      # - type: tmpfs
+      #   target: /cache
+      #   tmpfs:
+      #     size: 2147483648  # 2GB
       - jellyfin-cache:/cache
       - ${MEDIA_PATH:-/mnt/nas/media}:/media:ro
     environment:

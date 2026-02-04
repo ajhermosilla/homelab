@@ -29,7 +29,8 @@ services:
     ports:
       - "53:53/tcp"   # DNS TCP
       - "53:53/udp"   # DNS UDP
-      - "8080:80/tcp" # Web interface (80 reserved for other services)
+      # Web UI on 8080 (not 8053 like fixed homelab) - port 80 reserved for future services
+      - "8080:80/tcp"
     environment:
       TZ: ${TZ:-America/Asuncion}
       WEBPASSWORD: ${PIHOLE_PASSWORD:?PIHOLE_PASSWORD required in .env}
