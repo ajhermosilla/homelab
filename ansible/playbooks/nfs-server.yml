@@ -95,7 +95,53 @@
         update_cache: yes
 
     # =========================================================================
-    # Directory Setup
+    # Directory Setup - Create /srv symlinks
+    # =========================================================================
+    - name: Ensure /srv directory exists
+      file:
+        path: "{{ nfs_srv_root }}"
+        state: directory
+        mode: '0755'
+      tags: directories
+
+    - name: Create /srv/media symlink
+      file:
+        src: "{{ nfs_red8_root }}/media"
+        dest: "{{ nfs_srv_root }}/media"
+        state: link
+      when: red8_mount.stat.exists
+      ignore_errors: true
+      tags: directories
+
+    - name: Create /srv/downloads symlink
+      file:
+        src: "{{ nfs_red8_root }}/downloads"
+        dest: "{{ nfs_srv_root }}/downloads"
+        state: link
+      when: red8_mount.stat.exists
+      ignore_errors: true
+      tags: directories
+
+    - name: Create /srv/backup symlink
+      file:
+        src: "{{ nfs_red8_root }}/backup"
+        dest: "{{ nfs_srv_root }}/backup"
+        state: link
+      when: red8_mount.stat.exists
+      ignore_errors: true
+      tags: directories
+
+    - name: Create /srv/frigate symlink
+      file:
+        src: "{{ nfs_purple_root }}/frigate"
+        dest: "{{ nfs_srv_root }}/frigate"
+        state: link
+      when: purple_mount.stat.exists
+      ignore_errors: true
+      tags: directories
+
+    # =========================================================================
+    # Verify Symlinks
     # =========================================================================
     - name: Verify export paths exist (symlinks or directories)
       stat:
@@ -106,7 +152,7 @@
 
     - name: Warn about missing export paths
       debug:
-        msg: "WARNING: Export path {{ item.item.path }} does not exist. Create symlink or directory first."
+        msg: "WARNING: Export path {{ item.item.path }} does not exist. Check symlink target directories."
       loop: "{{ export_paths.results }}"
       when: not item.stat.exists
       tags: directories
