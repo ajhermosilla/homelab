@@ -71,8 +71,9 @@ objects:
 # CAMERAS
 # =============================================================================
 #
-# ⚠️  IMPORTANT: Replace ALL credential placeholders before deploying!
-#     Search for: {REOLINK_USER}, {REOLINK_PASS}, {TAPO_USER}, {TAPO_PASS}
+# ⚠️  IMPORTANT: Set camera credentials in .env before deploying!
+#     Required env vars: FRIGATE_REOLINK_USER, FRIGATE_REOLINK_PASS, FRIGATE_TAPO_USER, FRIGATE_TAPO_PASS
+#     These are substituted into RTSP URLs automatically.
 #
 # -----------------------------------------------------------------------------
 # RTSP URL Formats by Camera Model
@@ -98,10 +99,10 @@ cameras:
   front_door:
     ffmpeg:
       inputs:
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.101:554/h264Preview_01_sub
+        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.1.101:554/h264Preview_01_sub
           roles:
             - detect
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.101:554/h264Preview_01_main
+        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.1.101:554/h264Preview_01_main
           roles:
             - record
     detect:
@@ -123,10 +124,10 @@ cameras:
   back_yard:
     ffmpeg:
       inputs:
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.102:554/h264Preview_01_sub
+        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.1.102:554/h264Preview_01_sub
           roles:
             - detect
-        - path: rtsp://{REOLINK_USER}:{REOLINK_PASS}@192.168.1.102:554/h264Preview_01_main
+        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.1.102:554/h264Preview_01_main
           roles:
             - record
     detect:
@@ -149,7 +150,7 @@ cameras:
   indoor:
     ffmpeg:
       inputs:
-        - path: rtsp://{TAPO_USER}:{TAPO_PASS}@192.168.1.103:554/stream1
+        - path: rtsp://${FRIGATE_TAPO_USER}:${FRIGATE_TAPO_PASS}@192.168.1.103:554/stream1
           roles:
             - detect
             - record
@@ -171,10 +172,12 @@ cameras:
 # SETUP NOTES
 # =============================================================================
 #
-# 1. Replace placeholder credentials (DO NOT deploy with placeholders):
-#    - {REOLINK_USER} / {REOLINK_PASS} - Reolink camera credentials
-#    - {TAPO_USER} / {TAPO_PASS} - Tapo camera credentials
-#    - MQTT password in mqtt section above
+# 1. Set camera credentials in .env file:
+#    FRIGATE_REOLINK_USER=admin
+#    FRIGATE_REOLINK_PASS=your-reolink-password
+#    FRIGATE_TAPO_USER=your-tapo-username
+#    FRIGATE_TAPO_PASS=your-tapo-password
+#    (See .env.example for template)
 #
 # 2. Camera IPs (Day 1 - Main LAN):
 #    - 192.168.1.101 - Front door (Reolink)
