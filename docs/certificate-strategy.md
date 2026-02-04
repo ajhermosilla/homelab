@@ -14,6 +14,19 @@ SSL/TLS certificate management for homelab services.
 
 ---
 
+## Current Status (as of 2026-02-04)
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| VPS Caddy + Let's Encrypt | Deployed | cronova.dev, hs, status, notify |
+| Cloudflare Edge | Deployed | DNS proxied |
+| Docker VM Tailscale certs | Not deployed | Certs directory doesn't exist yet |
+| Headscale MagicDNS | Partial | Enabled but name resolution unreliable |
+
+**Next steps:** Generate Tailscale certs on Docker VM, configure Caddy to use them.
+
+---
+
 ## Why Tailscale HTTPS?
 
 | Factor | Tailscale HTTPS | Internal CA |
@@ -67,7 +80,7 @@ notify.cronova.dev {
 }
 
 vault.cronova.dev {
-    reverse_proxy 100.64.0.10:8843
+    reverse_proxy 100.68.63.168:8843
 }
 ```
 
@@ -104,10 +117,12 @@ Enable MagicDNS in Headscale config:
 # /etc/headscale/config.yaml
 dns_config:
   magic_dns: true
-  base_domain: cronova.dev
+  base_domain: hs.net
   nameservers:
-    - 100.64.0.1      # Pi-hole
+    - 100.68.63.168   # Pi-hole (Docker VM)
 ```
+
+**Note:** MagicDNS with Headscale has known limitations - name resolution may not work reliably. Use Tailscale IPs directly as fallback.
 
 ### Caddy with Tailscale Certs
 
@@ -285,21 +300,21 @@ openssl x509 -in /etc/ssl/cloudflare/verava.ai.pem -noout -dates
 ## Implementation Checklist
 
 ### VPS (Let's Encrypt)
-- [ ] Verify ports 80/443 open
-- [ ] Configure Caddy with email
-- [ ] Deploy Caddyfile
-- [ ] Verify auto-cert: `curl -I https://status.cronova.dev`
+- [x] Verify ports 80/443 open
+- [x] Configure Caddy with email
+- [x] Deploy Caddyfile
+- [x] Verify auto-cert: `curl -I https://status.cronova.dev`
 
 ### Fixed Homelab (Tailscale)
-- [ ] Enable MagicDNS in Headscale
+- [x] Enable MagicDNS in Headscale (partial - has limitations)
 - [ ] Generate certs: `tailscale cert home.cronova.dev`
 - [ ] Configure Caddy with Tailscale certs
 - [ ] Set up renewal cron job
 - [ ] Test: `curl -I https://home.cronova.dev` (from Tailscale device)
 
 ### Cloudflare
-- [ ] Set SSL mode to Full (strict)
-- [ ] Enable Always Use HTTPS
+- [x] Set SSL mode to Full (strict)
+- [x] Enable Always Use HTTPS
 - [ ] (Optional) Create origin certificate for VPS
 
 ---
