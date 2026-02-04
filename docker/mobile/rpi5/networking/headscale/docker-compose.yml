@@ -37,7 +37,7 @@ services:
 
   # Hourly backup sidecar - backs up Headscale DB and config
   headscale-backup:
-    image: alpine:latest
+    image: alpine:3.19
     container_name: headscale-backup
     restart: unless-stopped
     security_opt:

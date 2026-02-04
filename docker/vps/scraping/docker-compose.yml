@@ -1,10 +1,13 @@
 # changedetection.io - Website change monitoring
 # VPS - Vultr
 # https://changedetection.io/
+#
+# NOTE: Using :latest intentionally - changedetection + sockpuppetbrowser
+# need compatible versions, and project recommends using latest together.
 
 services:
   changedetection:
-    image: ghcr.io/dgtlmoon/changedetection.io:latest
+    image: ghcr.io/dgtlmoon/changedetection.io:latest  # See note above
     env_file:
       - ../../shared/common.env
     container_name: changedetection

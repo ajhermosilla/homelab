@@ -14,6 +14,7 @@
     homelab_base: /opt/homelab
     homelab_repo: "https://github.com/ajhermosilla/homelab.git"
     compose_action: "up"  # up, down, restart, pull
+    nas_ip: "192.168.1.12"  # NAS IP for NFS mounts
     # Stack base paths per environment
     # Structure: docker/<environment>/<host_subdir>/<stack>
     stack_paths:
@@ -141,12 +142,12 @@
           {% endfor %}
 
           Ensure NFS is mounted before starting services:
-            sudo mount -t nfs 192.168.1.12:/srv/media /mnt/nas/media
-            sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+            sudo mount -t nfs {{ nas_ip }}:/srv/media /mnt/nas/media
+            sudo mount -t nfs {{ nas_ip }}:/srv/frigate /mnt/nas/frigate
 
           Or add to /etc/fstab for persistent mounts:
-            192.168.1.12:/srv/media    /mnt/nas/media    nfs  defaults,_netdev,nofail  0  0
-            192.168.1.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
+            {{ nas_ip }}:/srv/media    /mnt/nas/media    nfs  defaults,_netdev,nofail  0  0
+            {{ nas_ip }}:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
       when:
         - deploying_nfs_dependent | default(false)
         - nfs_mounts.results | selectattr('stat.exists', 'undefined') | list | length > 0 or
