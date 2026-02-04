@@ -21,6 +21,43 @@ Step-by-step guide to deploy the DIY NAS (Mini-ITX build from 2013).
 
 ---
 
+## Remote Preparation (Do Before Going Home)
+
+Complete these tasks remotely before the deployment day:
+
+### 1. Generate Tailscale Auth Key
+```bash
+# SSH to VPS
+ssh linuxuser@100.77.172.46
+
+# Generate pre-auth key (expires in 1 hour, single use)
+docker exec headscale headscale preauthkeys create --user augusto --expiration 1h
+
+# Save the key! You'll need it during NAS setup
+```
+
+### 2. Verify OPNsense DHCP Reservation
+- Login to OPNsense via Tailscale: https://100.79.230.235
+- Services → DHCPv4 → LAN
+- Add reservation: MAC → 192.168.1.12 (get MAC from NAS motherboard sticker)
+
+### 3. Prepare USB Boot Drive
+- Debian 12 netinst ISO already downloaded
+- Flash to USB with: `sudo dd if=debian.iso of=/dev/sdX bs=4M status=progress`
+
+### 4. Pre-generate Passwords
+```bash
+# Samba password
+openssl rand -base64 24
+
+# Restic htpasswd password
+openssl rand -base64 24
+```
+
+Save these securely (Vaultwarden) before going home.
+
+---
+
 ## Pre-Deployment Checklist
 
 ### Hardware Ready
@@ -223,30 +260,52 @@ tailscale ip
 
 ## Phase 5: NFS Server Setup
 
-### Install NFS
+### Option A: Ansible Playbook (Recommended)
+
+Run from your MacBook after NAS is accessible via SSH:
 
 ```bash
-sudo apt install -y nfs-kernel-server
+cd ~/homelab/ansible
+
+# Test connection first
+ansible -i inventory.yml nas -m ping
+
+# Run NFS server playbook (creates dirs, symlinks, exports, firewall)
+ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
 ```
 
-### Configure Exports
+The playbook automatically:
+- Creates /srv symlinks to drive mounts
+- Configures /etc/exports with correct permissions
+- Opens firewall ports (111, 2049)
+- Starts NFS server
+
+### Option B: Manual Setup
+
+If Ansible isn't available:
 
 ```bash
+# Install NFS
+sudo apt install -y nfs-kernel-server
+
+# Configure exports
 sudo nano /etc/exports
 
 # Add:
 /srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
-/srv/media      192.168.1.10(ro,sync,no_subtree_check)
-/srv/downloads  192.168.1.10(rw,sync,no_subtree_check)
-```
+/srv/media      192.168.1.0/24(ro,sync,no_subtree_check)
+/srv/downloads  192.168.1.0/24(rw,sync,no_subtree_check)
+/srv/backup     192.168.1.0/24(rw,sync,no_subtree_check)
 
-### Apply and Start
-
-```bash
+# Apply and start
 sudo exportfs -ra
 sudo exportfs -v
 sudo systemctl enable nfs-kernel-server
 sudo systemctl start nfs-kernel-server
+
+# Open firewall
+sudo ufw allow from 192.168.1.0/24 to any port 111
+sudo ufw allow from 192.168.1.0/24 to any port 2049
 ```
 
 ---
@@ -403,6 +462,60 @@ curl http://192.168.1.12:8000/
 
 - **Restore on AC Power Loss**: Power On (auto-boot after outage)
 - **Wake on LAN**: Enabled (optional)
+
+---
+
+## Troubleshooting
+
+### Drive Not Mounting
+```bash
+# Check drive is detected
+lsblk
+sudo fdisk -l
+
+# Check SMART health
+sudo apt install smartmontools
+sudo smartctl -H /dev/sdb
+
+# Manual mount test
+sudo mount /dev/sdb1 /mnt/purple
+```
+
+### NFS Not Working
+```bash
+# Check service status
+sudo systemctl status nfs-kernel-server
+
+# Verify exports
+sudo exportfs -v
+
+# Check firewall
+sudo ufw status
+
+# Test from Docker VM
+showmount -e 192.168.1.12
+```
+
+### Samba Connection Failed
+```bash
+# Check container logs
+docker logs samba
+
+# Test authentication
+smbclient -L localhost -U augusto
+
+# Check ports
+ss -tlnp | grep -E '139|445'
+```
+
+### Tailscale Won't Connect
+```bash
+# Check status
+tailscale status
+
+# Re-authenticate (get new key from Headscale)
+sudo tailscale up --login-server=https://hs.cronova.dev --authkey=<new-key> --reset
+```
 
 ---
 
