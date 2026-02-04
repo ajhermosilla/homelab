@@ -16,11 +16,11 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-| 6 | Stack dependency not documented (automation → security) | `docker/fixed/docker-vm/security/docker-compose.yml` | 193 | Pending |
+| 6 | Stack dependency not documented (automation → security) | `docker/fixed/docker-vm/security/docker-compose.yml` | 193 | N/A (exists) |
 | 7 | NFS mount IP hardcoded in playbook warning | `ansible/playbooks/docker-compose-deploy.yml` | 144-145 | **Fixed** |
-| 8 | Camera RTSP credentials in plaintext | `docker/fixed/docker-vm/security/frigate.yml` | 101-104 | Pending |
-| 9 | Restic password var inconsistency (PASSWORD vs PASSWORD_FILE) | multiple docker-compose files | - | Pending |
-| 10 | NAS download path symlink not in nfs-server playbook | `ansible/playbooks/nfs-server.yml` | 39 | Pending |
+| 8 | Camera RTSP credentials in plaintext | `docker/fixed/docker-vm/security/frigate.yml` | 101-104 | **Fixed** |
+| 9 | Restic password var inconsistency (PASSWORD vs PASSWORD_FILE) | multiple docker-compose files | - | **Fixed** |
+| 10 | NAS download path symlink not in nfs-server playbook | `ansible/playbooks/nfs-server.yml` | 39 | **Fixed** |
 
 ## Medium Priority Issues
 
@@ -58,7 +58,11 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 ### High Priority
 
+6. **Stack dependency**: Documentation already exists at lines 195-203 (false positive)
 7. **NFS IP configurable**: Added `nas_ip` variable to docker-compose-deploy.yml playbook
+8. **Camera credentials**: Changed from placeholder syntax to proper env vars (FRIGATE_REOLINK_*, FRIGATE_TAPO_*)
+9. **Restic password**: Documented consistency requirement - both stacks must use same password
+10. **NFS symlinks**: Added symlink creation tasks to nfs-server.yml (media, downloads, backup, frigate)
 
 ### Medium Priority
 
