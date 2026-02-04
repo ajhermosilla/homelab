@@ -47,7 +47,7 @@ services:
 
   # Hourly backup sidecar
   headscale-backup:
-    image: alpine:latest
+    image: alpine:3.19
     env_file:
       - ../../../shared/common.env
     container_name: headscale-backup
