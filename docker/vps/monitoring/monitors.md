@@ -28,7 +28,7 @@ Core homelab services. Alert after 2 failures.
 | NAS | TCP | `100.64.0.12:445` | Samba |
 | NAS Syncthing | HTTP | `http://100.64.0.12:8384` | File sync |
 | Start9 (RPi 4) | HTTP | `http://100.64.0.11` | Bitcoin node |
-| OPNsense | HTTPS | `https://100.64.0.14` | Router |
+| OPNsense | HTTPS | `https://100.79.230.235` | Router (Tailscale) |
 
 ### Mobile Kit (5m interval, info-level alerts)
 

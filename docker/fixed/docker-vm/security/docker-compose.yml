@@ -58,6 +58,7 @@ services:
     environment:
       TZ: ${TZ:-America/Asuncion}
       DOMAIN: https://vault.cronova.dev
+      # Security: Signups disabled by default. Enable temporarily to create accounts.
       SIGNUPS_ALLOWED: ${VAULTWARDEN_SIGNUPS:-false}
       ADMIN_TOKEN_FILE: /run/secrets/vaultwarden_admin_token
       WEBSOCKET_ENABLED: "true"

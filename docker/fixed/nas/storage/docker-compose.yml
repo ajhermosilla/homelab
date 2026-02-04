@@ -37,7 +37,11 @@ services:
       TZ: ${TZ:-America/Asuncion}
       USERID: ${PUID:-1000}
       GROUPID: ${PGID:-1000}
-    # NOTE: Password visible in docker inspect. Use strong password from .env
+    # ⚠️  SECURITY: Password visible in `docker inspect`. This is a limitation of
+    # the dperson/samba image. Mitigations:
+    #   1. Use a strong, unique password in .env
+    #   2. Restrict container access (only trusted users can run docker commands)
+    #   3. Consider switching to servercontainers/samba for secrets support
     command: >
       -u "${SAMBA_USER:-augusto};${SAMBA_PASSWORD:?SAMBA_PASSWORD required in .env}"
       -s "media;/media;yes;no;no;augusto"
