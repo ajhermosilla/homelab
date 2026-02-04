@@ -26,14 +26,14 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-| 11 | Proxmox vs OPNsense IP ambiguity (.10 vs .14) | `docker/vps/monitoring/monitors.md` | 31 | Pending |
-| 12 | Missing certificate renewal cron example | `docker/fixed/docker-vm/networking/caddy/Caddyfile` | 110 | Pending |
+| 11 | Proxmox vs OPNsense IP ambiguity (.10 vs .14) | `docker/vps/monitoring/monitors.md` | 31 | **Fixed** |
+| 12 | Missing certificate renewal cron example | `docker/fixed/docker-vm/networking/caddy/Caddyfile` | 110 | **Fixed** |
 | 13 | Docker image version not pinned (watchtower:latest) | `docker/fixed/docker-vm/maintenance/docker-compose.yml` | 11 | **Fixed** |
-| 14 | Caddy loose version (2.8 vs specific) | multiple Caddyfiles | - | Pending |
-| 15 | Vaultwarden signups default could be clearer | `docker/fixed/docker-vm/security/docker-compose.yml` | 61 | Pending |
-| 16 | NFS media export missing no_root_squash | `ansible/playbooks/nfs-server.yml` | 33 | Pending |
-| 17 | Samba credentials visible in docker inspect | `docker/fixed/nas/storage/docker-compose.yml` | 42 | Pending |
-| 18 | OpenClaw VM local IP comment missing | `ansible/inventory.yml` | 50 | Pending |
+| 14 | Caddy loose version (2.8 vs specific) | multiple Caddyfiles | - | **Fixed** |
+| 15 | Vaultwarden signups default could be clearer | `docker/fixed/docker-vm/security/docker-compose.yml` | 61 | **Fixed** |
+| 16 | NFS media export missing no_root_squash | `ansible/playbooks/nfs-server.yml` | 33 | **Fixed** |
+| 17 | Samba credentials visible in docker inspect | `docker/fixed/nas/storage/docker-compose.yml` | 42 | **Fixed** |
+| 18 | OpenClaw VM local IP comment missing | `ansible/inventory.yml` | 50 | N/A (exists) |
 
 ## Low Priority Issues
 
@@ -66,7 +66,14 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 ### Medium Priority
 
+11. **OPNsense IP**: Fixed monitors.md from 100.64.0.14 to 100.79.230.235 (actual Tailscale IP)
+12. **Certificate renewal**: Updated Caddyfile to note Headscale limitation
 13. **Version pinning**: Pinned watchtower:1.7.1, alpine:3.19 for backup sidecars, documented changedetection:latest rationale
+14. **Caddy version**: Pinned to 2.8.4 (fixed) and 2.8.4-alpine (VPS)
+15. **Vaultwarden signups**: Added security comment explaining default=false
+16. **NFS no_root_squash**: Added comment explaining why media export doesn't need it (read-only)
+17. **Samba credentials**: Enhanced warning with mitigations and alternative image suggestion
+18. **OpenClaw local IP**: Already had comment (false positive)
 
 ---
 

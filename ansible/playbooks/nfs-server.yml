@@ -30,6 +30,7 @@
     nfs_exports:
       - path: "{{ nfs_srv_root }}/media"
         clients: "{{ nfs_network }}"
+        # no_root_squash omitted: read-only mount, root access unnecessary
         options: "ro,sync,no_subtree_check"
         ensure_exists: false  # symlink to /mnt/red8/media
       - path: "{{ nfs_srv_root }}/downloads"

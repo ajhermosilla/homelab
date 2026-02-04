@@ -106,9 +106,10 @@ prowlarr.cronova.dev {
 #    volumes:
 #      - /var/lib/tailscale/certs:/var/lib/tailscale/certs:ro
 #
-# 3. Renew certs monthly (90-day validity):
-#    Add to crontab: 0 3 1 * * /usr/local/bin/renew-tailscale-certs.sh
-#    See docs/certificate-strategy.md for renewal script.
+# 3. Certificate renewal:
+#    NOTE: `tailscale cert` is NOT available with self-hosted Headscale.
+#    Use HTTP for internal services - Tailscale tunnel provides encryption.
+#    See docs/certificate-strategy.md for alternative approaches.
 #
 # 4. DNS Configuration:
 #    For *.cronova.dev subdomains to work:
