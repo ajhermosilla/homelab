@@ -121,7 +121,7 @@ docker compose up -d
 
 ```bash
 # SSH to Docker VM (join Tailscale first)
-ssh user@100.64.0.13
+ssh user@100.68.63.168
 
 # 1. Pi-hole (local DNS)
 cd /opt/homelab/repo/docker/fixed/docker-vm/networking/pihole
@@ -259,7 +259,7 @@ If everything goes down, restart in this order:
 │   Fixed Homelab  Mobile Kit  MacBook                            │
 │   (192.168.1.x)  (portable)  (anywhere)                         │
 │        │                                                         │
-│        ├── Docker VM (100.64.0.13)                              │
+│        ├── Docker VM (100.68.63.168)                            │
 │        ├── NAS (100.64.0.12)                                    │
 │        └── RPi 4/Start9 (100.64.0.11)                          │
 │                                                                  │

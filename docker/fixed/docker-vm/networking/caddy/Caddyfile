@@ -4,7 +4,7 @@
 # =============================================================================
 #
 # Internal reverse proxy for services on Docker VM.
-# Accessed via Tailscale mesh (100.64.0.13) or local network (192.168.1.10).
+# Accessed via Tailscale mesh (100.68.63.168) or local network (192.168.1.10).
 #
 # TLS Strategy: Tailscale HTTPS certificates (see docs/certificate-strategy.md)
 # - Certs stored in /var/lib/tailscale/certs/
@@ -114,7 +114,7 @@ prowlarr.cronova.dev {
 #    For *.cronova.dev subdomains to work:
 #    - Configure Headscale MagicDNS, OR
 #    - Add Pi-hole local DNS entries, OR
-#    - Add Cloudflare DNS pointing to Tailscale IP (100.64.0.13)
+#    - Add Cloudflare DNS pointing to Tailscale IP (100.68.63.168)
 #
 # 5. Alternative: Direct HTTP Access (no HTTPS)
 #    Most services work fine over HTTP on local network:
