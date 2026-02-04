@@ -50,7 +50,7 @@ Codebase review identified issues in Ansible playbooks, Docker Compose files, an
 
 11. **Hardcoded IPs**: Reviewed - IPs are used as sensible defaults with `${VAR:-default}` pattern allowing override via .env files. Acceptable design.
 12. **inventory.yml**: Removed unused `docker_compose_version: "2"` variable from `docker_hosts` group
-13. **Tailscale IPs**: Fixed Docker VM IP references from 100.64.0.10 to 100.64.0.13 in:
+13. **Tailscale IPs**: Fixed Docker VM IP references to 100.68.63.168 in:
     - `docker/fixed/docker-vm/networking/pihole/docker-compose.yml` (DNS records comments)
     - `docker/fixed/docker-vm/networking/caddy/Caddyfile` (header comment)
 

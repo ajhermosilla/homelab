@@ -20,11 +20,11 @@ Core homelab services. Alert after 2 failures.
 
 | Monitor | Type | Target | Notes |
 |---------|------|--------|-------|
-| Docker VM | Ping | `100.64.0.13` | Tailscale IP |
-| Pi-hole (Fixed) | TCP | `100.64.0.13:53` | Local DNS |
-| Home Assistant | HTTP | `http://100.64.0.13:8123` | Automation |
-| Jellyfin | HTTP | `http://100.64.0.13:8096` | Media |
-| Frigate | HTTP | `http://100.64.0.13:5000` | NVR |
+| Docker VM | Ping | `100.68.63.168` | Tailscale IP |
+| Pi-hole (Fixed) | TCP | `100.68.63.168:53` | Local DNS |
+| Home Assistant | HTTP | `http://100.68.63.168:8123` | Automation |
+| Jellyfin | HTTP | `http://100.68.63.168:8096` | Media |
+| Frigate | HTTP | `http://100.68.63.168:5000` | NVR |
 | NAS | TCP | `100.64.0.12:445` | Samba |
 | NAS Syncthing | HTTP | `http://100.64.0.12:8384` | File sync |
 | Start9 (RPi 4) | HTTP | `http://100.64.0.11` | Bitcoin node |

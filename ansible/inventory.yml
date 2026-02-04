@@ -40,7 +40,7 @@ all:
           hosts:
             docker:
               ansible_host: 100.68.63.168
-              # ansible_host: 192.168.1.126  # Local access (bootstrap)
+              # ansible_host: 192.168.1.10  # Local access (bootstrap)
           vars:
             docker_host: true
 

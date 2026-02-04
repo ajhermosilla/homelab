@@ -309,7 +309,7 @@ Host vultr
     User linuxuser
 
 Host docker
-    HostName 100.64.0.13
+    HostName 100.68.63.168
     User augusto
 
 Host openclaw
