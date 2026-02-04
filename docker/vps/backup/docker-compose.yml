@@ -97,14 +97,14 @@ networks:
 #
 # Tailscale-only access:
 #   Change ports to "127.0.0.1:8000:8000"
-#   Access via Tailscale IP: 100.64.0.20:8000
+#   Access via Tailscale IP: 100.77.172.46:8000
 #
 # =============================================================================
 # RESTIC CLIENT EXAMPLES
 # =============================================================================
 #
 # # Environment setup
-# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@100.64.0.20:8000/homelab"
+# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@100.77.172.46:8000/homelab"
 # export RESTIC_PASSWORD_FILE=/root/.restic-password
 #
 # # Backup
