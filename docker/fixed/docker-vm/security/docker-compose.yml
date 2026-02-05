@@ -249,7 +249,7 @@ networks:
 #   front_door:
 #     ffmpeg:
 #       inputs:
-#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.1.101:554/stream1
+#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.10.101:554/stream1
 #           roles:
 #             - detect
 #             - record
@@ -274,7 +274,7 @@ networks:
 #   back_yard:
 #     ffmpeg:
 #       inputs:
-#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.1.102:554/stream1
+#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.10.102:554/stream1
 #           roles:
 #             - detect
 #             - record
@@ -292,7 +292,7 @@ networks:
 #   indoor_cam:
 #     ffmpeg:
 #       inputs:
-#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.1.103:554/stream1
+#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.10.103:554/stream1
 #           roles:
 #             - detect
 #             - record
@@ -338,7 +338,7 @@ networks:
 # =============================================================================
 #
 # 1. Configure static IPs in OPNsense DHCP
-# 2. Access each camera at http://192.168.1.10x
+# 2. Access each camera at http://192.168.10.10x (IoT VLAN)
 # 3. Enable RTSP in camera settings
 # 4. Note stream URLs:
 #    - Main: rtsp://{USER}:{PASS}@ip:554/h264Preview_01_main
@@ -351,7 +351,7 @@ networks:
 # =============================================================================
 #
 # RTSP URL format:
-#   rtsp://username:password@192.168.1.103:554/stream1
+#   rtsp://username:password@192.168.10.103:554/stream1
 #
 # Enable RTSP in Tapo app:
 #   Camera Settings → Advanced Settings → Device Account
