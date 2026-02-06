@@ -22,7 +22,7 @@ services:
   # https://github.com/dani-garcia/vaultwarden
   # =========================================================================
   vaultwarden:
-    image: vaultwarden/server:1.32.0
+    image: vaultwarden/server:1.35.2
     env_file:
       - ../../../shared/common.env
     container_name: vaultwarden
