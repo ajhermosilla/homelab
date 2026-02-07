@@ -8,6 +8,7 @@ services:
   # https://www.samba.org/
   # =========================================================================
   samba:
+    # TODO: Migrate to jlaptechnologies/samba (maintained fork) after NAS deployment
     image: dperson/samba:amd64
     env_file:
       - ../../../shared/common.env
@@ -67,6 +68,7 @@ services:
   # https://syncthing.net/
   # =========================================================================
   syncthing:
+    # Syncthing v2.x available — test upgrade after initial deployment
     image: lscr.io/linuxserver/syncthing:1.27
     env_file:
       - ../../../shared/common.env

@@ -60,7 +60,8 @@ services:
       DOMAIN: https://vault.cronova.dev
       # Security: Signups disabled by default. Enable temporarily to create accounts.
       SIGNUPS_ALLOWED: ${VAULTWARDEN_SIGNUPS:-false}
-      ADMIN_TOKEN_FILE: /run/secrets/vaultwarden_admin_token
+      # ADMIN_TOKEN is set via .env (Argon2id hash with $$ escaping)
+      # Docker Compose v5 auto-injects .env vars, overriding _FILE mechanism
       WEBSOCKET_ENABLED: "true"
       LOG_LEVEL: info
     logging:

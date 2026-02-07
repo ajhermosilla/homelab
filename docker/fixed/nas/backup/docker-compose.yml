@@ -8,7 +8,7 @@ services:
   # https://github.com/restic/rest-server
   # =========================================================================
   restic-rest:
-    image: restic/rest-server:0.12
+    image: restic/rest-server:0.14.0
     env_file:
       - ../../../shared/common.env
     container_name: restic-rest
