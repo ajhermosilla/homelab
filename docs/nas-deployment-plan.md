@@ -31,7 +31,8 @@ Complete these tasks remotely before the deployment day:
 ssh linuxuser@100.77.172.46
 
 # Generate pre-auth key (expires in 1 hour, single use)
-docker exec headscale headscale preauthkeys create --user augusto --expiration 1h
+# Note: Headscale 0.28.0 dropped the --user flag
+docker exec headscale headscale preauthkeys create --expiration 1h
 
 # Save the key! You'll need it during NAS setup
 ```
