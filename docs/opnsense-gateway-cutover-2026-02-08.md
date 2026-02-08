@@ -125,11 +125,10 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
   - NAS (future): `192.168.0.12`
   - TP-Link AP: `192.168.0.2`
 
-### 1d. Re-IP Docker-vm (brief homelab downtime)
+### 1d. Re-IP Docker-vm — DEFERRED TO PHASE 2
 
-- [ ] Change static IP: `192.168.1.10` → `192.168.0.10`
-- [ ] Update gateway: `192.168.1.1` → `192.168.0.1`
-- [ ] Update DNS resolver to `192.168.0.1` or `127.0.0.1`
+> Cannot be done during prep: OPNsense LAN is still `192.168.1.x`, so gateway
+> `192.168.0.1` won't exist. Done in Phase 2 step 8 after OPNsense LAN re-IP.
 
 ### 1e. Update Homelab Configs
 
@@ -174,41 +173,52 @@ Files referencing `192.168.1.x` that need updating:
 
 ### Step-by-step
 
+> **Critical ordering:** Connect `nic1` to switch and apply Proxmox config BEFORE
+> swapping `nic0` to ISP. Otherwise Proxmox becomes unreachable (mgmt IP on `vmbr0`
+> which would face the modem, not the LAN).
+
 1. **Announce:** "Internet will be down for 15 minutes"
-2. **Cable changes (two operations):**
-   - **Cable A:** Unplug ISP ethernet from TP-Link WAN port → plug into Proxmox `nic0`
-   - **Cable B:** Connect Proxmox `nic1` to the switch (currently has no cable — use the cable that was going from switch to `nic0`, or a new one)
+2. **Connect `nic1` to switch:**
+   - Plug a cable from Proxmox `nic1` into the switch (currently has no cable)
+   - Verify `nic1` shows link UP: `ssh proxmox "ip link show nic1 | grep 'state UP'"`
 3. **Apply Proxmox network config:**
    ```bash
    ssh proxmox "sudo cp /etc/network/interfaces.cutover /etc/network/interfaces && sudo cp /etc/network/interfaces.d/vmbr1.cutover /etc/network/interfaces.d/vmbr1 && sudo ifreload -a"
    ```
-   This moves Proxmox management IP from `vmbr0` (now WAN) to `vmbr1` (now LAN).
-4. **Verify OPNsense gets public IP:**
-   - Access OPNsense web UI (from Mac on WiFi, `https://192.168.1.1` — still LAN IP until step 6)
+   This moves Proxmox management IP from `vmbr0` to `vmbr1` (now on switch).
+   Verify: `ssh proxmox "ip -br addr show vmbr1"` — should show `192.168.0.237/24`.
+   > **Note:** Proxmox gateway (`192.168.0.1`) won't work until step 7 (OPNsense LAN re-IP).
+   > Local SSH still works. Tailscale/internet will be down on Proxmox until then.
+4. **Swap ISP cable to `nic0`:**
+   - Unplug ISP ethernet from TP-Link WAN port → plug into Proxmox `nic0`
+   - Unplug old switch cable from `nic0` (no longer needed — `nic1` is on switch now)
+5. **Verify OPNsense gets public IP:**
+   - Access OPNsense web UI from Mac on WiFi: `https://192.168.1.1` (still old LAN IP)
    - Check dashboard → WAN interface → should show public IP via DHCP from ARRIS
-5. **Switch TP-Link to AP mode:**
+6. **Switch TP-Link to AP mode:**
    - Access TP-Link admin via WiFi
-   - Switch to AP mode
-   - Set static IP to `192.168.0.2`
-   - Connect TP-Link LAN port to switch (NOT WAN port)
-6. **Configure OPNsense LAN (web UI at `https://192.168.1.1`):**
+   - Switch to AP mode, set static IP to `192.168.0.2`
+   - Move TP-Link cable: LAN port to switch (NOT WAN port)
+7. **Configure OPNsense LAN (web UI at `https://192.168.1.1`):**
    - Interfaces > LAN: change `192.168.1.1/24` → `192.168.0.1/24`, Save, Apply
-   - *(Mac loses access to OPNsense — reconnect at `https://192.168.0.1` after WiFi reconnects)*
+   - *(Mac loses OPNsense access — reconnect WiFi, then browse to `https://192.168.0.1`)*
    - Services > DHCPv4 > LAN: enable, range `192.168.0.100`–`192.168.0.250`
    - Set DNS server: `192.168.0.10`, gateway: `192.168.0.1`
    - Add static mappings: Docker-vm `192.168.0.10` (MAC `BC:24:11:A8:E9:C5`)
-7. **Re-IP Docker-vm:**
+   - *(Proxmox gateway now works — Tailscale reconnects automatically)*
+8. **Re-IP Docker-vm:**
    ```bash
-   ssh docker-vm  # via Tailscale (may still work briefly) or Proxmox qm terminal
-   # Change static IP, gateway, DNS
+   # SSH via Proxmox console (Tailscale on docker-vm is down — its gateway 192.168.1.1 is gone)
+   ssh proxmox "sudo qm guest exec 101 -- bash -c 'ip addr del 192.168.1.10/24 dev ens18; ip addr add 192.168.0.10/24 dev ens18; ip route add default via 192.168.0.1'"
+   # Then make persistent: edit /etc/network/interfaces on docker-vm
    ```
-   See Phase 1d for detailed commands.
-8. **Test from phone:**
+   Or if qm guest exec doesn't work, use Proxmox web UI > VM 101 > Console.
+9. **Test from phone:**
    - Disconnect/reconnect WiFi
    - Should get `192.168.0.x` IP
    - Open browser, check internet
-9. **Test Netflix on TV**
-10. **Verify homelab:**
+10. **Test Netflix on TV**
+11. **Verify homelab:**
     - SSH to docker-vm (via Tailscale or `192.168.0.10`)
     - Check Pi-hole resolving
     - Check Tailscale status
@@ -233,15 +243,22 @@ Files referencing `192.168.1.x` that need updating:
 
 If anything breaks during cutover:
 
+**If failed before step 7 (OPNsense LAN still 192.168.1.x):**
 1. Revert Proxmox network config:
    ```bash
    ssh proxmox "sudo cp /etc/network/interfaces.original /etc/network/interfaces && sudo cp /etc/network/interfaces.d/vmbr1.original /etc/network/interfaces.d/vmbr1 && sudo ifreload -a"
    ```
 2. Unplug ISP cable from Proxmox `nic0` → plug back into TP-Link WAN port
 3. Reconnect Proxmox `nic0` to switch (restore original cable)
-4. Switch TP-Link back to router mode (reboot restores if needed)
-5. ARRIS stays in bridge mode (no change needed)
-6. Everything back to normal — family resumes Netflix
+4. Disconnect `nic1` from switch (return to original state)
+5. Switch TP-Link back to router mode (reboot restores if needed)
+6. ARRIS stays in bridge mode (no change needed)
+7. Everything back to normal — family resumes Netflix
+
+**If failed after step 7 (OPNsense LAN already changed to 192.168.0.x):**
+1. Revert OPNsense LAN: Interfaces > LAN → change back to `192.168.1.1/24`, Apply
+2. Revert Docker-vm IP if changed: `192.168.0.10` → `192.168.1.10`, gateway `192.168.1.1`
+3. Then follow the steps above (revert Proxmox config, re-cable, TP-Link back to router mode)
 
 ---
 
