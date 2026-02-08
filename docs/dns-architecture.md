@@ -67,11 +67,11 @@ Mobile kit uses two DNS ad-blockers for redundancy:
 ```
 [Home Devices]
        |
-       | DNS: 192.168.1.10 (Docker Host)
+       | DNS: 192.168.0.10 (Docker Host)
        v
 [Pi-hole in Docker]
        |
-       | Upstream: 192.168.1.1 (OPNsense)
+       | Upstream: 192.168.0.1 (OPNsense)
        v
 [Unbound on OPNsense]
        |
@@ -82,9 +82,9 @@ Mobile kit uses two DNS ad-blockers for redundancy:
 
 | Component | Role | IP |
 |-----------|------|-----|
-| OPNsense | DHCP, points to Pi-hole | 192.168.1.1 |
-| Pi-hole (Docker) | Ad-blocking, DNS server | 192.168.1.10 |
-| Unbound (OPNsense) | Recursive resolver | 192.168.1.1:5353 |
+| OPNsense | DHCP, points to Pi-hole | 192.168.0.1 |
+| Pi-hole (Docker) | Ad-blocking, DNS server | 192.168.0.10 |
+| Unbound (OPNsense) | Recursive resolver | 192.168.0.1:5353 |
 
 **Why Unbound behind Pi-hole:**
 - Pi-hole handles ad-blocking and logging (what you care about)
@@ -103,7 +103,7 @@ Services → Unbound DNS → General
 **Pi-hole Upstream Config:**
 ```
 Settings → DNS → Upstream DNS Servers
-- Custom: 192.168.1.1#5353
+- Custom: 192.168.0.1#5353
 - Uncheck all public resolvers
 ```
 
@@ -157,9 +157,9 @@ Pi-hole can resolve local hostnames:
 
 ```
 # Pi-hole → Local DNS → DNS Records
-192.168.1.10    minipc.home
-192.168.1.11    rpi4.home
-192.168.1.12    nas.home
+192.168.0.10    minipc.home
+192.168.0.11    rpi4.home
+192.168.0.12    nas.home
 192.168.8.5     rpi5.local
 ```
 
@@ -181,7 +181,7 @@ rpi5.tail.net    → 100.64.0.1
 **Recommendation:** Configure Pi-hole with both Unbound AND one public resolver as backup:
 ```
 Upstream DNS:
-- 192.168.1.1#5353 (Unbound, primary)
+- 192.168.0.1#5353 (Unbound, primary)
 - 9.9.9.9 (Quad9, fallback)
 ```
 
@@ -204,7 +204,7 @@ Upstream DNS:
 ### Fixed Homelab
 - [ ] Configure Unbound on OPNsense (port 5353)
 - [ ] Install Pi-hole in Docker Host
-- [ ] Set Pi-hole upstream: 192.168.1.1#5353
+- [ ] Set Pi-hole upstream: 192.168.0.1#5353
 - [ ] Configure OPNsense DHCP to give Pi-hole IP as DNS
 - [ ] Add local DNS records
 
@@ -228,10 +228,10 @@ Upstream DNS:
 
 ```bash
 # Test Pi-hole
-dig @192.168.1.10 example.com
+dig @192.168.0.10 example.com
 
 # Test Unbound
-dig @192.168.1.1 -p 5353 example.com
+dig @192.168.0.1 -p 5353 example.com
 
 # Check Pi-hole logs
 pihole -t

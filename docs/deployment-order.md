@@ -257,7 +257,7 @@ If everything goes down, restart in this order:
 │        │           │           │                                │
 │        ▼           ▼           ▼                                │
 │   Fixed Homelab  Mobile Kit  MacBook                            │
-│   (192.168.1.x)  (portable)  (anywhere)                         │
+│   (192.168.0.x)  (portable)  (anywhere)                         │
 │        │                                                         │
 │        ├── Docker VM (100.68.63.168)                            │
 │        ├── NAS (100.64.0.12)                                    │

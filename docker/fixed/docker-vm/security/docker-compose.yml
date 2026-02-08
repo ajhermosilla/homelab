@@ -165,7 +165,7 @@ services:
       - restic_password
     environment:
       TZ: ${TZ:-America/Asuncion}
-      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.1.12:8000/vaultwarden}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/vaultwarden}
       RESTIC_PASSWORD_FILE: /run/secrets/restic_password
       BACKUP_PATH: /data
       BACKUP_TAG: vaultwarden
@@ -221,10 +221,10 @@ networks:
 # Mount NAS Purple 2TB for Frigate recordings:
 #
 # sudo mkdir -p /mnt/nas/frigate
-# sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+# sudo mount -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
 #
 # Add to /etc/fstab:
-# 192.168.1.12:/srv/frigate /mnt/nas/frigate nfs defaults 0 0
+# 192.168.0.12:/srv/frigate /mnt/nas/frigate nfs defaults 0 0
 #
 # =============================================================================
 # FRIGATE CONFIGURATION (frigate.yml)
@@ -322,8 +322,8 @@ networks:
 #    docker compose up -d
 #
 # 5. Access services:
-#    - Vaultwarden: https://vault.cronova.dev (or http://192.168.1.10:8843)
-#    - Frigate: http://192.168.1.10:5000
+#    - Vaultwarden: https://vault.cronova.dev (or http://192.168.0.10:8843)
+#    - Frigate: http://192.168.0.10:5000
 #
 # =============================================================================
 # VAULTWARDEN ADMIN PANEL

@@ -40,7 +40,7 @@ docker exec headscale headscale preauthkeys create --expiration 1h
 ### 2. Verify OPNsense DHCP Reservation
 - Login to OPNsense via Tailscale: https://100.79.230.235
 - Services → DHCPv4 → LAN
-- Add reservation: MAC → 192.168.1.12 (get MAC from NAS motherboard sticker)
+- Add reservation: MAC → 192.168.0.12 (get MAC from NAS motherboard sticker)
 
 ### 3. Prepare USB Boot Drive
 - Debian 12 netinst ISO already downloaded
@@ -70,8 +70,8 @@ Save these securely (Vaultwarden) before going home.
 
 ### Network Ready
 - [ ] MokerLink port 4 configured as VLAN 1 access
-- [ ] OPNsense DHCP reservation: 192.168.1.12 → NAS MAC
-- [ ] Pi-hole DNS entry: nas.home → 192.168.1.12
+- [ ] OPNsense DHCP reservation: 192.168.0.12 → NAS MAC
+- [ ] Pi-hole DNS entry: nas.home → 192.168.0.12
 
 ### Software Ready
 - [ ] Debian 12 ISO on USB (prepared already)
@@ -118,10 +118,10 @@ usermod -aG sudo augusto
 nano /etc/network/interfaces
 # auto enp0s25
 # iface enp0s25 inet static
-#   address 192.168.1.12
+#   address 192.168.0.12
 #   netmask 255.255.255.0
-#   gateway 192.168.1.1
-#   dns-nameservers 192.168.1.1
+#   gateway 192.168.0.1
+#   dns-nameservers 192.168.0.1
 
 # Reboot
 reboot
@@ -293,10 +293,10 @@ sudo apt install -y nfs-kernel-server
 sudo nano /etc/exports
 
 # Add:
-/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
-/srv/media      192.168.1.0/24(ro,sync,no_subtree_check)
-/srv/downloads  192.168.1.0/24(rw,sync,no_subtree_check)
-/srv/backup     192.168.1.0/24(rw,sync,no_subtree_check)
+/srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash)
+/srv/media      192.168.0.0/24(ro,sync,no_subtree_check)
+/srv/downloads  192.168.0.0/24(rw,sync,no_subtree_check)
+/srv/backup     192.168.0.0/24(rw,sync,no_subtree_check)
 
 # Apply and start
 sudo exportfs -ra
@@ -305,8 +305,8 @@ sudo systemctl enable nfs-kernel-server
 sudo systemctl start nfs-kernel-server
 
 # Open firewall
-sudo ufw allow from 192.168.1.0/24 to any port 111
-sudo ufw allow from 192.168.1.0/24 to any port 2049
+sudo ufw allow from 192.168.0.0/24 to any port 111
+sudo ufw allow from 192.168.0.0/24 to any port 2049
 ```
 
 ---
@@ -397,14 +397,14 @@ ping 100.x.x.12  # NAS Tailscale IP
 ssh augusto@100.x.x.12
 
 # From local network
-ping 192.168.1.12
+ping 192.168.0.12
 ```
 
 ### Samba Shares
 
 ```bash
 # From MacBook Finder:
-# Go → Connect to Server → smb://192.168.1.12/media
+# Go → Connect to Server → smb://192.168.0.12/media
 
 # Or via Tailscale:
 # smb://100.x.x.12/media
@@ -415,7 +415,7 @@ ping 192.168.1.12
 ```bash
 # On Docker VM:
 sudo apt install nfs-common
-sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+sudo mount -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
 ```
 
 ### Syncthing
@@ -433,7 +433,7 @@ ssh -L 8384:localhost:8384 augusto@100.x.x.12
 
 ```bash
 # Test API
-curl http://192.168.1.12:8000/
+curl http://192.168.0.12:8000/
 
 # Initialize repo from Docker VM later
 ```
@@ -446,18 +446,18 @@ curl http://192.168.1.12:8000/
 
 | Hostname | IP |
 |----------|-----|
-| nas.home | 192.168.1.12 |
-| syncthing.home | 192.168.1.12 |
+| nas.home | 192.168.0.12 |
+| syncthing.home | 192.168.0.12 |
 
 ### Add Uptime Kuma Monitors
 
 | Service | Check |
 |---------|-------|
-| NAS SSH | TCP 192.168.1.12:22 |
-| Samba | TCP 192.168.1.12:445 |
-| Syncthing | HTTP 192.168.1.12:8384 |
-| Restic REST | HTTP 192.168.1.12:8000 |
-| NFS | TCP 192.168.1.12:2049 |
+| NAS SSH | TCP 192.168.0.12:22 |
+| Samba | TCP 192.168.0.12:445 |
+| Syncthing | HTTP 192.168.0.12:8384 |
+| Restic REST | HTTP 192.168.0.12:8000 |
+| NFS | TCP 192.168.0.12:2049 |
 
 ### BIOS Settings
 
@@ -494,7 +494,7 @@ sudo exportfs -v
 sudo ufw status
 
 # Test from Docker VM
-showmount -e 192.168.1.12
+showmount -e 192.168.0.12
 ```
 
 ### Samba Connection Failed
@@ -555,7 +555,7 @@ Once NAS is running with NFS:
 4. Set static IPs via camera web UI:
    - Cam 1: 192.168.10.101
    - Cam 2: 192.168.10.102
-5. Add firewall rule in OPNsense: IoT → 192.168.1.x:5000 (Frigate)
+5. Add firewall rule in OPNsense: IoT → 192.168.0.x:5000 (Frigate)
 6. Configure cameras in Frigate config
 
 ---

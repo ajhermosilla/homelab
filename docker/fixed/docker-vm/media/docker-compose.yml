@@ -279,12 +279,12 @@ networks:
 # Mount NAS shares on Docker VM host:
 #
 # sudo mkdir -p /mnt/nas/{media,downloads}
-# sudo mount -t nfs 192.168.1.12:/srv/media /mnt/nas/media
-# sudo mount -t nfs 192.168.1.12:/srv/downloads /mnt/nas/downloads
+# sudo mount -t nfs 192.168.0.12:/srv/media /mnt/nas/media
+# sudo mount -t nfs 192.168.0.12:/srv/downloads /mnt/nas/downloads
 #
 # Add to /etc/fstab for persistence:
-# 192.168.1.12:/srv/media    /mnt/nas/media    nfs defaults 0 0
-# 192.168.1.12:/srv/downloads /mnt/nas/downloads nfs defaults 0 0
+# 192.168.0.12:/srv/media    /mnt/nas/media    nfs defaults 0 0
+# 192.168.0.12:/srv/downloads /mnt/nas/downloads nfs defaults 0 0
 #
 # =============================================================================
 # SETUP INSTRUCTIONS
@@ -298,11 +298,11 @@ networks:
 #    docker compose up -d
 #
 # 4. Configure services:
-#    - Jellyfin: http://192.168.1.10:8096 (create admin, add libraries)
-#    - Prowlarr: http://192.168.1.10:9696 (add indexers)
-#    - Sonarr: http://192.168.1.10:8989 (connect Prowlarr, qBit)
-#    - Radarr: http://192.168.1.10:7878 (connect Prowlarr, qBit)
-#    - qBittorrent: http://192.168.1.10:8081 (change default password immediately)
+#    - Jellyfin: http://192.168.0.10:8096 (create admin, add libraries)
+#    - Prowlarr: http://192.168.0.10:9696 (add indexers)
+#    - Sonarr: http://192.168.0.10:8989 (connect Prowlarr, qBit)
+#    - Radarr: http://192.168.0.10:7878 (connect Prowlarr, qBit)
+#    - qBittorrent: http://192.168.0.10:8081 (change default password immediately)
 #
 # =============================================================================
 # INTEGRATION FLOW

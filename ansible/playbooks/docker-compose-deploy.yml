@@ -14,7 +14,7 @@
     homelab_base: /opt/homelab
     homelab_repo: "https://github.com/ajhermosilla/homelab.git"
     compose_action: "up"  # up, down, restart, pull
-    nas_ip: "192.168.1.12"  # NAS IP for NFS mounts
+    nas_ip: "192.168.0.12"  # NAS IP for NFS mounts
     # Stack base paths per environment
     # Structure: docker/<environment>/<host_subdir>/<stack>
     stack_paths:

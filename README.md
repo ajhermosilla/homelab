@@ -133,7 +133,7 @@ See [docker/README.md](docker/README.md) for Docker network strategy and deploym
 - **Domain**: cronova.dev (Cloudflare)
 - **Internal**: cronova.local
 - **Tailscale**: 100.64.0.0/24
-- **Local**: 192.168.1.0/24
+- **Local**: 192.168.0.0/24
 
 VLANs:
 - VLAN 1: Management (servers)

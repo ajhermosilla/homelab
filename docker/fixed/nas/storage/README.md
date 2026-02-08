@@ -47,7 +47,7 @@ docker compose up -d
 
 ```
 Finder → Go → Connect to Server
-smb://192.168.1.12/media
+smb://192.168.0.12/media
 
 # Or via Tailscale
 smb://nas.tail/media
@@ -55,7 +55,7 @@ smb://nas.tail/media
 
 ## Syncthing
 
-Web UI: http://192.168.1.12:8384
+Web UI: http://192.168.0.12:8384
 
 ### Suggested Folders
 
@@ -70,9 +70,9 @@ Web UI: http://192.168.1.12:8384
 For Docker VM access, add to `/etc/exports`:
 
 ```
-/srv/frigate 192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
-/srv/media 192.168.1.10(ro,sync,no_subtree_check)
-/srv/downloads 192.168.1.10(rw,sync,no_subtree_check)
+/srv/frigate 192.168.0.10(rw,sync,no_subtree_check,no_root_squash)
+/srv/media 192.168.0.10(ro,sync,no_subtree_check)
+/srv/downloads 192.168.0.10(rw,sync,no_subtree_check)
 ```
 
 Apply: `sudo exportfs -ra`

@@ -40,7 +40,7 @@ docker compose restart mosquitto
 
 ## Home Assistant Setup
 
-1. Access http://192.168.1.10:8123
+1. Access http://192.168.0.10:8123
 2. Create admin account
 3. Add MQTT integration:
    - Settings → Devices & Services → Add → MQTT
@@ -52,7 +52,7 @@ docker compose restart mosquitto
 
 Add Frigate integration in Home Assistant:
 - Settings → Devices & Services → Add → Frigate
-- URL: http://192.168.1.10:5000
+- URL: http://192.168.0.10:5000
 
 ## MQTT Topics (Frigate)
 

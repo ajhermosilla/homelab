@@ -161,7 +161,7 @@ See `docs/proxmox-setup.md` for detailed steps.
 
 1. Boot Mini PC from Proxmox USB
 2. Complete installation wizard
-3. Access web UI at https://192.168.1.100:8006
+3. Access web UI at https://192.168.0.100:8006
 4. Enable IOMMU for NIC passthrough
 5. Configure network bridge (vmbr0)
 
@@ -173,7 +173,7 @@ See `docs/opnsense-setup.md` for detailed steps.
 2. Create VM with WAN NIC passthrough
 3. Install OPNsense
 4. Configure WAN (DHCP from ISP)
-5. Configure LAN (192.168.1.1/24)
+5. Configure LAN (192.168.0.1/24)
 6. Enable DHCP server
 
 ### 2.4 Configure VLANs
@@ -229,7 +229,7 @@ cd /opt/homelab/docker/fixed/docker-vm/networking/pihole
 cp .env.example .env
 docker compose up -d
 
-# Update DHCP to use Pi-hole as DNS (192.168.1.10)
+# Update DHCP to use Pi-hole as DNS (192.168.0.10)
 
 # Caddy
 cd /opt/homelab/docker/fixed/docker-vm/networking/caddy
@@ -322,7 +322,7 @@ sudo apt install nfs-kernel-server
 
 # Export Frigate directory
 sudo vim /etc/exports
-# /mnt/purple/frigate 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)
+# /mnt/purple/frigate 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)
 
 sudo exportfs -ra
 ```
@@ -352,10 +352,10 @@ docker compose up -d
 # On Docker VM
 sudo apt install nfs-common
 sudo mkdir -p /mnt/frigate
-sudo mount -t nfs 192.168.1.12:/mnt/purple/frigate /mnt/frigate
+sudo mount -t nfs 192.168.0.12:/mnt/purple/frigate /mnt/frigate
 
 # Add to fstab
-echo "192.168.1.12:/mnt/purple/frigate /mnt/frigate nfs defaults 0 0" | sudo tee -a /etc/fstab
+echo "192.168.0.12:/mnt/purple/frigate /mnt/frigate nfs defaults 0 0" | sudo tee -a /etc/fstab
 ```
 
 ---
@@ -419,7 +419,7 @@ docker compose restart frigate
 
 ### 6.4 Verify Recordings
 
-1. Access Frigate at http://192.168.1.10:5000
+1. Access Frigate at http://192.168.0.10:5000
 2. Verify cameras show video
 3. Check recordings in /mnt/frigate
 
@@ -434,7 +434,7 @@ docker compose restart frigate
 apt install restic
 
 # Initialize repository
-export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.0.12:8000/homelab"
 # Set your restic encryption password
 export RESTIC_PASSWORD_FILE=/root/.restic-password
 restic init
@@ -539,13 +539,13 @@ systemctl status docker
 
 ```bash
 # Check NFS server
-showmount -e 192.168.1.12
+showmount -e 192.168.0.12
 
 # Check firewall
 sudo ufw status
 
 # Test mount manually
-sudo mount -v -t nfs 192.168.1.12:/mnt/purple/frigate /mnt/frigate
+sudo mount -v -t nfs 192.168.0.12:/mnt/purple/frigate /mnt/frigate
 ```
 
 ---

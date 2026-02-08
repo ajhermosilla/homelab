@@ -96,7 +96,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
                               │ │   VM    │ │
                               │ └─────────┘ │
                               └──────┬──────┘
-                                     │ LAN (192.168.1.1)
+                                     │ LAN (192.168.0.1)
                                      │
                     ┌────────────────┴────────────────┐
                     │   MokerLink 8-Port 2.5G Switch  │
@@ -126,11 +126,11 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 
 | Device | Model | Specs | IP | Role |
 |--------|-------|-------|-----|------|
-| Mini PC | N150 | 12GB RAM, 512GB SSD | 192.168.1.1 (WAN) | Proxmox host |
-| Docker VM | Debian | 7GB RAM, 100GB | 192.168.1.10 | Containers |
-| OpenClaw VM | Debian | 2GB RAM, 20GB | 192.168.1.20 | AI assistant |
-| NAS | i3-3220T | 8GB RAM, 10TB total | 192.168.1.12 | Storage |
-| RPi 4 | 4GB | 1TB ext SSD | 192.168.1.11 | Start9 Bitcoin |
+| Mini PC | N150 | 12GB RAM, 512GB SSD | 192.168.0.1 (WAN) | Proxmox host |
+| Docker VM | Debian | 7GB RAM, 100GB | 192.168.0.10 | Containers |
+| OpenClaw VM | Debian | 2GB RAM, 20GB | 192.168.0.20 | AI assistant |
+| NAS | i3-3220T | 8GB RAM, 10TB total | 192.168.0.12 | Storage |
+| RPi 4 | 4GB | 1TB ext SSD | 192.168.0.11 | Start9 Bitcoin |
 | Switch | MokerLink | 8-port 2.5G | - | Backbone |
 | PoE Switch | TP-Link | 5-port 1G, 4xPoE | - | Camera power |
 | WiFi AP | TP-Link | AX3000 WiFi 6 | - | Wireless |
@@ -216,7 +216,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │                                                                              │
 │  FIXED HOMELAB                                                               │
 │  ─────────────                                                               │
-│  [Device] ──► Pi-hole (Docker 192.168.1.10) ──► Unbound (OPNsense)          │
+│  [Device] ──► Pi-hole (Docker 192.168.0.10) ──► Unbound (OPNsense)          │
 │                                                      │                       │
 │                                                      └──► Root DNS Servers   │
 │                                                                              │

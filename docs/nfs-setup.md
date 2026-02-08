@@ -7,7 +7,7 @@ NFS configuration for Frigate recordings (Docker VM → NAS).
 ```
 ┌─────────────────┐         NFS          ┌─────────────────┐
 │   Docker VM     │ ◄──────────────────► │      NAS        │
-│  (192.168.1.10) │                      │  (192.168.1.12) │
+│  (192.168.0.10) │                      │  (192.168.0.12) │
 │                 │                      │                 │
 │  /mnt/nas/      │                      │  /srv/frigate   │
 │  └── frigate/   │                      │  (Purple 2TB)   │
@@ -52,9 +52,9 @@ sudo nano /etc/exports
 Add the following lines:
 
 ```
-/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
-/srv/media      192.168.1.0/24(ro,sync,no_subtree_check)
-/srv/downloads  192.168.1.0/24(rw,sync,no_subtree_check)
+/srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash)
+/srv/media      192.168.0.0/24(ro,sync,no_subtree_check)
+/srv/downloads  192.168.0.0/24(rw,sync,no_subtree_check)
 ```
 
 **Options explained:**
@@ -73,7 +73,7 @@ sudo exportfs -ra
 sudo exportfs -v
 
 # Expected output:
-# /srv/frigate  192.168.1.10(rw,wdelay,no_root_squash,no_subtree_check,sec=sys,rw,secure,no_root_squash,no_all_squash)
+# /srv/frigate  192.168.0.10(rw,wdelay,no_root_squash,no_subtree_check,sec=sys,rw,secure,no_root_squash,no_all_squash)
 ```
 
 ### 5. Start NFS Service
@@ -88,8 +88,8 @@ sudo systemctl status nfs-kernel-server
 
 ```bash
 # Allow NFS from Docker VM
-sudo ufw allow from 192.168.1.10 to any port nfs
-sudo ufw allow from 192.168.1.10 to any port 111  # portmapper
+sudo ufw allow from 192.168.0.10 to any port nfs
+sudo ufw allow from 192.168.0.10 to any port 111  # portmapper
 ```
 
 ---
@@ -113,7 +113,7 @@ sudo mkdir -p /mnt/nas/frigate
 
 ```bash
 # Manual mount to test
-sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+sudo mount -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
 
 # Verify mount
 df -h /mnt/nas/frigate
@@ -133,7 +133,7 @@ sudo nano /etc/fstab
 Add the following line:
 
 ```
-192.168.1.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
+192.168.0.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
 ```
 
 **Options explained:**
@@ -203,10 +203,10 @@ Recordings will be stored at `/media/frigate` inside the container, which maps t
 systemctl status nfs-common
 
 # Check network connectivity
-ping 192.168.1.12
+ping 192.168.0.12
 
 # Try manual mount with verbose output
-sudo mount -v -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+sudo mount -v -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
 ```
 
 ### Permission Denied
@@ -292,7 +292,7 @@ This allows Frigate to access NAS recordings even when not on local network.
 
 ### Network Isolation
 
-NFS is **only accessible on the local LAN** (192.168.1.0/24):
+NFS is **only accessible on the local LAN** (192.168.0.0/24):
 - Firewall restricts access to specific IPs
 - NFS ports not exposed to internet
 - OPNsense blocks NFS traffic from IoT/Guest VLANs
@@ -300,12 +300,12 @@ NFS is **only accessible on the local LAN** (192.168.1.0/24):
 ### Export Options
 
 ```
-/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash)
+/srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash)
 ```
 
 | Option | Security Impact |
 |--------|-----------------|
-| `192.168.1.10` | Only Docker VM can access (not subnet wildcard) |
+| `192.168.0.10` | Only Docker VM can access (not subnet wildcard) |
 | `sync` | Data integrity - writes confirmed before reply |
 | `no_root_squash` | Needed for Docker, but limits to specific IP |
 
@@ -315,10 +315,10 @@ For additional security, consider:
 
 ```bash
 # Use sec=krb5p for Kerberos encryption (complex setup)
-/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash,sec=krb5p)
+/srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash,sec=krb5p)
 
 # Or use NFSv4 with stronger authentication
-/srv/frigate    192.168.1.10(rw,sync,no_subtree_check,no_root_squash,fsid=0)
+/srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash,fsid=0)
 ```
 
 ### Monitoring

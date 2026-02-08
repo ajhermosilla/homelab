@@ -49,7 +49,7 @@ Monthly verification that backups work and can be restored.
 
 ```bash
 # Set environment
-export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.0.12:8000/homelab"
 export RESTIC_PASSWORD_FILE=/root/.restic-password
 
 # Check repository integrity
@@ -314,7 +314,7 @@ Add monitors for backup infrastructure:
 
 | Check | Type | Target |
 |-------|------|--------|
-| Restic REST (NAS) | TCP | 192.168.1.12:8000 |
+| Restic REST (NAS) | TCP | 192.168.0.12:8000 |
 | Restic REST (VPS) | TCP | localhost:8000 |
 
 ---

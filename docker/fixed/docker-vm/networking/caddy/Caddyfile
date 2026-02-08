@@ -4,7 +4,7 @@
 # =============================================================================
 #
 # Internal reverse proxy for services on Docker VM.
-# Accessed via Tailscale mesh (100.68.63.168) or local network (192.168.1.10).
+# Accessed via Tailscale mesh (100.68.63.168) or local network (192.168.0.10).
 #
 # TLS Strategy: Tailscale HTTPS certificates (see docs/certificate-strategy.md)
 # - Certs stored in /var/lib/tailscale/certs/
@@ -26,27 +26,27 @@
 # =============================================================================
 
 # Vaultwarden - Password Manager
-# Access: https://192.168.1.10:443 or via VPS proxy (vault.cronova.dev)
+# Access: https://192.168.0.10:443 or via VPS proxy (vault.cronova.dev)
 :8843 {
     reverse_proxy host.docker.internal:8843
 }
 
 # Home Assistant - Automation
-# Access: https://home.cronova.dev (Tailscale) or http://192.168.1.10:8123
+# Access: https://home.cronova.dev (Tailscale) or http://192.168.0.10:8123
 home.cronova.dev {
     tls /var/lib/tailscale/certs/home.cronova.dev.crt /var/lib/tailscale/certs/home.cronova.dev.key
     reverse_proxy host.docker.internal:8123
 }
 
 # Jellyfin - Media Server
-# Access: https://media.cronova.dev (Tailscale) or http://192.168.1.10:8096
+# Access: https://media.cronova.dev (Tailscale) or http://192.168.0.10:8096
 media.cronova.dev {
     tls /var/lib/tailscale/certs/media.cronova.dev.crt /var/lib/tailscale/certs/media.cronova.dev.key
     reverse_proxy host.docker.internal:8096
 }
 
 # Frigate - NVR
-# Access: https://frigate.cronova.dev (Tailscale) or http://192.168.1.10:5000
+# Access: https://frigate.cronova.dev (Tailscale) or http://192.168.0.10:5000
 frigate.cronova.dev {
     tls /var/lib/tailscale/certs/frigate.cronova.dev.crt /var/lib/tailscale/certs/frigate.cronova.dev.key
     reverse_proxy host.docker.internal:5000
@@ -60,7 +60,7 @@ frigate.cronova.dev {
 }
 
 # Pi-hole Admin - DNS Ad Blocking
-# Access: http://192.168.1.10:80/admin (no HTTPS proxy needed)
+# Access: http://192.168.0.10:80/admin (no HTTPS proxy needed)
 # Pi-hole runs directly on port 80, not through Caddy
 
 # =============================================================================
@@ -119,9 +119,9 @@ prowlarr.cronova.dev {
 #
 # 5. Alternative: Direct HTTP Access (no HTTPS)
 #    Most services work fine over HTTP on local network:
-#    - Home Assistant: http://192.168.1.10:8123
-#    - Jellyfin: http://192.168.1.10:8096
-#    - Frigate: http://192.168.1.10:5000
+#    - Home Assistant: http://192.168.0.10:8123
+#    - Jellyfin: http://192.168.0.10:8096
+#    - Frigate: http://192.168.0.10:5000
 #
 # 6. Docker Network:
 #    Caddy uses host.docker.internal to reach services on Docker VM.

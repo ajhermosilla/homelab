@@ -40,7 +40,7 @@ all:
           hosts:
             docker:
               ansible_host: 100.68.63.168
-              # ansible_host: 192.168.1.10  # Local access (bootstrap)
+              # ansible_host: 192.168.0.10  # Local access (bootstrap)
           vars:
             docker_host: true
 
@@ -48,7 +48,7 @@ all:
           hosts:
             openclaw:
               ansible_host: 100.64.0.14
-              # ansible_host: 192.168.1.20  # Local access (bootstrap)
+              # ansible_host: 192.168.0.20  # Local access (bootstrap)
           vars:
             openclaw_host: true
 
@@ -56,7 +56,7 @@ all:
           hosts:
             nas:
               ansible_host: 100.64.0.12
-              # ansible_host: 192.168.1.12  # Local access
+              # ansible_host: 192.168.0.12  # Local access
           vars:
             storage_host: true
 
@@ -64,7 +64,7 @@ all:
           hosts:
             rpi4:
               ansible_host: 100.64.0.11
-              # ansible_host: 192.168.1.11  # Local access
+              # ansible_host: 192.168.0.11  # Local access
           vars:
             bitcoin_host: true
             # Start9 uses a different user
@@ -73,7 +73,7 @@ all:
       vars:
         environment_type: fixed
         timezone: America/Asuncion
-        local_network: 192.168.1.0/24
+        local_network: 192.168.0.0/24
 
     # ==========================================================================
     # Mobile Kit

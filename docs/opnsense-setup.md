@@ -108,7 +108,7 @@ After reboot, at console:
 *** Welcome to OPNsense ***
 
 WAN (vtnet0/igc0) -> dhcp (from ISP)
-LAN (vtnet1)      -> 192.168.1.1/24
+LAN (vtnet1)      -> 192.168.0.1/24
 
 Login: root
 Password: opnsense
@@ -123,7 +123,7 @@ Assign interfaces:
 From a device on LAN:
 
 ```
-https://192.168.1.1
+https://192.168.0.1
 Username: root
 Password: opnsense
 ```
@@ -164,7 +164,7 @@ Password: opnsense
 
 | Setting | Value |
 |---------|-------|
-| IPv4 Address | 192.168.1.1/24 |
+| IPv4 Address | 192.168.0.1/24 |
 | Description | LAN |
 
 ---
@@ -176,9 +176,9 @@ Password: opnsense
 | Setting | Value |
 |---------|-------|
 | Enable | Yes |
-| Range | 192.168.1.100 - 192.168.1.199 |
-| DNS Servers | 192.168.1.10 (Pi-hole) |
-| Gateway | 192.168.1.1 |
+| Range | 192.168.0.100 - 192.168.0.199 |
+| DNS Servers | 192.168.0.10 (Pi-hole) |
+| Gateway | 192.168.0.1 |
 | Domain | cronova.local |
 
 ### Static Mappings
@@ -187,12 +187,12 @@ Password: opnsense
 
 | Device | MAC | IP |
 |--------|-----|-----|
-| Docker VM | xx:xx:xx:xx:xx:xx | 192.168.1.10 |
-| RPi 4 | xx:xx:xx:xx:xx:xx | 192.168.1.11 |
-| NAS | xx:xx:xx:xx:xx:xx | 192.168.1.12 |
-| Yamaha RX-V671 | xx:xx:xx:xx:xx:xx | 192.168.1.30 |
-| Apple TV | xx:xx:xx:xx:xx:xx | 192.168.1.31 |
-| LG TV | xx:xx:xx:xx:xx:xx | 192.168.1.32 |
+| Docker VM | xx:xx:xx:xx:xx:xx | 192.168.0.10 |
+| RPi 4 | xx:xx:xx:xx:xx:xx | 192.168.0.11 |
+| NAS | xx:xx:xx:xx:xx:xx | 192.168.0.12 |
+| Yamaha RX-V671 | xx:xx:xx:xx:xx:xx | 192.168.0.30 |
+| Apple TV | xx:xx:xx:xx:xx:xx | 192.168.0.31 |
+| LG TV | xx:xx:xx:xx:xx:xx | 192.168.0.32 |
 
 ---
 
@@ -255,9 +255,9 @@ See `docs/vlan-design.md` for detailed VLAN setup.
 
 | # | Action | Source | Dest | Port | Description |
 |---|--------|--------|------|------|-------------|
-| 1 | Pass | IOT net | 192.168.1.10 | 53 | DNS (Pi-hole) |
-| 2 | Pass | IOT net | 192.168.1.10 | 123 | NTP |
-| 3 | Pass | 192.168.10.101-103 | 192.168.1.10 | 5000 | Cameras → Frigate |
+| 1 | Pass | IOT net | 192.168.0.10 | 53 | DNS (Pi-hole) |
+| 2 | Pass | IOT net | 192.168.0.10 | 123 | NTP |
+| 3 | Pass | 192.168.10.101-103 | 192.168.0.10 | 5000 | Cameras → Frigate |
 | 4 | Block | IOT net | RFC1918 | any | Block LAN access |
 | 5 | Block | IOT net | any | any | Block internet |
 
@@ -267,7 +267,7 @@ See `docs/vlan-design.md` for detailed VLAN setup.
 
 | # | Action | Source | Dest | Port | Description |
 |---|--------|--------|------|------|-------------|
-| 1 | Pass | GUEST net | 192.168.1.10 | 53 | DNS |
+| 1 | Pass | GUEST net | 192.168.0.10 | 53 | DNS |
 | 2 | Block | GUEST net | RFC1918 | any | Block LAN |
 | 3 | Pass | GUEST net | any | 80,443 | HTTP/HTTPS |
 | 4 | Block | GUEST net | any | any | Block all else |
@@ -285,7 +285,7 @@ See `docs/vlan-design.md` for detailed VLAN setup.
 | Network Interfaces | LAN, IOT, GUEST |
 | DNSSEC | Enabled |
 
-**Note:** Pi-hole on Docker VM (192.168.1.10) provides ad-blocking. Configure DHCP to use Pi-hole as DNS, with OPNsense Unbound as fallback.
+**Note:** Pi-hole on Docker VM (192.168.0.10) provides ad-blocking. Configure DHCP to use Pi-hole as DNS, with OPNsense Unbound as fallback.
 
 ---
 
@@ -314,7 +314,7 @@ For graceful shutdown on power loss:
 | Setting | Value |
 |---------|-------|
 | UPS Type | nut (networked) |
-| Remote Host | 192.168.1.12 (NAS) |
+| Remote Host | 192.168.0.12 (NAS) |
 | Remote User | upsmon |
 | Remote Password | (from NAS NUT config) |
 
@@ -343,7 +343,7 @@ age -r age1... opnsense-config.xml > opnsense-config.xml.age
 
 Add OPNsense health check:
 - Type: HTTP
-- URL: https://192.168.1.1
+- URL: https://192.168.0.1
 - Expected: 200
 
 ### Prometheus (Optional)

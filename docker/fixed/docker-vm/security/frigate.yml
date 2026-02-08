@@ -193,6 +193,6 @@ cameras:
 #    docker exec frigate vainfo
 #
 # 5. Mount NFS before starting:
-#    sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+#    sudo mount -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
 #
 # =============================================================================

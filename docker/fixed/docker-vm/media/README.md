@@ -25,8 +25,8 @@ Prowlarr → Sonarr/Radarr → qBittorrent → Jellyfin
 ```bash
 # 1. Mount NFS shares from NAS
 sudo mkdir -p /mnt/nas/{media,downloads}
-sudo mount -t nfs 192.168.1.12:/srv/media /mnt/nas/media
-sudo mount -t nfs 192.168.1.12:/srv/downloads /mnt/nas/downloads
+sudo mount -t nfs 192.168.0.12:/srv/media /mnt/nas/media
+sudo mount -t nfs 192.168.0.12:/srv/downloads /mnt/nas/downloads
 
 # 2. Configure environment
 cp .env.example .env
