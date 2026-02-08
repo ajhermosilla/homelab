@@ -33,20 +33,20 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
               │                          │            100.64.0.100
               │                          │
     [Samsung A13]                [Home Router]        [DERP Relay]
-              │                   192.168.1.0/24      [Pi-hole]
+              │                   192.168.0.0/24      [Pi-hole]
               │                          │            [Uptime Kuma]
          [Beryl AX]              [Mini PC - Proxmox]  [ntfy]
-        192.168.8.1               192.168.1.10        [changedetection]
+        192.168.8.1               192.168.0.10        [changedetection]
         /         \                      │            [Restic REST]
        /           \             [OPNsense VM]
-    MacBook   RPi 5-Headscale   192.168.1.1
+    MacBook   RPi 5-Headscale   192.168.0.1
   192.168.8.10  192.168.8.5           │
     [Mobile Kit]                 [vmbr0 - LAN]
                                        │
                        ┌───────────────┼────────────┐
                        │               │            │
                   [Docker VM]    [RPi 4-Start9]  [Old PC/NAS]
-                  192.168.1.10   192.168.1.11    192.168.1.12
+                  192.168.0.10   192.168.0.11    192.168.0.12
 ```
 
 ### Environment Summary

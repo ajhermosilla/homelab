@@ -80,7 +80,7 @@ networks:
 #    docker compose up -d
 #
 # 4. Initialize repository from client:
-#    export RESTIC_REPOSITORY="rest:http://augusto:$HTPASSWD_PASSWORD@192.168.1.12:8000/homelab"
+#    export RESTIC_REPOSITORY="rest:http://augusto:$HTPASSWD_PASSWORD@192.168.0.12:8000/homelab"
 #    export RESTIC_PASSWORD_FILE=/root/.restic-password
 #    restic init
 #
@@ -149,7 +149,7 @@ networks:
 # # On Docker VM or any Tailscale-connected device
 #
 # # Environment setup
-# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
+# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.0.12:8000/homelab"
 # export RESTIC_PASSWORD_FILE=/root/.restic-password
 #
 # # Backup Headscale
@@ -177,7 +177,7 @@ networks:
 # #!/bin/bash
 # # /usr/local/bin/backup-homelab.sh
 #
-# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.1.12:8000/homelab"
+# export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.0.12:8000/homelab"
 # export RESTIC_PASSWORD_FILE=/root/.restic-password
 #
 # echo "$(date) - Starting backup..."
@@ -200,9 +200,9 @@ networks:
 # =============================================================================
 #
 # Prometheus metrics available at:
-#   http://192.168.1.12:8000/metrics
+#   http://192.168.0.12:8000/metrics
 #
 # Add Uptime Kuma check:
-#   TCP 192.168.1.12:8000
+#   TCP 192.168.0.12:8000
 #
 # =============================================================================

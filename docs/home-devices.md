@@ -113,7 +113,7 @@ All home devices use Pi-hole for:
 - Tracking protection
 - Local DNS resolution (*.cronova.dev)
 
-Configure via OPNsense DHCP → DNS Server: `192.168.1.10`
+Configure via OPNsense DHCP → DNS Server: `192.168.0.10`
 
 ---
 

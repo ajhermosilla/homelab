@@ -1,8 +1,8 @@
 # NFS server configuration
 # Usage: ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
 # Options:
-#   -e "nfs_network=192.168.1.0/24" - Override allowed network
-#   -e "docker_vm_ip=192.168.1.10" - Override Docker VM IP for Frigate
+#   -e "nfs_network=192.168.0.0/24" - Override allowed network
+#   -e "docker_vm_ip=192.168.0.10" - Override Docker VM IP for Frigate
 #
 # Prerequisites:
 #   1. Drives mounted at /mnt/red8 and /mnt/purple
@@ -21,8 +21,8 @@
     # Symlink root (exports use /srv/ for cleaner paths)
     nfs_srv_root: "/srv"
     # Network settings
-    nfs_network: "192.168.1.0/24"
-    docker_vm_ip: "192.168.1.10"
+    nfs_network: "192.168.0.0/24"
+    docker_vm_ip: "192.168.0.10"
     # Owner/group for directories (default: current user UID/GID)
     nfs_owner: "1000"
     nfs_group: "1000"
@@ -200,7 +200,7 @@
     - name: Allow NFS traffic from local network
       ufw:
         rule: allow
-        from_ip: "192.168.1.0/24"
+        from_ip: "192.168.0.0/24"
         port: "{{ item }}"
         proto: tcp
       loop:
@@ -211,7 +211,7 @@
     - name: Allow NFS UDP traffic
       ufw:
         rule: allow
-        from_ip: "192.168.1.0/24"
+        from_ip: "192.168.0.0/24"
         port: "{{ item }}"
         proto: udp
       loop:
@@ -248,10 +248,10 @@
           - {{ export.path }} -> {{ export.clients }}
           {% endfor %}
 
-          Mount from Docker VM (192.168.1.10):
-            sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
-            sudo mount -t nfs 192.168.1.12:/srv/media /mnt/nas/media
-            sudo mount -t nfs 192.168.1.12:/srv/downloads /mnt/nas/downloads
+          Mount from Docker VM (192.168.0.10):
+            sudo mount -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
+            sudo mount -t nfs 192.168.0.12:/srv/media /mnt/nas/media
+            sudo mount -t nfs 192.168.0.12:/srv/downloads /mnt/nas/downloads
 
   handlers:
     - name: Reload NFS exports

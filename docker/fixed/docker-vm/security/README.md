@@ -16,7 +16,7 @@ Vaultwarden password manager + Frigate NVR with AI detection.
 ```bash
 # 1. Mount NFS for Frigate recordings
 sudo mkdir -p /mnt/nas/frigate
-sudo mount -t nfs 192.168.1.12:/srv/frigate /mnt/nas/frigate
+sudo mount -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
 
 # 2. Generate Vaultwarden admin token
 openssl rand -base64 32
@@ -33,7 +33,7 @@ docker compose up -d
 
 ## Vaultwarden
 
-- Web UI: https://vault.cronova.dev (or http://192.168.1.10:8843)
+- Web UI: https://vault.cronova.dev (or http://192.168.0.10:8843)
 - Admin panel: https://vault.cronova.dev/admin
 - Disable signups after creating your account
 

@@ -299,19 +299,19 @@ How services are accessed based on location.
 | Service | Local Access | Tailscale Access | Public Access |
 |---------|--------------|------------------|---------------|
 | **Headscale** | - | - | hs.cronova.dev |
-| **Pi-hole** | 192.168.1.10:8053 | pihole.tail:8053 | - |
-| **Caddy** | 192.168.1.10:443 | - | - |
+| **Pi-hole** | 192.168.0.10:8053 | pihole.tail:8053 | - |
+| **Caddy** | 192.168.0.10:443 | - | - |
 | **Jellyfin** | media.cronova.dev | media.cronova.dev | - |
 | **Home Assistant** | home.cronova.dev | home.cronova.dev | - |
 | **Vaultwarden** | vault.cronova.dev | vault.cronova.dev | - |
-| **Frigate** | 192.168.1.10:5000 | frigate.tail:5000 | - |
-| **Sonarr** | 192.168.1.10:8989 | sonarr.tail:8989 | - |
-| **Radarr** | 192.168.1.10:7878 | radarr.tail:7878 | - |
-| **Prowlarr** | 192.168.1.10:9696 | prowlarr.tail:9696 | - |
-| **qBittorrent** | 192.168.1.10:8081 | qbit.tail:8081 | - |
+| **Frigate** | 192.168.0.10:5000 | frigate.tail:5000 | - |
+| **Sonarr** | 192.168.0.10:8989 | sonarr.tail:8989 | - |
+| **Radarr** | 192.168.0.10:7878 | radarr.tail:7878 | - |
+| **Prowlarr** | 192.168.0.10:9696 | prowlarr.tail:9696 | - |
+| **qBittorrent** | 192.168.0.10:8081 | qbit.tail:8081 | - |
 | **Uptime Kuma** | - | status.tail:3001 | - |
 | **ntfy** | - | ntfy.tail:80 | - |
-| **Syncthing** | 192.168.1.12:8384 | nas.tail:8384 | - |
+| **Syncthing** | 192.168.0.12:8384 | nas.tail:8384 | - |
 
 *Note: `.tail` = Tailscale MagicDNS hostname*
 

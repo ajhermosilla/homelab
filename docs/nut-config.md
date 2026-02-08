@@ -144,7 +144,7 @@ MODE=netclient
 ### Configure UPS Monitor (`/etc/nut/upsmon.conf`)
 
 ```ini
-MONITOR forza@192.168.1.12 1 upsmon_slave slave-password slave
+MONITOR forza@192.168.0.12 1 upsmon_slave slave-password slave
 MINSUPPLIES 1
 SHUTDOWNCMD "/sbin/shutdown -h +0"
 POLLFREQ 5
@@ -165,7 +165,7 @@ systemctl enable nut-client
 systemctl start nut-client
 
 # Verify connection
-upsc forza@192.168.1.12
+upsc forza@192.168.0.12
 ```
 
 ---
@@ -192,7 +192,7 @@ Create `/usr/local/bin/nut-notify.sh`:
 case $NOTIFYTYPE in
     LOWBATT)
         # Shutdown Start9 via SSH
-        ssh root@192.168.1.11 "shutdown -h now"
+        ssh root@192.168.0.11 "shutdown -h now"
         ;;
 esac
 ```
@@ -291,7 +291,7 @@ upsc forza@localhost
 
 ```bash
 # On Mini PC
-upsc forza@192.168.1.12
+upsc forza@192.168.0.12
 ```
 
 ### Simulate Power Failure (CAREFUL!)
@@ -317,7 +317,7 @@ NOTIFYTYPE=ONBATT /usr/local/bin/nut-notify.sh
 
 ### Add to Uptime Kuma
 
-- **TCP Check:** `192.168.1.12:3493` (NUT server)
+- **TCP Check:** `192.168.0.12:3493` (NUT server)
 - **Alert:** If NUT server is down, UPS monitoring is offline
 
 ### Prometheus Metrics (Optional)
@@ -326,7 +326,7 @@ Use [nut_exporter](https://github.com/DRuggeri/nut_exporter):
 
 ```bash
 docker run -d --name nut-exporter \
-  -e NUT_EXPORTER_SERVER=192.168.1.12 \
+  -e NUT_EXPORTER_SERVER=192.168.0.12 \
   -p 9199:9199 \
   druggeri/nut_exporter
 ```

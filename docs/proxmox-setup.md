@@ -40,8 +40,8 @@ Mini PC configuration for running OPNsense router and Docker VM.
 | Admin Password | (strong password) |
 | Email | augusto@cronova.dev |
 | Hostname | pve.cronova.local |
-| Management IP | 192.168.1.100/24 |
-| Gateway | 192.168.1.1 (temporary) |
+| Management IP | 192.168.0.100/24 |
+| Gateway | 192.168.0.1 (temporary) |
 | DNS | 1.1.1.1 |
 
 **Note:** Initial IP is temporary. After OPNsense setup, DHCP will assign static IPs.
@@ -53,7 +53,7 @@ Mini PC configuration for running OPNsense router and Docker VM.
 ### 1. Access Web UI
 
 ```
-https://192.168.1.100:8006
+https://192.168.0.100:8006
 Username: root
 Password: (set during install)
 ```
@@ -62,7 +62,7 @@ Password: (set during install)
 
 ```bash
 # SSH into Proxmox
-ssh root@192.168.1.100
+ssh root@192.168.0.100
 
 # Edit sources list
 sed -i 's/^deb/#deb/' /etc/apt/sources.list.d/pve-enterprise.list
@@ -132,8 +132,8 @@ iface lo inet loopback
 # LAN Bridge
 auto vmbr0
 iface vmbr0 inet static
-    address 192.168.1.100/24
-    gateway 192.168.1.1
+    address 192.168.0.100/24
+    gateway 192.168.0.1
     bridge-ports enp2s0
     bridge-stp off
     bridge-fd 0
@@ -141,7 +141,7 @@ iface vmbr0 inet static
 # Management (optional - direct access if OPNsense fails)
 # auto enp2s0
 # iface enp2s0 inet static
-#     address 192.168.1.100/24
+#     address 192.168.0.100/24
 ```
 
 ```bash
@@ -325,7 +325,7 @@ See `docs/opnsense-setup.md` for installation steps.
 
 ```bash
 # SSH into Docker VM
-ssh augusto@192.168.1.10
+ssh augusto@192.168.0.10
 
 # Become root
 su -
@@ -440,7 +440,7 @@ Experimental VM for OpenClaw AI assistant (cloud APIs).
 
 ```bash
 # SSH into OpenClaw VM
-ssh augusto@192.168.1.20
+ssh augusto@192.168.0.20
 
 # Become root
 su -
@@ -587,7 +587,7 @@ Available in Proxmox web UI:
 
 Add Proxmox health check:
 - Type: HTTP
-- URL: https://192.168.1.100:8006
+- URL: https://192.168.0.100:8006
 - Expected: 200
 
 ---

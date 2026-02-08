@@ -23,7 +23,7 @@ htpasswd -B -c htpasswd augusto
 docker compose up -d
 
 # 4. Initialize repository (from client)
-export RESTIC_REPOSITORY="rest:http://augusto:$PASSWORD@192.168.1.12:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://augusto:$PASSWORD@192.168.0.12:8000/homelab"
 export RESTIC_PASSWORD_FILE=/root/.restic-password
 restic init
 ```
@@ -32,7 +32,7 @@ restic init
 
 ```bash
 # Environment setup
-export RESTIC_REPOSITORY="rest:http://$USER:$PASS@192.168.1.12:8000/homelab"
+export RESTIC_REPOSITORY="rest:http://$USER:$PASS@192.168.0.12:8000/homelab"
 export RESTIC_PASSWORD_FILE=/root/.restic-password
 
 # Backup
@@ -66,4 +66,4 @@ restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune
 
 ## Monitoring
 
-Prometheus metrics: http://192.168.1.12:8000/metrics
+Prometheus metrics: http://192.168.0.12:8000/metrics

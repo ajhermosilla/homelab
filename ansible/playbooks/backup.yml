@@ -11,7 +11,7 @@
 
   vars:
     restic_version: "0.16.4"
-    backup_server: "192.168.1.12"  # NAS IP
+    backup_server: "192.168.0.12"  # NAS IP
     # Repository URL built from components (requires restic_repo_user and restic_repo_pass)
     restic_repository: "rest:http://{{ restic_repo_user }}:{{ restic_repo_pass }}@{{ backup_server }}:8000/{{ inventory_hostname }}"
 

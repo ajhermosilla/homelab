@@ -14,7 +14,7 @@ OPNsense VLAN configuration for network segmentation and IoT isolation.
                     │          │          │
               VLAN 1      VLAN 10     VLAN 20
             Management      IoT       Guest
-           192.168.1.0  192.168.10.0 192.168.20.0
+           192.168.0.0  192.168.10.0 192.168.20.0
                 │          │          │
            ┌────┴────┐     │     ┌────┴────┐
            │         │     │     │         │
@@ -31,7 +31,7 @@ OPNsense VLAN configuration for network segmentation and IoT isolation.
 
 | VLAN ID | Name | Subnet | Purpose |
 |---------|------|--------|---------|
-| 1 | Management | 192.168.1.0/24 | Servers, admin devices |
+| 1 | Management | 192.168.0.0/24 | Servers, admin devices |
 | 10 | IoT | 192.168.10.0/24 | Cameras, smart devices |
 | 20 | Guest | 192.168.20.0/24 | Untrusted devices, visitors |
 
@@ -39,7 +39,7 @@ OPNsense VLAN configuration for network segmentation and IoT isolation.
 
 ## Device Placement
 
-### VLAN 1 - Management (192.168.1.0/24)
+### VLAN 1 - Management (192.168.0.0/24)
 
 Trusted devices with full network access.
 
@@ -105,7 +105,7 @@ Internet-only access. No LAN access.
 
 | Interface | IPv4 | DHCP Range |
 |-----------|------|------------|
-| LAN | 192.168.1.1/24 | .100-.199 |
+| LAN | 192.168.0.1/24 | .100-.199 |
 | IOT | 192.168.10.1/24 | .100-.199 |
 | GUEST | 192.168.20.1/24 | .100-.199 |
 
@@ -116,7 +116,7 @@ Internet-only access. No LAN access.
 For each interface:
 - Enable DHCP
 - Set range: .100 to .199
-- DNS: Point to Pi-hole (192.168.1.10)
+- DNS: Point to Pi-hole (192.168.0.10)
 
 ---
 
@@ -132,9 +132,9 @@ For each interface:
 
 | # | Action | Source | Destination | Ports | Description |
 |---|--------|--------|-------------|-------|-------------|
-| 1 | Pass | IOT net | 192.168.1.10 | 53 | Allow DNS (Pi-hole) |
-| 2 | Pass | IOT net | 192.168.1.10 | 123 | Allow NTP |
-| 3 | Pass | 192.168.10.101-103 | 192.168.1.10 | 5000 | Cameras → Frigate |
+| 1 | Pass | IOT net | 192.168.0.10 | 53 | Allow DNS (Pi-hole) |
+| 2 | Pass | IOT net | 192.168.0.10 | 123 | Allow NTP |
+| 3 | Pass | 192.168.10.101-103 | 192.168.0.10 | 5000 | Cameras → Frigate |
 | 4 | Block | IOT net | RFC1918 | any | Block LAN access |
 | 5 | Block | IOT net | any | any | Block internet (default deny) |
 
@@ -144,7 +144,7 @@ For each interface:
 
 | # | Action | Source | Destination | Ports | Description |
 |---|--------|--------|-------------|-------|-------------|
-| 1 | Pass | GUEST net | 192.168.1.10 | 53 | Allow DNS |
+| 1 | Pass | GUEST net | 192.168.0.10 | 53 | Allow DNS |
 | 2 | Block | GUEST net | RFC1918 | any | Block LAN access |
 | 3 | Pass | GUEST net | any | 80,443 | Allow HTTP/HTTPS |
 | 4 | Block | GUEST net | any | any | Block all else |
@@ -213,7 +213,7 @@ All cameras automatically on VLAN 10 (IoT) without per-port config.
 │      └──────────┼──────────┘                         │
 │                 │                                    │
 │           Only allowed to:                           │
-│           192.168.1.10:5000 (Frigate)               │
+│           192.168.0.10:5000 (Frigate)               │
 │                                                      │
 │           ✗ No internet                             │
 │           ✗ No LAN access                           │
@@ -285,7 +285,7 @@ Services → DHCPv4 → Leases
 # Check firewall logs
 Firewall → Log Files → Live View
 
-# Verify rule allows IoT → 192.168.1.10:5000
+# Verify rule allows IoT → 192.168.0.10:5000
 ```
 
 ### Inter-VLAN Traffic Blocked

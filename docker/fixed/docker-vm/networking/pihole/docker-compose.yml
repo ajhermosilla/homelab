@@ -38,7 +38,7 @@ services:
     environment:
       TZ: ${TZ:-America/Asuncion}
       WEBPASSWORD: ${PIHOLE_PASSWORD:?PIHOLE_PASSWORD required in .env}
-      FTLCONF_LOCAL_IPV4: ${HOST_IP:-192.168.1.10}
+      FTLCONF_LOCAL_IPV4: ${HOST_IP:-192.168.0.10}
       PIHOLE_DNS_: 1.1.1.1;9.9.9.9
       DNSSEC: "true"
       QUERY_LOGGING: "true"
@@ -68,7 +68,7 @@ networks:
 #
 # TZ=America/Asuncion
 # PIHOLE_PASSWORD=your-secure-password
-# HOST_IP=192.168.1.10
+# HOST_IP=192.168.0.10
 #
 # =============================================================================
 # SETUP INSTRUCTIONS
@@ -80,10 +80,10 @@ networks:
 #    docker compose up -d
 #
 # 3. Access web admin:
-#    http://192.168.1.10/admin
+#    http://192.168.0.10/admin
 #
 # 4. Configure OPNsense DHCP to use this as DNS:
-#    Services → DHCPv4 → LAN → DNS Server: 192.168.1.10
+#    Services → DHCPv4 → LAN → DNS Server: 192.168.0.10
 #
 # =============================================================================
 # LOCAL DNS RECORDS
