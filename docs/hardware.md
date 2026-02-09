@@ -164,7 +164,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    NAS (Primary)                         │
-│  SSD 1TB │ Purple 2TB │ Red Plus 8TB                    │
+│ SSD 240GB│ Purple 2TB │ Red Plus 8TB                    │
 │  OS/Apps │ Frigate    │ Media + Data                    │
 └─────────────────────────────────────────────────────────┘
                           │

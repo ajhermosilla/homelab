@@ -126,7 +126,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 
 | Device | Model | Specs | IP | Role |
 |--------|-------|-------|-----|------|
-| Mini PC | N150 | 12GB RAM, 512GB SSD | 192.168.0.1 (WAN) | Proxmox host |
+| Mini PC (oga) | N150 | 12GB RAM, 512GB SSD | 192.168.0.237 | Proxmox host |
 | Docker VM | Debian | 7GB RAM, 100GB | 192.168.0.10 | Containers |
 | OpenClaw VM | Debian | 2GB RAM, 20GB | 192.168.0.20 | AI assistant |
 | NAS | i3-3220T | 8GB RAM, 10TB total | 192.168.0.12 | Storage |
@@ -290,7 +290,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │                           ┌────────┴───────┐         │                      │
 │                           │  qBittorrent   │         │                      │
 │                           │   media-net    │◄────────┘                      │
-│                           │     :8080      │                                │
+│                           │     :8081      │                                │
 │                           └────────────────┘                                │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -371,8 +371,8 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | Home Assistant | Mosquitto | MQTT | 1883 |
 | Sonarr | Prowlarr | HTTP | 9696 |
 | Radarr | Prowlarr | HTTP | 9696 |
-| Sonarr | qBittorrent | HTTP | 8080 |
-| Radarr | qBittorrent | HTTP | 8080 |
+| Sonarr | qBittorrent | HTTP | 8081 |
+| Radarr | qBittorrent | HTTP | 8081 |
 | changedetection | Playwright | WebSocket | 3000 |
 
 ### Cross-Compose (Host Network)
@@ -419,7 +419,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | 6881 | qBittorrent | TCP/UDP |
 | 7878 | Radarr | TCP |
 | 8053 | Pi-hole Web | TCP |
-| 8080 | qBittorrent Web | TCP |
+| 8081 | qBittorrent Web | TCP |
 | 8096 | Jellyfin | TCP |
 | 8123 | Home Assistant | TCP |
 | 8554 | Frigate RTSP | TCP |

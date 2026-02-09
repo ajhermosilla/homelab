@@ -402,7 +402,7 @@ verava.ai {
 
 ---
 
-## Service Inventory (22 Services)
+## Service Inventory (24 Services)
 
 ### By Category
 

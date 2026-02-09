@@ -25,7 +25,7 @@ On-demand                 24/7                         24/7
                           └── Cameras (3x)
 ```
 
-**23 services** across 3 environments. See [docs/services.md](docs/services.md) for full list.
+**24 services** across 3 environments. See [docs/services.md](docs/services.md) for full list.
 
 ## Documentation
 
@@ -144,9 +144,9 @@ VLANs:
 
 | Environment | Status |
 |-------------|--------|
-| VPS | Planned |
-| Fixed Homelab | Planned |
-| Mobile Kit | PSU in transit |
+| VPS | Active (Headscale, Caddy, Uptime Kuma, ntfy) |
+| Fixed Homelab | Partial (Pi-hole, Caddy, Vaultwarden on Docker VM) |
+| Mobile Kit | Pending |
 
 ---
 
