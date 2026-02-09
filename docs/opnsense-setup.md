@@ -8,12 +8,12 @@ OPNsense VM configuration on Proxmox for the fixed homelab.
                     [ISP Modem]
                          │
                     ┌────┴────┐
-                    │  WAN    │ ← NIC1 (passthrough)
+                    │  WAN    │ ← vmbr0 (bridged)
                     │         │
                     │ OPNsense│
                     │   VM    │
                     │         │
-                    │  LAN    │ ← vmbr0 (bridge)
+                    │  LAN    │ ← vmbr1 (bridged)
                     └────┬────┘
                          │
                 [MokerLink Switch]
@@ -44,34 +44,33 @@ OPNsense VM configuration on Proxmox for the fixed homelab.
 
 ### 2. Network Configuration
 
-**Two network interfaces required:**
+**Two network interfaces required (both bridged):**
 
 | Interface | Type | Purpose |
 |-----------|------|---------|
-| net0 | PCI Passthrough (NIC1) | WAN - direct to ISP |
-| net1 | Bridge (vmbr0) | LAN - internal network |
+| net0 | Bridge (vmbr0) | WAN - ISP/switch side |
+| net1 | Bridge (vmbr1) | LAN - internal network |
 
-**PCI Passthrough for WAN:**
+**Bridged Networking:**
 
-```bash
-# On Proxmox host, identify NIC for passthrough
-lspci | grep -i ethernet
-
-# Example output:
-# 02:00.0 Ethernet controller: Intel Corporation I225-V
-# 03:00.0 Ethernet controller: Intel Corporation I225-V
-
-# Pass through first NIC (02:00.0) to OPNsense
-# In Proxmox GUI: VM > Hardware > Add > PCI Device
-```
-
-**Bridge for LAN:**
+Both NICs use Proxmox bridges (no PCI passthrough needed):
 
 ```bash
 # /etc/network/interfaces on Proxmox
+
+# WAN bridge (OPNsense WAN - public IP via DHCP)
 auto vmbr0
 iface vmbr0 inet manual
-    bridge-ports eno2
+    bridge-ports enp1s0
+    bridge-stp off
+    bridge-fd 0
+
+# LAN bridge (OPNsense LAN + Docker VM + Proxmox mgmt)
+auto vmbr1
+iface vmbr1 inet static
+    address 192.168.0.237/24
+    gateway 192.168.0.1
+    bridge-ports enp2s0
     bridge-stp off
     bridge-fd 0
 ```

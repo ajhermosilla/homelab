@@ -19,7 +19,7 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
 
 | Device | Model | Specs | Role |
 |--------|-------|-------|------|
-| Access Point | TP-Link AX3000 | WiFi 6, Dual Band, Gigabit | AP mode (stock firmware) |
+| Access Point | TP-Link Archer AX50 | WiFi 6, Dual Band, Gigabit | AP mode (stock firmware) |
 
 *Connected to MokerLink switch, provides WiFi for devices and Tapo camera.*
 
@@ -28,7 +28,7 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
 | Model | Count | Specs | Connection |
 |-------|-------|-------|------------|
 | Reolink RLC-520A | 2 | 5MP PoE | TP-Link PoE Switch |
-| TP-Link Tapo C110 | 1 | 3MP WiFi | AX3000 AP (WiFi) |
+| TP-Link Tapo C110 | 1 | 3MP WiFi | Archer AX50 AP (WiFi) |
 
 ## Architecture Diagram
 
@@ -480,7 +480,7 @@ See Headscale admin for current allocations.
 
 | Source | Destination | Method | Retention |
 |--------|-------------|--------|-----------|
-| Headscale DB (RPi 5) | NAS + Google Drive | Restic + rclone | 30 days |
+| Headscale DB (VPS) | NAS + Google Drive | Restic + rclone | 30 days |
 | Vaultwarden (Docker VM) | NAS + Google Drive | Restic + rclone | 30 days |
 
 ### Standard Services (Daily)

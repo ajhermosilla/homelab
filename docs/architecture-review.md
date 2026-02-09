@@ -30,16 +30,16 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
               ┌──────────────────────────┼───────────────────┐
               │                          │                   │
          [Tethering]             [Home ISP/WiFi]     [Vultr VPS]
-              │                          │            100.64.0.100
+              │                          │            100.77.172.46
               │                          │
     [Samsung A13]                [Home Router]        [DERP Relay]
               │                   192.168.0.0/24      [Pi-hole]
               │                          │            [Uptime Kuma]
          [Beryl AX]              [Mini PC - Proxmox]  [ntfy]
-        192.168.8.1               192.168.0.10        [changedetection]
+        192.168.8.1               192.168.0.237       [changedetection]
         /         \                      │            [Restic REST]
        /           \             [OPNsense VM]
-    MacBook   RPi 5-Headscale   192.168.0.1
+    MacBook   RPi 5-Pi-hole     192.168.0.1
   192.168.8.10  192.168.8.5           │
     [Mobile Kit]                 [vmbr0 - LAN]
                                        │
@@ -232,7 +232,7 @@ verava.ai
                           [Cloudflare DNS]
                                  │
                           [VPS - Caddy]
-                         100.64.0.100
+                         100.77.172.46
                     ┌──────────┴──────────┐
                     │                     │
               [Public Services]    [Tailscale Mesh]
@@ -247,8 +247,8 @@ verava.ai
                     │                     │                     │
              [Mobile Kit]          [Fixed Homelab]        [VPS Helper]
              RPi 5 + MacBook       Mini PC + RPi 4        Vultr US
-             100.64.0.1-2          + NAS                  100.64.0.100
-                                   100.64.0.10-12
+             100.64.0.1-2          + NAS                  100.77.172.46
+                                   100.68.63.168+
 ```
 
 ### Caddy Reverse Proxy Config (Proposed)
@@ -256,7 +256,7 @@ verava.ai
 ```caddyfile
 # cronova.dev - Public services
 vault.cronova.dev {
-    reverse_proxy 100.64.0.10:8843
+    reverse_proxy 100.68.63.168:8843
 }
 
 status.cronova.dev {
@@ -306,7 +306,7 @@ verava.ai {
                                  │
                           ┌──────┴──────┐
                           │ VPS (Caddy) │
-                          │100.64.0.100 │
+                          │100.77.172.46│
                           │             │
                           │ • DERP      │
                           │ • Pi-hole   │
@@ -327,7 +327,7 @@ verava.ai {
    │             │        │             │        │  Already    │
    │ RPi 5       │        │ Mini PC     │        │  shown      │
    │ 100.64.0.1  │        │ (Proxmox)   │        │  above      │
-   │ • Headscale │        │ 100.64.0.10 │        │             │
+   │ • Headscale │        │100.78.12.241│        │             │
    │ • Pi-hole   │        │             │        └─────────────┘
    │             │        │ ┌─────────┐ │
    │ MacBook     │        │ │OPNsense │ │

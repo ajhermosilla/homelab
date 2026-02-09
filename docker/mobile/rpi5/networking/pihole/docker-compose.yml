@@ -94,7 +94,7 @@ networks:
 #   UPSTREAM_DNS=9.9.9.9;149.112.112.112  (Quad9)
 #
 # Fixed homelab (with Unbound):
-#   UPSTREAM_DNS=100.64.0.10#5353  (OPNsense Unbound via Tailscale)
+#   UPSTREAM_DNS=100.68.63.168#5353  (OPNsense Unbound via Tailscale)
 #
 # =============================================================================
 # USEFUL COMMANDS

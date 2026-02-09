@@ -73,8 +73,8 @@ status.cronova.dev {
 |---------|------|--------|
 | Pi-hole (RPi 5) | TCP | `100.64.0.1:53` |
 | Vaultwarden | HTTP(s) | `https://vault.cronova.dev/alive` |
-| Home Assistant | HTTP(s) | `http://100.64.0.10:8123` |
-| Jellyfin | HTTP(s) | `http://100.64.0.10:8096` |
+| Home Assistant | HTTP(s) | `http://100.68.63.168:8123` |
+| Jellyfin | HTTP(s) | `http://100.68.63.168:8096` |
 
 ## Monitor Types Reference
 

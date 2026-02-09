@@ -71,7 +71,7 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Subdomain | Service | Location | Access |
 |-----------|---------|----------|--------|
-| `hs.cronova.dev` | Headscale | RPi 5 | Tailscale clients |
+| `hs.cronova.dev` | Headscale | VPS | Tailscale clients |
 | `home.cronova.dev` | Home Assistant | Docker VM | Tailscale |
 | `media.cronova.dev` | Jellyfin | Docker VM | Tailscale |
 | `btc.cronova.dev` | Start9 | RPi 4 | Tailscale |
@@ -131,8 +131,8 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 │                                                                   │
 │  # Tailscale services (DNS only, grey cloud)                     │
 │  A     hs       → RPi5 public IP (or Tailscale Funnel)           │
-│  A     home     → 100.64.0.10 (internal only)                    │
-│  A     media    → 100.64.0.10 (internal only)                    │
+│  A     home     → 100.68.63.168 (internal only)                    │
+│  A     media    → 100.68.63.168 (internal only)                    │
 │  A     btc      → 100.64.0.11 (internal only)                    │
 │  A     nas      → 100.64.0.12 (internal only)                    │
 │  A     git      → 100.64.0.2 (internal only)                     │
@@ -151,11 +151,11 @@ dns_config:
   base_domain: cronova.dev
   nameservers:
     - 100.64.0.1      # RPi 5 Pi-hole
-    - 100.64.0.10     # Home Pi-hole
+    - 100.68.63.168   # Home Pi-hole
 ```
 
 This means:
-- `home.cronova.dev` resolves to `100.64.0.10` inside Tailscale
+- `home.cronova.dev` resolves to `100.68.63.168` inside Tailscale
 - Outside Tailscale, it doesn't resolve (private)
 
 ---
@@ -211,7 +211,7 @@ This means:
 
 # Vault - Public password manager
 vault.cronova.dev {
-    reverse_proxy 100.64.0.10:8843
+    reverse_proxy 100.68.63.168:8843
 }
 
 # Status - Public uptime monitoring

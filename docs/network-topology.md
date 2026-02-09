@@ -21,7 +21,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │ • Pi-hole       │       │ • NAS           │       │ • MacBook       │
 │ • Uptime Kuma   │       │ • Start9/RPi4   │       │                 │
 │                 │       │                 │       │                 │
-│ 100.77.172.46   │       │ 100.64.0.10-13  │       │ 100.64.0.1      │
+│ 100.77.172.46   │       │ 100.68.63.168+  │       │ 100.64.0.1      │
 └────────┬────────┘       └────────┬────────┘       └────────┬────────┘
          │                         │                         │
          └─────────────────────────┼─────────────────────────┘
@@ -49,8 +49,8 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
           │               │               │               │               │
           ▼               ▼               ▼               ▼               ▼
    ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐
-   │  minipc    │  │   docker   │  │    nas     │  │   rpi4     │  │   rpi5     │
-   │ 100.64.0.10│  │100.68.63.168│ │ 100.64.0.12│  │ 100.64.0.11│  │ 100.64.0.1 │
+   │    oga     │  │   docker   │  │    nas     │  │   rpi4     │  │   rpi5     │
+   │100.78.12.241│ │100.68.63.168│ │ 100.64.0.12│  │ 100.64.0.11│  │ 100.64.0.1 │
    │  Proxmox   │  │ Docker VM  │  │  Storage   │  │  Start9    │  │  Mobile    │
    └────────────┘  └────────────┘  └────────────┘  └────────────┘  └────────────┘
                                           │
@@ -69,7 +69,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | Device | Tailscale IP | Role | Location |
 |--------|-------------|------|----------|
 | rpi5 | 100.64.0.1 | Mobile DNS | Mobile |
-| minipc | 100.64.0.10 | Proxmox host | Fixed |
+| oga | 100.78.12.241 | Proxmox host | Fixed |
 | rpi4 | 100.64.0.11 | Start9 Bitcoin | Fixed |
 | nas | 100.64.0.12 | Storage server | Fixed |
 | docker | 100.68.63.168 | Container host | Fixed |
@@ -108,8 +108,8 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
      ▼                     ▼    ▼    ▼    ▼    ▼                     ▼
 ┌─────────┐          ┌─────────┐  ┌───┐  ┌─────────┐          ┌─────────┐
 │Docker VM│          │  RPi 4  │  │NAS│  │PoE Sw.  │          │ WiFi AP │
-│(Proxmox)│          │ Start9  │  │   │  │TP-Link  │          │ AX3000  │
-│.1.10    │          │ .1.11   │  │.12│  │         │          │         │
+│(Proxmox)│          │ Start9  │  │   │  │TP-Link  │          │Archer   │
+│.0.10    │          │ .0.11   │  │.12│  │         │          │AX50     │
 └─────────┘          └─────────┘  └───┘  └────┬────┘          └─────────┘
                                               │
                                     ┌─────────┴─────────┐
@@ -133,7 +133,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | RPi 4 | 4GB | 1TB ext SSD | 192.168.0.11 | Start9 Bitcoin |
 | Switch | MokerLink | 8-port 2.5G | - | Backbone |
 | PoE Switch | TP-Link | 5-port 1G, 4xPoE | - | Camera power |
-| WiFi AP | TP-Link | AX3000 WiFi 6 | - | Wireless |
+| WiFi AP | TP-Link | Archer AX50 WiFi 6 | - | Wireless |
 | UPS | Forza | 1000VA | - | Power backup |
 
 ## Mobile Kit - Physical Topology

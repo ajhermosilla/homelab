@@ -80,7 +80,7 @@ Portable infrastructure for dev, self-hosting, and travel.
           100.x.x.x
               |
          [VPS - Headscale]
-          100.64.0.100
+          100.77.172.46
 ```
 
 ## Services

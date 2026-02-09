@@ -137,16 +137,16 @@ When on Tailscale mesh, devices can use any Pi-hole:
 | Pi-hole Location | Tailscale IP | Use Case |
 |------------------|--------------|----------|
 | RPi 5 (mobile) | 100.64.0.1 | Primary when traveling |
-| Docker Host (home) | 100.64.0.10 | Primary when home |
-| VPS | 100.64.0.100 | Fallback, US-based |
+| Docker Host (home) | 100.68.63.168 | Primary when home |
+| VPS | 100.77.172.46 | Fallback, US-based |
 
-**Headscale DNS Config** (on RPi 5):
+**Headscale DNS Config** (on VPS):
 ```yaml
 # /etc/headscale/config.yaml
 dns_config:
   nameservers:
     - 100.64.0.1      # RPi 5 Pi-hole (primary)
-    - 100.64.0.10     # Home Pi-hole (secondary)
+    - 100.68.63.168   # Home Pi-hole (secondary)
   magic_dns: true
   base_domain: tail.net
 ```
@@ -157,7 +157,7 @@ Pi-hole can resolve local hostnames:
 
 ```
 # Pi-hole → Local DNS → DNS Records
-192.168.0.10    minipc.home
+192.168.0.237   oga.home
 192.168.0.11    rpi4.home
 192.168.0.12    nas.home
 192.168.8.5     rpi5.local
@@ -165,7 +165,7 @@ Pi-hole can resolve local hostnames:
 
 Or use Headscale MagicDNS:
 ```
-minipc.tail.net  → 100.64.0.10
+oga.tail.net     → 100.78.12.241
 rpi5.tail.net    → 100.64.0.1
 ```
 

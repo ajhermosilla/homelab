@@ -84,7 +84,7 @@ vps/
 ## Tailscale Integration
 
 The VPS joins the Tailscale mesh to:
-- Proxy requests to homelab services (vault.cronova.dev → 100.64.0.10)
+- Proxy requests to homelab services (vault.cronova.dev → 100.68.63.168)
 - Monitor internal services via Uptime Kuma
 - Receive backups from homelab via Restic
 
@@ -94,7 +94,7 @@ tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 
 # Verify connectivity
 tailscale status
-ping 100.64.0.10  # Should reach Docker VM
+ping 100.68.63.168  # Should reach Docker VM
 ```
 
 ## Cloudflare DNS
@@ -164,7 +164,7 @@ After deployment, configure Uptime Kuma monitors:
 
 - [ ] Headscale (https://hs.cronova.dev)
 - [ ] Vaultwarden (https://vault.cronova.dev/alive)
-- [ ] Home Assistant (100.64.0.10:8123)
+- [ ] Home Assistant (100.68.63.168:8123)
 - [ ] Pi-hole RPi 5 (100.64.0.1:53)
 - [ ] Start9 (100.64.0.11)
 - [ ] cronova.dev (https://cronova.dev)

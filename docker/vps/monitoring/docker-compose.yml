@@ -138,8 +138,8 @@ networks:
 #   - Pi-hole:      TCP 100.64.0.1:53 (RPi 5)
 #
 # High (check every 5m):
-#   - Home Assistant: http://100.64.0.10:8123 (via Tailscale)
-#   - Jellyfin:       http://100.64.0.10:8096 (via Tailscale)
+#   - Home Assistant: http://100.68.63.168:8123 (via Tailscale)
+#   - Jellyfin:       http://100.68.63.168:8096 (via Tailscale)
 #   - Start9:         http://100.64.0.11 (via Tailscale)
 #   - NAS:            TCP 100.64.0.12:445 (via Tailscale)
 #

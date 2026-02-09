@@ -9,7 +9,7 @@ Procedures for recovering from failures across all homelab environments. Created
 │                    RECOVERY PRIORITY ORDER                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  1. HEADSCALE (RPi 5)     ← Mesh dies without this              │
+│  1. HEADSCALE (VPS)       ← Mesh dies without this              │
 │  2. Pi-hole (any)         ← DNS resolution                      │
 │  3. VPS Services          ← Public endpoints                    │
 │  4. Vaultwarden           ← Password access                     │
@@ -124,55 +124,55 @@ ls -t ${BACKUP_DIR}/vaultwarden_*.tar.gz | tail -n +721 | xargs -r rm
 
 ### Recovery Procedure
 
-#### Option A: Restore on Same Hardware (RPi 5)
+#### Option A: Restore on VPS (Primary Location)
 
 ```bash
-# 1. SSH to RPi 5 (if accessible) or connect directly
-ssh admin@rpi5.local
+# 1. SSH to VPS
+ssh linuxuser@vps
 
-# 2. Check Headscale status
-sudo systemctl status headscale
-sudo journalctl -u headscale -n 50
+# 2. Check Headscale container status
+docker ps -a | grep headscale
+docker logs headscale --tail 50
 
 # 3. If config corrupted, restore from backup
+cd /opt/homelab/headscale
+docker compose down
 LATEST_BACKUP=$(ls -t /mnt/nas/backups/headscale/*.tar.gz | head -1)
-sudo systemctl stop headscale
-sudo tar -xzf ${LATEST_BACKUP} -C /etc/
-sudo systemctl start headscale
+sudo tar -xzf ${LATEST_BACKUP} -C ./config/
+docker compose up -d
 
 # 4. Verify
-headscale nodes list
-headscale users list
+docker exec headscale headscale nodes list
+docker exec headscale headscale users list
 ```
 
-#### Option B: Rebuild from Scratch
+#### Option B: Rebuild VPS from Scratch
 
 ```bash
-# 1. Flash fresh Raspberry Pi OS to SD card
+# 1. Provision new VPS (Vultr, Debian)
 # 2. Basic setup
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl wget
+sudo apt install -y curl wget docker.io docker-compose-plugin
 
-# 3. Install Headscale
-wget https://github.com/juanfont/headscale/releases/latest/download/headscale_linux_arm64.deb
-sudo dpkg -i headscale_linux_arm64.deb
+# 3. Deploy Headscale via Docker Compose
+mkdir -p /opt/homelab/headscale && cd /opt/homelab/headscale
+# Copy docker-compose.yml and config from repo
 
-# 4. Restore configuration
+# 4. Restore configuration from backup
 LATEST_BACKUP=$(ls -t /mnt/nas/backups/headscale/*.tar.gz | head -1)
 # Or download from cloud: rclone copy b2:homelab-backups/headscale/latest.tar.gz /tmp/
-sudo tar -xzf ${LATEST_BACKUP} -C /etc/
+sudo tar -xzf ${LATEST_BACKUP} -C ./config/
 
 # 5. Start service
-sudo systemctl enable headscale
-sudo systemctl start headscale
+docker compose up -d
 
 # 6. Verify all nodes reconnect
-headscale nodes list
+docker exec headscale headscale nodes list
 ```
 
-#### Option C: Emergency VPS Failover
+#### Option C: Emergency Alternative Host
 
-If RPi 5 hardware is dead and replacement not available:
+If VPS is unavailable:
 
 ```bash
 # 1. SSH to VPS
