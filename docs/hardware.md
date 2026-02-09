@@ -9,7 +9,7 @@
 ├── Beryl AX Router            ├── NAS (DIY Mini-ITX)          ├── Uptime Kuma
 └── Samsung A13                ├── MokerLink 2.5G Switch       └── ~$6/mo
                                ├── TP-Link PoE Switch
-                               ├── TP-Link AX3000 AP
+                               ├── TP-Link Archer AX50 AP
                                ├── 3x IP Cameras
                                └── Forza UPS
 ```
@@ -83,7 +83,7 @@ Always-on infrastructure at home.
 |--------|-------|-------|------|
 | Managed Switch | MokerLink 8-Port | 8x 2.5G + 10G SFP+, fanless, metal | Main LAN backbone |
 | PoE Switch | TP-Link TL-SG1005P | 5x 1G, 4x PoE+ @65W, fanless | Camera power |
-| Access Point | TP-Link AX3000 | WiFi 6, Dual Band, Gigabit | AP mode (stock firmware) |
+| Access Point | TP-Link Archer AX50 | WiFi 6, Dual Band, Gigabit | AP mode (stock firmware) |
 
 ### Cameras
 
@@ -393,7 +393,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | Logitech MX Master 3 | 2021 | Owned |
 | WD Red Plus 8TB | 2021 | Owned |
 | Sabrent HDD Dock | 2021 | Owned |
-| TP-Link AX3000 AP | 2021 | Owned |
+| TP-Link Archer AX50 AP | 2021 | Owned |
 | Logitech MX Keys for Mac | 2023 | Owned (at T&C office) |
 | WD Purple 2TB | 2026 | Owned |
 | MokerLink 2.5G Switch | 2026 | Owned |

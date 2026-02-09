@@ -278,7 +278,7 @@ If accessing via Tailscale mesh instead of local network:
 
 ```bash
 # /etc/exports on NAS
-/srv/frigate    100.64.0.10(rw,sync,no_subtree_check,no_root_squash)
+/srv/frigate    100.68.63.168(rw,sync,no_subtree_check,no_root_squash)
 
 # /etc/fstab on Docker VM
 100.64.0.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0

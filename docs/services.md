@@ -7,11 +7,11 @@
 | Service | Category | Environment | Host | Status |
 |---------|----------|-------------|------|--------|
 | Pi-hole | Networking | Mobile | RPi 5 | Planned |
-| Headscale | Networking | VPS | Vultr | Planned |
+| Headscale | Networking | VPS | Vultr | Active |
 | soft-serve | Git | Mobile | MacBook | Active |
-| Pi-hole | Networking | Fixed | Docker VM | Planned |
+| Pi-hole | Networking | Fixed | Docker VM | Active |
 | OpenClaw | AI | Fixed | OpenClaw VM | Planned |
-| Caddy | Networking | Fixed | Docker VM | Planned |
+| Caddy | Networking | Fixed | Docker VM | Active |
 | Jellyfin | Media | Fixed | Docker VM | Planned |
 | Sonarr | Media | Fixed | Docker VM | Planned |
 | Radarr | Media | Fixed | Docker VM | Planned |
@@ -19,7 +19,7 @@
 | qBittorrent | Media | Fixed | Docker VM | Planned |
 | Home Assistant | Automation | Fixed | Docker VM | Planned |
 | Mosquitto | Messaging | Fixed | Docker VM | Planned |
-| Vaultwarden | Security | Fixed | Docker VM | Planned |
+| Vaultwarden | Security | Fixed | Docker VM | Active |
 | Bitcoin Core | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
 | LND | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
 | Electrum Server | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
@@ -27,10 +27,10 @@
 | Syncthing | Storage | Fixed | NAS | Planned |
 | Frigate | Security | Fixed | Docker VM | Planned |
 | Restic REST | Backup | Fixed | NAS | Planned |
-| DERP Relay | Networking | VPS | Vultr | Planned |
+| DERP Relay | Networking | VPS | Vultr | Active |
 | Pi-hole | Networking | VPS | Vultr | Planned |
-| Uptime Kuma | Monitoring | VPS | Vultr | Planned |
-| ntfy | Monitoring | VPS | Vultr | Planned |
+| Uptime Kuma | Monitoring | VPS | Vultr | Active |
+| ntfy | Monitoring | VPS | Vultr | Active |
 | changedetection | Scraping | VPS | Vultr | Planned |
 | Restic REST | Backup | VPS | Vultr | Planned |
 

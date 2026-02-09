@@ -6,10 +6,10 @@ Mini PC configuration for running OPNsense router and Docker VM.
 
 | Component | Spec | Notes |
 |-----------|------|-------|
-| CPU | Intel N150 | VT-x/VT-d for passthrough |
+| CPU | Intel N150 | VT-x/VT-d enabled |
 | RAM | 12GB | ~1GB host + 2GB OPNsense + 7GB Docker + 2GB OpenClaw |
 | Storage | 512GB SSD | VMs + ISO storage |
-| NIC | Dual port | WAN passthrough + LAN bridge |
+| NIC | Dual port | nic0/vmbr0 (WAN) + nic1/vmbr1 (LAN) |
 
 ---
 
@@ -40,7 +40,7 @@ Mini PC configuration for running OPNsense router and Docker VM.
 | Admin Password | (strong password) |
 | Email | augusto@cronova.dev |
 | Hostname | pve.cronova.local |
-| Management IP | 192.168.0.100/24 |
+| Management IP | 192.168.0.237/24 |
 | Gateway | 192.168.0.1 (temporary) |
 | DNS | 1.1.1.1 |
 
@@ -53,7 +53,7 @@ Mini PC configuration for running OPNsense router and Docker VM.
 ### 1. Access Web UI
 
 ```
-https://192.168.0.100:8006
+https://192.168.0.237:8006
 Username: root
 Password: (set during install)
 ```
@@ -62,7 +62,7 @@ Password: (set during install)
 
 ```bash
 # SSH into Proxmox
-ssh root@192.168.0.100
+ssh root@192.168.0.237
 
 # Edit sources list
 sed -i 's/^deb/#deb/' /etc/apt/sources.list.d/pve-enterprise.list
@@ -74,7 +74,7 @@ echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" >
 apt update && apt full-upgrade -y
 ```
 
-### 3. Enable IOMMU (for NIC passthrough)
+### 3. Enable IOMMU (optional, for future PCI passthrough)
 
 ```bash
 # Edit GRUB config
@@ -126,22 +126,21 @@ nano /etc/network/interfaces
 auto lo
 iface lo inet loopback
 
-# WAN NIC - DO NOT bridge (for OPNsense passthrough)
-# enp1s0 will be passed through to OPNsense
-
-# LAN Bridge
+# WAN Bridge (OPNsense WAN - public IP via DHCP)
 auto vmbr0
-iface vmbr0 inet static
-    address 192.168.0.100/24
+iface vmbr0 inet manual
+    bridge-ports enp1s0
+    bridge-stp off
+    bridge-fd 0
+
+# LAN Bridge (OPNsense LAN + Docker VM + Proxmox mgmt)
+auto vmbr1
+iface vmbr1 inet static
+    address 192.168.0.237/24
     gateway 192.168.0.1
     bridge-ports enp2s0
     bridge-stp off
     bridge-fd 0
-
-# Management (optional - direct access if OPNsense fails)
-# auto enp2s0
-# iface enp2s0 inet static
-#     address 192.168.0.100/24
 ```
 
 ```bash
@@ -587,7 +586,7 @@ Available in Proxmox web UI:
 
 Add Proxmox health check:
 - Type: HTTP
-- URL: https://192.168.0.100:8006
+- URL: https://192.168.0.237:8006
 - Expected: 200
 
 ---

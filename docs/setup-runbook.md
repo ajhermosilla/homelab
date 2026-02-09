@@ -161,7 +161,7 @@ See `docs/proxmox-setup.md` for detailed steps.
 
 1. Boot Mini PC from Proxmox USB
 2. Complete installation wizard
-3. Access web UI at https://192.168.0.100:8006
+3. Access web UI at https://192.168.0.237:8006
 4. Enable IOMMU for NIC passthrough
 5. Configure network bridge (vmbr0)
 

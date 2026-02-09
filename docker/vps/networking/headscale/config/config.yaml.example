@@ -75,16 +75,16 @@ dns:
   # Override DNS for specific domains (route to Pi-hole when available)
   # restricted_nameservers:
   #   cronova.dev:
-  #     - 100.64.0.10  # Fixed homelab Pi-hole
+  #     - 100.68.63.168  # Fixed homelab Pi-hole
 
   # Extra DNS records (optional)
   extra_records:
     - name: "nas"
       type: "A"
       value: "100.64.0.12"
-    - name: "minipc"
+    - name: "oga"
       type: "A"
-      value: "100.64.0.10"
+      value: "100.78.12.241"
 
 # =============================================================================
 # IP Allocation

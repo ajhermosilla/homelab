@@ -192,7 +192,7 @@ ansible-playbook -i inventory.yml playbooks/common.yml --check --diff
 |-------|-------|-------------|
 | `all` | All hosts | Every managed host |
 | `vps` | vultr | Cloud VPS |
-| `fixed` | minipc, docker, openclaw, nas, rpi4 | Fixed homelab |
+| `fixed` | oga, docker, openclaw, nas, rpi4 | Fixed homelab |
 | `mobile` | rpi5 | Mobile kit |
 | `docker_hosts` | vultr, docker, nas | Hosts running Docker |
 | `pihole_hosts` | vultr, docker, rpi5 | Hosts running Pi-hole |

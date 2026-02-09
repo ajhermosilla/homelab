@@ -11,7 +11,7 @@ Services that must be available 24/7. Alert immediately on failure.
 | Monitor | Type | Target | Notes |
 |---------|------|--------|-------|
 | Headscale | HTTP | `https://hs.cronova.dev/health` | Mesh coordination |
-| VPS Pi-hole | TCP | `100.64.0.100:53` | DNS fallback |
+| VPS Pi-hole | TCP | `100.77.172.46:53` | DNS fallback |
 | Vaultwarden | HTTP | `https://vault.cronova.dev/alive` | Password manager |
 
 ### High Priority (5m interval)

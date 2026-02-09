@@ -185,7 +185,7 @@ All cameras automatically on VLAN 10 (IoT) without per-port config.
 
 ## WiFi Configuration
 
-### TP-Link AX3000 AP
+### TP-Link Archer AX50 AP
 
 | SSID | VLAN | Purpose |
 |------|------|---------|
@@ -236,7 +236,7 @@ Tailscale devices access services via overlay network, bypassing VLANs:
 
 | Tailscale IP | Device | Physical VLAN |
 |--------------|--------|---------------|
-| 100.64.0.10 | Docker VM | 1 |
+| 100.68.63.168 | Docker VM | 1 |
 | 100.64.0.11 | RPi 4 | 1 |
 | 100.64.0.12 | NAS | 1 |
 

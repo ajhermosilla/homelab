@@ -78,7 +78,7 @@ cronova.dev {
 
 # Vault - Password manager (proxied to Fixed Homelab via Tailscale)
 vault.cronova.dev {
-    reverse_proxy 100.64.0.10:8843 {
+    reverse_proxy 100.68.63.168:8843 {
         # Health check
         health_uri /alive
         health_interval 30s
@@ -373,8 +373,8 @@ networks:
 | A | api | VPS_IP | Yes |
 | A | saas | VPS_IP | Yes |
 | A | hs | RPi5_PUBLIC_IP | No (DNS only) |
-| A | home | 100.64.0.10 | No (internal) |
-| A | media | 100.64.0.10 | No (internal) |
+| A | home | 100.68.63.168 | No (internal) |
+| A | media | 100.68.63.168 | No (internal) |
 | A | btc | 100.64.0.11 | No (internal) |
 | A | nas | 100.64.0.12 | No (internal) |
 | A | git | 100.64.0.2 | No (internal) |
@@ -517,10 +517,10 @@ docker exec caddy curl localhost:3001
 
 ```bash
 # Verify Tailscale connectivity
-tailscale ping 100.64.0.10
+tailscale ping 100.68.63.168
 
 # Check if service is reachable
-curl http://100.64.0.10:8843
+curl http://100.68.63.168:8843
 ```
 
 ---
