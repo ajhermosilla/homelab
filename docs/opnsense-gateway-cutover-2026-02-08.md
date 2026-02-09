@@ -80,11 +80,11 @@ ISP coax → ARRIS TG2482 (bridge mode)
 
 ## Phase 1: Prep (Weekday, No Downtime)
 
-### 1a. Document Current State
+### 1a. Document Current State — DONE
 
-- [ ] Screenshot TP-Link DHCP reservations
-- [ ] Note TP-Link WiFi settings (SSID, password, channel, band)
-- [ ] Back up OPNsense config (System → Configuration → Backups)
+- [x] Screenshot TP-Link DHCP reservations (no reservations, 9 clients, pool 192.168.0.100–249)
+- [x] Note TP-Link WiFi settings (SSID, password, channel, band)
+- [x] Back up OPNsense config (System → Configuration → Backups)
 
 ### 1b. Verify Proxmox Network — DONE
 
@@ -97,9 +97,9 @@ ISP coax → ARRIS TG2482 (bridge mode)
 Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN).
 **Cannot apply until cutover** — `nic1` has no cable, so `vmbr1` has no physical connectivity.
 
-- [ ] Stage target config at `/etc/network/interfaces.cutover` on Proxmox
-- [ ] Target config: `vmbr0` = manual (no IP), `vmbr1` = `192.168.0.237/24` gw `192.168.0.1`
-- [ ] Applied during Phase 2 after cabling `nic1` to switch
+- [x] Stage target config at `/etc/network/interfaces.cutover` on Proxmox
+- [x] Target config: `vmbr0` = manual (no IP), `vmbr1` = `192.168.0.237/24` gw `192.168.0.1`
+- [ ] Applied during Phase 2 after cabling `nic1` to switch (cutover day)
 
 ### 1c. Verify OPNsense Settings — DONE
 
@@ -130,34 +130,34 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
 > Cannot be done during prep: OPNsense LAN is still `192.168.1.x`, so gateway
 > `192.168.0.1` won't exist. Done in Phase 2 step 8 after OPNsense LAN re-IP.
 
-### 1e. Update Homelab Configs
+### 1e. Update Homelab Configs — DONE
 
-Files referencing `192.168.1.x` that need updating:
+226 replacements across 38 files (commit `ca99bfc`). Remote configs also updated (2026-02-09):
 
 **Compose files:**
-- [ ] `docker/fixed/docker-vm/security/docker-compose.yml` — NFS mount IP, Restic repository URL
-- [ ] `docker/fixed/docker-vm/networking/caddy/` — Caddy bind address
-- [ ] `docker/fixed/nas/storage/docker-compose.yml` — NFS exports
-- [ ] `docker/fixed/nas/backup/docker-compose.yml` — REST server references
+- [x] `docker/fixed/docker-vm/security/docker-compose.yml` — NFS mount IP, Restic repository URL
+- [x] `docker/fixed/docker-vm/networking/caddy/` — Caddy bind address
+- [x] `docker/fixed/nas/storage/docker-compose.yml` — NFS exports
+- [x] `docker/fixed/nas/backup/docker-compose.yml` — REST server references
 
 **Infrastructure:**
-- [ ] `ansible/inventory.yml` — Docker-vm host IP, local_network var
-- [ ] `~/.ssh/config` — not affected (uses Tailscale IPs)
-- [ ] Pi-hole TOML — `nas.home` DNS entry (192.168.1.12 → 192.168.0.12)
-- [ ] Caddy config on Docker-vm — TLS bindings reference LAN IP
-- [ ] NAS deployment plan — all 192.168.1.x references
+- [x] `ansible/inventory.yml` — Docker-vm host IP, local_network var
+- [x] `~/.ssh/config` — not affected (uses Tailscale IPs)
+- [x] Pi-hole TOML — `nas.home` + `syncthing.home` DNS entries (updated live on docker-vm)
+- [x] Caddy config on Docker-vm — TLS bindings (updated live, container restarted)
+- [x] NAS deployment plan — all 192.168.1.x references
 
 **Documentation:**
-- [ ] `docs/nas-deployment-plan.md`
-- [ ] `docs/network-topology.md`
-- [ ] `docs/vlan-design.md`
+- [x] `docs/nas-deployment-plan.md`
+- [x] `docs/network-topology.md`
+- [x] `docs/vlan-design.md`
 
-### 1f. Prepare TP-Link for AP Mode
+### 1f. Prepare TP-Link for AP Mode — DONE
 
-- [ ] Log into TP-Link admin (192.168.0.1)
-- [ ] Note exact WiFi settings: SSID, password, security type, channel, band
-- [ ] Locate AP mode setting (Operation Mode → Access Point)
-- [ ] **DON'T switch yet** — just know where the setting is
+- [x] Log into TP-Link admin (192.168.0.1) — Archer AX50 v1.0, FW 1.1.2
+- [x] Note exact WiFi settings: SSID, password, security type, channel, band
+- [x] Locate AP mode setting (Operation Mode → Access Point)
+- [ ] Assign static IP `192.168.0.2` for management after AP mode (during cutover)
 - [ ] Assign static IP `192.168.0.2` for management after AP mode
 
 ---
