@@ -110,8 +110,8 @@ Virtualization host running network gateway and Docker services.
 │   └── Resources: 2 vCPU, 2GB RAM
 │
 └── Docker Host VM (Ubuntu/Debian)
-    ├── Network: vmbr0 (LAN)
-    ├── Resources: 2 vCPU, 8GB RAM, 400GB disk
+    ├── Network: vmbr1 (LAN)
+    ├── Resources: 2 vCPU, 7GB RAM, 100GB disk
     └── Services: All containers
 ```
 
@@ -159,9 +159,9 @@ Virtualization host running network gateway and Docker services.
 |---------|-------|
 | OS | Ubuntu 24.04 LTS / Debian 12 |
 | vCPU | 2 (expandable) |
-| RAM | 8GB (expandable) |
-| Disk | 400GB |
-| Network | vmbr0 (static IP) |
+| RAM | 7GB (expandable) |
+| Disk | 100GB |
+| Network | vmbr1 (static IP) |
 
 **Docker Services:**
 
@@ -173,7 +173,7 @@ Virtualization host running network gateway and Docker services.
 | Sonarr | Media | 8989 | TV show management |
 | Radarr | Media | 7878 | Movie management |
 | Prowlarr | Media | 9696 | Indexer management |
-| qBittorrent | Media | 8080, 6881 | Torrent client (Web UI, protocol) |
+| qBittorrent | Media | 8081, 6881 | Torrent client (Web UI, protocol) |
 | Home Assistant | Automation | 8123 | Home automation |
 | Mosquitto | Automation | 1883 | MQTT broker (HA ↔ Frigate) |
 | Frigate | Security | 5000 | NVR (recordings via NFS to NAS) |
