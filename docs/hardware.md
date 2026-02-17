@@ -4,11 +4,12 @@
 
 ```
 [Mobile Kit - On Demand]        [Fixed Homelab - 24/7]          [VPS - 24/7]
-├── RPi 5 (Pi-hole)            ├── Mini PC (Proxmox)           ├── Headscale
-├── MacBook Air M1             ├── RPi 4 (Start9)              ├── Caddy
-├── Beryl AX Router            ├── NAS (DIY Mini-ITX)          ├── Uptime Kuma
-└── Samsung A13                ├── MokerLink 2.5G Switch       ├── ntfy
-                               ├── TP-Link PoE Switch          └── ~$6/mo
+├── MacBook Air M1             ├── Mini PC (Proxmox)           ├── Headscale
+├── Beryl AX Router            ├── RPi 5 (OpenClaw)            ├── Caddy
+└── Samsung A13                ├── RPi 4 (Start9)              ├── Uptime Kuma
+                               ├── NAS (DIY Mini-ITX)          ├── ntfy
+                               ├── MokerLink 2.5G Switch       └── ~$6/mo
+                               ├── TP-Link PoE Switch
                                ├── TP-Link Archer AX50 AP
                                ├── 3x IP Cameras
                                └── Forza UPS
@@ -22,20 +23,9 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | Pi-hole (mobile DNS) | PSU in transit |
 | MacBook Air M1 | 16GB RAM, 1TB SSD, macOS Sonoma | Workstation, soft-serve, Docker dev | Active |
-| Beryl AX | GL-MT3000 | Network gateway, DHCP, VPN | Active |
+| Beryl AX | GL-MT3000 | Network gateway, DHCP, VPN, AdGuard DNS | Active |
 | Samsung A13 | Android | USB tethering for internet | Active |
-
-### RPi 5 Details
-
-| Component | Model | Notes |
-|-----------|-------|-------|
-| Board | Raspberry Pi 5 8GB | Mobile DNS server |
-| Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
-| Cooling | Official Active Cooler | Required for 24/7 operation |
-| PSU | Official 27W USB-C | In transit (Miami → Asunción) |
-| Case | TBD | See `docs/rpi5-case-research.md` |
 
 ### Mobile Network Topology
 
@@ -46,11 +36,9 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
            USB Tether
                  |
          [Travel Router]
-           /         \
-          /           \
-   [MacBook Air]    [RPi 5]
-         \           /
-          \         /
+                 |
+          [MacBook Air]
+                 |
         [Tailscale Mesh]
 ```
 
@@ -58,7 +46,7 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 
 | Device | Services |
 |--------|----------|
-| RPi 5 | Pi-hole (mobile DNS) |
+| Beryl AX | AdGuard DNS (mobile ad-blocking) |
 | MacBook | soft-serve, Docker workloads |
 
 *Note: Headscale moved to VPS for 24/7 availability.*
@@ -74,6 +62,7 @@ Always-on infrastructure at home.
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
 | Mini PC | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
+| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | OpenClaw (AI assistant) | Pending setup |
 | Raspberry Pi 4 | 4GB RAM, 1TB external SSD | Start9 (Bitcoin node) | Pending setup |
 | NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian (Frigate, Samba, Syncthing) | Pending setup |
 
@@ -110,7 +99,7 @@ Always-on infrastructure at home.
 |-----------|------|-------|
 | Model | Aoostar N1 Pro | |
 | CPU | Intel N150 | VT-x for virtualization |
-| RAM | 12GB | ~1GB host + 11GB VMs |
+| RAM | 12GB | ~1GB host + 2GB OPNsense + 9GB Docker |
 | Storage | 512GB SSD | Proxmox + VMs |
 | NIC | Dual port required | WAN bridge (vmbr0) + LAN bridge (vmbr1) |
 | BIOS | Restore on AC Power Loss | Set to "Power On" for auto-boot |
@@ -119,12 +108,20 @@ Always-on infrastructure at home.
 | VM | ID | vCPU | RAM | Disk | Start Order |
 |----|-----|------|-----|------|-------------|
 | OPNsense | 100 | 2 | 2GB | 20GB | 1 (delay: 0) |
-| Docker | 101 | 2 | 7GB | 100GB | 2 (delay: 30) |
-| OpenClaw | 102 | 2 | 2GB | 20GB | 3 (delay: 60) |
+| Docker | 101 | 2 | 9GB | 100GB | 2 (delay: 30) |
 
 - **OPNsense** - Router/firewall
 - **Docker** - Pi-hole, Jellyfin, Frigate, Home Assistant, *arr stack, etc.
-- **OpenClaw** - AI assistant experimentation (cloud APIs)
+
+### RPi 5 Details
+
+| Component | Model | Notes |
+|-----------|-------|-------|
+| Board | Raspberry Pi 5 8GB | OpenClaw AI assistant |
+| Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
+| Cooling | Official Active Cooler | Required for 24/7 operation |
+| PSU | Official 27W USB-C | In transit (Miami → Asunción) |
+| Case | TBD | See `docs/rpi5-case-research.md` |
 
 ### RPi 4 Details
 
@@ -214,10 +211,10 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
                            |
                   [Managed 2.5G Switch]
                            |
-     +----------+----------+-----------+----------+
-     |          |          |           |          |
-[Docker VM] [Bitcoin]   [NAS]    [WiFi AP]  [PoE Switch]
-              Node                              |
+     +----------+----------+-----------+----------+-----------+
+     |          |          |           |          |           |
+[Docker VM] [RPi 5]  [Bitcoin]   [NAS]    [WiFi AP]  [PoE Switch]
+           OpenClaw    Node                              |
                                           +----+----+
                                           |         |
                                      [PoE Cam]  [PoE Cam]
@@ -230,6 +227,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 | Device | Services |
 |--------|----------|
 | Docker VM | Pi-hole, Caddy, Jellyfin, *arr stack, Home Assistant, Vaultwarden, Mosquitto, Frigate |
+| RPi 5 | OpenClaw (AI assistant) |
 | RPi 4 | Bitcoin Core, LND, Electrum Server (Start9) |
 | NAS | NFS (for Frigate), Samba, Syncthing, Restic REST |
 
@@ -337,11 +335,8 @@ acls:
 
 | Device | Power | Notes |
 |--------|-------|-------|
-| RPi 5 | 27W USB-C | Official PSU required |
 | Beryl AX | 15W USB-C | Can share power bank |
 | MacBook | Battery | 15+ hours |
-
-**Future:** USB-C power bank for RPi 5 + Beryl AX
 
 ### Fixed Homelab
 
@@ -350,6 +345,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | Device | Power | UPS Protected |
 |--------|-------|---------------|
 | Mini PC | ~35W | Yes |
+| RPi 5 | 27W | Yes |
 | RPi 4 | 15W | Yes |
 | NAS | ~50W idle | Yes |
 | MokerLink Switch | ~15W | Yes |

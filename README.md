@@ -17,11 +17,12 @@ Personal infrastructure as code. Mobile kit, fixed homelab, and VPS.
 ```
 [Mobile Kit]              [Fixed Homelab]              [VPS]
 On-demand                 24/7                         24/7
-├── RPi 5 (Pi-hole)       ├── Proxmox (Mini PC)        ├── Headscale
-├── MacBook Air           │   ├── OPNsense VM          ├── Caddy
-└── Beryl AX Router       │   └── Docker VM            ├── DERP Relay
-                          ├── Start9 (RPi 4)           ├── Uptime Kuma
-                          └── NAS (Mini-ITX)           └── ntfy
+├── MacBook Air           ├── Proxmox (Mini PC)        ├── Headscale
+├── Beryl AX Router       │   ├── OPNsense VM          ├── Caddy
+└── Samsung A13           │   └── Docker VM            ├── DERP Relay
+                          ├── RPi 5 (OpenClaw)         ├── Uptime Kuma
+                          ├── Start9 (RPi 4)           └── ntfy
+                          └── NAS (Mini-ITX)
 ```
 
 **24 services** across 3 environments. See [docs/services.md](docs/services.md) for full list.
@@ -111,7 +112,7 @@ See [docker/README.md](docker/README.md) for Docker network strategy and deploym
    - Docker VM with services
    - NAS services
    - Start9 on RPi 4
-3. **Mobile Kit** - Pi-hole on RPi 5
+3. **Mobile Kit** - MacBook Air + Beryl AX
 
 ## Key Services
 
@@ -142,7 +143,7 @@ VLANs:
 | Environment | Status |
 |-------------|--------|
 | VPS | Active (Headscale, Caddy, Uptime Kuma, ntfy) |
-| Fixed Homelab | Partial (Proxmox + OPNsense active; Pi-hole, Caddy, Vaultwarden on Docker VM) |
+| Fixed Homelab | Partial (Proxmox + OPNsense active; Pi-hole, Caddy, Vaultwarden on Docker VM; RPi 5 pending setup) |
 | Mobile Kit | Pending |
 
 ---

@@ -39,7 +39,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
         192.168.8.1               192.168.0.237       [changedetection]
         /         \                      │            [Restic REST]
        /           \             [OPNsense VM]
-    MacBook   RPi 5-Pi-hole     192.168.0.1
+    MacBook                192.168.0.1
   192.168.8.10  192.168.8.5           │
     [Mobile Kit]                 [vmbr0 - LAN]
                                        │
@@ -53,7 +53,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Environment | Hardware | Role | Key Services |
 |-------------|----------|------|--------------|
-| **Mobile Kit** | RPi 5, MacBook, Beryl AX | On-demand, portable | Pi-hole, soft-serve |
+| **Mobile Kit** | MacBook, Beryl AX, Samsung A13 | On-demand, portable | soft-serve |
 | **Fixed Homelab** | Mini PC, RPi 4, NAS | Always-on (24/7) | Media, Bitcoin, storage, automation |
 | **VPS** | Vultr US ($6/mo) | Always-on (24/7) | Headscale, DERP, monitoring |
 
@@ -246,7 +246,7 @@ verava.ai
                     ┌─────────────────────┼─────────────────────┐
                     │                     │                     │
              [Mobile Kit]          [Fixed Homelab]        [VPS Helper]
-             RPi 5 + MacBook       Mini PC + RPi 4        Vultr US
+             MacBook + Beryl AX    Mini PC + RPi 4        Vultr US
              100.64.0.1-2          + NAS                  100.77.172.46
                                    100.68.63.168+
 ```
@@ -325,10 +325,10 @@ verava.ai {
    ┌──────┴──────┐        ┌──────┴──────┐        ┌──────┴──────┐
    │ Mobile Kit  │        │Fixed Homelab│        │   (VPS)     │
    │             │        │             │        │  Already    │
-   │ RPi 5       │        │ Mini PC     │        │  shown      │
-   │ 100.64.0.1  │        │ (Proxmox)   │        │  above      │
-   │ • Headscale │        │100.78.12.241│        │             │
-   │ • Pi-hole   │        │             │        └─────────────┘
+   │             │        │ Mini PC     │        │  shown      │
+   │             │        │ (Proxmox)   │        │  above      │
+   │             │        │100.78.12.241│        │             │
+   │             │        │             │        └─────────────┘
    │             │        │ ┌─────────┐ │
    │ MacBook     │        │ │OPNsense │ │
    │ 100.64.0.2  │        │ │  VM     │ │
@@ -343,6 +343,10 @@ verava.ai {
                           │ │HA       │ │
                           │ │Vault    │ │
                           │ └─────────┘ │
+                          │             │
+                          │ RPi 5       │
+                          │ 192.168.0.20│
+                          │ • OpenClaw  │
                           │             │
                           │ RPi 4       │
                           │ 100.64.0.11 │
@@ -377,7 +381,7 @@ verava.ai {
 | # | Task | Deliverable | Priority |
 |---|------|-------------|----------|
 | 5 | Document NAS hardware specs | Update `hardware.md` | High |
-| 6 | Create mobile kit compose files | `docker/mobile/rpi5/` | High |
+| 6 | Create mobile kit compose files | `docker/mobile/` | High |
 | 7 | Create VPS compose files | `docker/vps/` | High |
 | 8 | Audit VPS RAM usage | Document actual consumption | High |
 | 9 | Plan domain DNS records | Update `domain-research.md` | High |

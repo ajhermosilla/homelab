@@ -2,13 +2,13 @@
 # Usage: ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw
 #
 # Prerequisites:
-#   - Debian 12 installed on VM
+#   - Raspberry Pi OS (Debian-based) on RPi 5
 #   - SSH access configured
 #   - Run common.yml first for base setup
 
 ---
 - name: Install and configure OpenClaw
-  hosts: openclaw_vm
+  hosts: openclaw_hosts
   become: true
 
   vars:

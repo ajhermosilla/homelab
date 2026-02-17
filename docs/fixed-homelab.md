@@ -111,7 +111,7 @@ Virtualization host running network gateway and Docker services.
 │
 └── Docker Host VM (Debian 13 trixie)
     ├── Network: vmbr1 (LAN)
-    ├── Resources: 2 vCPU, 7GB RAM, 100GB disk
+    ├── Resources: 2 vCPU, 9GB RAM, 100GB disk
     └── Services: All containers
 ```
 
@@ -159,7 +159,7 @@ Virtualization host running network gateway and Docker services.
 |---------|-------|
 | OS | Debian 13 (trixie) |
 | vCPU | 2 (expandable) |
-| RAM | 7GB (expandable) |
+| RAM | 9GB |
 | Disk | 100GB |
 | Network | vmbr1 (static IP) |
 

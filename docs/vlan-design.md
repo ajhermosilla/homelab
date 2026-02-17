@@ -49,7 +49,7 @@ Trusted devices with full network access.
 | Docker VM | .10 | MokerLink P2 | Pi-hole, Jellyfin, etc |
 | RPi 4 (Start9) | .11 | MokerLink P3 | Bitcoin node |
 | NAS | .12 | MokerLink P4 | Storage, backups |
-| OpenClaw VM | .20 | (virtual) | AI assistant |
+| RPi 5 (openclaw) | .20 | MokerLink P5 | AI assistant |
 | TP-Link AP | - | MokerLink P7 | VLAN trunk |
 | Yamaha RX-V671 | .30 | MokerLink P5 | AV Receiver (Ethernet) |
 | Apple TV | .31 | WiFi (HomeNet) | Jellyfin client |

@@ -7,6 +7,7 @@ Step-by-step guide for deploying the homelab from scratch.
 ### Hardware Ready
 
 - [ ] Mini PC with dual NIC
+- [ ] Raspberry Pi 5 with SD card
 - [ ] Raspberry Pi 4 with 1TB SSD
 - [ ] NAS with drives installed
 - [ ] MokerLink switch
@@ -19,7 +20,8 @@ Step-by-step guide for deploying the homelab from scratch.
 ### Software Ready
 
 - [ ] Proxmox VE ISO on USB
-- [ ] Debian 12 ISO on USB
+- [ ] Debian ISO on USB (Docker VM)
+- [ ] Raspberry Pi OS on SD card (RPi 5)
 - [ ] Start9 ISO on USB/SD
 - [ ] OPNsense ISO downloaded
 - [ ] This repo cloned locally
@@ -149,11 +151,12 @@ docker compose up -d
 
 1. Connect ISP modem to Mini PC NIC1 (WAN)
 2. Connect Mini PC NIC2 to MokerLink Port 1
-3. Connect PoE switch to MokerLink Port 6
-4. Connect AP to MokerLink Port 7
-5. Connect NAS to MokerLink Port 4
-6. Connect RPi 4 to MokerLink Port 3
-7. Power on all devices
+3. Connect RPi 5 to MokerLink Port 5
+4. Connect PoE switch to MokerLink Port 6
+5. Connect AP to MokerLink Port 7
+6. Connect NAS to MokerLink Port 4
+7. Connect RPi 4 to MokerLink Port 3
+8. Power on all devices
 
 ### 2.2 Install Proxmox VE
 
@@ -201,7 +204,7 @@ tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 
 See `docs/proxmox-setup.md` for VM creation.
 
-1. Create VM (8GB RAM, 100GB disk)
+1. Create VM (9GB RAM, 100GB disk)
 2. Install Debian 13 (trixie)
 3. Configure static IP or DHCP reservation
 4. Install Docker
@@ -266,6 +269,26 @@ docker compose up -d
 cd /opt/homelab/docker/fixed/docker-vm/media
 cp .env.example .env
 docker compose up -d
+```
+
+### 3.8 RPi 5 Setup (OpenClaw)
+
+1. Flash Raspberry Pi OS to SD card
+2. Boot RPi 5, configure network (192.168.0.20)
+3. Connect to MokerLink switch
+4. Bootstrap with Ansible:
+
+```bash
+ssh-copy-id augusto@192.168.0.20
+
+ansible-playbook -i inventory.yml playbooks/common.yml -l rpi5 \
+  -e "ansible_host=192.168.0.20"
+
+ansible-playbook -i inventory.yml playbooks/openclaw.yml -l rpi5 \
+  -e "ansible_host=192.168.0.20"
+
+ansible-playbook -i inventory.yml playbooks/tailscale.yml -l rpi5 \
+  -e "ansible_host=192.168.0.20" -e "authkey=tskey-xxx"
 ```
 
 ---
