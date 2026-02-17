@@ -1,5 +1,5 @@
 # OpenClaw AI assistant installation
-# Usage: ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw
+# Usage: ansible-playbook -i inventory.yml playbooks/openclaw.yml -l rpi5
 #
 # Prerequisites:
 #   - Raspberry Pi OS (Debian-based) on RPi 5
