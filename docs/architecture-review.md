@@ -461,7 +461,7 @@ These MUST work for the architecture to function:
 | Unbound on OPNsense | Privacy DNS | Fallback to public DNS |
 | Restic encryption keys | All backups | Store in Vaultwarden + paper |
 | Tailscale connectivity | Inter-device comms | DERP relay on VPS |
-| OPNsense WAN passthrough | Network isolation | Alternative: bridge mode |
+| OPNsense WAN bridged (vmbr0) | Network isolation | Bridged approach, no passthrough needed |
 
 ---
 

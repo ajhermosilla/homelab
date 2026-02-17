@@ -162,15 +162,15 @@ See `docs/proxmox-setup.md` for detailed steps.
 1. Boot Mini PC from Proxmox USB
 2. Complete installation wizard
 3. Access web UI at https://192.168.0.237:8006
-4. Enable IOMMU for NIC passthrough
-5. Configure network bridge (vmbr0)
+4. Enable IOMMU (optional, for future PCI passthrough)
+5. Configure network bridges (vmbr0, vmbr1)
 
 ### 2.3 Create OPNsense VM
 
 See `docs/opnsense-setup.md` for detailed steps.
 
 1. Upload OPNsense ISO to Proxmox
-2. Create VM with WAN NIC passthrough
+2. Create VM with dual bridged NICs (vmbr0 WAN, vmbr1 LAN)
 3. Install OPNsense
 4. Configure WAN (DHCP from ISP)
 5. Configure LAN (192.168.0.1/24)
