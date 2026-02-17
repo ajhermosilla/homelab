@@ -168,7 +168,6 @@ If you only need basic Tailscale features (no custom login server), use the buil
 After successful implementation:
 
 - [ ] Update `docs/hardware.md` - note Tailscale persistence fix applied
-- [ ] Update `docker/mobile/rpi5/README.md` - reference this guide for Beryl AX setup
 - [ ] Test disaster recovery procedure with this configuration
 
 ## References
@@ -176,7 +175,7 @@ After successful implementation:
 - [GL.iNet Forum - Tailscale Settings Lost](https://forum.gl-inet.com/t/tailscale-settings-lost-on-reboot/31524)
 - [Headscale Documentation](https://headscale.net/)
 - [Tailscale on OpenWrt](https://tailscale.com/kb/1114/openwrt/)
-- This homelab: `docs/hardware.md`, `docker/mobile/rpi5/README.md`
+- This homelab: `docs/hardware.md`
 
 ## Implementation Notes (2026-01-20)
 

@@ -21,7 +21,6 @@
       vps: "vps"                    # docker/vps/<stack>
       docker_vm: "fixed/docker-vm"  # docker/fixed/docker-vm/<stack>
       storage: "fixed/nas"          # docker/fixed/nas/<stack>
-      mobile: "mobile/rpi5"         # docker/mobile/rpi5/<stack>
     # Available stacks per host type:
     vps_stacks:
       - networking/headscale

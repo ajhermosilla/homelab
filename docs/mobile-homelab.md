@@ -211,16 +211,9 @@ Portable infrastructure for dev, self-hosting, and travel.
 | 9 | Join RPi 5 to Headscale (VPS) | Pending |
 | 10 | Test on-demand operation | Pending |
 
-## Docker Structure (RPi 5)
+## RPi 5 (Moved to Fixed Homelab)
 
-```
-docker/mobile/rpi5/
-└── networking/
-    └── pihole/
-        └── docker-compose.yml
-```
-
-*Headscale docker-compose is now in `docker/vps/networking/headscale/`*
+RPi 5 has been migrated from the mobile kit to the fixed homelab, running OpenClaw directly (not Docker). See `docs/rpi5-deployment-plan.md`.
 
 ## Backup Strategy
 
