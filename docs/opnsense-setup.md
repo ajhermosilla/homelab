@@ -83,8 +83,8 @@ Hardware:
   - Processors: 2 (host)
   - BIOS: OVMF (UEFI)
   - Disk: 20GB virtio
-  - PCI Device: 02:00.0 (WAN NIC passthrough)
-  - Network: vmbr0 (LAN bridge)
+  - net0: vmbr0 (WAN bridge)
+  - net1: vmbr1 (LAN bridge)
 ```
 
 ---
@@ -114,8 +114,8 @@ Password: opnsense
 ```
 
 Assign interfaces:
-- WAN: `igc0` (passthrough NIC)
-- LAN: `vtnet0` (bridge)
+- WAN: `vtnet0` (bridged, vmbr0)
+- LAN: `vtnet1` (bridged, vmbr1)
 
 ### 3. Web GUI Access
 
@@ -355,7 +355,7 @@ Install telegraf plugin for metrics export.
 
 ### Initial Setup
 - [ ] VM created with correct resources
-- [ ] WAN NIC passthrough configured
+- [ ] WAN bridge (vmbr0) configured
 - [ ] LAN bridge configured
 - [ ] OPNsense installed
 - [ ] Web GUI accessible

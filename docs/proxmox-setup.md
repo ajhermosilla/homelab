@@ -112,8 +112,8 @@ dmesg | grep -e DMAR -e IOMMU
 ```bash
 ip link show
 # Example:
-# enp1s0 - WAN (for passthrough)
-# enp2s0 - LAN (for bridge)
+# enp1s0 - WAN (vmbr0 bridge)
+# enp2s0 - LAN (vmbr1 bridge)
 ```
 
 ### Edit Network Config
@@ -217,21 +217,16 @@ ifreload -a
 | Bridge | vmbr0 |
 | Model | VirtIO |
 
-### 2. Add PCI Passthrough (WAN NIC)
+### 2. Add Second NIC (WAN)
 
-```bash
-# Find WAN NIC PCI address
-lspci | grep -i ethernet
-# Example: 01:00.0 Ethernet controller: Intel...
-```
+The OPNsense VM needs two bridged NICs — one for WAN (vmbr0) and one for LAN (vmbr1).
+The first NIC (vmbr0) was added during VM creation. Now add the second:
 
-**VM > Hardware > Add > PCI Device:**
+**VM > Hardware > Add > Network Device:**
 | Setting | Value |
 |---------|-------|
-| Device | 01:00.0 (WAN NIC) |
-| All Functions | Yes |
-| Primary GPU | No |
-| PCI-Express | Yes |
+| Bridge | vmbr1 |
+| Model | VirtIO |
 
 ### 3. VM Options
 
@@ -598,7 +593,7 @@ Add Proxmox health check:
 - [ ] Proxmox VE installed and accessible
 - [ ] IOMMU enabled and verified
 - [ ] Network bridge (vmbr0) configured
-- [ ] WAN NIC identified for passthrough
+- [ ] WAN NIC identified for vmbr0 bridge
 - [ ] ISOs uploaded
 
 ### OPNsense VM

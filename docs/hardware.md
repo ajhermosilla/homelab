@@ -73,7 +73,7 @@ Always-on infrastructure at home.
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-| Mini PC | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Pending setup |
+| Mini PC | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
 | Raspberry Pi 4 | 4GB RAM, 1TB external SSD | Start9 (Bitcoin node) | Pending setup |
 | NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian (Frigate, Samba, Syncthing) | Pending setup |
 
@@ -109,10 +109,10 @@ Always-on infrastructure at home.
 | Component | Spec | Notes |
 |-----------|------|-------|
 | Model | Aoostar N1 Pro | |
-| CPU | Intel N150 | VT-x/VT-d for passthrough |
+| CPU | Intel N150 | VT-x for virtualization |
 | RAM | 12GB | ~1GB host + 11GB VMs |
 | Storage | 512GB SSD | Proxmox + VMs |
-| NIC | Dual port required | WAN passthrough + LAN bridge |
+| NIC | Dual port required | WAN bridge (vmbr0) + LAN bridge (vmbr1) |
 | BIOS | Restore on AC Power Loss | Set to "Power On" for auto-boot |
 
 **VMs:**
