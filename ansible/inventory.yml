@@ -44,11 +44,12 @@ all:
           vars:
             docker_host: true
 
-        openclaw_vm:
+        openclaw_hosts:
           hosts:
-            openclaw:
-              ansible_host: 100.64.0.14
-              # ansible_host: 192.168.0.20  # Local access (bootstrap)
+            rpi5:
+              ansible_host: 192.168.0.20  # LAN IP
+              # Tailscale IP: assigned on enrollment
+              ansible_user: augusto
           vars:
             openclaw_host: true
 
@@ -79,10 +80,6 @@ all:
     # Mobile Kit
     # ==========================================================================
     mobile:
-      hosts:
-        rpi5:
-          ansible_host: 100.64.0.1
-          # ansible_host: 192.168.8.5  # Beryl AX network
       vars:
         environment_type: mobile
         timezone: America/Asuncion
@@ -102,7 +99,6 @@ all:
       hosts:
         vultr:
         docker:
-        rpi5:
 
     backup_targets:
       hosts:
@@ -113,8 +109,7 @@ all:
       hosts:
         vultr:
         docker:
-        openclaw:
+        rpi5:
         nas:
         rpi4:
-        rpi5:
         oga:

@@ -130,7 +130,7 @@ ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
 
 ### openclaw.yml
 
-Install OpenClaw AI assistant on dedicated VM.
+Install OpenClaw AI assistant on Raspberry Pi 5.
 
 ```bash
 ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw
@@ -192,11 +192,11 @@ ansible-playbook -i inventory.yml playbooks/common.yml --check --diff
 |-------|-------|-------------|
 | `all` | All hosts | Every managed host |
 | `vps` | vultr | Cloud VPS |
-| `fixed` | oga, docker, openclaw, nas, rpi4 | Fixed homelab |
-| `mobile` | rpi5 | Mobile kit |
+| `fixed` | oga, docker, rpi5, nas, rpi4 | Fixed homelab |
+| `mobile` | (none currently) | Mobile kit |
 | `docker_hosts` | vultr, docker, nas | Hosts running Docker |
-| `pihole_hosts` | vultr, docker, rpi5 | Hosts running Pi-hole |
-| `openclaw_vm` | openclaw | OpenClaw AI assistant |
+| `pihole_hosts` | vultr, docker | Hosts running Pi-hole |
+| `openclaw_hosts` | rpi5 | OpenClaw AI assistant (RPi 5) |
 | `tailscale_clients` | All except control | Tailscale mesh members |
 
 ## Variables
@@ -266,7 +266,7 @@ Manual step - create VM, install Debian, note the IP.
 ```bash
 ssh-copy-id augusto@192.168.0.10  # Docker VM
 ssh-copy-id augusto@192.168.0.12  # NAS
-ssh-copy-id augusto@192.168.0.20  # OpenClaw VM
+ssh-copy-id augusto@192.168.0.20  # RPi 5 (openclaw)
 ```
 
 ### 3. Run playbooks with local IP override
@@ -282,14 +282,14 @@ ansible-playbook -i inventory.yml playbooks/docker.yml -l docker \
 ansible-playbook -i inventory.yml playbooks/tailscale.yml -l docker \
   -e "ansible_host=192.168.0.10" -e "authkey=tskey-xxx"
 
-# OpenClaw VM bootstrap
-ansible-playbook -i inventory.yml playbooks/common.yml -l openclaw \
+# RPi 5 (openclaw) bootstrap
+ansible-playbook -i inventory.yml playbooks/common.yml -l rpi5 \
   -e "ansible_host=192.168.0.20"
 
-ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw \
+ansible-playbook -i inventory.yml playbooks/openclaw.yml -l rpi5 \
   -e "ansible_host=192.168.0.20"
 
-ansible-playbook -i inventory.yml playbooks/tailscale.yml -l openclaw \
+ansible-playbook -i inventory.yml playbooks/tailscale.yml -l rpi5 \
   -e "ansible_host=192.168.0.20" -e "authkey=tskey-xxx"
 ```
 
@@ -312,8 +312,8 @@ Host docker
     HostName 100.68.63.168
     User augusto
 
-Host openclaw
-    HostName 100.64.0.14
+Host rpi5  # RPi 5 (openclaw)
+    HostName 192.168.0.20
     User augusto
 
 Host nas

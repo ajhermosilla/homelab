@@ -6,11 +6,10 @@
 
 | Service | Category | Environment | Host | Status |
 |---------|----------|-------------|------|--------|
-| Pi-hole | Networking | Mobile | RPi 5 | Planned |
 | Headscale | Networking | VPS | Vultr | Active |
 | soft-serve | Git | Mobile | MacBook | Active |
 | Pi-hole | Networking | Fixed | Docker VM | Active |
-| OpenClaw | AI | Fixed | OpenClaw VM | Planned |
+| OpenClaw | AI | Fixed | RPi 5 | Planned |
 | Caddy | Networking | Fixed | Docker VM | Active |
 | Jellyfin | Media | Fixed | Docker VM | Planned |
 | Sonarr | Media | Fixed | Docker VM | Planned |
@@ -42,8 +41,9 @@
 
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
-| **Pi-hole** | 53, 80 | DNS ad-blocking (mobile) |
 | **soft-serve** | 23231-23233 | Git server (on MacBook) |
+
+*Mobile DNS handled by Beryl AX AdGuard Home.*
 
 ### Fixed Homelab - Docker VM
 
@@ -61,13 +61,13 @@
 | **Vaultwarden** | 8843 | Password manager |
 | **Frigate** | 5000 | NVR with AI detection (NFS to NAS) |
 
-### Fixed Homelab - OpenClaw VM
+### Fixed Homelab - RPi 5
 
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
 | **OpenClaw** | 18789 | AI assistant (cloud APIs) |
 
-*Standalone Debian VM for AI experimentation, isolated from Docker host.*
+*Raspberry Pi 5 (8GB) dedicated to OpenClaw, connected to MokerLink switch.*
 
 ### Fixed Homelab - Start9 (RPi 4)
 

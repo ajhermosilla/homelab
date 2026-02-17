@@ -68,12 +68,12 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 
 | Device | Tailscale IP | Role | Location |
 |--------|-------------|------|----------|
-| rpi5 | 100.64.0.1 | Mobile DNS | Mobile |
+| rpi5 | 192.168.0.20 | OpenClaw AI assistant | Fixed |
 | oga | 100.78.12.241 | Proxmox host | Fixed |
 | rpi4 | 100.64.0.11 | Start9 Bitcoin | Fixed |
 | nas | 100.64.0.12 | Storage server | Fixed |
 | docker | 100.68.63.168 | Container host | Fixed |
-| openclaw | 100.64.0.14 | AI assistant | Fixed |
+| rpi5 (openclaw) | 192.168.0.20 | AI assistant (RPi 5) | Fixed |
 | vultr | 100.77.172.46 | VPS / Exit node | Cloud |
 | macbook | 100.86.220.9 | Workstation | Mobile |
 | beryl-ax | 100.102.244.131 | Travel router | Mobile |
@@ -128,8 +128,8 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | Device | Model | Specs | IP | Role |
 |--------|-------|-------|-----|------|
 | Mini PC (oga) | N150 | 12GB RAM, 512GB SSD | 192.168.0.237 | Proxmox host |
-| Docker VM | Debian | 7GB RAM, 100GB | 192.168.0.10 | Containers |
-| OpenClaw VM | Debian | 2GB RAM, 20GB | 192.168.0.20 | AI assistant |
+| Docker VM | Debian | 9GB RAM, 100GB | 192.168.0.10 | Containers |
+| RPi 5 (openclaw) | Raspberry Pi OS | 8GB RAM, 32GB SD | 192.168.0.20 | AI assistant |
 | NAS | i3-3220T | 8GB RAM, 10TB total | 192.168.0.12 | Storage |
 | RPi 4 | 4GB | 1TB ext SSD | 192.168.0.11 | Start9 Bitcoin |
 | Switch | MokerLink | 8-port 2.5G | - | Backbone |
@@ -156,15 +156,6 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │    │               │              └─────────────┘          │
 │    │ • AdGuard DNS │                                        │
 │    │ • Tailscale   │                                        │
-│    └───────┬───────┘                                        │
-│            │ WiFi/Ethernet                                  │
-│            │                                                │
-│    ┌───────┴───────┐                                        │
-│    │    RPi 5      │  (Future: USB-C powered from Beryl)   │
-│    │  192.168.8.5  │                                        │
-│    │               │                                        │
-│    │ • Pi-hole DNS │                                        │
-│    │ • Tailscale   │                                        │
 │    └───────────────┘                                        │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
@@ -188,17 +179,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │               │      │               │
 │  AdGuard Home │      │  soft-serve   │
 │  (Primary DNS)│      │  Tailscale    │
-└───────┬───────┘      └───────────────┘
-        │
-        ▼
-┌───────────────┐
-│    RPi 5      │
-│  192.168.8.5  │
-│               │
-│   Pi-hole     │
-│  (Backup DNS) │
-│   Tailscale   │
-└───────────────┘
+└───────────────┘      └───────────────┘
 ```
 
 ## DNS Resolution Flow
@@ -212,8 +193,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │  ──────────                                                                  │
 │  [Device] ──► AdGuard (Beryl 192.168.8.1) ──► Cloudflare/Quad9              │
 │                    │                                                         │
-│                    └──► Pi-hole (RPi5 192.168.8.5) ──► Cloudflare/Quad9     │
-│                         (fallback)                                           │
+│                    (Beryl AX AdGuard handles mobile DNS)                    │
 │                                                                              │
 │  FIXED HOMELAB                                                               │
 │  ─────────────                                                               │
@@ -227,8 +207,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │                                                                              │
 │  TAILSCALE MESH (Fallback Chain)                                            │
 │  ───────────────────────────────                                            │
-│  Primary:  RPi 5      (100.64.0.1)                                          │
-│  Fallback: Docker VM  (100.68.63.168)                                       │
+│  Primary:  Docker VM  (100.68.63.168)                                       │
 │  Fallback: VPS        (100.77.172.46)                                       │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -314,17 +293,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
                                     │
                             [Tailscale Mesh]
                                     │
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           Mobile (RPi 5)                                     │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌──────────────┐                                                           │
-│  │   Pi-hole    │                                                           │
-│  │  pihole-net  │                                                           │
-│  │   :53,:8080  │                                                           │
-│  └──────────────┘                                                           │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
+*RPi 5 is now in the Fixed Homelab running OpenClaw (not Docker-based, installed via Ansible).*
 ```
 
 ## Docker Networks by Environment
@@ -357,11 +326,9 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | `storage-net` | Samba, Syncthing | File sharing |
 | `backup-net` | Restic REST | Local backup |
 
-### Mobile (RPi 5)
+### Mobile
 
-| Network | Services | Purpose |
-|---------|----------|---------|
-| `pihole-net` | Pi-hole | Mobile DNS |
+*Mobile kit no longer runs Docker services. Beryl AX AdGuard handles mobile DNS.*
 
 ## Inter-Service Communication
 
@@ -441,12 +408,11 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | 22000 | Syncthing Transfer | TCP/UDP |
 | 21027 | Syncthing Discovery | UDP |
 
-### Mobile (RPi 5)
+### RPi 5 (OpenClaw)
 
 | Port | Service | Protocol |
 |------|---------|----------|
-| 53 | Pi-hole DNS | TCP/UDP |
-| 8080 | Pi-hole Web | TCP |
+| 18789 | OpenClaw Gateway | TCP |
 
 ## Network Isolation
 
