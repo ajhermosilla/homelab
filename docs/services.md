@@ -27,7 +27,7 @@
 | Syncthing | Storage | Fixed | NAS | Planned |
 | Frigate | Security | Fixed | Docker VM | Planned |
 | Restic REST | Backup | Fixed | NAS | Planned |
-| DERP Relay | Networking | VPS | Vultr | Active |
+| DERP Relay | Networking | VPS | Vultr | Planned |
 | Pi-hole | Networking | VPS | Vultr | Planned |
 | Uptime Kuma | Monitoring | VPS | Vultr | Active |
 | ntfy | Monitoring | VPS | Vultr | Active |

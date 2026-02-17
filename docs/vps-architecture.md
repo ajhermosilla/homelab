@@ -63,7 +63,7 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
         +-------------------+-------------------+
         |                   |                   |
    [Mobile Kit]        [Devices]         [Fixed Homelab]
-   Beryl AX + RPi 5    MacBook, Phone    (Future)
+   Beryl AX + RPi 5    MacBook, Phone    Proxmox + Docker VM
 ```
 
 **Flow:** VPS Headscale coordinates mesh. All devices connect via Tailscale. VPS acts as exit node when needed.
@@ -111,8 +111,7 @@ docker/vps/
 │       ├── Caddyfile
 │       └── www/
 └── monitoring/
-    ├── uptime-kuma (via docker run)
-    └── ntfy (via docker run)
+    └── docker-compose.yml    # Uptime Kuma, ntfy
 ```
 
 ## Deployment Status
