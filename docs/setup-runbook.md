@@ -202,7 +202,7 @@ tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 See `docs/proxmox-setup.md` for VM creation.
 
 1. Create VM (8GB RAM, 100GB disk)
-2. Install Debian 12
+2. Install Debian 13 (trixie)
 3. Configure static IP or DHCP reservation
 4. Install Docker
 

@@ -5,10 +5,10 @@
 ```
 [Mobile Kit - On Demand]        [Fixed Homelab - 24/7]          [VPS - 24/7]
 ├── RPi 5 (Pi-hole)            ├── Mini PC (Proxmox)           ├── Headscale
-├── MacBook Air M1             ├── RPi 4 (Start9)              ├── DERP Relay
+├── MacBook Air M1             ├── RPi 4 (Start9)              ├── Caddy
 ├── Beryl AX Router            ├── NAS (DIY Mini-ITX)          ├── Uptime Kuma
-└── Samsung A13                ├── MokerLink 2.5G Switch       └── ~$6/mo
-                               ├── TP-Link PoE Switch
+└── Samsung A13                ├── MokerLink 2.5G Switch       ├── ntfy
+                               ├── TP-Link PoE Switch          └── ~$6/mo
                                ├── TP-Link Archer AX50 AP
                                ├── 3x IP Cameras
                                └── Forza UPS
@@ -245,7 +245,7 @@ Cloud helper node (not critical infrastructure).
 |----------|------|-------|------|
 | Vultr | High Frequency | 1 vCPU, 1GB RAM, 32GB NVMe | ~$6/mo |
 
-**Services:** DERP relay, Pi-hole, Uptime Kuma, ntfy, changedetection, Restic REST
+**Services (active):** Headscale, Caddy, Uptime Kuma, ntfy | **Planned:** DERP relay, changedetection, Restic REST
 
 **See:** `docs/vps-architecture.md`
 
