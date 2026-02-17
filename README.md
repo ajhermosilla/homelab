@@ -18,11 +18,10 @@ Personal infrastructure as code. Mobile kit, fixed homelab, and VPS.
 [Mobile Kit]              [Fixed Homelab]              [VPS]
 On-demand                 24/7                         24/7
 ├── RPi 5 (Pi-hole)       ├── Proxmox (Mini PC)        ├── Headscale
-├── MacBook Air           │   ├── OPNsense VM          ├── DERP Relay
-└── Beryl AX Router       │   └── Docker VM            ├── Pi-hole
+├── MacBook Air           │   ├── OPNsense VM          ├── Caddy
+└── Beryl AX Router       │   └── Docker VM            ├── DERP Relay
                           ├── Start9 (RPi 4)           ├── Uptime Kuma
-                          ├── NAS (Mini-ITX)           └── ntfy
-                          └── Cameras (3x)
+                          └── NAS (Mini-ITX)           └── ntfy
 ```
 
 **24 services** across 3 environments. See [docs/services.md](docs/services.md) for full list.
@@ -81,9 +80,7 @@ On-demand                 24/7                         24/7
 
 ### Sessions
 
-Daily work logs in [docs/sessions/](docs/sessions/):
-- [2026-01-16.md](docs/sessions/2026-01-16.md) - Latest session
-- [improvements-2026-01-16.md](docs/sessions/improvements-2026-01-16.md) - Current improvement tracking
+Daily work logs in [docs/sessions/](docs/sessions/).
 
 ## Directory Structure
 
@@ -132,7 +129,7 @@ See [docker/README.md](docker/README.md) for Docker network strategy and deploym
 
 - **Domain**: cronova.dev (Cloudflare)
 - **Internal**: cronova.local
-- **Tailscale**: 100.64.0.0/24
+- **Tailscale**: 100.64.0.0/10
 - **Local**: 192.168.0.0/24
 
 VLANs:
@@ -145,7 +142,7 @@ VLANs:
 | Environment | Status |
 |-------------|--------|
 | VPS | Active (Headscale, Caddy, Uptime Kuma, ntfy) |
-| Fixed Homelab | Partial (Pi-hole, Caddy, Vaultwarden on Docker VM) |
+| Fixed Homelab | Partial (Proxmox + OPNsense active; Pi-hole, Caddy, Vaultwarden on Docker VM) |
 | Mobile Kit | Pending |
 
 ---

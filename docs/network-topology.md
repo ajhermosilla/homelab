@@ -77,6 +77,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | vultr | 100.77.172.46 | VPS / Exit node | Cloud |
 | macbook | 100.86.220.9 | Workstation | Mobile |
 | beryl-ax | 100.102.244.131 | Travel router | Mobile |
+| opnsense | 100.79.230.235 | Firewall VM | Fixed |
 | mombeu | 100.110.253.126 | Phone | Mobile |
 
 ## Fixed Homelab - Physical Topology
@@ -255,7 +256,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                             [Tailscale Mesh]
-                           100.64.0.x overlay
+                           100.64.0.0/10 overlay
                                     │
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         Fixed Homelab (Docker VM)                            │

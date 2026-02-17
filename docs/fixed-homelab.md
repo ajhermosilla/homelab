@@ -8,7 +8,7 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-| Mini PC | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Pending setup |
+| Mini PC | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
 | Raspberry Pi 4 | 4GB RAM, 1TB external SSD | Start9 (Bitcoin node) | Pending setup |
 | NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian (Frigate, Samba, Syncthing) | Pending setup |
 | MokerLink Switch | 8x 2.5G + 10G SFP+ | Main LAN backbone | Owned |
@@ -98,18 +98,18 @@ Virtualization host running network gateway and Docker services.
 
 - Dual NIC (WAN + LAN)
 - Intel N150, 12GB RAM, 512GB SSD
-- VT-x/VT-d enabled for passthrough
+- VT-x enabled for virtualization
 
 ### VM Architecture
 
 ```
 [Proxmox VE - Mini PC]
 ├── OPNsense VM (Router/Firewall)
-│   ├── WAN: NIC1 (passthrough) → ISP
-│   ├── LAN: vmbr0 → Internal network
+│   ├── WAN: NIC1 (bridged vmbr0) → ISP
+│   ├── LAN: vmbr1 → Internal network
 │   └── Resources: 2 vCPU, 2GB RAM
 │
-└── Docker Host VM (Ubuntu/Debian)
+└── Docker Host VM (Debian 13 trixie)
     ├── Network: vmbr1 (LAN)
     ├── Resources: 2 vCPU, 7GB RAM, 100GB disk
     └── Services: All containers
@@ -120,7 +120,7 @@ Virtualization host running network gateway and Docker services.
 ```
 [ISP Modem]
      |
-[NIC1 - WAN] ──passthrough──→ [OPNsense VM]
+[NIC1 - WAN] ──bridged vmbr0──→ [OPNsense VM]
                                     |
                               [vmbr0 - LAN]
                                     |
@@ -142,7 +142,7 @@ Virtualization host running network gateway and Docker services.
 | vCPU | 2 |
 | RAM | 2GB |
 | Disk | 20GB |
-| WAN | NIC1 passthrough (PCI-e) |
+| WAN | NIC1 bridged (vmbr0) |
 | LAN | vmbr0 (bridge) |
 
 **OPNsense Services:**
@@ -157,7 +157,7 @@ Virtualization host running network gateway and Docker services.
 
 | Setting | Value |
 |---------|-------|
-| OS | Ubuntu 24.04 LTS / Debian 12 |
+| OS | Debian 13 (trixie) |
 | vCPU | 2 (expandable) |
 | RAM | 7GB (expandable) |
 | Disk | 100GB |
@@ -444,12 +444,12 @@ See Headscale admin for current allocations.
 
 | Phase | Task | Device | Status |
 |-------|------|--------|--------|
-| 1 | Install Proxmox VE | Mini PC | Pending |
-| 2 | Configure networking (vmbr0, passthrough) | Mini PC | Pending |
-| 3 | Create OPNsense VM, configure WAN/LAN | Mini PC | Pending |
-| 4 | Create Docker Host VM, install Docker | Mini PC | Pending |
-| 5 | Deploy Pi-hole | Docker VM | Pending |
-| 6 | Deploy Caddy + Vaultwarden | Docker VM | Pending |
+| 1 | Install Proxmox VE | Mini PC | Done |
+| 2 | Configure networking (vmbr0, vmbr1 bridged) | Mini PC | Done |
+| 3 | Create OPNsense VM, configure WAN/LAN | Mini PC | Done |
+| 4 | Create Docker Host VM, install Docker | Mini PC | Done |
+| 5 | Deploy Pi-hole | Docker VM | Done |
+| 6 | Deploy Caddy + Vaultwarden | Docker VM | Done |
 | 7 | Deploy media stack (Jellyfin, *arr, qBittorrent) | Docker VM | Pending |
 | 8 | Deploy Mosquitto MQTT broker | Docker VM | Pending |
 | 9 | Deploy Home Assistant | Docker VM | Pending |
@@ -550,7 +550,7 @@ All critical devices connected to **Forza NT-1012U 1000VA UPS**.
 ### Infrastructure
 - [x] VLANs for IoT/camera isolation (see `docs/vlan-design.md`)
 - [ ] Proxmox Backup Server on NAS
-- [x] NUT for UPS graceful shutdown (see `docs/nut-config.md`)
+- [ ] NUT for UPS graceful shutdown (see `docs/nut-config.md`)
 - [ ] HA cluster (second Proxmox node)
 
 ### Automation
