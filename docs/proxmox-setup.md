@@ -256,7 +256,7 @@ See `docs/opnsense-setup.md` for installation steps.
 **OS:**
 | Setting | Value |
 |---------|-------|
-| ISO | debian-12-amd64.iso |
+| ISO | debian-13-amd64.iso |
 | Type | Linux |
 | Version | 6.x - 2.6 Kernel |
 
@@ -291,7 +291,7 @@ See `docs/opnsense-setup.md` for installation steps.
 **Network:**
 | Setting | Value |
 |---------|-------|
-| Bridge | vmbr0 |
+| Bridge | vmbr1 |
 | Model | VirtIO |
 
 ### 2. VM Options
@@ -406,7 +406,7 @@ Experimental VM for OpenClaw AI assistant (cloud APIs).
 **Network:**
 | Setting | Value |
 |---------|-------|
-| Bridge | vmbr0 |
+| Bridge | vmbr1 |
 | Model | VirtIO |
 
 ### 2. VM Options
@@ -599,15 +599,14 @@ Add Proxmox health check:
 ### OPNsense VM
 
 - [ ] VM created with correct resources
-- [ ] WAN NIC passed through
-- [ ] Connected to vmbr0 for LAN
+- [ ] Dual bridged NICs configured (vmbr0 WAN, vmbr1 LAN)
 - [ ] Boots successfully
 - [ ] See `docs/opnsense-setup.md` for configuration
 
 ### Docker VM
 
 - [ ] VM created with 7GB RAM, 100GB disk
-- [ ] Debian 12 installed
+- [ ] Debian 13 (trixie) installed
 - [ ] Docker and docker-compose installed
 - [ ] User added to docker group
 - [ ] NFS client installed
