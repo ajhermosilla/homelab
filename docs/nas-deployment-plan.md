@@ -254,7 +254,14 @@ sudo tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 tailscale status
 tailscale ip
 
-# Expected IP: 100.x.x.12 range
+# Note: Headscale uses random allocation. The NAS will NOT get 100.64.0.12.
+# Save the actual IP and update these files after enrollment:
+#   - ansible/inventory.yml (ansible_host)
+#   - docker/vps/networking/headscale/config/config.yaml.example (extra_records)
+#   - docs/network-topology.md (Tailscale table + diagram)
+#   - docs/nfs-setup.md (NFS mount fstab entry)
+#   - MEMORY.md (Tailscale node list)
+#   - ~/.ssh/config (nas HostName)
 ```
 
 ---
