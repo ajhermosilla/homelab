@@ -45,13 +45,12 @@ Trusted devices with full network access.
 
 | Device | IP | Connection | Notes |
 |--------|-----|------------|-------|
-| OPNsense | .1 | MokerLink P1 | Router/gateway |
-| Docker VM | .10 | MokerLink P2 | Pi-hole, Jellyfin, etc |
-| RPi 4 (Start9) | .11 | MokerLink P3 | Bitcoin node |
+| Proxmox (OPNsense + Docker VM) | .1 / .10 | MokerLink P1 | Trunk — both VMs share nic1/vmbr1 |
+| RPi 4 (Start9) | .11 | MokerLink P2 | Bitcoin node |
+| RPi 5 (openclaw) | .20 | MokerLink P3 | AI assistant |
 | NAS | .12 | MokerLink P4 | Storage, backups |
-| RPi 5 (openclaw) | .20 | MokerLink P5 | AI assistant |
-| TP-Link AP | - | MokerLink P7 | VLAN trunk |
 | Yamaha RX-V671 | .30 | MokerLink P5 | AV Receiver (Ethernet) |
+| TP-Link AP | - | MokerLink P7 | VLAN trunk |
 | Apple TV | .31 | WiFi (HomeNet) | Jellyfin client |
 | LG Smart TV | .32 | WiFi (HomeNet) | Jellyfin client |
 | MacBook | DHCP | MokerLink P8 | Admin workstation |
@@ -159,14 +158,43 @@ Configure for VLAN trunking:
 
 | Port | Mode | VLAN | Device | Speed |
 |------|------|------|--------|-------|
-| 1 | Trunk | 1,10,20 | Mini PC (OPNsense) | 2.5G |
-| 2 | Access | 1 | Docker VM | 2.5G |
-| 3 | Access | 1 | RPi 4 (Start9) | 1G |
+| 1 | Trunk | 1,10,20 | Proxmox (OPNsense + Docker VM) | 2.5G |
+| 2 | Access | 1 | RPi 4 (Start9) | 1G |
+| 3 | Access | 1 | RPi 5 (OpenClaw) | 1G |
 | 4 | Access | 1 | NAS | 2.5G |
 | 5 | Access | 1 | Yamaha RX-V671 | 1G |
 | 6 | Access | 10 | TP-Link PoE Switch | 1G |
 | 7 | Trunk | 1,10,20 | TP-Link AP | 1G |
 | 8 | Access | 1 | Reserved (MacBook) | 2.5G |
+
+**Note:** Port 1 is a trunk because Proxmox's vmbr1 bridge carries both OPNsense
+VLAN-tagged traffic (10, 20) and Docker VM untagged traffic (VLAN 1). OPNsense
+handles tagging internally via vtnet1 sub-interfaces (vtnet1.10, vtnet1.20).
+
+### MokerLink VLAN Membership (802.1Q)
+
+Configure in the switch web UI (http://192.168.1.2):
+
+| VLAN ID | Tagged (trunk) | Untagged (access) |
+|---------|----------------|-------------------|
+| 1 | P1, P7 | P2, P3, P4, P5, P8 |
+| 10 | P1, P7 | P6 |
+| 20 | P1, P7 | — |
+
+### MokerLink PVID Settings
+
+Each port's PVID determines which VLAN untagged incoming traffic is assigned to:
+
+| Port | PVID |
+|------|------|
+| 1 | 1 |
+| 2 | 1 |
+| 3 | 1 |
+| 4 | 1 |
+| 5 | 1 |
+| 6 | 10 |
+| 7 | 1 |
+| 8 | 1 |
 
 ### TP-Link PoE Switch (TL-SG1005P)
 
