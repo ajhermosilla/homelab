@@ -1,6 +1,6 @@
 # Services
 
-24 services across 3 environments. Organized by location and category.
+27 services across 3 environments. Organized by location and category.
 
 ## Service Matrix
 
@@ -19,6 +19,7 @@
 | Home Assistant | Automation | Fixed | Docker VM | Planned |
 | Mosquitto | Messaging | Fixed | Docker VM | Planned |
 | Vaultwarden | Security | Fixed | Docker VM | Active |
+| Watchtower | Monitoring | Fixed | Docker VM | Active |
 | Bitcoin Core | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
 | LND | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
 | Electrum Server | Bitcoin | Fixed | RPi 4 (Start9) | Planned |
@@ -30,6 +31,8 @@
 | Pi-hole | Networking | VPS | Vultr | Planned |
 | Uptime Kuma | Monitoring | VPS | Vultr | Active |
 | ntfy | Monitoring | VPS | Vultr | Active |
+| Caddy | Networking | VPS | Vultr | Active |
+| headscale-backup | Backup | VPS | Vultr | Active |
 | changedetection | Scraping | VPS | Vultr | Planned |
 | Restic REST | Backup | VPS | Vultr | Planned |
 
@@ -59,6 +62,7 @@
 | **Home Assistant** | 8123 | Home automation |
 | **Mosquitto** | 1883 | MQTT broker (HA ↔ Frigate) |
 | **Vaultwarden** | 8843 | Password manager |
+| **Watchtower** | - | Automatic container updates |
 | **Frigate** | 5000 | NVR with AI detection (NFS to NAS) |
 
 ### Fixed Homelab - RPi 5
@@ -93,6 +97,8 @@
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
 | **Headscale** | 443, 3478 | Tailscale coordination (PRIMARY) |
+| **Caddy** | 80, 443 | Reverse proxy, auto-SSL |
+| **headscale-backup** | - | Headscale database backups |
 | **DERP Relay** | 443, 3478 | Tailscale NAT traversal |
 | **Pi-hole** | 53, 8053 | DNS (US-based fallback) |
 | **Uptime Kuma** | 3001 | External monitoring |
@@ -177,12 +183,6 @@ ssh -p 23231 localhost repo create <name>
 ```
 docker/
 ├── mobile/
-│   └── rpi5/
-│       ├── networking/
-│       │   ├── headscale/
-│       │   │   └── docker-compose.yml
-│       │   └── pihole/
-│       │       └── docker-compose.yml
 ├── fixed/
 │   ├── docker-vm/
 │   │   ├── networking/
@@ -217,20 +217,20 @@ docker/
 
 | Category | Services | Count |
 |----------|----------|-------|
-| Networking | Headscale, Pi-hole (x3), Caddy, DERP | 6 |
+| Networking | Headscale, Pi-hole (x3), Caddy (x2), DERP | 7 |
 | Media | Jellyfin, Sonarr, Radarr, Prowlarr, qBittorrent | 5 |
 | Bitcoin | Bitcoin Core, LND, Electrum Server | 3 |
 | Storage | Samba, Syncthing | 2 |
 | Security | Vaultwarden, Frigate | 2 |
 | Automation | Home Assistant | 1 |
 | Messaging | Mosquitto | 1 |
-| Monitoring | Uptime Kuma, ntfy | 2 |
-| Backup | Restic REST (x2) | 2 |
+| Monitoring | Uptime Kuma, ntfy, Watchtower | 3 |
+| Backup | Restic REST (x2), headscale-backup | 3 |
 | Scraping | changedetection | 1 |
 | Git | soft-serve | 1 |
 | AI | OpenClaw | 1 |
 
-**Unique services:** 24 | **Total deployments:** 27
+**Unique services:** 26 | **Total deployments:** 30
 
 ## Service Dependencies
 
@@ -286,11 +286,12 @@ qBittorrent             ← Download client
 **Fixed Homelab - Docker VM:**
 1. Pi-hole → local DNS
 2. Caddy → reverse proxy
-3. Mosquitto → MQTT broker
-4. Frigate → NVR (needs NFS, MQTT)
-5. Home Assistant → automation (needs MQTT)
-6. Vaultwarden → passwords
-7. Media stack (Prowlarr → Sonarr/Radarr → qBittorrent → Jellyfin)
+3. Watchtower → automatic container updates
+4. Mosquitto → MQTT broker
+5. Frigate → NVR (needs NFS, MQTT)
+6. Home Assistant → automation (needs MQTT)
+7. Vaultwarden → passwords
+8. Media stack (Prowlarr → Sonarr/Radarr → qBittorrent → Jellyfin)
 
 ## Access Matrix
 

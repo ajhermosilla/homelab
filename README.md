@@ -19,13 +19,13 @@ Personal infrastructure as code. Mobile kit, fixed homelab, and VPS.
 On-demand                 24/7                         24/7
 ├── MacBook Air           ├── Proxmox (Mini PC)        ├── Headscale
 ├── Beryl AX Router       │   ├── OPNsense VM          ├── Caddy
-└── Samsung A13           │   └── Docker VM            ├── DERP Relay
+└── Samsung A13           │   └── Docker VM            ├── headscale-backup
                           ├── RPi 5 (OpenClaw)         ├── Uptime Kuma
                           ├── Start9 (RPi 4)           └── ntfy
                           └── NAS (Mini-ITX)
 ```
 
-**24 services** across 3 environments. See [docs/services.md](docs/services.md) for full list.
+**27 services** across 3 environments. See [docs/services.md](docs/services.md) for full list.
 
 ## Documentation
 
@@ -142,9 +142,9 @@ VLANs:
 
 | Environment | Status |
 |-------------|--------|
-| VPS | Active (Headscale, Caddy, Uptime Kuma, ntfy) |
-| Fixed Homelab | Partial (Proxmox + OPNsense active; Pi-hole, Caddy, Vaultwarden on Docker VM; RPi 5 pending setup) |
-| Mobile Kit | Pending |
+| VPS | Active (Headscale, Caddy, Uptime Kuma, ntfy, headscale-backup) |
+| Fixed Homelab | Active (Proxmox + OPNsense gateway; Docker VM: Pi-hole, Caddy, Vaultwarden, Watchtower; RPi 5 pending physical setup; NAS pending deployment) |
+| Mobile Kit | Active (Beryl AX AdGuard, MacBook soft-serve) |
 
 ---
 

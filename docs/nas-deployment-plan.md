@@ -38,7 +38,7 @@ docker exec headscale headscale preauthkeys create --expiration 1h
 ```
 
 ### 2. Verify OPNsense DHCP Reservation
-- Login to OPNsense via Tailscale: https://100.79.230.235
+- Login to OPNsense via SSH tunnel: `ssh -L 8443:192.168.0.1:443 augusto@100.78.12.241` then `https://localhost:8443`
 - Services → DHCPv4 → LAN
 - Add reservation: MAC → 192.168.0.12 (get MAC from NAS motherboard sticker)
 
@@ -121,7 +121,7 @@ nano /etc/network/interfaces
 #   address 192.168.0.12
 #   netmask 255.255.255.0
 #   gateway 192.168.0.1
-#   dns-nameservers 192.168.0.1
+#   dns-nameservers 192.168.0.10
 
 # Reboot
 reboot
@@ -318,11 +318,8 @@ sudo ufw allow from 192.168.0.0/24 to any port 2049
 sudo mkdir -p /opt/homelab
 sudo chown augusto:augusto /opt/homelab
 
-# Clone repo
-git clone git@github.com:ajhermosilla/homelab.git /opt/homelab/repo
-
-# Or via HTTPS if SSH not configured
-git clone https://github.com/ajhermosilla/homelab.git /opt/homelab/repo
+# Clone repo from Soft Serve
+git clone ssh://100.86.220.9:23231/homelab.git /opt/homelab/repo
 ```
 
 ---
