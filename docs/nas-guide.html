@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAS Deployment Guide</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-surface: #f8f9fa;
+    --bg-code: #1e1e2e;
+    --text: #1a1a2e;
+    --text-muted: #6b7280;
+    --text-code: #cdd6f4;
+    --border: #e5e7eb;
+    --accent: #6366f1;
+    --accent-light: #eef2ff;
+    --success: #22c55e;
+    --success-light: #f0fdf4;
+    --warning: #f59e0b;
+    --warning-light: #fffbeb;
+    --danger: #ef4444;
+    --danger-light: #fef2f2;
+    --phase-badge: #6366f1;
+    --phase-badge-text: #ffffff;
+    --nav-bg: #f8f9fa;
+    --nav-active: #eef2ff;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+    --checkbox-bg: #ffffff;
+    --checkbox-border: #d1d5db;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f1a;
+      --bg-surface: #1a1a2e;
+      --bg-code: #11111b;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-code: #cdd6f4;
+      --border: #2d2d44;
+      --accent: #818cf8;
+      --accent-light: #1e1b4b;
+      --success: #4ade80;
+      --success-light: #052e16;
+      --warning: #fbbf24;
+      --warning-light: #451a03;
+      --danger: #f87171;
+      --danger-light: #450a0a;
+      --phase-badge: #818cf8;
+      --phase-badge-text: #0f0f1a;
+      --nav-bg: #1a1a2e;
+      --nav-active: #1e1b4b;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+      --checkbox-bg: #1a1a2e;
+      --checkbox-border: #4b5563;
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  /* Layout */
+  .layout {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    min-width: 280px;
+    overflow-y: auto;
+    background: var(--nav-bg);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    scrollbar-width: thin;
+  }
+
+  nav h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: 0 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1.25rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+  }
+
+  nav a:hover {
+    background: var(--nav-active);
+  }
+
+  nav a.active {
+    background: var(--nav-active);
+    border-left-color: var(--accent);
+    font-weight: 600;
+  }
+
+  nav .nav-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--phase-badge);
+    color: var(--phase-badge-text);
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  nav .nav-badge.prep { background: var(--text-muted); }
+
+  nav .nav-progress {
+    margin: 1rem 1.25rem;
+    padding: 0.75rem;
+    background: var(--bg-surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  nav .nav-progress .bar-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+  }
+
+  nav .nav-progress .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  nav .nav-progress .progress-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  nav .nav-progress .progress-count {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* Mobile nav toggle */
+  .nav-toggle {
+    display: none;
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+  }
+
+  main {
+    flex: 1;
+    min-width: 0;
+    padding: 2rem 3rem;
+  }
+
+  /* Header */
+  .hero {
+    text-align: center;
+    padding: 2rem 0 3rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero .subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+
+  .hero .time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    padding: 0.4rem 1rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  /* Phase cards */
+  .phase {
+    margin-bottom: 3rem;
+    scroll-margin-top: 1rem;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .phase-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--phase-badge);
+    color: var(--phase-badge-text);
+    font-size: 1.1rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .phase-number.prep {
+    background: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .phase-title {
+    flex: 1;
+  }
+
+  .phase-title h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  .phase-title .phase-time {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* Sections within phases */
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 1.75rem 0 0.75rem;
+    color: var(--text);
+  }
+
+  p {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--bg-code);
+    color: var(--text-code);
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    border: 1px solid var(--border);
+  }
+
+  code {
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875em;
+  }
+
+  p code, li code, td code {
+    background: var(--bg-surface);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    font-size: 0.85em;
+  }
+
+  /* Explanation boxes */
+  .what-this-does {
+    background: var(--bg-surface);
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1rem;
+    margin: 0.5rem 0 1rem;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+
+  .what-this-does strong {
+    color: var(--accent);
+  }
+
+  /* Callouts */
+  .callout {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+    border: 1px solid;
+  }
+
+  .callout-tip {
+    background: var(--success-light);
+    border-color: var(--success);
+  }
+
+  .callout-warning {
+    background: var(--warning-light);
+    border-color: var(--warning);
+  }
+
+  .callout-danger {
+    background: var(--danger-light);
+    border-color: var(--danger);
+  }
+
+  .callout-label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .callout-tip .callout-label { color: var(--success); }
+  .callout-warning .callout-label { color: var(--warning); }
+  .callout-danger .callout-label { color: var(--danger); }
+
+  /* Checkboxes */
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    margin: 0.35rem 0;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+
+  .step:hover {
+    background: var(--bg-surface);
+  }
+
+  .step input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 2px solid var(--checkbox-border);
+    border-radius: 5px;
+    background: var(--checkbox-bg);
+    cursor: pointer;
+    margin-top: 2px;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .step input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .step input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .step.checked label {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  .step label {
+    cursor: pointer;
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .step .write-in {
+    display: inline-block;
+    border-bottom: 2px dashed var(--border);
+    min-width: 160px;
+    padding: 0 0.25rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 0.92rem;
+  }
+
+  th, td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    font-weight: 700;
+    background: var(--bg-surface);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+  }
+
+  /* Troubleshooting sections */
+  details {
+    margin: 0.75rem 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  summary {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    background: var(--bg-surface);
+    user-select: none;
+    font-size: 0.95rem;
+  }
+
+  summary:hover {
+    background: var(--accent-light);
+  }
+
+  details[open] summary {
+    border-bottom: 1px solid var(--border);
+  }
+
+  details .details-body {
+    padding: 1rem;
+  }
+
+  details .details-body p {
+    font-size: 0.92rem;
+  }
+
+  /* Reset progress button */
+  .reset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  /* Print */
+  @media print {
+    nav, .nav-toggle, .nav-overlay { display: none !important; }
+    main { padding: 0; }
+    .layout { display: block; }
+    .phase { page-break-inside: avoid; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+    .step input[type="checkbox"] {
+      appearance: auto;
+      -webkit-appearance: auto;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    nav {
+      position: fixed;
+      left: -300px;
+      top: 0;
+      z-index: 999;
+      transition: left 0.3s ease;
+      width: 280px;
+      min-width: 280px;
+    }
+
+    nav.open {
+      left: 0;
+    }
+
+    .nav-toggle {
+      display: flex;
+    }
+
+    .nav-overlay.open {
+      display: block;
+    }
+
+    main {
+      padding: 1.5rem 1.25rem;
+    }
+
+    .hero h1 {
+      font-size: 1.5rem;
+    }
+
+    .phase-header {
+      flex-wrap: wrap;
+    }
+
+    pre {
+      font-size: 0.8rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <nav id="nav">
+    <div class="nav-progress">
+      <div class="progress-text"><span class="progress-count" id="progress-count">0</span> of <span id="progress-total">0</span> steps done</div>
+      <div class="bar-track"><div class="bar-fill" id="progress-bar" style="width: 0%"></div></div>
+      <button class="reset-btn" onclick="resetProgress()">Reset progress</button>
+    </div>
+    <h2>Preparation</h2>
+    <a href="#needs" data-section="needs"><span class="nav-badge prep">i</span> What You'll Need</a>
+    <a href="#before" data-section="before"><span class="nav-badge prep">ii</span> Before Deployment</a>
+    <h2>Deployment</h2>
+    <a href="#phase1" data-section="phase1"><span class="nav-badge">1</span> Install Debian</a>
+    <a href="#phase2" data-section="phase2"><span class="nav-badge">2</span> Set Up Drives</a>
+    <a href="#phase3" data-section="phase3"><span class="nav-badge">3</span> Install Docker</a>
+    <a href="#phase4" data-section="phase4"><span class="nav-badge">4</span> Connect Tailscale</a>
+    <a href="#phase5" data-section="phase5"><span class="nav-badge">5</span> Set Up NFS</a>
+    <a href="#phase6" data-section="phase6"><span class="nav-badge">6</span> Clone Repo</a>
+    <a href="#phase7" data-section="phase7"><span class="nav-badge">7</span> Start Services</a>
+    <a href="#phase8" data-section="phase8"><span class="nav-badge">8</span> Verify Everything</a>
+    <h2>Wrap-up</h2>
+    <a href="#after" data-section="after"><span class="nav-badge prep">+</span> After Deployment</a>
+    <a href="#troubleshooting" data-section="troubleshooting"><span class="nav-badge prep">?</span> Troubleshooting</a>
+  </nav>
+
+  <div class="nav-overlay" id="nav-overlay" onclick="toggleNav()"></div>
+  <button class="nav-toggle" id="nav-toggle" onclick="toggleNav()" aria-label="Toggle navigation">&#9776;</button>
+
+  <main>
+    <div class="hero">
+      <h1>NAS Deployment Guide</h1>
+      <p class="subtitle">A friendly, follow-along walkthrough for deployment day</p>
+      <div class="time-badge">&#9202; Estimated total: 1.5&ndash;2 hours</div>
+    </div>
+
+    <!-- WHAT YOU'LL NEED -->
+    <section class="phase" id="needs">
+      <div class="phase-header">
+        <div class="phase-number prep">i</div>
+        <div class="phase-title">
+          <h2>What You'll Need</h2>
+        </div>
+      </div>
+
+      <h3>Hardware on Hand</h3>
+      <div class="step"><input type="checkbox" id="c-hw1"><label for="c-hw1">NAS assembled, all 3 drives installed (SSD + Purple + Red)</label></div>
+      <div class="step"><input type="checkbox" id="c-hw2"><label for="c-hw2">Ethernet cable (goes to MokerLink switch port 4)</label></div>
+      <div class="step"><input type="checkbox" id="c-hw3"><label for="c-hw3">Power cable (plugged into UPS)</label></div>
+      <div class="step"><input type="checkbox" id="c-hw4"><label for="c-hw4">USB keyboard + monitor (initial setup only)</label></div>
+      <div class="step"><input type="checkbox" id="c-hw5"><label for="c-hw5">Debian 13 USB boot drive</label></div>
+
+      <h3>Credentials (Have These Ready)</h3>
+      <div class="step"><input type="checkbox" id="c-cr1"><label for="c-cr1">Tailscale auth key (from Headscale)</label></div>
+      <div class="step"><input type="checkbox" id="c-cr2"><label for="c-cr2">Samba password (from prep script &mdash; in Vaultwarden)</label></div>
+      <div class="step"><input type="checkbox" id="c-cr3"><label for="c-cr3">Restic password (from prep script &mdash; in Vaultwarden)</label></div>
+      <div class="step"><input type="checkbox" id="c-cr4"><label for="c-cr4">Root &amp; user passwords you'll set during Debian install</label></div>
+
+      <h3>On Your MacBook</h3>
+      <div class="step"><input type="checkbox" id="c-mb1"><label for="c-mb1">SSH to VPS works: <code>ssh vps</code></label></div>
+      <div class="step"><input type="checkbox" id="c-mb2"><label for="c-mb2">SSH tunnel to OPNsense works</label></div>
+      <div class="step"><input type="checkbox" id="c-mb3"><label for="c-mb3">This guide open in browser</label></div>
+    </section>
+
+    <!-- BEFORE DEPLOYMENT DAY -->
+    <section class="phase" id="before">
+      <div class="phase-header">
+        <div class="phase-number prep">ii</div>
+        <div class="phase-title">
+          <h2>Before Deployment Day</h2>
+          <div class="phase-time">Remote prep from your MacBook</div>
+        </div>
+      </div>
+
+      <h3>Step 1: Generate Secrets with the Prep Script</h3>
+      <p>Run this from your homelab repo on the MacBook:</p>
+      <pre><code>bash scripts/nas-prep-env.sh</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Generates a random Samba password, creates <code>.env</code> files for the NAS Docker stacks, and prompts you for a Restic backup password.</div>
+      <div class="step"><input type="checkbox" id="c-b1"><label for="c-b1">Script ran successfully</label></div>
+      <div class="step"><input type="checkbox" id="c-b2"><label for="c-b2">Samba password saved in Vaultwarden</label></div>
+      <div class="step"><input type="checkbox" id="c-b3"><label for="c-b3">Restic password saved in Vaultwarden</label></div>
+
+      <h3>Step 2: Generate a Tailscale Auth Key</h3>
+      <pre><code>ssh vps
+docker exec headscale headscale preauthkeys create --expiration 1h</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Creates a one-time key that lets the NAS join your Tailscale network. Expires in 1 hour, single use.</div>
+      <div class="callout callout-warning"><span class="callout-label">Timing tip</span> This key expires in 1 hour. If you're doing prep the night before, skip this and do it right before Phase 4 on deployment day.</div>
+      <div class="step"><input type="checkbox" id="c-b4"><label for="c-b4">Auth key saved (Vaultwarden or note)</label></div>
+
+      <h3>Step 3: Add DHCP Reservation in OPNsense</h3>
+      <ol>
+        <li>Open SSH tunnel: <code>ssh -L 8443:192.168.0.1:443 augusto@100.78.12.241</code></li>
+        <li>Open <code>https://localhost:8443</code></li>
+        <li>Go to <strong>Services &rarr; DHCPv4 &rarr; LAN</strong></li>
+        <li>Add reservation: NAS MAC &rarr; <code>192.168.0.12</code></li>
+      </ol>
+      <div class="what-this-does"><strong>What this does:</strong> Tells OPNsense to always assign 192.168.0.12 to the NAS. Get the MAC from the motherboard sticker.</div>
+      <div class="step"><input type="checkbox" id="c-b5"><label for="c-b5">DHCP reservation added for 192.168.0.12</label></div>
+
+      <h3>Step 4: Add DNS Entry in Pi-hole</h3>
+      <pre><code>ssh docker-vm
+docker exec -it pihole bash</code></pre>
+      <p>Inside the container, edit <code>/etc/pihole/pihole.toml</code> and add to the <code>dns.hosts</code> array:</p>
+      <pre><code>[[dns.hosts]]
+  addr = "192.168.0.12"
+  names = ["nas.home", "syncthing.home"]</code></pre>
+      <p>Then reload:</p>
+      <pre><code>pihole reloaddns</code></pre>
+      <div class="step"><input type="checkbox" id="c-b6"><label for="c-b6">DNS entry added for nas.home</label></div>
+
+      <h3>Step 5: Flash Debian USB (if not done)</h3>
+      <pre><code>sudo dd if=debian.iso of=/dev/sdX bs=4M status=progress</code></pre>
+      <div class="step"><input type="checkbox" id="c-b7"><label for="c-b7">Debian 13 netinst ISO on USB</label></div>
+    </section>
+
+    <!-- PHASE 1 -->
+    <section class="phase" id="phase1">
+      <div class="phase-header">
+        <div class="phase-number">1</div>
+        <div class="phase-title">
+          <h2>Install Debian</h2>
+          <div class="phase-time">~25 minutes</div>
+        </div>
+      </div>
+
+      <h3>Boot from USB</h3>
+      <ol>
+        <li>Connect USB keyboard, monitor, and Debian USB to the NAS</li>
+        <li>Power on</li>
+        <li>Press <strong>F8</strong> (or DEL) for boot menu</li>
+        <li>Select the USB drive</li>
+      </ol>
+      <div class="step"><input type="checkbox" id="c-1a"><label for="c-1a">Booted into Debian installer</label></div>
+
+      <h3>Installer Settings</h3>
+      <table>
+        <tr><th>Setting</th><th>Value</th></tr>
+        <tr><td>Language</td><td>English</td></tr>
+        <tr><td>Location</td><td>Paraguay</td></tr>
+        <tr><td>Hostname</td><td><code>nas</code></td></tr>
+        <tr><td>Domain</td><td><em>(leave blank)</em></td></tr>
+        <tr><td>Root password</td><td><em>(strong &mdash; save in Vaultwarden)</em></td></tr>
+        <tr><td>Username</td><td><code>augusto</code></td></tr>
+        <tr><td>Timezone</td><td>America/Asuncion</td></tr>
+        <tr><td>Partitioning</td><td><strong>Use entire disk</strong> &rarr; Lexar SSD (240GB)</td></tr>
+        <tr><td>Software</td><td>SSH server + standard utilities only</td></tr>
+      </table>
+      <div class="what-this-does"><strong>What this does:</strong> Installs a minimal Debian server on the SSD. The two data drives are left untouched &mdash; we set those up in Phase 2.</div>
+      <div class="step"><input type="checkbox" id="c-1b"><label for="c-1b">Installer completed, NAS rebooted into Debian</label></div>
+
+      <h3>First Boot Setup</h3>
+      <p>Log in as <code>root</code> at the console:</p>
+      <pre><code>apt update && apt upgrade -y</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Downloads and installs the latest security patches.</div>
+      <div class="step"><input type="checkbox" id="c-1c"><label for="c-1c">System updated</label></div>
+
+      <pre><code>apt install -y sudo curl wget git vim htop tmux</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Installs essential tools for the rest of setup.</div>
+      <div class="step"><input type="checkbox" id="c-1d"><label for="c-1d">Packages installed</label></div>
+
+      <pre><code>usermod -aG sudo augusto</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Gives your user account permission to run admin commands with <code>sudo</code>.</div>
+
+      <pre><code>reboot</code></pre>
+      <div class="step"><input type="checkbox" id="c-1e"><label for="c-1e">Rebooted successfully</label></div>
+      <div class="step"><input type="checkbox" id="c-1f"><label for="c-1f">Can SSH in: <code>ssh augusto@192.168.0.12</code></label></div>
+
+      <details>
+        <summary>Trouble? NAS didn't get IP 192.168.0.12</summary>
+        <div class="details-body">
+          <p>Check the OPNsense DHCP reservation. As a fallback, set a static IP as root:</p>
+          <pre><code>nano /etc/network/interfaces
+
+# Add:
+auto enp0s25
+iface enp0s25 inet static
+  address 192.168.0.12
+  netmask 255.255.255.0
+  gateway 192.168.0.1
+  dns-nameservers 192.168.0.10</code></pre>
+          <p>Then <code>reboot</code>.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- PHASE 2 -->
+    <section class="phase" id="phase2">
+      <div class="phase-header">
+        <div class="phase-number">2</div>
+        <div class="phase-title">
+          <h2>Set Up the Drives</h2>
+          <div class="phase-time">~15 minutes</div>
+        </div>
+      </div>
+
+      <p>From here on, work via SSH: <code>ssh augusto@192.168.0.12</code></p>
+
+      <h3>Identify Your Drives</h3>
+      <pre><code>lsblk -f</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Lists all drives. Expect: <code>sda</code> = Lexar SSD (boot), <code>sdb</code> = WD Purple 2TB, <code>sdc</code> = WD Red 8TB.</div>
+      <div class="step"><input type="checkbox" id="c-2a"><label for="c-2a">All three drives visible</label></div>
+
+      <h3>Check Drive Health</h3>
+      <pre><code>sudo apt install -y smartmontools
+sudo smartctl -a /dev/sdb
+sudo smartctl -a /dev/sdc</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Runs a health check. Look for <code>PASSED</code> in the output.</div>
+      <div class="step"><input type="checkbox" id="c-2b"><label for="c-2b">Purple: PASSED</label></div>
+      <div class="step"><input type="checkbox" id="c-2c"><label for="c-2c">Red: PASSED</label></div>
+
+      <h3>Partition and Format</h3>
+      <pre><code># Purple 2TB
+sudo fdisk /dev/sdb
+# n (new), p (primary), 1, Enter, Enter, w (write)
+sudo mkfs.ext4 -L purple /dev/sdb1</code></pre>
+      <div class="step"><input type="checkbox" id="c-2d"><label for="c-2d">Purple partitioned and formatted</label></div>
+
+      <pre><code># Red 8TB
+sudo fdisk /dev/sdc
+# n (new), p (primary), 1, Enter, Enter, w (write)
+sudo mkfs.ext4 -L red8 /dev/sdc1</code></pre>
+      <div class="step"><input type="checkbox" id="c-2e"><label for="c-2e">Red partitioned and formatted</label></div>
+
+      <h3>Create Mount Points</h3>
+      <pre><code>sudo mkdir -p /mnt/{purple,red8}</code></pre>
+
+      <h3>Configure Automatic Mounting</h3>
+      <p>Get UUIDs:</p>
+      <pre><code>sudo blkid</code></pre>
+      <p>Edit fstab:</p>
+      <pre><code>sudo nano /etc/fstab
+
+# Add at the end (replace UUIDs with actual values):
+UUID=&lt;purple-uuid&gt;  /mnt/purple  ext4  defaults,noatime  0  2
+UUID=&lt;red8-uuid&gt;    /mnt/red8    ext4  defaults,noatime  0  2</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Auto-mounts the drives on every boot. <code>noatime</code> improves performance.</div>
+      <div class="step"><input type="checkbox" id="c-2f"><label for="c-2f">fstab entries added</label></div>
+
+      <h3>Mount and Verify</h3>
+      <pre><code>sudo mount -a
+df -h</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Mounts everything now. You should see ~2TB on <code>/mnt/purple</code> and ~8TB on <code>/mnt/red8</code>.</div>
+      <div class="step"><input type="checkbox" id="c-2g"><label for="c-2g">Both drives mounted with correct sizes</label></div>
+
+      <h3>Create Directory Structure</h3>
+      <pre><code># Folders on Red 8TB
+sudo mkdir -p /mnt/red8/{media,downloads,data,sync,backup}
+
+# Folder on Purple 2TB
+sudo mkdir -p /mnt/purple/frigate
+
+# Shortcuts in /srv
+sudo mkdir -p /srv
+sudo ln -s /mnt/red8/media /srv/media
+sudo ln -s /mnt/red8/downloads /srv/downloads
+sudo ln -s /mnt/red8/data /srv/data
+sudo ln -s /mnt/red8/sync /srv/sync
+sudo ln -s /mnt/red8/backup /srv/backup
+sudo ln -s /mnt/purple/frigate /srv/frigate
+
+# Set ownership
+sudo chown -R 1000:1000 /mnt/red8 /mnt/purple /srv</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Creates the folder structure and convenient <code>/srv</code> shortcuts so services use consistent paths regardless of which physical drive holds the data.</div>
+      <div class="step"><input type="checkbox" id="c-2h"><label for="c-2h">Directories and symlinks created</label></div>
+      <div class="step"><input type="checkbox" id="c-2i"><label for="c-2i">Ownership set to 1000:1000</label></div>
+
+      <details>
+        <summary>Trouble? Drive not showing up</summary>
+        <div class="details-body">
+          <pre><code>lsblk
+sudo fdisk -l</code></pre>
+          <p>Check SATA cables. Try a different SATA port. Check health: <code>sudo smartctl -H /dev/sdb</code></p>
+        </div>
+      </details>
+    </section>
+
+    <!-- PHASE 3 -->
+    <section class="phase" id="phase3">
+      <div class="phase-header">
+        <div class="phase-number">3</div>
+        <div class="phase-title">
+          <h2>Install Docker</h2>
+          <div class="phase-time">~10 minutes</div>
+        </div>
+      </div>
+
+      <pre><code>curl -fsSL https://get.docker.com | sudo sh</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Installs Docker using the official script.</div>
+      <div class="step"><input type="checkbox" id="c-3a"><label for="c-3a">Docker installed</label></div>
+
+      <pre><code>sudo usermod -aG docker augusto</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Lets your user run Docker without <code>sudo</code>.</div>
+
+      <p>Log out and back in:</p>
+      <pre><code>exit
+# SSH back in: ssh augusto@192.168.0.12</code></pre>
+
+      <pre><code>docker --version
+docker compose version</code></pre>
+      <div class="step"><input type="checkbox" id="c-3b"><label for="c-3b"><code>docker --version</code> shows a version</label></div>
+      <div class="step"><input type="checkbox" id="c-3c"><label for="c-3c"><code>docker compose version</code> shows a version</label></div>
+
+      <pre><code>docker run hello-world</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Runs a tiny test container to confirm Docker works end-to-end.</div>
+      <div class="step"><input type="checkbox" id="c-3d"><label for="c-3d">hello-world ran successfully</label></div>
+
+      <details>
+        <summary>Trouble? Docker won't install</summary>
+        <div class="details-body">
+          <p>Check internet: <code>ping 8.8.8.8</code></p>
+          <p>Check DNS: <code>ping google.com</code></p>
+          <p>If DNS fails, verify <code>/etc/resolv.conf</code> points to <code>192.168.0.10</code> (Pi-hole).</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- PHASE 4 -->
+    <section class="phase" id="phase4">
+      <div class="phase-header">
+        <div class="phase-number">4</div>
+        <div class="phase-title">
+          <h2>Connect to Tailscale</h2>
+          <div class="phase-time">~5 minutes</div>
+        </div>
+      </div>
+
+      <div class="callout callout-warning"><span class="callout-label">Reminder</span> If you generated the auth key earlier, it may have expired (1 hour). Generate a fresh one now from your MacBook: <code>ssh vps</code> then <code>docker exec headscale headscale preauthkeys create --expiration 1h</code></div>
+
+      <pre><code>curl -fsSL https://tailscale.com/install.sh | sh</code></pre>
+      <div class="step"><input type="checkbox" id="c-4a"><label for="c-4a">Tailscale installed</label></div>
+
+      <pre><code>sudo tailscale up --login-server=https://hs.cronova.dev --authkey=&lt;key&gt;</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Connects the NAS to your Tailscale network via Headscale. Replace <code>&lt;key&gt;</code> with your auth key.</div>
+      <div class="step"><input type="checkbox" id="c-4b"><label for="c-4b">Tailscale connected</label></div>
+
+      <pre><code>tailscale status
+tailscale ip</code></pre>
+      <div class="step"><input type="checkbox" id="c-4c"><label for="c-4c">Tailscale IP noted: <span class="write-in" id="ts-ip">&nbsp;</span></label></div>
+
+      <div class="callout callout-warning"><span class="callout-label">Important</span> Headscale assigns a <strong>random</strong> IP &mdash; the NAS will NOT get <code>100.64.0.12</code>. Write down the actual IP. After deployment, update:
+        <code>ansible/inventory.yml</code>,
+        <code>docs/network-topology.md</code>,
+        <code>docs/nfs-setup.md</code>,
+        <code>~/.ssh/config</code>
+      </div>
+
+      <details>
+        <summary>Trouble? Tailscale won't connect</summary>
+        <div class="details-body">
+          <pre><code>tailscale status</code></pre>
+          <p>Auth key expired? Generate a new one. Re-authenticate:</p>
+          <pre><code>sudo tailscale up --login-server=https://hs.cronova.dev --authkey=&lt;new-key&gt; --reset</code></pre>
+        </div>
+      </details>
+    </section>
+
+    <!-- PHASE 5 -->
+    <section class="phase" id="phase5">
+      <div class="phase-header">
+        <div class="phase-number">5</div>
+        <div class="phase-title">
+          <h2>Set Up NFS</h2>
+          <div class="phase-time">~10 minutes</div>
+        </div>
+      </div>
+
+      <div class="what-this-does"><strong>What NFS does:</strong> Lets the Docker VM mount the NAS's Frigate folder directly, as if it were a local drive. This is how Frigate stores camera recordings on the NAS.</div>
+
+      <h3>Option A: Ansible (Recommended)</h3>
+      <p>Run from your <strong>MacBook</strong>:</p>
+      <pre><code>cd ~/homelab/ansible
+ansible -i inventory.yml nas -m ping
+ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Automatically installs NFS, configures shared folders, opens firewall ports, and starts the service.</div>
+      <div class="step"><input type="checkbox" id="c-5a"><label for="c-5a">Ansible playbook completed</label></div>
+
+      <details>
+        <summary>Option B: Manual setup (if Ansible isn't working)</summary>
+        <div class="details-body">
+          <pre><code>sudo apt install -y nfs-kernel-server</code></pre>
+          <pre><code>sudo nano /etc/exports
+
+# Add:
+/srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash)
+/srv/media      192.168.0.0/24(ro,sync,no_subtree_check)
+/srv/downloads  192.168.0.0/24(rw,sync,no_subtree_check)
+/srv/backup     192.168.0.0/24(rw,sync,no_subtree_check)</code></pre>
+          <pre><code>sudo exportfs -ra
+sudo exportfs -v
+sudo systemctl enable nfs-kernel-server
+sudo systemctl start nfs-kernel-server</code></pre>
+          <pre><code>sudo ufw allow from 192.168.0.0/24 to any port 111
+sudo ufw allow from 192.168.0.0/24 to any port 2049</code></pre>
+          <div class="step"><input type="checkbox" id="c-5b"><label for="c-5b">NFS exports configured (manual)</label></div>
+          <div class="step"><input type="checkbox" id="c-5c"><label for="c-5c">Firewall rules added (manual)</label></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>Trouble? Ansible can't reach NAS</summary>
+        <div class="details-body">
+          <p>Make sure <code>ansible_host</code> in <code>inventory.yml</code> matches the NAS's actual Tailscale IP from Phase 4.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- PHASE 6 -->
+    <section class="phase" id="phase6">
+      <div class="phase-header">
+        <div class="phase-number">6</div>
+        <div class="phase-title">
+          <h2>Clone the Repo</h2>
+          <div class="phase-time">~5 minutes</div>
+        </div>
+      </div>
+
+      <pre><code>sudo mkdir -p /opt/homelab
+sudo chown augusto:augusto /opt/homelab
+git clone ssh://100.86.220.9:23231/homelab.git /opt/homelab/repo</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Gets your homelab configuration files onto the NAS from Soft Serve, so it has all the Docker Compose files it needs.</div>
+      <div class="step"><input type="checkbox" id="c-6a"><label for="c-6a">Repo cloned to <code>/opt/homelab/repo</code></label></div>
+
+      <details>
+        <summary>Trouble? Git clone fails</summary>
+        <div class="details-body">
+          <p>Check Tailscale connectivity: <code>ping 100.86.220.9</code></p>
+          <p>Verify Soft Serve is running on your MacBook.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- PHASE 7 -->
+    <section class="phase" id="phase7">
+      <div class="phase-header">
+        <div class="phase-number">7</div>
+        <div class="phase-title">
+          <h2>Start the Services</h2>
+          <div class="phase-time">~15 minutes</div>
+        </div>
+      </div>
+
+      <h3>Storage Stack (Samba + Syncthing)</h3>
+      <pre><code>cd /opt/homelab/repo/docker/fixed/nas/storage</code></pre>
+      <p>Copy the <code>.env</code> from your MacBook:</p>
+      <pre><code># On MacBook:
+scp ~/homelab/docker/fixed/nas/storage/.env augusto@192.168.0.12:/opt/homelab/repo/docker/fixed/nas/storage/.env</code></pre>
+      <p>Or create manually on the NAS:</p>
+      <pre><code>cp .env.example .env
+nano .env
+
+# Set:
+# TZ=America/Asuncion
+# PUID=1000
+# PGID=1000
+# SAMBA_USER=augusto
+# SAMBA_PASSWORD=&lt;from-vaultwarden&gt;
+# MEDIA_PATH=/srv/media
+# DATA_PATH=/srv/data
+# DOWNLOADS_PATH=/srv/downloads
+# BACKUP_PATH=/srv/backup
+# SYNC_PATH=/srv/sync</code></pre>
+
+      <pre><code>docker compose up -d
+docker compose ps
+docker compose logs -f</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Starts Samba (file sharing) and Syncthing (file sync) in containers. Press <strong>Ctrl+C</strong> to stop watching logs.</div>
+      <div class="step"><input type="checkbox" id="c-7a"><label for="c-7a"><code>.env</code> file in place</label></div>
+      <div class="step"><input type="checkbox" id="c-7b"><label for="c-7b">Storage containers running</label></div>
+
+      <h3>Backup Stack (Restic REST)</h3>
+      <pre><code>cd /opt/homelab/repo/docker/fixed/nas/backup
+
+sudo mkdir -p /srv/backup/restic
+sudo chown 1000:1000 /srv/backup/restic</code></pre>
+
+      <p>Copy files from MacBook:</p>
+      <pre><code># On MacBook:
+scp ~/homelab/docker/fixed/nas/backup/.env augusto@192.168.0.12:/opt/homelab/repo/docker/fixed/nas/backup/.env
+scp ~/homelab/docker/fixed/nas/backup/htpasswd augusto@192.168.0.12:/opt/homelab/repo/docker/fixed/nas/backup/htpasswd</code></pre>
+
+      <p>Or create manually:</p>
+      <pre><code>cp .env.example .env
+nano .env
+# Set: BACKUP_DATA=/srv/backup/restic
+
+sudo apt install -y apache2-utils
+htpasswd -B -c htpasswd augusto</code></pre>
+
+      <pre><code>docker compose up -d
+docker compose ps
+curl http://localhost:8000/</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Starts the Restic REST server for HTTP-based backups.</div>
+      <div class="step"><input type="checkbox" id="c-7c"><label for="c-7c">Backup directory created</label></div>
+      <div class="step"><input type="checkbox" id="c-7d"><label for="c-7d"><code>.env</code> and <code>htpasswd</code> in place</label></div>
+      <div class="step"><input type="checkbox" id="c-7e"><label for="c-7e">Restic REST container running</label></div>
+      <div class="step"><input type="checkbox" id="c-7f"><label for="c-7f"><code>curl</code> returns a response</label></div>
+
+      <details>
+        <summary>Trouble? Samba won't start</summary>
+        <div class="details-body">
+          <pre><code>docker logs samba</code></pre>
+          <p>Check <code>.env</code> values. Test: <code>smbclient -L localhost -U augusto</code></p>
+          <p>Check ports: <code>ss -tlnp | grep -E '139|445'</code></p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Trouble? Restic REST won't start</summary>
+        <div class="details-body">
+          <pre><code>docker logs restic-rest</code></pre>
+          <p>Check <code>htpasswd</code> file exists. Check <code>.env</code> has <code>BACKUP_DATA=/srv/backup/restic</code>.</p>
+          <p>Test: <code>curl -v http://localhost:8000/</code></p>
+        </div>
+      </details>
+    </section>
+
+    <!-- PHASE 8 -->
+    <section class="phase" id="phase8">
+      <div class="phase-header">
+        <div class="phase-number">8</div>
+        <div class="phase-title">
+          <h2>Verify Everything Works</h2>
+          <div class="phase-time">~15 minutes</div>
+        </div>
+      </div>
+
+      <h3>Network Connectivity</h3>
+      <pre><code># From MacBook:
+ping 192.168.0.12
+ping &lt;nas-tailscale-ip&gt;
+ssh augusto@&lt;nas-tailscale-ip&gt;</code></pre>
+      <div class="step"><input type="checkbox" id="c-8a"><label for="c-8a">Reachable via LAN (192.168.0.12)</label></div>
+      <div class="step"><input type="checkbox" id="c-8b"><label for="c-8b">Reachable via Tailscale</label></div>
+      <div class="step"><input type="checkbox" id="c-8c"><label for="c-8c">SSH works over Tailscale</label></div>
+
+      <h3>Samba Shares</h3>
+      <p>On Mac: <strong>Finder &rarr; Cmd+K</strong> (Connect to Server):</p>
+      <pre><code>smb://192.168.0.12/media</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Connects to the NAS media share. Enter user <code>augusto</code> and the Samba password from Vaultwarden.</div>
+      <div class="step"><input type="checkbox" id="c-8d"><label for="c-8d">Samba share accessible from Finder</label></div>
+
+      <h3>NFS (from Docker VM)</h3>
+      <pre><code># SSH to Docker VM:
+ssh docker-vm
+
+sudo apt install -y nfs-common
+sudo mkdir -p /mnt/nas/frigate
+sudo mount -t nfs 192.168.0.12:/srv/frigate /mnt/nas/frigate
+ls /mnt/nas/frigate</code></pre>
+      <div class="step"><input type="checkbox" id="c-8e"><label for="c-8e">NFS mount works from Docker VM</label></div>
+
+      <h3>Syncthing</h3>
+      <p>Access web UI:</p>
+      <pre><code># Direct: http://192.168.0.12:8384
+# Or tunnel: ssh -L 8384:localhost:8384 augusto@&lt;nas-tailscale-ip&gt;
+# Then: http://localhost:8384</code></pre>
+      <div class="step"><input type="checkbox" id="c-8f"><label for="c-8f">Syncthing web UI loads</label></div>
+
+      <h3>Restic REST</h3>
+      <pre><code>curl http://192.168.0.12:8000/</code></pre>
+      <div class="step"><input type="checkbox" id="c-8g"><label for="c-8g">Restic REST responds</label></div>
+    </section>
+
+    <!-- AFTER DEPLOYMENT -->
+    <section class="phase" id="after">
+      <div class="phase-header">
+        <div class="phase-number prep">+</div>
+        <div class="phase-title">
+          <h2>After Deployment</h2>
+          <div class="phase-time">Can be done later, from MacBook</div>
+        </div>
+      </div>
+
+      <h3>Add Uptime Kuma Monitors</h3>
+      <table>
+        <tr><th>Service</th><th>Type</th><th>Target</th></tr>
+        <tr><td>NAS SSH</td><td>TCP</td><td>192.168.0.12:22</td></tr>
+        <tr><td>Samba</td><td>TCP</td><td>192.168.0.12:445</td></tr>
+        <tr><td>Syncthing</td><td>HTTP</td><td>http://192.168.0.12:8384</td></tr>
+        <tr><td>Restic REST</td><td>HTTP</td><td>http://192.168.0.12:8000</td></tr>
+        <tr><td>NFS</td><td>TCP</td><td>192.168.0.12:2049</td></tr>
+      </table>
+      <div class="step"><input type="checkbox" id="c-a1"><label for="c-a1">Monitors added in Uptime Kuma</label></div>
+
+      <h3>Update Files with Actual Tailscale IP</h3>
+      <p>Replace placeholder <code>100.64.0.12</code> with the real IP in:</p>
+      <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+        <li><code>ansible/inventory.yml</code></li>
+        <li><code>docker/vps/networking/headscale/config/config.yaml.example</code></li>
+        <li><code>docs/network-topology.md</code></li>
+        <li><code>docs/nfs-setup.md</code></li>
+        <li><code>~/.ssh/config</code></li>
+      </ul>
+      <div class="step"><input type="checkbox" id="c-a2"><label for="c-a2">Tailscale IP updated in all files</label></div>
+
+      <h3>Set BIOS Options</h3>
+      <p>Next time you have a keyboard/monitor on the NAS:</p>
+      <div class="step"><input type="checkbox" id="c-a3"><label for="c-a3"><strong>Restore on AC Power Loss &rarr; Power On</strong></label></div>
+      <div class="step"><input type="checkbox" id="c-a4"><label for="c-a4"><strong>Wake on LAN &rarr; Enabled</strong> (optional)</label></div>
+    </section>
+
+    <!-- TROUBLESHOOTING -->
+    <section class="phase" id="troubleshooting">
+      <div class="phase-header">
+        <div class="phase-number prep">?</div>
+        <div class="phase-title">
+          <h2>If Something Goes Wrong</h2>
+        </div>
+      </div>
+
+      <details>
+        <summary>Debian won't install (Phase 1)</summary>
+        <div class="details-body">
+          <ul style="margin-left: 1rem;">
+            <li>Make sure you're booting from USB (F8 boot menu)</li>
+            <li>Try a different USB port</li>
+            <li>Re-flash the USB: <code>sudo dd if=debian.iso of=/dev/sdX bs=4M status=progress</code></li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary>Drive won't mount after reboot (Phase 2)</summary>
+        <div class="details-body">
+          <p>Check fstab syntax: <code>cat /etc/fstab</code></p>
+          <p>Verify UUIDs match: <code>sudo blkid</code></p>
+          <p>Try manual mount: <code>sudo mount /dev/sdb1 /mnt/purple</code></p>
+        </div>
+      </details>
+
+      <details>
+        <summary>NFS not working (Phase 5)</summary>
+        <div class="details-body">
+          <pre><code>sudo systemctl status nfs-kernel-server
+sudo exportfs -v
+sudo ufw status</code></pre>
+          <p>From Docker VM: <code>showmount -e 192.168.0.12</code></p>
+          <p>Make sure firewall allows ports 111 and 2049.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Can't SSH into NAS</summary>
+        <div class="details-body">
+          <ul style="margin-left: 1rem;">
+            <li>Connect keyboard/monitor directly</li>
+            <li>Check network: <code>ip addr</code></li>
+            <li>Check SSH: <code>systemctl status ssh</code></li>
+            <li>Try local network first, then Tailscale</li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary>Nuclear option: Full reinstall</summary>
+        <div class="details-body">
+          <p>If everything is broken:</p>
+          <ol style="margin-left: 1rem;">
+            <li>Boot from Debian USB</li>
+            <li>Reinstall on the SSD only</li>
+            <li>Your data drives (Purple and Red) are <strong>not touched</strong> &mdash; data is safe</li>
+            <li>After reinstall, re-mount drives using their UUIDs (Phase 2)</li>
+          </ol>
+        </div>
+      </details>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'nas-guide-progress';
+
+  // Load saved state
+  function loadState() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch { return {}; }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // Initialize checkboxes
+  const checkboxes = document.querySelectorAll('.step input[type="checkbox"]');
+  const state = loadState();
+
+  checkboxes.forEach(cb => {
+    if (state[cb.id]) {
+      cb.checked = true;
+      cb.closest('.step').classList.add('checked');
+    }
+
+    cb.addEventListener('change', function() {
+      const s = loadState();
+      s[this.id] = this.checked;
+      saveState(s);
+      this.closest('.step').classList.toggle('checked', this.checked);
+      updateProgress();
+    });
+  });
+
+  // Progress bar
+  function updateProgress() {
+    const total = checkboxes.length;
+    const checked = document.querySelectorAll('.step input[type="checkbox"]:checked').length;
+    const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+    document.getElementById('progress-count').textContent = checked;
+    document.getElementById('progress-total').textContent = total;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  }
+
+  updateProgress();
+
+  // Reset
+  window.resetProgress = function() {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    checkboxes.forEach(cb => {
+      cb.checked = false;
+      cb.closest('.step').classList.remove('checked');
+    });
+    updateProgress();
+  };
+
+  // Nav toggle (mobile)
+  window.toggleNav = function() {
+    document.getElementById('nav').classList.toggle('open');
+    document.getElementById('nav-overlay').classList.toggle('open');
+  };
+
+  // Active nav on scroll
+  const sections = document.querySelectorAll('.phase');
+  const navLinks = document.querySelectorAll('nav a[data-section]');
+
+  function onScroll() {
+    let current = '';
+    sections.forEach(section => {
+      const top = section.getBoundingClientRect().top;
+      if (top <= 100) current = section.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.dataset.section === current);
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Close mobile nav on link click
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      document.getElementById('nav').classList.remove('open');
+      document.getElementById('nav-overlay').classList.remove('open');
+    });
+  });
+})();
+</script>
+</body>
+</html>
