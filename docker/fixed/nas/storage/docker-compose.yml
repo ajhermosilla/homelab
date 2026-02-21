@@ -8,8 +8,8 @@ services:
   # https://www.samba.org/
   # =========================================================================
   samba:
-    # TODO: Migrate to jlaptechnologies/samba (maintained fork) after NAS deployment
-    image: dperson/samba:amd64
+    # Maintained fork of dperson/samba (https://github.com/jlaptechnologies/samba)
+    image: justinpatchett/samba
     env_file:
       - ../../../shared/common.env
     container_name: samba
@@ -39,10 +39,9 @@ services:
       USERID: ${PUID:-1000}
       GROUPID: ${PGID:-1000}
     # ⚠️  SECURITY: Password visible in `docker inspect`. This is a limitation of
-    # the dperson/samba image. Mitigations:
+    # the samba image CLI. Mitigations:
     #   1. Use a strong, unique password in .env
     #   2. Restrict container access (only trusted users can run docker commands)
-    #   3. Consider switching to servercontainers/samba for secrets support
     command: >
       -u "${SAMBA_USER:-augusto};${SAMBA_PASSWORD:?SAMBA_PASSWORD required in .env}"
       -s "media;/media;yes;no;no;augusto"
@@ -68,8 +67,7 @@ services:
   # https://syncthing.net/
   # =========================================================================
   syncthing:
-    # Syncthing v2.x available — test upgrade after initial deployment
-    image: lscr.io/linuxserver/syncthing:1.27
+    image: lscr.io/linuxserver/syncthing:2.0.14
     env_file:
       - ../../../shared/common.env
     container_name: syncthing

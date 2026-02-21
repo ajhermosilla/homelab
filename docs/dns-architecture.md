@@ -21,28 +21,16 @@ How DNS resolution works across all homelab environments.
 
 ## Environment DNS Flows
 
-### Mobile Kit (Dual-DNS)
+### Mobile Kit
 
-Mobile kit uses two DNS ad-blockers for redundancy:
+Mobile kit uses Beryl AX AdGuard Home as the sole DNS ad-blocker:
 
 ```
 [MacBook/Devices]
        |
-       | DNS: 192.168.8.1 (primary)
+       | DNS: 192.168.8.1
        v
 [AdGuard Home on Beryl AX]  ← Built-in, lightweight, always on
-       |
-       | Upstream: 1.1.1.1, 9.9.9.9
-       v
-[Cloudflare/Quad9]
-
-       --- Fallback (when RPi 5 available) ---
-
-[MacBook/Devices]
-       |
-       | DNS: 192.168.8.5 (secondary)
-       v
-[Pi-hole on RPi 5]  ← Full-featured, but RPi 5 may be tinkering
        |
        | Upstream: 1.1.1.1, 9.9.9.9
        v
@@ -51,14 +39,10 @@ Mobile kit uses two DNS ad-blockers for redundancy:
 
 | Component | Role | IP |
 |-----------|------|-----|
-| Beryl AX | AdGuard Home (primary DNS), DHCP | 192.168.8.1 |
-| RPi 5 | Pi-hole (secondary DNS), tinkering device | 192.168.8.5 |
+| Beryl AX | AdGuard Home (DNS), DHCP | 192.168.8.1 |
 | Upstream | Public recursive DNS | 1.1.1.1, 9.9.9.9 |
 
-**Why dual-DNS:**
-- AdGuard Home on Beryl AX is lightweight (~30MB), always on with router
-- RPi 5 is a tinkering device - can be reassigned to other projects
-- Redundancy: DNS ad-blocking works even when RPi 5 is busy/off
+**Mobile kit:** MacBook Air + Beryl AX + Samsung A13. RPi 5 moved to fixed homelab (runs OpenClaw, not Pi-hole).
 
 **Why public upstream:** Mobile kit travels. Running Unbound adds complexity for minimal benefit on the go.
 
@@ -132,12 +116,11 @@ Settings → DNS → Upstream DNS Servers
 
 ## Tailscale DNS Integration
 
-When on Tailscale mesh, devices can use any Pi-hole:
+When on Tailscale mesh, devices can use Pi-hole on Docker VM or VPS:
 
 | Pi-hole Location | Tailscale IP | Use Case |
 |------------------|--------------|----------|
-| RPi 5 (mobile) | 100.64.0.1 | Primary when traveling |
-| Docker Host (home) | 100.68.63.168 | Primary when home |
+| Docker VM (home) | 100.68.63.168 | Primary when home |
 | VPS | 100.77.172.46 | Fallback, US-based |
 
 **Headscale DNS Config** (on VPS):
@@ -145,8 +128,8 @@ When on Tailscale mesh, devices can use any Pi-hole:
 # /etc/headscale/config.yaml
 dns_config:
   nameservers:
-    - 100.64.0.1      # RPi 5 Pi-hole (primary)
-    - 100.68.63.168   # Home Pi-hole (secondary)
+    - 100.68.63.168   # Home Pi-hole (primary)
+    - 100.77.172.46   # VPS Pi-hole (fallback)
   magic_dns: true
   base_domain: tail.net
 ```
@@ -158,15 +141,15 @@ Pi-hole can resolve local hostnames:
 ```
 # Pi-hole → Local DNS → DNS Records
 192.168.0.237   oga.home
+192.168.0.20    rpi5.home
 192.168.0.11    rpi4.home
 192.168.0.12    nas.home
-192.168.8.5     rpi5.local
 ```
 
 Or use Headscale MagicDNS:
 ```
 oga.tail.net     → 100.78.12.241
-rpi5.tail.net    → 100.64.0.1
+docker.tail.net  → 100.68.63.168
 ```
 
 ## DNS Failover
@@ -195,11 +178,10 @@ Upstream DNS:
 
 ## Configuration Checklist
 
-### Mobile Kit (RPi 5)
-- [ ] Install Pi-hole
+### Mobile Kit (Beryl AX)
+- [ ] Configure AdGuard Home on Beryl AX
 - [ ] Set upstream: 1.1.1.1, 9.9.9.9
-- [ ] Configure Beryl AX DHCP to give 192.168.8.5 as DNS
-- [ ] Add local DNS records
+- [ ] Beryl AX is DHCP server and DNS (192.168.8.1)
 
 ### Fixed Homelab
 - [ ] Configure Unbound on OPNsense (port 5353)
