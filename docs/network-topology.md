@@ -17,11 +17,11 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │   24/7 Cloud    │       │   Home Server   │       │   On-Demand     │
 │                 │       │                 │       │                 │
 │ • Headscale     │       │ • Proxmox       │       │ • Beryl AX      │
-│ • Caddy         │       │ • Docker VM     │       │ • RPi 5         │
-│ • Pi-hole       │       │ • NAS           │       │ • MacBook       │
-│ • Uptime Kuma   │       │ • Start9/RPi4   │       │                 │
-│                 │       │                 │       │                 │
-│ 100.77.172.46   │       │ 100.68.63.168+  │       │ 100.64.0.1      │
+│ • Caddy         │       │ • Docker VM     │       │ • MacBook       │
+│ • Pi-hole       │       │ • NAS           │       │ • Samsung A13   │
+│ • Uptime Kuma   │       │ • RPi 5         │       │                 │
+│                 │       │ • Start9/RPi4   │       │                 │
+│ 100.77.172.46   │       │ 100.68.63.168+  │       │ 100.102.244.131 │
 └────────┬────────┘       └────────┬────────┘       └────────┬────────┘
          │                         │                         │
          └─────────────────────────┼─────────────────────────┘
@@ -50,8 +50,8 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
           ▼               ▼               ▼               ▼               ▼
    ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐
    │    oga     │  │   docker   │  │    nas     │  │   rpi4     │  │   rpi5     │
-   │100.78.12.241│ │100.68.63.168│ │ 100.64.0.12│  │ 100.64.0.11│  │ 100.64.0.1 │
-   │  Proxmox   │  │ Docker VM  │  │  Storage   │  │  Start9    │  │  Mobile    │
+   │100.78.12.241│ │100.68.63.168│ │ 100.64.0.12│  │ 100.64.0.11│  │192.168.0.20│
+   │  Proxmox   │  │ Docker VM  │  │  Storage   │  │  Start9    │  │  OpenClaw  │
    └────────────┘  └────────────┘  └────────────┘  └────────────┘  └────────────┘
                                           │
           ┌───────────────────────────────┼───────────────────────────────┐
@@ -66,19 +66,18 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 
 ### Tailscale IP Allocation
 
-| Device | Tailscale IP | Role | Location |
-|--------|-------------|------|----------|
-| rpi5 | 192.168.0.20 | OpenClaw AI assistant | Fixed |
-| oga | 100.78.12.241 | Proxmox host | Fixed |
-| rpi4 | 100.64.0.11 | Start9 Bitcoin | Fixed |
-| nas | 100.64.0.12 | Storage server | Fixed |
-| docker | 100.68.63.168 | Container host | Fixed |
-| rpi5 (openclaw) | 192.168.0.20 | AI assistant (RPi 5) | Fixed |
-| vultr | 100.77.172.46 | VPS / Exit node | Cloud |
-| macbook | 100.86.220.9 | Workstation | Mobile |
-| beryl-ax | 100.102.244.131 | Travel router | Mobile |
-| opnsense | 100.79.230.235 | Firewall VM | Fixed |
-| mombeu | 100.110.253.126 | Phone | Mobile |
+| Device | Tailscale IP | LAN IP | Role | Location |
+|--------|-------------|--------|------|----------|
+| oga | 100.78.12.241 | 192.168.0.237 | Proxmox host | Fixed |
+| docker | 100.68.63.168 | 192.168.0.10 | Container host | Fixed |
+| opnsense | 100.79.230.235 | 192.168.0.1 | Firewall/Router VM | Fixed |
+| rpi5 | pending | 192.168.0.20 | OpenClaw AI assistant | Fixed |
+| rpi4 | 100.64.0.11 | 192.168.0.11 | Start9 Bitcoin | Fixed |
+| nas | 100.64.0.12 | 192.168.0.12 | Storage server | Fixed |
+| vultr | 100.77.172.46 | — | VPS / Exit node | Cloud |
+| macbook | 100.86.220.9 | — | Workstation | Mobile |
+| beryl-ax | 100.102.244.131 | — | Travel router | Mobile |
+| mombeu | 100.110.253.126 | — | Phone | Mobile |
 
 ## Fixed Homelab - Physical Topology
 
@@ -108,9 +107,9 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
      │                     │    │    │    │    │                     │
      ▼                     ▼    ▼    ▼    ▼    ▼                     ▼
 ┌─────────┐          ┌─────────┐  ┌───┐  ┌─────────┐          ┌─────────┐
-│Docker VM│          │  RPi 4  │  │NAS│  │PoE Sw.  │          │ WiFi AP │
-│(Proxmox)│          │ Start9  │  │   │  │TP-Link  │          │Archer   │
-│.0.10    │          │ .0.11   │  │.12│  │         │          │AX50     │
+│Docker VM│          │  RPi 4  │  │NAS│  │  RPi 5  │          │ WiFi AP │
+│(Proxmox)│          │ Start9  │  │   │  │OpenClaw │          │Archer   │
+│.0.10    │          │ .0.11   │  │.12│  │ .0.20   │          │AX50     │
 └─────────┘          └─────────┘  └───┘  └────┬────┘          └─────────┘
                                               │
                                     ┌─────────┴─────────┐
@@ -134,7 +133,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | RPi 4 | 4GB | 1TB ext SSD | 192.168.0.11 | Start9 Bitcoin |
 | Switch | MokerLink | 8-port 2.5G | - | Backbone |
 | PoE Switch | TP-Link | 5-port 1G, 4xPoE | - | Camera power |
-| WiFi AP | TP-Link | Archer AX50 WiFi 6 | - | Wireless |
+| WiFi AP | TP-Link | Archer AX50 WiFi 6 (AP mode) | 192.168.0.2 | Wireless |
 | UPS | Forza | 1000VA | - | Power backup |
 
 ## Mobile Kit - Physical Topology
@@ -155,7 +154,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │    │  192.168.8.1  │              │ 192.168.8.10│          │
 │    │               │              └─────────────┘          │
 │    │ • AdGuard DNS │                                        │
-│    │ • Tailscale   │                                        │
+│    │ • Tailscale   │  (RPi 5 moved to fixed homelab)       │
 │    └───────────────┘                                        │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
