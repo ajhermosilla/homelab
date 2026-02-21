@@ -5,10 +5,10 @@
 services:
   # =========================================================================
   # Watchtower - Automatic Container Updates
-  # https://containrrr.dev/watchtower/
+  # https://github.com/nicholas-fedor/watchtower (actively maintained fork)
   # =========================================================================
   watchtower:
-    image: containrrr/watchtower:1.7.1
+    image: ghcr.io/nicholas-fedor/watchtower:1.14.2
     env_file:
       - ../../../shared/common.env
     container_name: watchtower
