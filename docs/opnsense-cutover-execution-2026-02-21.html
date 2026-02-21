@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPNsense Gateway Cutover — 2026-02-21</title>
+<style>
+  :root {
+    --bg: #1a1b26;
+    --surface: #24283b;
+    --surface2: #2f3348;
+    --text: #c0caf5;
+    --text-dim: #565f89;
+    --accent: #7aa2f7;
+    --green: #9ece6a;
+    --red: #f7768e;
+    --yellow: #e0af68;
+    --orange: #ff9e64;
+    --border: #3b4261;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 1.5rem;
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    background: var(--surface);
+    border-radius: 8px;
+  }
+  .meta strong { color: var(--text); }
+  h2 {
+    font-size: 1.15rem;
+    color: var(--yellow);
+    margin: 1.75rem 0 0.75rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--surface);
+    border-left: 4px solid var(--yellow);
+    border-radius: 0 6px 6px 0;
+  }
+  h2.rollback {
+    color: var(--red);
+    border-left-color: var(--red);
+  }
+  h3 {
+    font-size: 0.95rem;
+    color: var(--orange);
+    margin: 1rem 0 0.5rem;
+  }
+  p, li { font-size: 0.9rem; margin-bottom: 0.35rem; }
+  ul { list-style: none; padding-left: 0; }
+  li { padding: 0.15rem 0; }
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .task:hover { background: var(--surface2); }
+  .task input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 1px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .task input[type="checkbox"]:checked {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .task input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -1px;
+    left: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--bg);
+  }
+  .task.done label { text-decoration: line-through; color: var(--text-dim); }
+  pre {
+    background: #16161e;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+    margin: 0.5rem 0;
+    line-height: 1.5;
+  }
+  code {
+    font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+    font-size: 0.8rem;
+    background: var(--surface2);
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+  }
+  pre code { background: none; padding: 0; }
+  .warn {
+    background: rgba(247, 118, 142, 0.1);
+    border: 1px solid var(--red);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+  }
+  .warn::before { content: '⚠ '; color: var(--red); font-weight: bold; }
+  .note {
+    background: rgba(122, 162, 247, 0.1);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+  }
+  .physical {
+    background: rgba(224, 175, 104, 0.1);
+    border: 1px solid var(--yellow);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .physical::before { content: '🔧 '; }
+  .time-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 0.2rem 0.5rem;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.85rem;
+    width: 80px;
+  }
+  .expected {
+    color: var(--green);
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+  .expected::before { content: '→ '; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    background: var(--surface2);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+  @media (max-width: 600px) {
+    body { padding: 1rem; }
+    .meta { grid-template-columns: 1fr; }
+    pre { font-size: 0.7rem; padding: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<h1>OPNsense Gateway Cutover</h1>
+<div class="meta">
+  <div><strong>Date:</strong> 2026-02-21</div>
+  <div><strong>Window:</strong> 30 minutes max</div>
+  <div><strong>Rollback:</strong> ~2 minutes</div>
+  <div><strong>Alt internet:</strong> Phone tethering (safety net)</div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Before You Start</h2>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>Open Proxmox web UI: <code>https://192.168.0.237:8006</code></label></li>
+  <li class="task"><input type="checkbox"><label>Open this file on your phone (in case Mac loses connectivity)</label></li>
+  <li class="task"><input type="checkbox"><label>Have an Ethernet cable ready for nic1</label></li>
+  <li class="task"><input type="checkbox"><label>Announce: "Internet will be down for up to 30 minutes"</label></li>
+  <li class="task"><input type="checkbox"><label>Start time: <input type="text" class="time-input" placeholder="HH:MM"></label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 1 — Connect nic1 to Switch</h2>
+
+<div class="physical">Plug Ethernet cable from Proxmox <strong>nic1</strong> (2nd port) into MokerLink switch.</div>
+
+<p>Verify:</p>
+<pre><code>ssh augusto@192.168.0.237 "ip link show nic1 | grep 'state UP'"</code></pre>
+<p class="expected">state UP</p>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>nic1 shows UP</label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 2 — Apply Proxmox Network Config</h2>
+
+<p>Moves management IP from vmbr0 → vmbr1 (now on the switch via nic1).</p>
+
+<pre><code>ssh augusto@192.168.0.237 "sudo cp /etc/network/interfaces.cutover /etc/network/interfaces && sudo cp /etc/network/interfaces.d/vmbr1.cutover /etc/network/interfaces.d/vmbr1 && sudo ifreload -a"</code></pre>
+
+<p>Verify:</p>
+<pre><code>ssh augusto@192.168.0.237 "ip -br addr show vmbr0 && ip -br addr show vmbr1"</code></pre>
+<p class="expected">vmbr0 — no IP &nbsp;|&nbsp; vmbr1 — 192.168.0.237/24</p>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>vmbr0 has no IP</label></li>
+  <li class="task"><input type="checkbox"><label>vmbr1 has 192.168.0.237/24</label></li>
+  <li class="task"><input type="checkbox"><label>Proxmox web UI still works</label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 3 — Swap Cables</h2>
+
+<div class="physical">1. Unplug ISP Ethernet from <strong>TP-Link WAN</strong> → plug into <strong>Proxmox nic0</strong></div>
+<div class="physical">2. Unplug old switch cable from <strong>Proxmox nic0</strong> (no longer needed)</div>
+
+<div class="warn">Internet is now DOWN for everyone. Clock is ticking.</div>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>ISP cable in Proxmox nic0</label></li>
+  <li class="task"><input type="checkbox"><label>Old switch cable removed from nic0</label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 4 — Verify OPNsense Gets Public IP</h2>
+
+<p>Open <strong>Proxmox web UI</strong> → VM 100 (OPNsense) → <strong>Console</strong>.</p>
+<p>Dashboard → Interfaces → WAN → should show a public IP.</p>
+
+<p>If no public IP after 30 seconds:</p>
+<pre><code>/usr/local/sbin/configctl interface reconfigure wan</code></pre>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>OPNsense WAN has a public IP</label></li>
+</ul>
+
+<div class="warn">If no public IP after 2 minutes → <strong>ROLLBACK</strong> (see bottom).</div>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 5 — Switch TP-Link to AP Mode</h2>
+
+<p>From Mac (still connected to WiFi):</p>
+
+<table>
+  <tr><th>#</th><th>Action</th></tr>
+  <tr><td>1</td><td>Open <code>http://192.168.0.1</code> (TP-Link admin)</td></tr>
+  <tr><td>2</td><td>Operation Mode → <strong>Access Point</strong></td></tr>
+  <tr><td>3</td><td>Set static IP: <strong>192.168.0.2</strong></td></tr>
+  <tr><td>4</td><td>Apply (TP-Link reboots, ~1 min)</td></tr>
+  <tr><td>5</td><td>Move TP-Link cable: <strong>LAN port → switch</strong> (NOT WAN)</td></tr>
+</table>
+
+<div class="note">WiFi will briefly drop. Same SSID/password = auto-reconnect.</div>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>TP-Link in AP mode</label></li>
+  <li class="task"><input type="checkbox"><label>TP-Link cable: LAN port → switch</label></li>
+  <li class="task"><input type="checkbox"><label>Mac reconnected to WiFi</label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 6 — Configure OPNsense LAN</h2>
+
+<p>From <strong>Proxmox web UI</strong> → VM 100 → <strong>Console</strong> → browse to <code>https://192.168.1.1</code>:</p>
+
+<h3>6a. Change LAN IP</h3>
+<table>
+  <tr><td>Interfaces → LAN → IPv4</td><td><code>192.168.0.1/24</code></td></tr>
+  <tr><td colspan="2">Save → Apply</td></tr>
+</table>
+
+<h3>6b. Enable DHCP</h3>
+<table>
+  <tr><td>Services → DHCPv4 → LAN</td><td>Enable: ✓</td></tr>
+  <tr><td>Range</td><td><code>192.168.0.100</code> – <code>192.168.0.250</code></td></tr>
+  <tr><td>DNS server</td><td><code>192.168.0.10</code></td></tr>
+  <tr><td>Gateway</td><td><code>192.168.0.1</code></td></tr>
+</table>
+
+<h3>6c. Static Mappings</h3>
+<table>
+  <tr><th>Device</th><th>MAC</th><th>IP</th></tr>
+  <tr><td>Docker VM</td><td><code>BC:24:11:A8:E9:C5</code></td><td>192.168.0.10</td></tr>
+  <tr><td>TP-Link AP</td><td>(from lease list)</td><td>192.168.0.2</td></tr>
+</table>
+<p>Save → Apply.</p>
+
+<div class="note">After applying, OPNsense LAN is at 192.168.0.1. Proxmox gateway now works. Tailscale reconnects.</div>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>LAN IP changed to 192.168.0.1</label></li>
+  <li class="task"><input type="checkbox"><label>DHCP enabled (.100–.250, DNS .10, GW .1)</label></li>
+  <li class="task"><input type="checkbox"><label>Docker VM static mapping added</label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 7 — Re-IP Docker VM</h2>
+
+<p>Docker VM's gateway (192.168.1.1) is gone. Fix from Proxmox:</p>
+
+<pre><code>ssh augusto@192.168.0.237 "sudo qm guest exec 101 -- bash -c 'ip addr del 192.168.1.10/24 dev ens18; ip addr add 192.168.0.10/24 dev ens18; ip route add default via 192.168.0.1'"</code></pre>
+
+<div class="note">If <code>qm guest exec</code> fails → use Proxmox web UI → VM 101 → Console, then run the 3 commands manually.</div>
+
+<p>Make it persistent:</p>
+<pre><code>ssh augusto@192.168.0.237 "sudo qm guest exec 101 -- bash -c \"sed -i 's/192.168.1.10/192.168.0.10/g; s/gateway 192.168.1.1/gateway 192.168.0.1/g' /etc/network/interfaces\""</code></pre>
+
+<p>Verify:</p>
+<pre><code>ssh augusto@192.168.0.10 "ip addr show ens18 | grep inet && ping -c1 8.8.8.8"</code></pre>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>Docker VM at 192.168.0.10</label></li>
+  <li class="task"><input type="checkbox"><label>Docker VM has internet (ping 8.8.8.8)</label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2>Step 8 — The Family Test</h2>
+
+<h3>Internet</h3>
+<ul>
+  <li class="task"><input type="checkbox"><label>Phone WiFi → gets 192.168.0.x IP</label></li>
+  <li class="task"><input type="checkbox"><label>Phone can browse the web</label></li>
+  <li class="task"><input type="checkbox"><label><strong>Netflix works on TV</strong></label></li>
+</ul>
+
+<h3>Homelab</h3>
+<ul>
+  <li class="task"><input type="checkbox"><label>SSH to Docker VM: <code>ssh augusto@192.168.0.10</code></label></li>
+  <li class="task"><input type="checkbox"><label>Pi-hole resolving DNS</label></li>
+  <li class="task"><input type="checkbox"><label>Vaultwarden accessible</label></li>
+  <li class="task"><input type="checkbox"><label>Proxmox UI: <code>https://192.168.0.237:8006</code></label></li>
+  <li class="task"><input type="checkbox"><label>OPNsense UI: <code>https://192.168.0.1</code></label></li>
+  <li class="task"><input type="checkbox"><label>Tailscale: <code>tailscale status</code></label></li>
+</ul>
+
+<p style="text-align:center; font-size:1.1rem; color:var(--green); margin-top:1rem;">
+  ✓ Announce: "Internet is back!"
+</p>
+
+<ul>
+  <li class="task"><input type="checkbox"><label>End time: <input type="text" class="time-input" placeholder="HH:MM"></label></li>
+</ul>
+
+<hr class="divider">
+
+<!-- ============================================================ -->
+<h2 class="rollback">Rollback — If Anything Goes Wrong</h2>
+
+<h3>Before Step 6 (OPNsense LAN still 192.168.1.x)</h3>
+
+<pre><code># 1. Revert Proxmox config
+ssh augusto@192.168.0.237 "sudo cp /etc/network/interfaces.original /etc/network/interfaces && sudo cp /etc/network/interfaces.d/vmbr1.original /etc/network/interfaces.d/vmbr1 && sudo ifreload -a"
+
+# 2. Physical: ISP cable → TP-Link WAN, switch cable → Proxmox nic0, unplug nic1
+# 3. TP-Link: reboot to restore router mode</code></pre>
+
+<h3>After Step 6 (OPNsense LAN already at 192.168.0.x)</h3>
+
+<table>
+  <tr><th>#</th><th>Action</th></tr>
+  <tr><td>1</td><td>OPNsense console: LAN → change back to <code>192.168.1.1/24</code>, Apply</td></tr>
+  <tr><td>2</td><td>Docker VM: revert IP to <code>192.168.1.10</code>, gateway <code>192.168.1.1</code></td></tr>
+  <tr><td>3</td><td>Then do the cable/config revert above</td></tr>
+</table>
+
+<h3>Nuclear Option</h3>
+<p>Connect Mac to phone tethering → SSH to VPS → figure it out from there.</p>
+
+<script>
+document.querySelectorAll('.task').forEach(task => {
+  const cb = task.querySelector('input[type="checkbox"]');
+  if (!cb) return;
+  task.addEventListener('click', e => {
+    if (e.target.tagName === 'INPUT' && e.target.type === 'text') return;
+    if (e.target !== cb) cb.checked = !cb.checked;
+    task.classList.toggle('done', cb.checked);
+  });
+});
+</script>
+
+</body>
+</html>
