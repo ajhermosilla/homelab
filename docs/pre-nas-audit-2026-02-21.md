@@ -19,9 +19,9 @@
 ## MEDIUM (Nice to fix)
 
 - [x] **NAS deployment plan post-cutover update** — Updated OPNsense access (SSH tunnel), repo clone URL (Soft Serve), DNS nameserver (Pi-hole).
-- [ ] **OPNsense old config references** — `/conf/config.xml` has `192.168.1.126` and `192.168.1.250` entries from old subnet.
+- [x] **OPNsense old config references** — Removed `192.168.1.126` and `192.168.1.250` entries from `/conf/config.xml`.
 - [x] **README.md outdated** — Updated service counts, architecture diagram, status table. Also updated `docs/services.md` with Watchtower, Caddy VPS, headscale-backup.
-- [ ] **Missing `.env` files for NAS** — `.env.example` templates exist, actual `.env` files needed before deployment.
+- [x] **Missing `.env` files for NAS** — Created `scripts/nas-prep-env.sh` to generate `.env` files with secrets on deployment day.
 
 ## LOW (Cosmetic/future)
 
