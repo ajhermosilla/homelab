@@ -18,9 +18,9 @@
 
 ## MEDIUM (Nice to fix)
 
-- [ ] **NAS deployment plan post-cutover update** — `docs/nas-deployment-plan.md` written pre-cutover, some context dated.
+- [x] **NAS deployment plan post-cutover update** — Updated OPNsense access (SSH tunnel), repo clone URL (Soft Serve), DNS nameserver (Pi-hole).
 - [ ] **OPNsense old config references** — `/conf/config.xml` has `192.168.1.126` and `192.168.1.250` entries from old subnet.
-- [ ] **README.md outdated** — Service counts, architecture description stale after cutover + Watchtower.
+- [x] **README.md outdated** — Updated service counts, architecture diagram, status table. Also updated `docs/services.md` with Watchtower, Caddy VPS, headscale-backup.
 - [ ] **Missing `.env` files for NAS** — `.env.example` templates exist, actual `.env` files needed before deployment.
 
 ## LOW (Cosmetic/future)
