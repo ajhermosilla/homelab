@@ -85,9 +85,9 @@ services:
           cpus: '2'
     shm_size: "256mb"
     ports:
-      - "5000:5000"     # Web UI
-      - "8554:8554"     # RTSP restream
-      - "8555:8555/tcp" # WebRTC
+      - "127.0.0.1:5000:5000"  # Web UI — Caddy only
+      - "127.0.0.1:8554:8554"  # RTSP restream — internal only
+      - "8555:8555/tcp"         # WebRTC — browser needs direct UDP
       - "8555:8555/udp"
     volumes:
       - ./frigate.yml:/config/config.yml:ro
@@ -102,7 +102,11 @@ services:
       - /dev/dri:/dev/dri
     environment:
       TZ: ${TZ:-America/Asuncion}
-      FRIGATE_RTSP_PASSWORD: ${FRIGATE_RTSP_PASSWORD}
+      FRIGATE_REOLINK_USER: ${FRIGATE_REOLINK_USER:-admin}
+      FRIGATE_FRONT_PASS: ${FRIGATE_FRONT_PASS}
+      FRIGATE_BACK_PASS: ${FRIGATE_BACK_PASS}
+      FRIGATE_MQTT_USER: ${FRIGATE_MQTT_USER:-frigate}
+      FRIGATE_MQTT_PASS: ${FRIGATE_MQTT_PASS}
     logging:
       driver: "json-file"
       options:
@@ -193,7 +197,11 @@ networks:
 # TZ=America/Asuncion
 # VAULTWARDEN_ADMIN_TOKEN=<generate-with-openssl-rand-base64-32>
 # VAULTWARDEN_SIGNUPS=false
-# FRIGATE_RTSP_PASSWORD=camera-password
+# FRIGATE_REOLINK_USER=admin
+# FRIGATE_FRONT_PASS=your-front-camera-password
+# FRIGATE_BACK_PASS=your-back-camera-password-url-encoded
+# FRIGATE_MQTT_USER=frigate
+# FRIGATE_MQTT_PASS=your-mqtt-password
 # FRIGATE_RECORDINGS=/mnt/nas/frigate
 #
 # =============================================================================
@@ -305,7 +313,7 @@ networks:
 #
 # 5. Access services:
 #    - Vaultwarden: https://vault.cronova.dev (or http://192.168.0.10:8843)
-#    - Frigate: http://192.168.0.10:5000
+#    - Frigate: https://taguato.cronova.dev (port 5000 localhost-only)
 #
 # =============================================================================
 # VAULTWARDEN ADMIN PANEL
