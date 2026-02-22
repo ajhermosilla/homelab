@@ -70,7 +70,7 @@ services:
       - "com.cronova.critical=true"
       - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
-      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3", "-u", "frigate", "-P", "frigate123"]
       interval: 30s
       timeout: 10s
       retries: 3
