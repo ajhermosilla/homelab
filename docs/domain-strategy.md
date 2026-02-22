@@ -72,8 +72,8 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 | Subdomain | Service | Location | Access |
 |-----------|---------|----------|--------|
 | `hs.cronova.dev` | Headscale | VPS | Tailscale clients |
-| `home.cronova.dev` | Home Assistant | Docker VM | Tailscale |
-| `media.cronova.dev` | Jellyfin | Docker VM | Tailscale |
+| `jara.cronova.dev` | Home Assistant | Docker VM | Tailscale |
+| `yrasema.cronova.dev` | Jellyfin | Docker VM | Tailscale |
 | `btc.cronova.dev` | Start9 | RPi 4 | Tailscale |
 | `nas.cronova.dev` | Syncthing/Samba | NAS | Tailscale |
 | `git.cronova.dev` | soft-serve | MacBook | Tailscale |
@@ -155,7 +155,7 @@ dns_config:
 ```
 
 This means:
-- `home.cronova.dev` resolves to `100.68.63.168` inside Tailscale
+- `jara.cronova.dev` resolves to `100.68.63.168` inside Tailscale
 - Outside Tailscale, it doesn't resolve (private)
 
 ---
@@ -176,8 +176,8 @@ This means:
               ┌──────────────────┼──────────────────┐
               │                  │                  │
        [Cloudflare Pages]  [VPS - Caddy]    [Tailscale Mesh]
-       - www.cronova.dev   - vault.cronova  - home.cronova.dev
-       - docs.cronova.dev  - status.cronova - media.cronova.dev
+       - www.cronova.dev   - vault.cronova  - jara.cronova.dev
+       - docs.cronova.dev  - status.cronova - yrasema.cronova.dev
                            - notify.cronova - btc.cronova.dev
                            - api.cronova    - nas.cronova.dev
                            - www.verava.ai  - git.cronova.dev
@@ -192,8 +192,8 @@ This means:
    [Mobile Kit]           [Fixed Homelab]         [VPS Helper]
    RPi 5 + MacBook        Mini PC + RPi 4         Vultr US
    hs.cronova.dev         + NAS
-   git.cronova.dev        home.cronova.dev
-                          media.cronova.dev
+   git.cronova.dev        jara.cronova.dev
+                          yrasema.cronova.dev
                           btc.cronova.dev
                           nas.cronova.dev
 ```

@@ -93,9 +93,13 @@ networks:
 #
 # Domain                    IP
 # ------                    --
-# home.cronova.dev          100.68.63.168  # Docker VM
-# media.cronova.dev         100.68.63.168  # Docker VM
-# vault.cronova.dev         100.68.63.168  # Docker VM
+# jara.cronova.dev           192.168.0.10  # Home Assistant
+# yrasema.cronova.dev        192.168.0.10  # Jellyfin
+# taguato.cronova.dev        192.168.0.10  # Frigate NVR
+# japysaka.cronova.dev       192.168.0.10  # Sonarr
+# taanga.cronova.dev         192.168.0.10  # Radarr
+# aoao.cronova.dev           192.168.0.10  # Prowlarr
+# vault.cronova.dev          100.68.63.168  # Docker VM (via VPS)
 # nas.cronova.dev           100.82.77.97  # NAS
 # btc.cronova.dev           100.64.0.11  # RPi 4 (Start9)
 #

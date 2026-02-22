@@ -58,9 +58,9 @@ SSL/TLS certificate management for homelab services.
               │                  │                  │
     ┌─────────┴─────────┐       │           ┌──────┴──────┐
     │                   │       │           │             │
-www.cronova.dev    docs.cronova.dev    home.cronova.dev  media.cronova.dev
-(Cloudflare Pages)                     frigate.cronova.dev
-                                       sonarr/radarr/prowlarr.cronova.dev
+www.cronova.dev    docs.cronova.dev    jara.cronova.dev  yrasema.cronova.dev
+(Cloudflare Pages)                     taguato.cronova.dev
+                                       sonarr/radarr/aoao.cronova.dev
 ```
 
 ---
@@ -128,17 +128,17 @@ Caddy → Cloudflare API → _acme-challenge TXT record → Let's Encrypt valida
     }
 }
 
-home.cronova.dev {
+jara.cronova.dev {
     import internal_tls
     reverse_proxy host.docker.internal:8123
 }
 
-media.cronova.dev {
+yrasema.cronova.dev {
     import internal_tls
     reverse_proxy host.docker.internal:8096
 }
 
-frigate.cronova.dev {
+taguato.cronova.dev {
     import internal_tls
     reverse_proxy host.docker.internal:5000
 }
@@ -199,12 +199,12 @@ www.verava.ai {
 | vault.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
 | www.cronova.dev | Edge | Cloudflare | N/A | Yes |
 | docs.cronova.dev | Edge | Cloudflare | N/A | Yes |
-| home.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
-| media.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
-| frigate.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
-| sonarr.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
-| radarr.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
-| prowlarr.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| jara.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| yrasema.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| taguato.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| japysaka.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| taanga.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| aoao.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
 
 ---
 
@@ -218,15 +218,15 @@ Add certificate expiry monitoring:
 |---------|------|-----------------|
 | status.cronova.dev | HTTPS | 14 days |
 | vault.cronova.dev | HTTPS | 14 days |
-| home.cronova.dev | HTTPS | 14 days |
-| media.cronova.dev | HTTPS | 14 days |
-| frigate.cronova.dev | HTTPS | 14 days |
+| jara.cronova.dev | HTTPS | 14 days |
+| yrasema.cronova.dev | HTTPS | 14 days |
+| taguato.cronova.dev | HTTPS | 14 days |
 
 ### Manual Check
 
 ```bash
 # Check certificate expiry for any domain
-echo | openssl s_client -connect home.cronova.dev:443 -servername home.cronova.dev 2>/dev/null | openssl x509 -noout -dates
+echo | openssl s_client -connect jara.cronova.dev:443 -servername jara.cronova.dev 2>/dev/null | openssl x509 -noout -dates
 ```
 
 ---
@@ -261,7 +261,7 @@ curl -X GET "https://api.cloudflare.com/client/v4/zones" \
 docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 
 # Check certificate details
-echo | openssl s_client -connect home.cronova.dev:443 -servername home.cronova.dev 2>/dev/null | openssl x509 -noout -dates -issuer
+echo | openssl s_client -connect jara.cronova.dev:443 -servername jara.cronova.dev 2>/dev/null | openssl x509 -noout -dates -issuer
 ```
 
 ### Cloudflare Issues

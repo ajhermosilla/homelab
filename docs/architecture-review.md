@@ -159,8 +159,8 @@ cronova.dev
 ├── hs.cronova.dev        → Headscale (VPS)
 ├── dns.cronova.dev       → Pi-hole (all environments)
 ├── git.cronova.dev       → soft-serve (MacBook)
-├── home.cronova.dev      → Home Assistant (Docker VM)
-├── media.cronova.dev     → Jellyfin (Docker VM)
+├── jara.cronova.dev      → Home Assistant (Docker VM)
+├── yrasema.cronova.dev     → Jellyfin (Docker VM)
 ├── vault.cronova.dev     → Vaultwarden (Docker VM) [PUBLIC]
 ├── status.cronova.dev    → Uptime Kuma (VPS) [PUBLIC]
 ├── notify.cronova.dev    → ntfy (VPS) [PUBLIC]

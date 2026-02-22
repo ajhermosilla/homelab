@@ -47,25 +47,25 @@
 	reverse_proxy host.docker.internal:8843
 }
 
-# Home Assistant - Automation
-# Access: https://home.cronova.dev
-home.cronova.dev {
+# Home Assistant - Automation (Jara)
+# Access: https://jara.cronova.dev
+jara.cronova.dev {
 	import internal_tls
 	import security_headers
 	reverse_proxy host.docker.internal:8123
 }
 
-# Jellyfin - Media Server
-# Access: https://media.cronova.dev
-media.cronova.dev {
+# Jellyfin - Media Server (Yrasema)
+# Access: https://yrasema.cronova.dev
+yrasema.cronova.dev {
 	import internal_tls
 	import security_headers
 	reverse_proxy host.docker.internal:8096
 }
 
-# Frigate - NVR
-# Access: https://frigate.cronova.dev
-frigate.cronova.dev {
+# Frigate - NVR (Taguato)
+# Access: https://taguato.cronova.dev
+taguato.cronova.dev {
 	import internal_tls
 	import security_headers
 	reverse_proxy host.docker.internal:5000
@@ -82,22 +82,22 @@ frigate.cronova.dev {
 # ARR STACK
 # =============================================================================
 
-# Sonarr
-sonarr.cronova.dev {
+# Sonarr (Japysaka)
+japysaka.cronova.dev {
 	import internal_tls
 	import security_headers
 	reverse_proxy host.docker.internal:8989
 }
 
-# Radarr
-radarr.cronova.dev {
+# Radarr (Taanga)
+taanga.cronova.dev {
 	import internal_tls
 	import security_headers
 	reverse_proxy host.docker.internal:7878
 }
 
-# Prowlarr
-prowlarr.cronova.dev {
+# Prowlarr (Ao Ao)
+aoao.cronova.dev {
 	import internal_tls
 	import security_headers
 	reverse_proxy host.docker.internal:9696
@@ -109,7 +109,7 @@ prowlarr.cronova.dev {
 #
 # DNS Configuration:
 #   Pi-hole local DNS entries point *.cronova.dev → 192.168.0.10 (Docker VM).
-#   Required entries: home, media, frigate, sonarr, radarr, prowlarr
+#   Required entries: jara, yrasema, taguato, japysaka, taanga, aoao
 #
 # Direct Access (no reverse proxy needed):
 #   - Pi-hole: http://192.168.0.10:80/admin

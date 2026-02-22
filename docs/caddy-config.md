@@ -41,8 +41,8 @@ Caddy configuration for cronova.dev and verava.ai across all environments. Creat
 | `www.verava.ai` | VPS static files | Public |
 | `app.verava.ai` | VPS localhost:4000 | Public |
 | `api.verava.ai` | VPS localhost:4001 | Public |
-| `home.cronova.dev` | Fixed Homelab (Tailscale only) | Private |
-| `media.cronova.dev` | Fixed Homelab (Tailscale only) | Private |
+| `jara.cronova.dev` | Fixed Homelab (Tailscale only) | Private |
+| `yrasema.cronova.dev` | Fixed Homelab (Tailscale only) | Private |
 | `btc.cronova.dev` | RPi 4 Start9 (Tailscale only) | Private |
 | `nas.cronova.dev` | NAS (Tailscale only) | Private |
 | `git.cronova.dev` | MacBook (Tailscale only) | Private |
@@ -238,7 +238,7 @@ Internal reverse proxy for Tailscale-only services.
 }
 
 # Home Assistant
-home.cronova.dev {
+jara.cronova.dev {
     reverse_proxy localhost:8123
 
     # WebSocket support for HA
@@ -250,7 +250,7 @@ home.cronova.dev {
 }
 
 # Jellyfin Media Server
-media.cronova.dev {
+yrasema.cronova.dev {
     reverse_proxy localhost:8096
 
     # Large file uploads for media
@@ -260,17 +260,17 @@ media.cronova.dev {
 }
 
 # Sonarr
-sonarr.cronova.dev {
+japysaka.cronova.dev {
     reverse_proxy localhost:8989
 }
 
 # Radarr
-radarr.cronova.dev {
+taanga.cronova.dev {
     reverse_proxy localhost:7878
 }
 
 # Prowlarr
-prowlarr.cronova.dev {
+aoao.cronova.dev {
     reverse_proxy localhost:9696
 }
 
@@ -405,13 +405,13 @@ networks:
 
 ```bash
 # Enable Tailscale HTTPS
-tailscale cert home.cronova.dev
+tailscale cert jara.cronova.dev
 ```
 
 Caddy config for Tailscale certs:
 ```caddyfile
-home.cronova.dev {
-    tls /var/lib/tailscale/certs/home.cronova.dev.crt /var/lib/tailscale/certs/home.cronova.dev.key
+jara.cronova.dev {
+    tls /var/lib/tailscale/certs/jara.cronova.dev.crt /var/lib/tailscale/certs/jara.cronova.dev.key
     reverse_proxy localhost:8123
 }
 ```
