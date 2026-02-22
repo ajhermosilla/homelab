@@ -81,7 +81,7 @@ dns:
   extra_records:
     - name: "nas"
       type: "A"
-      value: "100.64.0.12"
+      value: "100.82.77.97"
     - name: "oga"
       type: "A"
       value: "100.78.12.241"

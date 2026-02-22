@@ -41,7 +41,7 @@ Must be online 24/7. Alert immediately on failure.
 | Headscale (VPS) | HTTPS | `https://hs.cronova.dev/health` | 200 OK |
 | Vaultwarden | HTTPS | `https://vault.cronova.dev/alive` | 200 OK |
 | Pi-hole (Fixed) | TCP | `100.68.63.168:53` | Open |
-| NUT Server | TCP | `100.64.0.12:3493` | Open |
+| NUT Server | TCP | `100.82.77.97:3493` | Open |
 
 ### High Priority Services (5m interval)
 
@@ -53,9 +53,9 @@ Core homelab services. Alert after 2 failures.
 | Jellyfin | HTTP | `http://100.68.63.168:8096` | 200 OK |
 | Frigate | HTTP | `http://100.68.63.168:5000` | 200 OK |
 | Start9 | HTTP | `http://100.64.0.11` | 200 OK |
-| NAS Samba | TCP | `100.64.0.12:445` | Open |
-| NAS Syncthing | HTTP | `http://100.64.0.12:8384` | 200 OK |
-| Restic REST (NAS) | TCP | `100.64.0.12:8000` | Open |
+| NAS Samba | TCP | `100.82.77.97:445` | Open |
+| NAS Syncthing | HTTP | `http://100.82.77.97:8384` | 200 OK |
+| Restic REST (NAS) | TCP | `100.82.77.97:8000` | Open |
 
 ### VPS Services (5m interval)
 

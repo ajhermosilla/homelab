@@ -241,7 +241,7 @@ www.verava.ai {
 | home (100.68.63.168:8123) | HTTP | Tailscale tunnel | N/A | N/A |
 | media (100.68.63.168:8096) | HTTP | Tailscale tunnel | N/A | N/A |
 | frigate (100.68.63.168:5000) | HTTP | Tailscale tunnel | N/A | N/A |
-| nas (100.64.0.12) | HTTP | Tailscale tunnel | N/A | N/A |
+| nas (100.82.77.97) | HTTP | Tailscale tunnel | N/A | N/A |
 | btc (100.64.0.11) | HTTP | Tailscale tunnel | N/A | N/A |
 
 ---

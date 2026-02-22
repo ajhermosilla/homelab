@@ -317,7 +317,7 @@ Host rpi5  # RPi 5 (openclaw)
     User augusto
 
 Host nas
-    HostName 100.64.0.12
+    HostName 100.82.77.97
     User augusto
 ```
 

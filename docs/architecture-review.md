@@ -355,7 +355,7 @@ verava.ai {
                           │ • Lightning │
                           │             │
                           │ NAS         │
-                          │ 100.64.0.12 │
+                          │ 100.82.77.97 │
                           │ • Samba     │
                           │ • Syncthing │
                           │ • Frigate   │

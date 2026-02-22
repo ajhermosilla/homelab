@@ -14,7 +14,7 @@
 - [x] **Syncthing pinned to 1.27** — Updated to 2.0.14. Fresh deployment, no migration risk (LevelDB→SQLite change only affects upgrades).
 - [x] **Network topology doc stale** — Fixed RPi 5 location (Mobile→Fixed), corrected IPs, updated diagrams.
 - [ ] **OPNsense DHCP static mapping for NAS** — Add MAC → 192.168.0.12 reservation (requires NAS MAC, do on deployment day).
-- [x] **Headscale pre-assignment** — Headscale uses random allocation; IP pre-assignment not supported. `100.64.0.12` is a placeholder in 13 files. Update docs with actual IP after enrollment.
+- [x] **Headscale pre-assignment** — Headscale uses random allocation; IP pre-assignment not supported. Placeholder `100.64.0.12` has been replaced with actual IP `100.82.77.97` across all repo files.
 
 ## MEDIUM (Nice to fix)
 

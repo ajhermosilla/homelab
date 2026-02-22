@@ -376,7 +376,7 @@ networks:
 | A | home | 100.68.63.168 | No (internal) |
 | A | media | 100.68.63.168 | No (internal) |
 | A | btc | 100.64.0.11 | No (internal) |
-| A | nas | 100.64.0.12 | No (internal) |
+| A | nas | 100.82.77.97 | No (internal) |
 | A | git | 100.64.0.2 | No (internal) |
 
 ### verava.ai

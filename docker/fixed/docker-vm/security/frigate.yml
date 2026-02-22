@@ -17,8 +17,8 @@ mqtt:
   enabled: true
   host: mosquitto
   port: 1883
-  user: ${FRIGATE_MQTT_USER}
-  password: ${FRIGATE_MQTT_PASS}
+  user: frigate
+  password: frigate123
 
 detectors:
   cpu:
@@ -29,8 +29,17 @@ detectors:
   #   type: edgetpu
   #   device: usb
 
-ffmpeg:
-  hwaccel_args: preset-vaapi  # Intel QuickSync
+# ffmpeg:
+#   hwaccel_args: preset-vaapi  # No GPU passthrough in Docker VM
+
+# go2rtc handles RTSP auth for cameras with special chars in passwords
+# Frigate's YAML parser URL-decodes %XX sequences, breaking @ in passwords
+go2rtc:
+  streams:
+    back_yard_sub:
+      - "rtsp://admin:shy-demanding-1002%21%40%23%24@192.168.0.111:554/h264Preview_01_sub"
+    back_yard_main:
+      - "rtsp://admin:shy-demanding-1002%21%40%23%24@192.168.0.111:554/h264Preview_01_main"
 
 # Global recording settings
 record:
@@ -38,10 +47,6 @@ record:
   retain:
     days: 7
     mode: motion
-  events:
-    retain:
-      default: 14
-      mode: active_objects
 
 # Global snapshot settings
 snapshots:
@@ -98,10 +103,10 @@ cameras:
   front_door:
     ffmpeg:
       inputs:
-        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.10.101:554/h264Preview_01_sub
+        - path: rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_sub
           roles:
             - detect
-        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.10.101:554/h264Preview_01_main
+        - path: rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_main
           roles:
             - record
     detect:
@@ -123,10 +128,10 @@ cameras:
   back_yard:
     ffmpeg:
       inputs:
-        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.10.102:554/h264Preview_01_sub
+        - path: rtsp://127.0.0.1:8554/back_yard_sub
           roles:
             - detect
-        - path: rtsp://${FRIGATE_REOLINK_USER}:${FRIGATE_REOLINK_PASS}@192.168.10.102:554/h264Preview_01_main
+        - path: rtsp://127.0.0.1:8554/back_yard_main
           roles:
             - record
     detect:
@@ -144,28 +149,28 @@ cameras:
         - cat
 
   # -------------------------------------------------------------------------
-  # Indoor - TP-Link Tapo C110 (WiFi)
+  # Indoor - TP-Link Tapo C110 (WiFi) — NOT CONNECTED YET
   # -------------------------------------------------------------------------
-  indoor:
-    ffmpeg:
-      inputs:
-        - path: rtsp://${FRIGATE_TAPO_USER}:${FRIGATE_TAPO_PASS}@192.168.10.103:554/stream1
-          roles:
-            - detect
-            - record
-    detect:
-      width: 1920
-      height: 1080
-      fps: 5
-    record:
-      enabled: true
-      retain:
-        days: 3  # Less retention for indoor
-    snapshots:
-      enabled: true
-    objects:
-      track:
-        - person
+  # indoor:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: rtsp://${FRIGATE_TAPO_USER}:${FRIGATE_TAPO_PASS}@192.168.10.103:554/stream1
+  #         roles:
+  #           - detect
+  #           - record
+  #   detect:
+  #     width: 1920
+  #     height: 1080
+  #     fps: 5
+  #   record:
+  #     enabled: true
+  #     retain:
+  #       days: 3
+  #   snapshots:
+  #     enabled: true
+  #   objects:
+  #     track:
+  #       - person
 
 # =============================================================================
 # SETUP NOTES
@@ -181,8 +186,8 @@ cameras:
 #    (See .env.example for template)
 #
 # 2. Camera IPs (IoT VLAN 10):
-#    - 192.168.10.101 - Front door (Reolink)
-#    - 192.168.10.102 - Back yard (Reolink)
+#    - 192.168.0.110 - Front door (Reolink)
+#    - 192.168.0.111 - Back yard (Reolink)
 #    - 192.168.10.103 - Indoor (Tapo)
 #
 # 3. Enable RTSP on cameras:

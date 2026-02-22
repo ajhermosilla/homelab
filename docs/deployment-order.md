@@ -150,7 +150,7 @@ docker compose up -d vaultwarden vaultwarden-backup
 
 ```bash
 # SSH to NAS
-ssh user@100.64.0.12
+ssh user@100.82.77.97
 
 # 1. Storage (Samba + Syncthing)
 cd /opt/homelab/repo/docker/fixed/nas/storage
@@ -260,7 +260,7 @@ If everything goes down, restart in this order:
 │   (192.168.0.x)  (portable)  (anywhere)                         │
 │        │                                                         │
 │        ├── Docker VM (100.68.63.168)                            │
-│        ├── NAS (100.64.0.12)                                    │
+│        ├── NAS (100.82.77.97)                                    │
 │        └── RPi 4/Start9 (100.64.0.11)                          │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘

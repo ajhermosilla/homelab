@@ -98,7 +98,7 @@ services:
       resources:
         limits:
           memory: 4G
-          cpus: '4'
+          cpus: '2'
     shm_size: "256mb"
     ports:
       - "5000:5000"     # Web UI

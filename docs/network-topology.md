@@ -50,7 +50,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
           ▼               ▼               ▼               ▼               ▼
    ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐
    │    oga     │  │   docker   │  │    nas     │  │   rpi4     │  │   rpi5     │
-   │100.78.12.241│ │100.68.63.168│ │ 100.64.0.12│  │ 100.64.0.11│  │192.168.0.20│
+   │100.78.12.241│ │100.68.63.168│ │100.82.77.97│  │ 100.64.0.11│  │192.168.0.20│
    │  Proxmox   │  │ Docker VM  │  │  Storage   │  │  Start9    │  │  OpenClaw  │
    └────────────┘  └────────────┘  └────────────┘  └────────────┘  └────────────┘
                                           │
@@ -73,7 +73,7 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 | opnsense | 100.79.230.235 | 192.168.0.1 | Firewall/Router VM | Fixed |
 | rpi5 | pending | 192.168.0.20 | OpenClaw AI assistant | Fixed |
 | rpi4 | 100.64.0.11 | 192.168.0.11 | Start9 Bitcoin | Fixed |
-| nas | 100.64.0.12 | 192.168.0.12 | Storage server | Fixed |
+| nas | 100.82.77.97 | 192.168.0.12 | Storage server | Fixed |
 | vultr | 100.77.172.46 | — | VPS / Exit node | Cloud |
 | macbook | 100.86.220.9 | — | Workstation | Mobile |
 | beryl-ax | 100.102.244.131 | — | Travel router | Mobile |

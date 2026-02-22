@@ -405,12 +405,7 @@ tailscale ip
 
 - [ ] Tailscale IP noted: `_______________`
 
-> **Important:** Headscale assigns a **random** Tailscale IP — the NAS will NOT get `100.64.0.12`. Write down the actual IP. After deployment, you'll need to update these files with the real IP:
-> - `ansible/inventory.yml`
-> - `docker/vps/networking/headscale/config/config.yaml.example`
-> - `docs/network-topology.md`
-> - `docs/nfs-setup.md`
-> - `~/.ssh/config` (the `nas` alias)
+> **Note:** The NAS Tailscale IP is `100.82.77.97` (assigned by Headscale).
 
 ---
 
@@ -693,14 +688,9 @@ Open the Uptime Kuma web UI and add these monitors:
 | Restic REST | HTTP | http://192.168.0.12:8000 |
 | NFS | TCP | 192.168.0.12:2049 |
 
-### Update Files with Actual Tailscale IP
+### Tailscale IP Reference
 
-Replace the placeholder `100.64.0.12` with the NAS's real Tailscale IP in:
-- `ansible/inventory.yml`
-- `docker/vps/networking/headscale/config/config.yaml.example`
-- `docs/network-topology.md`
-- `docs/nfs-setup.md`
-- `~/.ssh/config`
+The NAS Tailscale IP is `100.82.77.97` (assigned by Headscale). All repo files have been updated with this IP.
 
 ### Set BIOS Options
 
