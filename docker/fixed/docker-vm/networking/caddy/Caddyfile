@@ -4,10 +4,10 @@
 # =============================================================================
 #
 # Internal reverse proxy for services on Docker VM.
-# Accessed via Tailscale mesh (100.68.63.168) or local network (192.168.0.10).
+# Accessed via LAN (192.168.0.10) or Tailscale (100.68.63.168).
 #
-# TLS: Not used for internal services — Tailscale WireGuard tunnel provides
-# end-to-end encryption. `tailscale cert` is not available with Headscale.
+# TLS: Let's Encrypt certificates via Cloudflare DNS-01 challenge.
+# No ports need to be open to the internet.
 # See docs/certificate-strategy.md for details.
 #
 # Services are proxied from host.docker.internal (Docker VM localhost).
@@ -15,7 +15,25 @@
 # Global options
 {
 	email augusto@cronova.dev
-	auto_https off
+}
+
+# =============================================================================
+# SNIPPETS
+# =============================================================================
+
+(internal_tls) {
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+}
+
+(security_headers) {
+	header {
+		X-Frame-Options "SAMEORIGIN"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
 }
 
 # =============================================================================
@@ -23,26 +41,33 @@
 # =============================================================================
 
 # Vaultwarden - Password Manager
-# Access: http://192.168.0.10:8843 or via VPS proxy (vault.cronova.dev)
+# Access: https://vault.cronova.dev (via VPS proxy) or http://192.168.0.10:8843
+# Plain HTTP on port 8843 — TLS terminates at VPS Caddy
 :8843 {
 	reverse_proxy host.docker.internal:8843
 }
 
 # Home Assistant - Automation
-# Access: http://home.cronova.dev or http://192.168.0.10:8123
-http://home.cronova.dev {
+# Access: https://home.cronova.dev
+home.cronova.dev {
+	import internal_tls
+	import security_headers
 	reverse_proxy host.docker.internal:8123
 }
 
 # Jellyfin - Media Server
-# Access: http://media.cronova.dev or http://192.168.0.10:8096
-http://media.cronova.dev {
+# Access: https://media.cronova.dev
+media.cronova.dev {
+	import internal_tls
+	import security_headers
 	reverse_proxy host.docker.internal:8096
 }
 
 # Frigate - NVR
-# Access: http://frigate.cronova.dev or http://192.168.0.10:5000
-http://frigate.cronova.dev {
+# Access: https://frigate.cronova.dev
+frigate.cronova.dev {
+	import internal_tls
+	import security_headers
 	reverse_proxy host.docker.internal:5000
 
 	# WebSocket support for live view
@@ -58,17 +83,23 @@ http://frigate.cronova.dev {
 # =============================================================================
 
 # Sonarr
-http://sonarr.cronova.dev {
+sonarr.cronova.dev {
+	import internal_tls
+	import security_headers
 	reverse_proxy host.docker.internal:8989
 }
 
 # Radarr
-http://radarr.cronova.dev {
+radarr.cronova.dev {
+	import internal_tls
+	import security_headers
 	reverse_proxy host.docker.internal:7878
 }
 
 # Prowlarr
-http://prowlarr.cronova.dev {
+prowlarr.cronova.dev {
+	import internal_tls
+	import security_headers
 	reverse_proxy host.docker.internal:9696
 }
 
@@ -77,9 +108,8 @@ http://prowlarr.cronova.dev {
 # =============================================================================
 #
 # DNS Configuration:
-#   For *.cronova.dev subdomains to resolve to Docker VM:
-#   - Add Pi-hole local DNS entries, OR
-#   - Add Cloudflare DNS pointing to Tailscale IP (100.68.63.168)
+#   Pi-hole local DNS entries point *.cronova.dev → 192.168.0.10 (Docker VM).
+#   Required entries: home, media, frigate, sonarr, radarr, prowlarr
 #
 # Direct Access (no reverse proxy needed):
 #   - Pi-hole: http://192.168.0.10:80/admin
