@@ -25,8 +25,8 @@ Core homelab services. Alert after 2 failures.
 | Home Assistant | HTTP | `http://100.68.63.168:8123` | Automation |
 | Jellyfin | HTTP | `http://100.68.63.168:8096` | Media |
 | Frigate | HTTP | `http://100.68.63.168:5000` | NVR |
-| NAS | TCP | `100.64.0.12:445` | Samba |
-| NAS Syncthing | HTTP | `http://100.64.0.12:8384` | File sync |
+| NAS | TCP | `100.82.77.97:445` | Samba |
+| NAS Syncthing | HTTP | `http://100.82.77.97:8384` | File sync |
 | Start9 (RPi 4) | HTTP | `http://100.64.0.11` | Bitcoin node |
 | OPNsense | HTTPS | `https://100.79.230.235` | Router (Tailscale) |
 

@@ -281,7 +281,7 @@ If accessing via Tailscale mesh instead of local network:
 /srv/frigate    100.68.63.168(rw,sync,no_subtree_check,no_root_squash)
 
 # /etc/fstab on Docker VM
-100.64.0.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
+100.82.77.97:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
 ```
 
 This allows Frigate to access NAS recordings even when not on local network.

@@ -266,9 +266,9 @@ Tailscale devices access services via overlay network, bypassing VLANs:
 |--------------|--------|---------------|
 | 100.68.63.168 | Docker VM | 1 |
 | 100.64.0.11 | RPi 4 | 1 |
-| 100.64.0.12 | NAS | 1 |
+| 100.82.77.97 | NAS | 1 |
 
-Access from anywhere: `ssh 100.64.0.12` works regardless of VLAN.
+Access from anywhere: `ssh 100.82.77.97` works regardless of VLAN.
 
 ---
 

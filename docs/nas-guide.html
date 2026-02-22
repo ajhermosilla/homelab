@@ -908,12 +908,7 @@ docker compose version</code></pre>
 tailscale ip</code></pre>
       <div class="step"><input type="checkbox" id="c-4c"><label for="c-4c">Tailscale IP noted: <span class="write-in" id="ts-ip">&nbsp;</span></label></div>
 
-      <div class="callout callout-warning"><span class="callout-label">Important</span> Headscale assigns a <strong>random</strong> IP &mdash; the NAS will NOT get <code>100.64.0.12</code>. Write down the actual IP. After deployment, update:
-        <code>ansible/inventory.yml</code>,
-        <code>docs/network-topology.md</code>,
-        <code>docs/nfs-setup.md</code>,
-        <code>~/.ssh/config</code>
-      </div>
+      <div class="callout callout-info"><span class="callout-label">Note</span> The NAS Tailscale IP is <code>100.82.77.97</code> (assigned by Headscale).</div>
 
       <details>
         <summary>Trouble? Tailscale won't connect</summary>
@@ -1153,16 +1148,8 @@ ls /mnt/nas/frigate</code></pre>
       </table>
       <div class="step"><input type="checkbox" id="c-a1"><label for="c-a1">Monitors added in Uptime Kuma</label></div>
 
-      <h3>Update Files with Actual Tailscale IP</h3>
-      <p>Replace placeholder <code>100.64.0.12</code> with the real IP in:</p>
-      <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
-        <li><code>ansible/inventory.yml</code></li>
-        <li><code>docker/vps/networking/headscale/config/config.yaml.example</code></li>
-        <li><code>docs/network-topology.md</code></li>
-        <li><code>docs/nfs-setup.md</code></li>
-        <li><code>~/.ssh/config</code></li>
-      </ul>
-      <div class="step"><input type="checkbox" id="c-a2"><label for="c-a2">Tailscale IP updated in all files</label></div>
+      <h3>Tailscale IP Reference</h3>
+      <p>The NAS Tailscale IP is <code>100.82.77.97</code> (assigned by Headscale). All repo files have been updated with this IP.</p>
 
       <h3>Set BIOS Options</h3>
       <p>Next time you have a keyboard/monitor on the NAS:</p>

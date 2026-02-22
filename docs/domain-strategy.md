@@ -134,7 +134,7 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 │  A     home     → 100.68.63.168 (internal only)                    │
 │  A     media    → 100.68.63.168 (internal only)                    │
 │  A     btc      → 100.64.0.11 (internal only)                    │
-│  A     nas      → 100.64.0.12 (internal only)                    │
+│  A     nas      → 100.82.77.97 (internal only)                    │
 │  A     git      → 100.64.0.2 (internal only)                     │
 │                                                                   │
 └──────────────────────────────────────────────────────────────────┘

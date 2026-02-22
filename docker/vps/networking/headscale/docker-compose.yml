@@ -166,7 +166,7 @@ networks:
 #   2. Set BACKUP_PATH=/mnt/nas/backups/headscale
 #
 # Or use restic to push to NAS:
-#   restic -r rest:http://100.64.0.12:8000/headscale backup /backups
+#   restic -r rest:http://100.82.77.97:8000/headscale backup /backups
 #
 # =============================================================================
 # USEFUL COMMANDS
