@@ -32,10 +32,14 @@ detectors:
 # ffmpeg:
 #   hwaccel_args: preset-vaapi  # No GPU passthrough in Docker VM
 
-# go2rtc handles RTSP auth for cameras with special chars in passwords
-# Frigate's YAML parser URL-decodes %XX sequences, breaking @ in passwords
+# go2rtc restreams all cameras for WebRTC live view and single RTSP connection per stream
+# Also avoids Frigate's YAML parser URL-decoding %XX sequences in passwords
 go2rtc:
   streams:
+    front_door_sub:
+      - "rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_sub"
+    front_door_main:
+      - "rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_main"
     back_yard_sub:
       - "rtsp://admin:shy-demanding-1002%21%40%23%24@192.168.0.111:554/h264Preview_01_sub"
     back_yard_main:
@@ -57,7 +61,7 @@ snapshots:
 # Global detection settings
 detect:
   enabled: true
-  fps: 5
+  fps: 2
 
 # Object detection settings
 objects:
@@ -103,16 +107,16 @@ cameras:
   front_door:
     ffmpeg:
       inputs:
-        - path: rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_sub
+        - path: rtsp://127.0.0.1:8554/front_door_sub
           roles:
             - detect
-        - path: rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_main
+        - path: rtsp://127.0.0.1:8554/front_door_main
           roles:
             - record
     detect:
       width: 640
       height: 480
-      fps: 5
+      fps: 2
     record:
       enabled: true
     snapshots:
@@ -137,7 +141,7 @@ cameras:
     detect:
       width: 640
       height: 480
-      fps: 5
+      fps: 2
     record:
       enabled: true
     snapshots:

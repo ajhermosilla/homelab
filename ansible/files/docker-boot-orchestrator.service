@@ -1,0 +1,13 @@
+[Unit]
+Description=Docker Boot Orchestrator — starts stacks in dependency order
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=600
+ExecStart=/opt/homelab/repo/scripts/docker-boot-orchestrator.sh
+
+[Install]
+WantedBy=multi-user.target

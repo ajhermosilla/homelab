@@ -34,14 +34,11 @@ services:
           memory: 256M
           cpus: '0.5'
     ports:
-      - "80:80/tcp"     # HTTP (redirect to HTTPS)
-      - "443:443/tcp"   # HTTPS
-      - "443:443/udp"   # HTTP/3
+      - "80:80/tcp"     # HTTP
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
-      - /var/lib/tailscale/certs:/var/lib/tailscale/certs:ro  # Tailscale HTTPS certs
     environment:
       TZ: ${TZ:-America/Asuncion}
     logging:
