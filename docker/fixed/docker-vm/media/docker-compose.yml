@@ -160,7 +160,7 @@ services:
   # https://prowlarr.com/
   # =========================================================================
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:1.0
+    image: lscr.io/linuxserver/prowlarr:latest
     env_file:
       - ../../../shared/common.env
     container_name: prowlarr

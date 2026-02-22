@@ -2,20 +2,6 @@
 # Fixed Homelab - Docker VM
 # Password management and NVR with AI detection
 
-# =============================================================================
-# SECRETS (file-based, more secure than env vars)
-# =============================================================================
-# Create secret files in ./secrets/ directory:
-#   openssl rand -base64 32 > secrets/admin_token.txt
-#   openssl rand -base64 32 > secrets/restic_password.txt
-#   chmod 600 secrets/*.txt
-
-secrets:
-  vaultwarden_admin_token:
-    file: ./secrets/admin_token.txt
-  restic_password:
-    file: ./secrets/restic_password.txt
-
 services:
   # =========================================================================
   # Vaultwarden - Password Manager
@@ -53,8 +39,6 @@ services:
       - "8843:80"
     volumes:
       - vaultwarden-data:/data
-    secrets:
-      - vaultwarden_admin_token
     environment:
       TZ: ${TZ:-America/Asuncion}
       DOMAIN: https://vault.cronova.dev
@@ -161,12 +145,10 @@ services:
     volumes:
       - vaultwarden-data:/data:ro
       - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/restic-backup.sh:/backup.sh:ro
-    secrets:
-      - restic_password
     environment:
       TZ: ${TZ:-America/Asuncion}
       RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/vaultwarden}
-      RESTIC_PASSWORD_FILE: /run/secrets/restic_password
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
       BACKUP_PATH: /data
       BACKUP_TAG: vaultwarden
       KEEP_DAILY: "7"
