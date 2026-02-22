@@ -6,41 +6,41 @@ SSL/TLS certificate management for homelab services.
 
 | Service Type | Method | Provider |
 |--------------|--------|----------|
-| Public (VPS) | Let's Encrypt | Caddy ACME |
+| Public (VPS) | Let's Encrypt (HTTP-01) | Caddy ACME |
 | Public (Static) | Cloudflare | Edge certificates |
-| Internal (Tailscale) | Tailscale HTTPS | MagicDNS certs |
+| Internal (Docker VM) | Let's Encrypt (DNS-01) | Caddy + Cloudflare DNS |
 
-**Decision:** Use **Tailscale HTTPS** for internal services (not Internal CA).
+**Decision:** Use **Let's Encrypt via Cloudflare DNS-01** for internal services. No ports open to internet required.
 
 ---
 
-## Current Status (as of 2026-02-04)
+## Current Status (as of 2026-02-22)
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| VPS Caddy + Let's Encrypt | Deployed | cronova.dev, hs, status, notify |
+| VPS Caddy + Let's Encrypt (HTTP-01) | Deployed | cronova.dev, hs, status, notify |
 | Cloudflare Edge | Deployed | DNS proxied |
-| Docker VM Tailscale certs | Not available | Headscale doesn't support this feature |
-| Headscale MagicDNS | Partial | Enabled but name resolution unreliable |
+| Docker VM Caddy + Let's Encrypt (DNS-01) | Deployed | home, media, frigate, sonarr, radarr, prowlarr |
 
-**Headscale limitation:** `tailscale cert` returns "your Tailscale account does not support getting TLS certs" - this feature requires Tailscale's commercial infrastructure and is not available with self-hosted Headscale.
+**Previous limitation:** `tailscale cert` doesn't work with self-hosted Headscale.
 
-**Revised approach:** Use HTTP for internal services accessed via Tailscale. The WireGuard tunnel provides encryption, making HTTPS redundant for internal access.
+**Solution:** Custom Caddy build with `caddy-dns/cloudflare` plugin. Certificates obtained via DNS-01 challenge through Cloudflare API — no public ports needed.
 
 ---
 
-## Why Tailscale HTTPS?
+## Why DNS-01 via Cloudflare?
 
-| Factor | Tailscale HTTPS | Internal CA |
-|--------|-----------------|-------------|
-| Setup complexity | Low | Medium |
-| Device trust setup | None | Install CA on each device |
-| Auto-renewal | Yes | Manual/scripted |
-| Browser warnings | None | None (after CA trust) |
-| Mobile support | Automatic | Manual CA install |
-| Guest device access | Works | Requires CA install |
+| Factor | DNS-01 (Cloudflare) | Internal CA | Tailscale HTTPS |
+|--------|---------------------|-------------|-----------------|
+| Headscale compatible | Yes | Yes | No |
+| Setup complexity | Low | Medium | N/A |
+| Device trust setup | None | Install CA on each device | None |
+| Auto-renewal | Yes (Caddy) | Manual/scripted | Yes |
+| Browser warnings | None | None (after CA trust) | None |
+| Public ports required | No | No | No |
+| Guest device access | Works | Requires CA install | Works |
 
-**Winner:** Tailscale HTTPS - zero config on clients, automatic renewal.
+**Winner:** DNS-01 via Cloudflare — browser-trusted certs, no open ports, works with Headscale.
 
 ---
 
@@ -53,14 +53,14 @@ SSL/TLS certificate management for homelab services.
                                  │
               ┌──────────────────┼──────────────────┐
               │                  │                  │
-       [Cloudflare]        [VPS Caddy]       [Tailscale]
-       Edge Certs          Let's Encrypt      MagicDNS Certs
+       [Cloudflare]        [VPS Caddy]       [Docker VM Caddy]
+       Edge Certs          LE (HTTP-01)       LE (DNS-01 via CF)
               │                  │                  │
     ┌─────────┴─────────┐       │           ┌──────┴──────┐
     │                   │       │           │             │
 www.cronova.dev    docs.cronova.dev    home.cronova.dev  media.cronova.dev
-(Cloudflare Pages)                     vault.cronova.dev btc.cronova.dev
-                                       (internal)        nas.cronova.dev
+(Cloudflare Pages)                     frigate.cronova.dev
+                                       sonarr/radarr/prowlarr.cronova.dev
 ```
 
 ---
@@ -99,97 +99,58 @@ vault.cronova.dev {
 
 ---
 
-## Internal Services (Tailscale Access)
+## Internal Services (DNS-01 via Cloudflare)
 
-### Headscale Limitation
+### How It Works
 
-**Important:** Tailscale HTTPS (`tailscale cert`) is NOT available with self-hosted Headscale. This feature requires Tailscale's commercial backend infrastructure.
+Docker VM runs a custom Caddy build with the `caddy-dns/cloudflare` plugin. Caddy proves domain ownership by creating a DNS TXT record via the Cloudflare API, then Let's Encrypt issues the certificate. No public ports required.
 
-```bash
-# This does NOT work with Headscale:
-tailscale cert docker.hs.net
-# Error: 500 Internal Server Error: your Tailscale account does not support getting TLS certs
+```
+Caddy → Cloudflare API → _acme-challenge TXT record → Let's Encrypt validates → cert issued
 ```
 
-### Recommended Approach: HTTP via Tailscale
+### Requirements
 
-For internal services accessed only via Tailscale, use HTTP:
-- WireGuard tunnel provides end-to-end encryption
-- No certificate management overhead
-- Works with any Tailscale/Headscale setup
+- Cloudflare API Token with Zone/DNS/Edit + Zone/Zone/Read for cronova.dev
+- Pi-hole local DNS: `*.cronova.dev → 192.168.0.10` (Docker VM LAN IP)
+- Custom Caddy image built from `docker/fixed/docker-vm/networking/caddy/Dockerfile`
 
-Access internal services via Tailscale IPs:
-```
-http://100.68.63.168:8123  # Home Assistant
-http://100.68.63.168:8096  # Jellyfin
-http://100.68.63.168:5000  # Frigate
-```
-
-### Headscale Configuration
-
-Enable MagicDNS in Headscale config:
-
-```yaml
-# /etc/headscale/config.yaml
-dns_config:
-  magic_dns: true
-  base_domain: hs.net
-  nameservers:
-    - 100.68.63.168   # Pi-hole (Docker VM)
-```
-
-**Note:** MagicDNS with Headscale has known limitations - name resolution may not work reliably. Use Tailscale IPs directly as fallback.
-
-### Caddy with Tailscale Certs
+### Docker VM Caddy Configuration
 
 ```caddyfile
-# Fixed Homelab Caddyfile
 {
     email augusto@cronova.dev
 }
 
+(internal_tls) {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    }
+}
+
 home.cronova.dev {
-    tls /var/lib/tailscale/certs/home.cronova.dev.crt /var/lib/tailscale/certs/home.cronova.dev.key
-    reverse_proxy localhost:8123
+    import internal_tls
+    reverse_proxy host.docker.internal:8123
 }
 
 media.cronova.dev {
-    tls /var/lib/tailscale/certs/media.cronova.dev.crt /var/lib/tailscale/certs/media.cronova.dev.key
-    reverse_proxy localhost:8096
+    import internal_tls
+    reverse_proxy host.docker.internal:8096
 }
 
 frigate.cronova.dev {
-    tls /var/lib/tailscale/certs/frigate.cronova.dev.crt /var/lib/tailscale/certs/frigate.cronova.dev.key
-    reverse_proxy localhost:5000
+    import internal_tls
+    reverse_proxy host.docker.internal:5000
 }
 ```
 
-### Certificate Renewal Script
+### Certificate Renewal
 
-Tailscale certs expire after 90 days. Auto-renew with cron:
+Caddy handles renewal automatically — no cron jobs needed. Certificates renew 30 days before expiry.
 
-```bash
-#!/bin/bash
-# /usr/local/bin/renew-tailscale-certs.sh
+### Headscale Note
 
-DOMAINS="home.cronova.dev media.cronova.dev frigate.cronova.dev"
-
-for domain in $DOMAINS; do
-    tailscale cert $domain
-done
-
-# Reload Caddy to pick up new certs
-systemctl reload caddy
-
-# Notify
-curl -d "Tailscale certs renewed" https://notify.cronova.dev/cronova-info
-```
-
-Cron entry:
-```bash
-# Renew monthly (certs valid 90 days)
-0 3 1 * * /usr/local/bin/renew-tailscale-certs.sh
-```
+`tailscale cert` is NOT available with self-hosted Headscale. DNS-01 via Cloudflare is the chosen alternative.
 
 ---
 
@@ -231,18 +192,19 @@ www.verava.ai {
 
 ## Certificate Inventory
 
-| Domain | Type | Provider | Expiry | Auto-Renew |
-|--------|------|----------|--------|------------|
-| status.cronova.dev | Let's Encrypt | Caddy | 90 days | Yes |
-| notify.cronova.dev | Let's Encrypt | Caddy | 90 days | Yes |
-| vault.cronova.dev | Let's Encrypt | Caddy | 90 days | Yes |
+| Domain | Type | Provider | Challenge | Auto-Renew |
+|--------|------|----------|-----------|------------|
+| status.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
+| notify.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
+| vault.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
 | www.cronova.dev | Edge | Cloudflare | N/A | Yes |
 | docs.cronova.dev | Edge | Cloudflare | N/A | Yes |
-| home (100.68.63.168:8123) | HTTP | Tailscale tunnel | N/A | N/A |
-| media (100.68.63.168:8096) | HTTP | Tailscale tunnel | N/A | N/A |
-| frigate (100.68.63.168:5000) | HTTP | Tailscale tunnel | N/A | N/A |
-| nas (100.82.77.97) | HTTP | Tailscale tunnel | N/A | N/A |
-| btc (100.64.0.11) | HTTP | Tailscale tunnel | N/A | N/A |
+| home.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| media.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| frigate.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| sonarr.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| radarr.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| prowlarr.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
 
 ---
 
@@ -256,16 +218,15 @@ Add certificate expiry monitoring:
 |---------|------|-----------------|
 | status.cronova.dev | HTTPS | 14 days |
 | vault.cronova.dev | HTTPS | 14 days |
-| home.cronova.dev | HTTPS (Tailscale) | 14 days |
+| home.cronova.dev | HTTPS | 14 days |
+| media.cronova.dev | HTTPS | 14 days |
+| frigate.cronova.dev | HTTPS | 14 days |
 
 ### Manual Check
 
 ```bash
-# Check certificate expiry
-echo | openssl s_client -connect status.cronova.dev:443 -servername status.cronova.dev 2>/dev/null | openssl x509 -noout -dates
-
-# Check Tailscale cert
-openssl x509 -in /var/lib/tailscale/certs/home.cronova.dev.crt -noout -dates
+# Check certificate expiry for any domain
+echo | openssl s_client -connect home.cronova.dev:443 -servername home.cronova.dev 2>/dev/null | openssl x509 -noout -dates
 ```
 
 ---
@@ -285,20 +246,22 @@ caddy reload --config /etc/caddy/Caddyfile --force
 curl http://status.cronova.dev/.well-known/acme-challenge/test
 ```
 
-### Tailscale Cert Issues
+### DNS-01 Challenge Issues
 
 ```bash
-# Check Tailscale status
-tailscale status
+# Check Caddy logs for certificate errors
+docker logs caddy 2>&1 | grep -i "tls\|cert\|acme\|dns"
 
-# Verify MagicDNS is working
-tailscale dns status
+# Verify Cloudflare token works
+curl -X GET "https://api.cloudflare.com/client/v4/zones" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  -H "Content-Type: application/json"
 
-# Re-generate cert
-tailscale cert --force home.cronova.dev
+# Force certificate renewal
+docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 
-# Check cert file permissions
-ls -la /var/lib/tailscale/certs/
+# Check certificate details
+echo | openssl s_client -connect home.cronova.dev:443 -servername home.cronova.dev 2>/dev/null | openssl x509 -noout -dates -issuer
 ```
 
 ### Cloudflare Issues
@@ -321,10 +284,12 @@ openssl x509 -in /etc/ssl/cloudflare/verava.ai.pem -noout -dates
 - [x] Deploy Caddyfile
 - [x] Verify auto-cert: `curl -I https://status.cronova.dev`
 
-### Fixed Homelab (Internal Access)
-- [x] Enable MagicDNS in Headscale (partial - has limitations)
-- [x] Tailscale HTTPS: Not available with Headscale (use HTTP instead)
-- [x] Internal services accessible via HTTP over Tailscale tunnel (encrypted by WireGuard)
+### Fixed Homelab (DNS-01 via Cloudflare)
+- [x] Custom Caddy build with caddy-dns/cloudflare plugin
+- [x] Cloudflare API Token (Zone/DNS/Edit + Zone/Zone/Read)
+- [x] Pi-hole local DNS entries for *.cronova.dev → 192.168.0.10
+- [x] Caddy Caddyfile with DNS-01 TLS snippets
+- [x] HTTPS working for home, media, frigate, sonarr, radarr, prowlarr
 
 ### Cloudflare
 - [x] Set SSL mode to Full (strict)
