@@ -70,7 +70,7 @@ services:
       - "com.cronova.critical=true"
       - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
-      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3", "-u", "frigate", "-P", "frigate123"]
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3", "-u", "frigate", "-P", "${FRIGATE_MQTT_PASS}"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -80,8 +80,8 @@ services:
           memory: 128M
           cpus: '0.25'
     ports:
-      - "1883:1883"     # MQTT
-      - "9001:9001"     # WebSocket (optional)
+      - "127.0.0.1:1883:1883"  # MQTT — Docker network only, debug access via localhost
+      - "127.0.0.1:9001:9001"  # WebSocket — debug access via localhost
     volumes:
       - mosquitto-config:/mosquitto/config
       - mosquitto-data:/mosquitto/data

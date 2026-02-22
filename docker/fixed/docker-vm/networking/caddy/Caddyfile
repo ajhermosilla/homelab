@@ -36,6 +36,16 @@
 	}
 }
 
+(access_log) {
+	log {
+		output file /data/logs/{args[0]}.log {
+			roll_size 10mb
+			roll_keep 5
+		}
+		format json
+	}
+}
+
 # =============================================================================
 # INTERNAL SERVICES
 # =============================================================================
@@ -68,14 +78,8 @@ yrasema.cronova.dev {
 taguato.cronova.dev {
 	import internal_tls
 	import security_headers
+	import access_log taguato
 	reverse_proxy host.docker.internal:5000
-
-	# WebSocket support for live view
-	@websockets {
-		header Connection *Upgrade*
-		header Upgrade websocket
-	}
-	reverse_proxy @websockets host.docker.internal:5000
 }
 
 # =============================================================================
@@ -115,7 +119,7 @@ aoao.cronova.dev {
 #   - Pi-hole: http://192.168.0.10:80/admin
 #   - Home Assistant: http://192.168.0.10:8123
 #   - Jellyfin: http://192.168.0.10:8096
-#   - Frigate: http://192.168.0.10:5000
+#   - Frigate: https://taguato.cronova.dev (port 5000 localhost-only)
 #
 # Docker Network:
 #   Caddy uses host.docker.internal to reach services on Docker VM.

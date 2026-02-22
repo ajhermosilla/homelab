@@ -13,12 +13,18 @@
 #   - Recordings stored on NAS via NFS mount
 #   - Future: Coral USB TPU for detection
 
+auth:
+  enabled: true
+  failed_login_rate_limit: "1/second;5/minute;20/hour"
+  trusted_proxies:
+    - 172.16.0.0/12   # Docker bridge networks (Caddy)
+
 mqtt:
   enabled: true
   host: mosquitto
   port: 1883
-  user: frigate
-  password: frigate123
+  user: "{FRIGATE_MQTT_USER}"
+  password: "{FRIGATE_MQTT_PASS}"
 
 detectors:
   cpu:
@@ -37,13 +43,13 @@ detectors:
 go2rtc:
   streams:
     front_door_sub:
-      - "rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_sub"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@192.168.0.110:554/h264Preview_01_sub"
     front_door_main:
-      - "rtsp://admin:rush-sadly-deviator-sternum-10@192.168.0.110:554/h264Preview_01_main"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@192.168.0.110:554/h264Preview_01_main"
     back_yard_sub:
-      - "rtsp://admin:shy-demanding-1002%21%40%23%24@192.168.0.111:554/h264Preview_01_sub"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.0.111:554/h264Preview_01_sub"
     back_yard_main:
-      - "rtsp://admin:shy-demanding-1002%21%40%23%24@192.168.0.111:554/h264Preview_01_main"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.0.111:554/h264Preview_01_main"
 
 # Global recording settings
 record:
@@ -80,8 +86,9 @@ objects:
 # =============================================================================
 #
 # ⚠️  IMPORTANT: Set camera credentials in .env before deploying!
-#     Required env vars: FRIGATE_REOLINK_USER, FRIGATE_REOLINK_PASS, FRIGATE_TAPO_USER, FRIGATE_TAPO_PASS
-#     These are substituted into RTSP URLs automatically.
+#     Required env vars: FRIGATE_REOLINK_USER, FRIGATE_FRONT_PASS, FRIGATE_BACK_PASS
+#     These are passed as environment variables and substituted by Frigate's {VAR} syntax.
+#     Note: FRIGATE_BACK_PASS must be URL-encoded (e.g., %21 for !) since go2rtc doesn't auto-encode.
 #
 # -----------------------------------------------------------------------------
 # RTSP URL Formats by Camera Model
@@ -184,7 +191,8 @@ cameras:
 #    FRIGATE_MQTT_USER=frigate
 #    FRIGATE_MQTT_PASS=your-mqtt-password
 #    FRIGATE_REOLINK_USER=admin
-#    FRIGATE_REOLINK_PASS=your-reolink-password
+#    FRIGATE_FRONT_PASS=your-front-camera-password
+#    FRIGATE_BACK_PASS=your-back-camera-password-url-encoded
 #    FRIGATE_TAPO_USER=your-tapo-username
 #    FRIGATE_TAPO_PASS=your-tapo-password
 #    (See .env.example for template)
