@@ -120,8 +120,8 @@ See [docker/README.md](docker/README.md) for Docker network strategy and deploym
 |---------|---------|--------|
 | Headscale | Tailscale coordination | hs.cronova.dev |
 | Pi-hole | DNS ad-blocking | Local + Tailscale |
-| Jellyfin | Media streaming | media.cronova.dev |
-| Home Assistant | Automation | home.cronova.dev |
+| Jellyfin | Media streaming | yrasema.cronova.dev |
+| Home Assistant | Automation | jara.cronova.dev |
 | Vaultwarden | Passwords | vault.cronova.dev |
 | Frigate | NVR with AI | Local only |
 | Uptime Kuma | Monitoring | Tailscale |

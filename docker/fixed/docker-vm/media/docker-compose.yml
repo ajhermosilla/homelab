@@ -43,7 +43,7 @@ services:
       - ${MEDIA_PATH:-/mnt/nas/media}:/media:ro
     environment:
       TZ: ${TZ:-America/Asuncion}
-      JELLYFIN_PublishedServerUrl: https://media.cronova.dev
+      JELLYFIN_PublishedServerUrl: https://yrasema.cronova.dev
     devices:
       # Intel QuickSync for hardware transcoding (N150)
       - /dev/dri:/dev/dri

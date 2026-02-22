@@ -435,9 +435,9 @@ docker network inspect media-net
 | Domain | Backend | Port |
 |--------|---------|------|
 | vault.cronova.dev | Vaultwarden | 8843 |
-| home.cronova.dev | Home Assistant | 8123 |
-| media.cronova.dev | Jellyfin | 8096 |
-| frigate.cronova.dev | Frigate | 5000 |
+| jara.cronova.dev | Home Assistant | 8123 |
+| yrasema.cronova.dev | Jellyfin | 8096 |
+| taguato.cronova.dev | Frigate | 5000 |
 | hs.cronova.dev | Headscale | 8080 |
 | status.cronova.dev | Uptime Kuma | 3001 |
 

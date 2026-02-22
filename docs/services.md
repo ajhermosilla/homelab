@@ -302,8 +302,8 @@ How services are accessed based on location.
 | **Headscale** | - | - | hs.cronova.dev |
 | **Pi-hole** | 192.168.0.10:8053 | pihole.tail:8053 | - |
 | **Caddy** | 192.168.0.10:443 | - | - |
-| **Jellyfin** | media.cronova.dev | media.cronova.dev | - |
-| **Home Assistant** | home.cronova.dev | home.cronova.dev | - |
+| **Jellyfin** | yrasema.cronova.dev | yrasema.cronova.dev | - |
+| **Home Assistant** | jara.cronova.dev | jara.cronova.dev | - |
 | **Vaultwarden** | vault.cronova.dev | vault.cronova.dev | - |
 | **Frigate** | 192.168.0.10:5000 | frigate.tail:5000 | - |
 | **Sonarr** | 192.168.0.10:8989 | sonarr.tail:8989 | - |
