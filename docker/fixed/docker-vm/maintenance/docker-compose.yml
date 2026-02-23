@@ -18,6 +18,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=maintenance"
+      - "com.centurylinklabs.watchtower.enable=true"
     deploy:
       resources:
         limits:
