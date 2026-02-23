@@ -6,7 +6,7 @@
 #   - 1x TP-Link Tapo C110 (3MP WiFi)
 #
 # Network:
-#   - IoT VLAN 10 (192.168.10.x) for camera isolation
+#   - LAN (192.168.0.x) — Tapo C110 on WiFi, Reolinks on PoE
 #
 # Hardware:
 #   - Intel N150 QuickSync for video decode (VA-API)
@@ -48,6 +48,8 @@ go2rtc:
       - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.0.111:554/h264Preview_01_sub"
     back_yard_main:
       - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.0.111:554/h264Preview_01_main"
+    indoor:
+      - "rtsp://{FRIGATE_TAPO_USER}:{FRIGATE_TAPO_PASS}@192.168.0.101:554/stream1"
 
 # Global recording settings
 record:
@@ -158,28 +160,28 @@ cameras:
         - cat
 
   # -------------------------------------------------------------------------
-  # Indoor - TP-Link Tapo C110 (WiFi) — NOT CONNECTED YET
+  # Indoor - TP-Link Tapo C110 (WiFi)
   # -------------------------------------------------------------------------
-  # indoor:
-  #   ffmpeg:
-  #     inputs:
-  #       - path: rtsp://${FRIGATE_TAPO_USER}:${FRIGATE_TAPO_PASS}@192.168.10.103:554/stream1
-  #         roles:
-  #           - detect
-  #           - record
-  #   detect:
-  #     width: 1920
-  #     height: 1080
-  #     fps: 5
-  #   record:
-  #     enabled: true
-  #     retain:
-  #       days: 3
-  #   snapshots:
-  #     enabled: true
-  #   objects:
-  #     track:
-  #       - person
+  indoor:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/indoor
+          roles:
+            - detect
+            - record
+    detect:
+      width: 1920
+      height: 1080
+      fps: 2
+    record:
+      enabled: true
+      retain:
+        days: 3
+    snapshots:
+      enabled: true
+    objects:
+      track:
+        - person
 
 # =============================================================================
 # SETUP NOTES
@@ -195,10 +197,10 @@ cameras:
 #    FRIGATE_TAPO_PASS=your-tapo-password
 #    (See .env.example for template)
 #
-# 2. Camera IPs (IoT VLAN 10):
+# 2. Camera IPs:
 #    - 192.168.0.110 - Front door (Reolink)
 #    - 192.168.0.111 - Back yard (Reolink)
-#    - 192.168.10.103 - Indoor (Tapo)
+#    - 192.168.0.101 - Indoor (Tapo)
 #
 # 3. Enable RTSP on cameras:
 #    - Reolink: Device Settings → Network → Advanced → Port Settings
