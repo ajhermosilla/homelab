@@ -12,7 +12,7 @@ Updated: 2026-02-23.
 ### Missing .env vars on Docker VM — PARTIALLY RESOLVED (2026-02-22)
 - ~~FRIGATE_RTSP_PASSWORD~~ — Replaced with per-camera vars: `FRIGATE_FRONT_PASS`, `FRIGATE_BACK_PASS` (Frigate `{VAR}` syntax)
 - ~~Automation `.env` missing~~ — Created with `TZ` and `FRIGATE_MQTT_PASS`
-- **OPEN**: RESTIC_PASSWORD, RESTIC_USER, RESTIC_PASS — backup sidecar (`vaultwarden-backup`) silently fails without these
+- **BLOCKED**: RESTIC_PASSWORD, RESTIC_USER, RESTIC_PASS — backup sidecar targets NAS restic REST server (`192.168.0.12:8000`) which isn't deployed yet. Actionable after NAS deployment
 
 ### ~~Media stack broken upstream~~ RESOLVED (2026-02-22)
 - ~~Prowlarr image tag `lscr.io/linuxserver/prowlarr:1.0` — manifest unknown~~
@@ -20,10 +20,10 @@ Updated: 2026-02-23.
 
 ## High
 
-### Home Assistant unhealthy
-- Shows `unhealthy` in every `docker ps` check
-- May need initial onboarding (first-time setup wizard) or a config issue
-- Healthcheck: `curl -f http://localhost:8123/api/`
+### ~~Home Assistant unhealthy~~ RESOLVED (2026-02-23)
+- ~~Shows `unhealthy` in every `docker ps` check~~
+- Now healthy (0 failing streak, 16h uptime as of 2026-02-23)
+- Remaining: reverse proxy `trusted_proxies` not configured — HA logs warn about forwarded headers from Caddy (172.22.0.1). Non-blocking, cosmetic
 
 ### Proxmox VM 101 startup delay
 - Currently 30s — OPNsense (gateway) may not be ready when Docker VM boots
@@ -46,10 +46,9 @@ Updated: 2026-02-23.
 - Not managed by the repo — Ansible deploys and boot orchestrator use hardcoded path
 - Consider moving `.env.example` into repo for consistency
 
-### Caddy and Pi-hole port 80 conflict
-- Both Caddy and Pi-hole bind port 80 on the Docker VM host
-- Need to verify they use different IPs or one shadows the other
-- May need Pi-hole on a different port (e.g. 8080) or Caddy on a non-80 port
+### ~~Caddy and Pi-hole port 80 conflict~~ NO CONFLICT (2026-02-23)
+- ~~Both Caddy and Pi-hole bind port 80 on the Docker VM host~~
+- Verified: only Caddy binds host port 80. Pi-hole has no host port mappings (accessed via Docker network only)
 
 ## Strategic
 
