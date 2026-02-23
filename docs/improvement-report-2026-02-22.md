@@ -1,7 +1,7 @@
 # Improvement Report - 2026-02-22
 
 Issues and improvements identified during boot orchestrator deployment and testing.
-Updated: 2026-02-23.
+Updated: 2026-02-23 (evening).
 
 ## Critical
 
@@ -9,10 +9,10 @@ Updated: 2026-02-23.
 - ~~`secrets/admin_token.txt` at repo path is a placeholder — Docker needs the file for the bind mount~~
 - No `secrets:` section in current compose — ADMIN_TOKEN comes from `.env` via Compose v5 auto-injection
 
-### Missing .env vars on Docker VM — PARTIALLY RESOLVED (2026-02-22)
-- ~~FRIGATE_RTSP_PASSWORD~~ — Replaced with per-camera vars: `FRIGATE_FRONT_PASS`, `FRIGATE_BACK_PASS` (Frigate `{VAR}` syntax)
+### ~~Missing .env vars on Docker VM~~ RESOLVED (2026-02-23)
+- ~~FRIGATE_RTSP_PASSWORD~~ — Replaced with per-camera vars: `FRIGATE_FRONT_PASS`, `FRIGATE_BACK_PASS`, `FRIGATE_TAPO_USER`, `FRIGATE_TAPO_PASS`
 - ~~Automation `.env` missing~~ — Created with `TZ` and `FRIGATE_MQTT_PASS`
-- **BLOCKED**: RESTIC_PASSWORD, RESTIC_USER, RESTIC_PASS — backup sidecar targets NAS restic REST server (`192.168.0.12:8000`) which isn't deployed yet. Actionable after NAS deployment
+- ~~RESTIC_PASSWORD, RESTIC_USER, RESTIC_PASS~~ — Restic REST server deployed on NAS, backup sidecars configured and verified
 
 ### ~~Media stack broken upstream~~ RESOLVED (2026-02-22)
 - ~~Prowlarr image tag `lscr.io/linuxserver/prowlarr:1.0` — manifest unknown~~
@@ -23,12 +23,11 @@ Updated: 2026-02-23.
 ### ~~Home Assistant unhealthy~~ RESOLVED (2026-02-23)
 - ~~Shows `unhealthy` in every `docker ps` check~~
 - Now healthy (0 failing streak, 16h uptime as of 2026-02-23)
-- Remaining: reverse proxy `trusted_proxies` not configured — HA logs warn about forwarded headers from Caddy (172.22.0.1). Non-blocking, cosmetic
+- ~~Reverse proxy `trusted_proxies` warnings~~ — `172.16.0.0/12` in `configuration.yaml` covers Caddy's Docker bridge IP. Errors stopped after restart
 
-### Proxmox VM 101 startup delay
-- Currently 30s — OPNsense (gateway) may not be ready when Docker VM boots
-- Increase to 120s so network is available before Docker services start
-- Change in Proxmox UI: VM 101 → Options → Start/Shutdown order
+### ~~Proxmox VM 101 startup delay~~ RESOLVED (2026-02-23)
+- ~~Currently 30s — OPNsense (gateway) may not be ready when Docker VM boots~~
+- Bumped to 120s: `startup: order=2,up=120` in `/etc/pve/qemu-server/101.conf`
 
 ### Secondary DNS in OPNsense DHCP
 - If Pi-hole is down (booting, crashed), all LAN clients lose DNS
