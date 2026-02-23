@@ -55,14 +55,14 @@ go2rtc:
 record:
   enabled: true
   retain:
-    days: 7
+    days: 2
     mode: motion
 
 # Global snapshot settings
 snapshots:
   enabled: true
   retain:
-    default: 14
+    default: 2
 
 # Global detection settings
 detect:
@@ -176,7 +176,7 @@ cameras:
     record:
       enabled: true
       retain:
-        days: 3
+        days: 1
     snapshots:
       enabled: true
     objects:
