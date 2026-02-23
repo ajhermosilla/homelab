@@ -123,14 +123,14 @@ services:
     command:
       - -c
       - |
-        echo "0 3 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+        echo "30 2 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
         crond -f -l 2
     volumes:
       - homeassistant-config:/data:ro
       - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/restic-backup.sh:/backup.sh:ro
     environment:
       TZ: ${TZ:-America/Asuncion}
-      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/homeassistant}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/homeassistant}
       RESTIC_PASSWORD: ${RESTIC_PASSWORD}
       BACKUP_PATH: /data
       BACKUP_TAG: homeassistant
