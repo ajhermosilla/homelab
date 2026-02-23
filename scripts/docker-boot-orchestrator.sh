@@ -19,9 +19,7 @@ NFS_TIMEOUT=300
 DOCKER_TIMEOUT=60
 
 # Stack compose directories (absolute paths)
-# Pi-hole runs from /opt/homelab/pihole/ (not the repo) because it needs
-# a local .env with PIHOLE_PASSWORD that isn't checked into git.
-NETWORKING_STACKS=("/opt/homelab/pihole" "${COMPOSE_BASE}/networking/caddy")
+NETWORKING_STACKS=("${COMPOSE_BASE}/networking/pihole" "${COMPOSE_BASE}/networking/caddy")
 AUTOMATION_STACK="${COMPOSE_BASE}/automation"
 SECURITY_STACK="${COMPOSE_BASE}/security"
 MEDIA_STACK="${COMPOSE_BASE}/media"
