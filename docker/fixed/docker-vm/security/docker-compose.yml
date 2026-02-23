@@ -136,6 +136,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=backup"
+      - "com.centurylinklabs.watchtower.enable=true"
     deploy:
       resources:
         limits:
