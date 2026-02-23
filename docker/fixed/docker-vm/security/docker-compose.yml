@@ -85,7 +85,7 @@ services:
           cpus: '2'
     shm_size: "256mb"
     ports:
-      - "127.0.0.1:5000:5000"  # Web UI — Caddy only
+      # Port 5000 not mapped — Caddy reaches Frigate via security-net Docker network
       - "127.0.0.1:8554:8554"  # RTSP restream — internal only
       - "8555:8555/tcp"         # WebRTC — browser needs direct UDP
       - "8555:8555/udp"

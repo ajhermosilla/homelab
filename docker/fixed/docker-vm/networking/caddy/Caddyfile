@@ -79,7 +79,11 @@ taguato.cronova.dev {
 	import internal_tls
 	import security_headers
 	import access_log taguato
-	reverse_proxy host.docker.internal:5000
+	reverse_proxy https://frigate:8971 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
 }
 
 # =============================================================================

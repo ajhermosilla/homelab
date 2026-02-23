@@ -51,6 +51,7 @@ services:
         max-file: "3"
     networks:
       - caddy-net
+      - security-net  # Direct access to Frigate (port 5000 not exposed to host)
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -63,3 +64,5 @@ volumes:
 networks:
   caddy-net:
     name: caddy-net
+  security-net:
+    external: true  # Created by security stack
