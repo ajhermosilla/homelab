@@ -8,7 +8,7 @@ services:
   # https://forgejo.org
   # =========================================================================
   forgejo:
-    image: codeberg/forgejo:11
+    image: codeberg.org/forgejo/forgejo:11
     env_file:
       - ../../../shared/common.env
     container_name: forgejo
