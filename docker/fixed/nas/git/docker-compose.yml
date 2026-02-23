@@ -1,0 +1,106 @@
+# Git Stack - Forgejo
+# Fixed Homelab - NAS (Debian)
+# Self-hosted git server with web UI
+
+services:
+  # =========================================================================
+  # Forgejo - Git Server
+  # https://forgejo.org
+  # =========================================================================
+  forgejo:
+    image: codeberg/forgejo:11
+    env_file:
+      - ../../../shared/common.env
+    container_name: forgejo
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=git"
+      - "com.cronova.critical=true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    ports:
+      - "3000:3000"   # HTTP web UI
+      - "2222:22"     # SSH for git operations
+    volumes:
+      - ${FORGEJO_DATA:-/srv/forgejo}:/data
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      FORGEJO__database__DB_TYPE: sqlite3
+      FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL:-https://git.cronova.dev}
+      FORGEJO__server__SSH_PORT: 2222
+      FORGEJO__server__SSH_LISTEN_PORT: 22
+      FORGEJO__service__DISABLE_REGISTRATION: "true"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - git-net
+
+networks:
+  git-net:
+    name: git-net
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# FORGEJO_DATA=/srv/forgejo
+# FORGEJO_ROOT_URL=https://git.cronova.dev
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create data directory:
+#    sudo mkdir -p /srv/forgejo
+#    sudo chown 1000:1000 /srv/forgejo
+#
+# 2. Start service:
+#    docker compose up -d
+#
+# 3. Create admin account (first run):
+#    docker exec -u git forgejo forgejo admin user create \
+#      --username augusto --password <password> \
+#      --email augusto@hermosilla.me --admin
+#
+# 4. Disable registration (already set via env var, but verify in web UI):
+#    Site Administration > Settings > Disable Self-Registration
+#
+# =============================================================================
+# ACCESS METHODS
+# =============================================================================
+#
+# | Method            | URL                                          |
+# |-------------------|----------------------------------------------|
+# | LAN direct        | http://192.168.0.12:3000                     |
+# | Tailscale direct  | http://100.82.77.97:3000                     |
+# | Caddy HTTPS       | https://git.cronova.dev                      |
+# | SSH (LAN)         | ssh://git@192.168.0.12:2222                  |
+# | SSH (Tailscale)   | ssh://git@100.82.77.97:2222                  |
+#
+# =============================================================================
+# MIGRATION FROM SOFT SERVE
+# =============================================================================
+#
+# 1. Create repos in Forgejo web UI
+# 2. Add remote and push:
+#    git remote add forgejo ssh://git@192.168.0.12:2222/augusto/<repo>.git
+#    git push forgejo --all && git push forgejo --tags
+# 3. After verification, switch origin:
+#    git remote set-url origin ssh://git@192.168.0.12:2222/augusto/<repo>.git
+#
+# =============================================================================
