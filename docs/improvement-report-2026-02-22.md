@@ -1,23 +1,22 @@
 # Improvement Report - 2026-02-22
 
 Issues and improvements identified during boot orchestrator deployment and testing.
+Updated: 2026-02-23.
 
 ## Critical
 
-### Vaultwarden secrets placeholder
-- `secrets/admin_token.txt` at repo path is a placeholder — Docker needs the file for the bind mount
-- Either put the real Argon2 token there or remove the `secrets:` section from compose (ADMIN_TOKEN comes from `.env` anyway)
-- Location: `docker/fixed/docker-vm/security/docker-compose.yml`
+### ~~Vaultwarden secrets placeholder~~ RESOLVED (2026-02-22)
+- ~~`secrets/admin_token.txt` at repo path is a placeholder — Docker needs the file for the bind mount~~
+- No `secrets:` section in current compose — ADMIN_TOKEN comes from `.env` via Compose v5 auto-injection
 
-### Missing .env vars on Docker VM
-- RESTIC_PASSWORD, RESTIC_USER, RESTIC_PASS — backup sidecars silently fail
-- FRIGATE_RTSP_PASSWORD — Frigate RTSP restream may not auth to cameras
-- These need a `.env` file at `docker/fixed/docker-vm/security/` and `docker/fixed/docker-vm/automation/`
+### Missing .env vars on Docker VM — PARTIALLY RESOLVED (2026-02-22)
+- ~~FRIGATE_RTSP_PASSWORD~~ — Replaced with per-camera vars: `FRIGATE_FRONT_PASS`, `FRIGATE_BACK_PASS` (Frigate `{VAR}` syntax)
+- ~~Automation `.env` missing~~ — Created with `TZ` and `FRIGATE_MQTT_PASS`
+- **OPEN**: RESTIC_PASSWORD, RESTIC_USER, RESTIC_PASS — backup sidecar (`vaultwarden-backup`) silently fails without these
 
-### Media stack broken upstream
-- Prowlarr image tag `lscr.io/linuxserver/prowlarr:1.0` — manifest unknown (tag removed upstream)
-- Blocks entire media stack (`docker compose up -d` fails and aborts all services)
-- Fix: bump to current stable tag
+### ~~Media stack broken upstream~~ RESOLVED (2026-02-22)
+- ~~Prowlarr image tag `lscr.io/linuxserver/prowlarr:1.0` — manifest unknown~~
+- Updated to `prowlarr:latest`
 
 ## High
 
