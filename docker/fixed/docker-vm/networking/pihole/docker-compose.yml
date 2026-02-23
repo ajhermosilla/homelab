@@ -4,7 +4,7 @@
 
 services:
   pihole:
-    image: pihole/pihole:2024.07.0
+    image: pihole/pihole:2025.04.0
     env_file:
       - ../../../../shared/common.env
     container_name: pihole
@@ -41,6 +41,7 @@ services:
       FTLCONF_LOCAL_IPV4: ${HOST_IP:-192.168.0.10}
       PIHOLE_DNS_: 1.1.1.1;9.9.9.9
       DNSSEC: "true"
+      FTLCONF_dns_listeningMode: all
       QUERY_LOGGING: "true"
     cap_add:
       - NET_ADMIN

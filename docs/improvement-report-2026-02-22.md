@@ -29,10 +29,10 @@ Updated: 2026-02-23 (evening).
 - ~~Currently 30s — OPNsense (gateway) may not be ready when Docker VM boots~~
 - Bumped to 120s: `startup: order=2,up=120` in `/etc/pve/qemu-server/101.conf`
 
-### Secondary DNS in OPNsense DHCP
-- If Pi-hole is down (booting, crashed), all LAN clients lose DNS
-- Add fallback DNS (e.g. 1.1.1.1) in OPNsense DHCP settings
-- OPNsense web UI: Services → DHCPv4 → LAN → DNS servers
+### ~~Secondary DNS in OPNsense DHCP~~ RESOLVED (2026-02-23)
+- ~~If Pi-hole is down (booting, crashed), all LAN clients lose DNS~~
+- Added `1.1.1.1` (Cloudflare) as secondary DNS in OPNsense DHCP (Services → DHCPv4 → LAN)
+- Clients pick up both servers on next DHCP lease renewal
 
 ### Full reboot test
 - Boot orchestrator ran manually but hasn't been validated through actual `sudo reboot`
@@ -40,10 +40,12 @@ Updated: 2026-02-23 (evening).
 
 ## Medium
 
-### Pi-hole outside repo
-- Runs from `/opt/homelab/pihole/` with a local `.env` (PIHOLE_PASSWORD)
-- Not managed by the repo — Ansible deploys and boot orchestrator use hardcoded path
-- Consider moving `.env.example` into repo for consistency
+### ~~Pi-hole outside repo~~ RESOLVED (2026-02-23)
+- ~~Runs from `/opt/homelab/pihole/` with a local `.env` (PIHOLE_PASSWORD)~~
+- Migrated to repo at `docker/fixed/docker-vm/networking/pihole/`
+- Symlink `/opt/homelab/pihole → /opt/homelab/repo/docker/fixed/docker-vm/networking/pihole`
+- Boot orchestrator updated to use repo path
+- Image pinned to `2025.04.0` (Pi-hole v6), bridge mode, healthcheck, DNSSEC enabled
 
 ### ~~Caddy and Pi-hole port 80 conflict~~ NO CONFLICT (2026-02-23)
 - ~~Both Caddy and Pi-hole bind port 80 on the Docker VM host~~
