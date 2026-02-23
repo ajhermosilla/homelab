@@ -107,6 +107,8 @@ services:
       FRIGATE_BACK_PASS: ${FRIGATE_BACK_PASS}
       FRIGATE_MQTT_USER: ${FRIGATE_MQTT_USER:-frigate}
       FRIGATE_MQTT_PASS: ${FRIGATE_MQTT_PASS}
+      FRIGATE_TAPO_USER: ${FRIGATE_TAPO_USER}
+      FRIGATE_TAPO_PASS: ${FRIGATE_TAPO_PASS}
     logging:
       driver: "json-file"
       options:
@@ -202,6 +204,8 @@ networks:
 # FRIGATE_BACK_PASS=your-back-camera-password-url-encoded
 # FRIGATE_MQTT_USER=frigate
 # FRIGATE_MQTT_PASS=your-mqtt-password
+# FRIGATE_TAPO_USER=your-tapo-username
+# FRIGATE_TAPO_PASS=your-tapo-password
 # FRIGATE_RECORDINGS=/mnt/nas/frigate
 #
 # =============================================================================
@@ -283,7 +287,7 @@ networks:
 #   indoor_cam:
 #     ffmpeg:
 #       inputs:
-#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.10.103:554/stream1
+#         - path: rtsp://{CAM_USER}:{CAM_PASS}@192.168.0.101:554/stream1
 #           roles:
 #             - detect
 #             - record
@@ -342,7 +346,7 @@ networks:
 # =============================================================================
 #
 # RTSP URL format:
-#   rtsp://username:password@192.168.10.103:554/stream1
+#   rtsp://username:password@192.168.0.101:554/stream1
 #
 # Enable RTSP in Tapo app:
 #   Camera Settings → Advanced Settings → Device Account
