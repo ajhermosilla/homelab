@@ -36,6 +36,44 @@ notify:
       actions: "{{ data.actions | default([]) }}"
       markdown: true
 
+# Recorder — exclude noisy Frigate entities to keep DB lean
+# Frigate creates 120+ entities; FPS, CPU, and motion sensors change every few seconds
+recorder:
+  purge_keep_days: 7
+  exclude:
+    entity_globs:
+      # Per-camera FPS and CPU metrics (update every ~1s)
+      - sensor.*_camera_fps
+      - sensor.*_detection_fps
+      - sensor.*_process_fps
+      - sensor.*_skipped_fps
+      - sensor.*_capture_cpu_usage
+      - sensor.*_detect_cpu_usage
+      - sensor.*_ffmpeg_cpu_usage
+      # Per-camera and per-zone object counts (update on every detection frame)
+      - sensor.*_all_count
+      - sensor.*_all_active_count
+      - sensor.*_person_count
+      - sensor.*_person_active_count
+      - sensor.*_car_count
+      - sensor.*_car_active_count
+      - sensor.*_dog_count
+      - sensor.*_dog_active_count
+      - sensor.*_cat_count
+      - sensor.*_cat_active_count
+      # Motion binary sensors (flap constantly)
+      - binary_sensor.*_motion
+      # All-object occupancy (redundant with per-object)
+      - binary_sensor.*_all_occupancy
+      # Camera motion tuner numbers (rarely useful in history)
+      - number.*_contour_area
+      - number.*_threshold
+    entities:
+      # Global Frigate metrics (update every ~1s)
+      - sensor.frigate_cpu_inference_speed
+      - sensor.frigate_detection_fps
+      - sensor.frigate_ov_inference_speed
+
 # Additional dashboards
 lovelace:
   mode: storage
