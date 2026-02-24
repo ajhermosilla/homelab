@@ -35,7 +35,7 @@ Devices served by homelab services.
 
 | Device | Owner/Use | Specs | Homelab Services |
 |--------|-----------|-------|------------------|
-| MacBook Air M1 | Augusto (main) | 16GB RAM, 1TB SSD | Tailscale, soft-serve, dev work |
+| MacBook Air M1 | Augusto (main) | 16GB RAM, 1TB SSD | Tailscale, dev work |
 | MacBook Pro Mid 2012 | Andre | Pre-retina | Pi-hole DNS, Jellyfin |
 | Lenovo ThinkPad X240 | Tinkering | i7, 8GB RAM, 240GB SSD | Lab experiments |
 | Acer C720 | Tinkering | 2GB RAM, 128GB SSD | Lab experiments |

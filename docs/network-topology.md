@@ -176,8 +176,8 @@ Complete infrastructure diagram: physical, logical, and overlay networks.
 │   Beryl AX    │─────►│   MacBook     │
 │  192.168.8.1  │ WiFi │  192.168.8.10 │
 │               │      │               │
-│  AdGuard Home │      │  soft-serve   │
-│  (Primary DNS)│      │  Tailscale    │
+│  AdGuard Home │      │  Tailscale    │
+│  (Primary DNS)│      │               │
 └───────────────┘      └───────────────┘
 ```
 

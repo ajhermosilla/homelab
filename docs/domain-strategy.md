@@ -76,7 +76,7 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 | `yrasema.cronova.dev` | Jellyfin | Docker VM | Tailscale |
 | `btc.cronova.dev` | Start9 | RPi 4 | Tailscale |
 | `nas.cronova.dev` | Syncthing/Samba | NAS | Tailscale |
-| `git.cronova.dev` | soft-serve | MacBook | Tailscale |
+| `git.cronova.dev` | Forgejo | NAS | Tailscale |
 
 #### Public Services
 

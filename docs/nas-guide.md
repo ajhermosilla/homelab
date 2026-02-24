@@ -488,14 +488,14 @@ Get the homelab configuration files onto the NAS.
 ```bash
 sudo mkdir -p /opt/homelab
 sudo chown augusto:augusto /opt/homelab
-git clone ssh://100.86.220.9:23231/homelab.git /opt/homelab/repo
+git clone ssh://git@localhost:2222/augusto/homelab.git /opt/homelab/repo
 ```
 
-**What this does:** Creates the `/opt/homelab` directory and clones your homelab repo from Soft Serve. This gives the NAS access to all the Docker Compose files it needs.
+**What this does:** Creates the `/opt/homelab` directory and clones your homelab repo from Forgejo (running locally on the NAS). This gives the NAS access to all the Docker Compose files it needs.
 
 - [ ] Repo cloned to `/opt/homelab/repo`
 
-> **Trouble?** If the git clone fails, check that the NAS can reach your MacBook via Tailscale: `ping 100.86.220.9`. Also verify Soft Serve is running on your MacBook.
+> **Trouble?** If the git clone fails, check that Forgejo is running on the NAS: `docker ps | grep forgejo`.
 
 ---
 

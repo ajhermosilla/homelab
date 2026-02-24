@@ -45,15 +45,15 @@ creation_rules:
 
 ```bash
 # Create secrets file
-cat > docker/git/.env.enc.yaml << EOF
-soft_serve_admin_key: "ssh-ed25519 AAAA..."
+cat > docker/fixed/nas/git/.env.enc.yaml << EOF
+forgejo_secret_key: "your-secret-key-here"
 EOF
 
 # Encrypt it
-sops -e -i docker/git/.env.enc.yaml
+sops -e -i docker/fixed/nas/git/.env.enc.yaml
 
 # Decrypt to .env at deploy time
-sops -d docker/git/.env.enc.yaml > docker/git/.env
+sops -d docker/fixed/nas/git/.env.enc.yaml > docker/fixed/nas/git/.env
 ```
 
 ### 4. Gitignore Pattern
@@ -107,7 +107,7 @@ sops -d docker/git/.env.enc.yaml > docker/git/.env
 ## Recovery Procedure
 
 1. **Restore age key** from paper backup
-2. **Clone repo** from git (soft-serve or backup)
+2. **Clone repo** from git (Forgejo or backup)
 3. **Decrypt secrets** with `sops -d`
 4. **Deploy services** with decrypted `.env` files
 

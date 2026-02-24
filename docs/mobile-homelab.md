@@ -24,7 +24,7 @@ Portable infrastructure for dev, self-hosting, and travel.
 |--------|------|-------|--------|
 | Beryl AX (GL-MT3000) | Network gateway, DHCP, Tailscale | USB-C | Configured |
 | Samsung A13 | Dedicated tethering (Claro prepaid) | USB-C (always plugged) | Ready |
-| MacBook Air M1 | Workstation, Docker dev, soft-serve | Battery | Active |
+| MacBook Air M1 | Workstation, Docker dev | Battery | Active |
 | Raspberry Pi 5 (8GB) | Pi-hole DNS (mobile) | USB-C PSU | Pending PSU |
 | Samsung A16 (mombeu) | Personal phone, Tailscale client | Battery | Active |
 
@@ -108,7 +108,6 @@ Portable infrastructure for dev, self-hosting, and travel.
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| soft-serve | 23231-23233 | Git server |
 | Docker workloads | Various | Dev containers |
 
 ### DNS Strategy (Dual-DNS)
