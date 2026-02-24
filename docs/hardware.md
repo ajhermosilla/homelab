@@ -23,7 +23,7 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-| MacBook Air M1 | 16GB RAM, 1TB SSD, macOS Sonoma | Workstation, soft-serve, Docker dev | Active |
+| MacBook Air M1 | 16GB RAM, 1TB SSD, macOS Sonoma | Workstation, Docker dev | Active |
 | Beryl AX | GL-MT3000 | Network gateway, DHCP, VPN, AdGuard DNS | Active |
 | Samsung A13 | Android | USB tethering for internet | Active |
 
@@ -47,7 +47,7 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 | Device | Services |
 |--------|----------|
 | Beryl AX | AdGuard DNS (mobile ad-blocking) |
-| MacBook | soft-serve, Docker workloads |
+| MacBook | Docker workloads |
 
 *Note: Headscale moved to VPS for 24/7 availability.*
 

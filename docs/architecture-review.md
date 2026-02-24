@@ -53,7 +53,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Environment | Hardware | Role | Key Services |
 |-------------|----------|------|--------------|
-| **Mobile Kit** | MacBook, Beryl AX, Samsung A13 | On-demand, portable | soft-serve |
+| **Mobile Kit** | MacBook, Beryl AX, Samsung A13 | On-demand, portable | - |
 | **Fixed Homelab** | Mini PC, RPi 4, NAS | Always-on (24/7) | Media, Bitcoin, storage, automation |
 | **VPS** | Vultr US ($6/mo) | Always-on (24/7) | Headscale, DERP, monitoring |
 
@@ -158,7 +158,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 cronova.dev
 ├── hs.cronova.dev        → Headscale (VPS)
 ├── dns.cronova.dev       → Pi-hole (all environments)
-├── git.cronova.dev       → soft-serve (MacBook)
+├── git.cronova.dev       → Forgejo (NAS)
 ├── jara.cronova.dev      → Home Assistant (Docker VM)
 ├── yrasema.cronova.dev     → Jellyfin (Docker VM)
 ├── vault.cronova.dev     → Vaultwarden (Docker VM) [PUBLIC]
@@ -190,7 +190,7 @@ verava.ai
 | **Jellyfin** | No | Yes | Media is personal |
 | **Home Assistant** | No | Yes | Home automation is private |
 | **Start9** | No | Yes | Bitcoin = maximum privacy |
-| **soft-serve** | No | Yes | Code is private |
+| **Forgejo** | No | Yes | Code is private |
 | **Syncthing** | No | Yes | Files are private |
 | **www.verava.ai** | Yes | No | Public website |
 | **api.verava.ai** | Yes | No | Customer API |
@@ -332,7 +332,7 @@ verava.ai {
    │             │        │ ┌─────────┐ │
    │ MacBook     │        │ │OPNsense │ │
    │ 100.64.0.2  │        │ │  VM     │ │
-   │ • soft-serve│        │ └─────────┘ │
+   │ • Tailscale │        │ └─────────┘ │
    │             │        │             │
    │ Beryl AX    │        │ ┌─────────┐ │
    │ 192.168.8.1 │        │ │Docker VM│ │
@@ -421,7 +421,7 @@ verava.ai {
 | Monitoring | Uptime Kuma, ntfy | 2 |
 | Backup | Restic REST (x2) | 2 |
 | Scraping | changedetection | 1 |
-| Development | soft-serve | 1 |
+| Git | Forgejo | 1 |
 
 ### Missing Services (To Add)
 

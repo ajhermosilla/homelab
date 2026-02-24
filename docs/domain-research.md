@@ -176,7 +176,7 @@ curl https://api.verava.net/status
 |-----------|---------|-------------|
 | `hs.nanduti.io` | Headscale | Mobile (RPi 5) |
 | `dns.nanduti.io` | Pi-hole | All |
-| `git.nanduti.io` | soft-serve | Mobile (MacBook) |
+| `git.nanduti.io` | Forgejo | Fixed (NAS) |
 | `home.nanduti.io` | Home Assistant | Fixed |
 | `media.nanduti.io` | Jellyfin | Fixed |
 | `vault.nanduti.io` | Vaultwarden | Fixed |

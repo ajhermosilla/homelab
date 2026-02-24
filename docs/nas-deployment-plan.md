@@ -318,8 +318,8 @@ sudo ufw allow from 192.168.0.0/24 to any port 2049
 sudo mkdir -p /opt/homelab
 sudo chown augusto:augusto /opt/homelab
 
-# Clone repo from Soft Serve
-git clone ssh://100.86.220.9:23231/homelab.git /opt/homelab/repo
+# Clone repo from Forgejo (NAS local)
+git clone ssh://git@192.168.0.12:2222/augusto/homelab.git /opt/homelab/repo
 ```
 
 ---

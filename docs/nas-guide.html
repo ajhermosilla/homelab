@@ -982,15 +982,14 @@ sudo ufw allow from 192.168.0.0/24 to any port 2049</code></pre>
 
       <pre><code>sudo mkdir -p /opt/homelab
 sudo chown augusto:augusto /opt/homelab
-git clone ssh://100.86.220.9:23231/homelab.git /opt/homelab/repo</code></pre>
-      <div class="what-this-does"><strong>What this does:</strong> Gets your homelab configuration files onto the NAS from Soft Serve, so it has all the Docker Compose files it needs.</div>
+git clone ssh://git@localhost:2222/augusto/homelab.git /opt/homelab/repo</code></pre>
+      <div class="what-this-does"><strong>What this does:</strong> Gets your homelab configuration files onto the NAS from Forgejo (running locally), so it has all the Docker Compose files it needs.</div>
       <div class="step"><input type="checkbox" id="c-6a"><label for="c-6a">Repo cloned to <code>/opt/homelab/repo</code></label></div>
 
       <details>
         <summary>Trouble? Git clone fails</summary>
         <div class="details-body">
-          <p>Check Tailscale connectivity: <code>ping 100.86.220.9</code></p>
-          <p>Verify Soft Serve is running on your MacBook.</p>
+          <p>Check Forgejo is running: <code>docker ps | grep forgejo</code></p>
         </div>
       </details>
     </section>
