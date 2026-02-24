@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guarani Naming Convention — cronova.dev</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-hover: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent-green: #3fb950;
+    --accent-blue: #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-orange: #d29922;
+    --accent-red: #f85149;
+    --accent-cyan: #39d2c0;
+    --accent-pink: #f778ba;
+    --accent-yellow: #e3b341;
+    --accent-warm: #da7756;
+    --gradient-hero: linear-gradient(135deg, #0d1117 0%, #1a1420 30%, #1c1830 60%, #0d1117 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--gradient-hero);
+    border-bottom: 1px solid var(--border);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 500px 250px at 25% 60%, rgba(218, 119, 86, 0.08), transparent),
+      radial-gradient(ellipse 500px 250px at 75% 40%, rgba(188, 140, 255, 0.07), transparent),
+      radial-gradient(ellipse 400px 200px at 50% 90%, rgba(63, 185, 80, 0.05), transparent);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent-warm), var(--accent-orange), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.3rem;
+    position: relative;
+  }
+  .hero .guarani-script {
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--accent-warm);
+    opacity: 0.7;
+    margin-bottom: 0.75rem;
+  }
+  .hero .subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+  .hero .flag-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 1.5rem;
+    height: 4px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .flag-bar .red { background: #d52b1e; flex: 1; }
+  .flag-bar .white { background: #ffffff; flex: 1; }
+  .flag-bar .blue { background: #0038a8; flex: 1; }
+
+  /* ── Container ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ── Section Headers ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 3rem 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .section-icon.warm { background: rgba(218, 119, 86, 0.15); }
+  .section-icon.green { background: rgba(63, 185, 80, 0.15); }
+  .section-icon.blue { background: rgba(88, 166, 255, 0.15); }
+  .section-icon.purple { background: rgba(188, 140, 255, 0.15); }
+  .section-icon.cyan { background: rgba(57, 210, 192, 0.15); }
+  .section-icon.orange { background: rgba(210, 153, 34, 0.15); }
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .section-header .badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge.active { background: rgba(63, 185, 80, 0.15); color: var(--accent-green); border: 1px solid rgba(63, 185, 80, 0.3); }
+  .badge.proposed { background: rgba(188, 140, 255, 0.15); color: var(--accent-purple); border: 1px solid rgba(188, 140, 255, 0.3); }
+  .badge.map { background: rgba(57, 210, 192, 0.15); color: var(--accent-cyan); border: 1px solid rgba(57, 210, 192, 0.3); }
+  .badge.guide { background: rgba(210, 153, 34, 0.15); color: var(--accent-orange); border: 1px solid rgba(210, 153, 34, 0.3); }
+
+  /* ── Name Cards (existing) ── */
+  .name-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+  .name-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .name-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px rgba(218, 119, 86, 0.12);
+  }
+  .name-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-warm), var(--accent-orange));
+  }
+  .name-card .card-emoji {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .name-card .guarani-name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent-warm);
+    margin-bottom: 0.15rem;
+  }
+  .name-card .pronunciation {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    margin-bottom: 0.5rem;
+  }
+  .name-card .meaning {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-style: italic;
+  }
+  .name-card .service-name {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-family: 'SF Mono', monospace;
+    background: rgba(88, 166, 255, 0.12);
+    color: var(--accent-blue);
+  }
+  .name-card .subdomain {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-family: 'SF Mono', monospace;
+    color: var(--accent-green);
+    opacity: 0.8;
+  }
+  .name-card.existing .service-name {
+    background: rgba(63, 185, 80, 0.12);
+    color: var(--accent-green);
+  }
+  .name-card.proposed::before {
+    background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+  }
+  .name-card.proposed .guarani-name {
+    color: var(--accent-purple);
+  }
+
+  /* ── Alternatives Table ── */
+  .alt-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.9rem;
+  }
+  .alt-table thead th {
+    background: rgba(188, 140, 255, 0.08);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .alt-table tbody td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .alt-table tbody tr:last-child td { border-bottom: none; }
+  .alt-table tbody tr:hover { background: var(--bg-card-hover); }
+  .alt-table .guarani { font-weight: 700; color: var(--accent-purple); }
+  .alt-table .meaning-cell { color: var(--text-muted); font-style: italic; }
+
+  /* ── Subdomain Map ── */
+  .subdomain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0.75rem;
+  }
+  .subdomain-row {
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: transform 0.15s, border-color 0.2s;
+    gap: 0.75rem;
+  }
+  .subdomain-row:hover {
+    transform: translateX(3px);
+    border-color: rgba(57, 210, 192, 0.4);
+  }
+  .subdomain-row .domain {
+    font-family: 'SF Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent-cyan);
+    min-width: 180px;
+    white-space: nowrap;
+  }
+  .subdomain-row .arrow {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+  .subdomain-row .svc {
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+  .subdomain-row .host-tag {
+    margin-left: auto;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', monospace;
+    white-space: nowrap;
+  }
+  .host-tag.vps { background: rgba(63, 185, 80, 0.15); color: var(--accent-green); }
+  .host-tag.docker { background: rgba(88, 166, 255, 0.15); color: var(--accent-blue); }
+  .host-tag.nas { background: rgba(188, 140, 255, 0.15); color: var(--accent-purple); }
+
+  /* ── Guidelines ── */
+  .guidelines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  .guideline-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    transition: transform 0.2s;
+  }
+  .guideline-card:hover { transform: translateY(-2px); }
+  .guideline-card h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .guideline-card p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+  .guideline-card .example {
+    margin-top: 0.5rem;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent-warm);
+    opacity: 0.9;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+  .footer .guarani-quote {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--accent-warm);
+    opacity: 0.6;
+    margin-bottom: 0.75rem;
+  }
+  .footer .translation {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+  }
+  .footer .flag-bar-footer {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    height: 3px;
+    max-width: 200px;
+    margin: 1rem auto;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 2rem; }
+    .name-grid { grid-template-columns: repeat(2, 1fr); }
+    .subdomain-grid { grid-template-columns: 1fr; }
+    .guidelines-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .name-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════ HERO -->
+<div class="hero">
+  <h1>Guarani Naming Convention</h1>
+  <div class="guarani-script">Ñe'ẽ Guarani — Homelab Services</div>
+  <p class="subtitle">Every service gets a Guarani name that reflects its purpose, connecting Paraguayan heritage to modern self-hosting infrastructure</p>
+  <div class="flag-bar">
+    <div class="red"></div>
+    <div class="white"></div>
+    <div class="blue"></div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════════════ EXISTING -->
+<div class="section-header">
+  <div class="section-icon warm">&#127793;</div>
+  <h2>Existing Names</h2>
+  <span class="badge active">In Production</span>
+</div>
+
+<div class="name-grid">
+  <div class="name-card existing">
+    <span class="card-emoji">&#127960;</span>
+    <div class="guarani-name">oga</div>
+    <div class="pronunciation">/oh-GAH/</div>
+    <div class="meaning">"house"</div>
+    <span class="service-name">Proxmox Host</span>
+    <span class="subdomain">SSH alias: proxmox</span>
+  </div>
+
+  <div class="name-card existing">
+    <span class="card-emoji">&#128081;</span>
+    <div class="guarani-name">jara</div>
+    <div class="pronunciation">/ZHAH-rah/</div>
+    <div class="meaning">"owner, lord"</div>
+    <span class="service-name">Home Assistant</span>
+    <span class="subdomain">jara.cronova.dev</span>
+  </div>
+
+  <div class="name-card existing">
+    <span class="card-emoji">&#129413;</span>
+    <div class="guarani-name">taguato</div>
+    <div class="pronunciation">/tah-gwa-TOH/</div>
+    <div class="meaning">"hawk"</div>
+    <span class="service-name">Frigate NVR</span>
+    <span class="subdomain">taguato.cronova.dev</span>
+  </div>
+
+  <div class="name-card existing">
+    <span class="card-emoji">&#127754;</span>
+    <div class="guarani-name">yrasema</div>
+    <div class="pronunciation">/uh-rah-seh-MAH/</div>
+    <div class="meaning">"sound of waterfalls"</div>
+    <span class="service-name">Jellyfin</span>
+    <span class="subdomain">yrasema.cronova.dev</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ PROPOSED -->
+<div class="section-header">
+  <div class="section-icon purple">&#10024;</div>
+  <h2>Proposed Names</h2>
+  <span class="badge proposed">Top Picks</span>
+</div>
+
+<div class="name-grid">
+  <div class="name-card proposed">
+    <span class="card-emoji">&#11088;</span>
+    <div class="guarani-name">mbyja</div>
+    <div class="pronunciation">/mm-BUH-zhah/</div>
+    <div class="meaning">"star"</div>
+    <span class="service-name">Homepage</span>
+    <span class="subdomain">mbyja.cronova.dev</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#127754;</span>
+    <div class="guarani-name">ysyry</div>
+    <div class="pronunciation">/uh-suh-RUH/</div>
+    <div class="meaning">"river, stream"</div>
+    <span class="service-name">Dozzle</span>
+    <span class="subdomain">ysyry.cronova.dev</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#128220;</span>
+    <div class="guarani-name">kuatia</div>
+    <div class="pronunciation">/kwa-TEE-ah/</div>
+    <div class="meaning">"paper, document"</div>
+    <span class="service-name">Stirling-PDF</span>
+    <span class="subdomain">kuatia.cronova.dev</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#128682;</span>
+    <div class="guarani-name">okẽ</div>
+    <div class="pronunciation">/oh-KÉ/</div>
+    <div class="meaning">"door"</div>
+    <span class="service-name">Authelia</span>
+    <span class="subdomain">okẽ.cronova.dev</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#129704;</span>
+    <div class="guarani-name">itá</div>
+    <div class="pronunciation">/ee-TÁ/</div>
+    <div class="meaning">"stone, rock"</div>
+    <span class="service-name">CrowdSec</span>
+    <span class="subdomain">OPNsense plugin</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#128202;</span>
+    <div class="guarani-name">papa</div>
+    <div class="pronunciation">/pa-PÁ/</div>
+    <div class="meaning">"to count, measure"</div>
+    <span class="service-name">VictoriaMetrics + Grafana</span>
+    <span class="subdomain">papa.cronova.dev</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#9889;</span>
+    <div class="guarani-name">vera</div>
+    <div class="pronunciation">/VEH-rah/</div>
+    <div class="meaning">"shine, flash, lightning"</div>
+    <span class="service-name">Immich</span>
+    <span class="subdomain">vera.cronova.dev</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#128218;</span>
+    <div class="guarani-name">aranduka</div>
+    <div class="pronunciation">/ah-ran-DOO-kah/</div>
+    <div class="meaning">"book, library"</div>
+    <span class="service-name">Paperless-ngx</span>
+    <span class="subdomain">aranduka.cronova.dev</span>
+  </div>
+
+  <div class="name-card proposed">
+    <span class="card-emoji">&#129309;</span>
+    <div class="guarani-name">pytyvõ</div>
+    <div class="pronunciation">/puh-tuh-VÕ/</div>
+    <div class="meaning">"helper"</div>
+    <span class="service-name">n8n</span>
+    <span class="subdomain">pytyvõ.cronova.dev</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ ALTERNATIVES -->
+<div class="section-header">
+  <div class="section-icon blue">&#128161;</div>
+  <h2>Alternatives Considered</h2>
+</div>
+
+<table class="alt-table">
+  <thead>
+    <tr><th>Service</th><th>Alternative</th><th>Meaning</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Homepage</td><td class="guarani">yvága</td><td class="meaning-cell">sky</td><td>Overview from the heavens</td></tr>
+    <tr><td>Homepage</td><td class="guarani">arakuaa</td><td class="meaning-cell">wisdom</td><td>Knows the state of everything</td></tr>
+    <tr><td>Dozzle</td><td class="guarani">ñe'ẽ</td><td class="meaning-cell">word, voice</td><td>Reading the words of containers</td></tr>
+    <tr><td>Authelia</td><td class="guarani">ñangareko</td><td class="meaning-cell">guardian, caretaker</td><td>Longer but more descriptive</td></tr>
+    <tr><td>CrowdSec</td><td class="guarani">ñembyaty</td><td class="meaning-cell">assembly, gathering</td><td>Reflects crowd-sourced nature</td></tr>
+    <tr><td>VictoriaMetrics</td><td class="guarani">aravo</td><td class="meaning-cell">time, hour</td><td>Time-series data</td></tr>
+    <tr><td>Grafana</td><td class="guarani">ta'ãnga</td><td class="meaning-cell">image, picture</td><td>Visualizes data as graphs</td></tr>
+    <tr><td>Immich</td><td class="guarani">marangatú</td><td class="meaning-cell">beautiful, blessed</td><td>Beautiful memories preserved</td></tr>
+    <tr><td>n8n</td><td class="guarani">mba'apo</td><td class="meaning-cell">work, labor</td><td>The worker that runs workflows</td></tr>
+  </tbody>
+</table>
+
+<!-- ══════════════════════════════════════════════════════════════ SUBDOMAIN MAP -->
+<div class="section-header">
+  <div class="section-icon cyan">&#127760;</div>
+  <h2>Subdomain Map</h2>
+  <span class="badge map">cronova.dev</span>
+</div>
+
+<div class="subdomain-grid">
+  <div class="subdomain-row">
+    <span class="domain">jara.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Home Assistant</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row">
+    <span class="domain">taguato.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Frigate NVR</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row">
+    <span class="domain">yrasema.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Jellyfin</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row">
+    <span class="domain">vault.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Vaultwarden</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row">
+    <span class="domain">git.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Forgejo</span>
+    <span class="host-tag nas">NAS</span>
+  </div>
+  <div class="subdomain-row">
+    <span class="domain">status.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Uptime Kuma</span>
+    <span class="host-tag vps">VPS</span>
+  </div>
+  <div class="subdomain-row">
+    <span class="domain">notify.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">ntfy</span>
+    <span class="host-tag vps">VPS</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">mbyja.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Homepage</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">ysyry.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Dozzle</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">kuatia.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Stirling-PDF</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">okẽ.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Authelia</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">papa.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">VictoriaMetrics + Grafana</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">vera.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Immich</span>
+    <span class="host-tag nas">NAS</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">aranduka.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">Paperless-ngx</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+  <div class="subdomain-row" style="border-color: rgba(188, 140, 255, 0.25);">
+    <span class="domain" style="color: var(--accent-purple);">pytyvõ.cronova.dev</span>
+    <span class="arrow">&#8594;</span>
+    <span class="svc">n8n</span>
+    <span class="host-tag docker">Docker VM</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ GUIDELINES -->
+<div class="section-header">
+  <div class="section-icon orange">&#128214;</div>
+  <h2>Naming Guidelines</h2>
+  <span class="badge guide">Convention Rules</span>
+</div>
+
+<div class="guidelines-grid">
+  <div class="guideline-card">
+    <h4>&#127793; Keep It Short</h4>
+    <p>Prefer 2-3 syllable Guarani words that are easy to type and pronounce.</p>
+    <div class="example">okẽ, itá, vera &gt; ñangareko</div>
+  </div>
+  <div class="guideline-card">
+    <h4>&#129413; Animals for Intelligence</h4>
+    <p>Use animal names for services that actively watch, detect, or make decisions.</p>
+    <div class="example">taguato (hawk) &#8594; Frigate NVR</div>
+  </div>
+  <div class="guideline-card">
+    <h4>&#127754; Nature for Infrastructure</h4>
+    <p>Use natural elements for infrastructure services — water, rivers, stars, sky.</p>
+    <div class="example">ysyry (river) &#8594; log streams</div>
+  </div>
+  <div class="guideline-card">
+    <h4>&#128220; Objects for Utilities</h4>
+    <p>Use concrete nouns for tools that handle specific things.</p>
+    <div class="example">kuatia (paper) &#8594; PDF toolkit</div>
+  </div>
+  <div class="guideline-card">
+    <h4>&#128274; Abstract for Security</h4>
+    <p>Use abstract or structural concepts for security and defense services.</p>
+    <div class="example">okẽ (door), itá (stone) &#8594; auth, IPS</div>
+  </div>
+  <div class="guideline-card">
+    <h4>&#128161; Match the Essence</h4>
+    <p>The name should reflect the service's core purpose, not its brand name.</p>
+    <div class="example">vera (flash) &#8594; photos, not "immich"</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  <div class="guarani-quote">"Ñande ñe'ẽ, ñande rekove"</div>
+  <div class="translation">Our language, our life</div>
+  <div class="flag-bar-footer">
+    <div class="red" style="background:#d52b1e;flex:1"></div>
+    <div class="white" style="background:#ffffff;flex:1"></div>
+    <div class="blue" style="background:#0038a8;flex:1"></div>
+  </div>
+  <p>cronova.dev homelab &mdash; 2026-02-24</p>
+</div>
+
+</div>
+</body>
+</html>
