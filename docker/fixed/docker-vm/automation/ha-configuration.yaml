@@ -1,0 +1,41 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+# Reverse proxy support (Caddy)
+# Trusts X-Forwarded-For headers from Docker bridge networks
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.16.0.0/12
+
+# ntfy push notifications
+notify:
+  - name: ntfy_homelab
+    platform: rest
+    resource: https://notify.cronova.dev
+    method: POST_JSON
+    headers:
+      Authorization: !secret ntfy_token
+    data_template:
+      topic: "homelab"
+      title: "{{ title }}"
+      message: "{{ message }}"
+
+# Additional dashboards
+lovelace:
+  mode: storage
+  dashboards:
+    lovelace-cameras:
+      mode: yaml
+      title: Cameras
+      icon: mdi:cctv
+      show_in_sidebar: true
+      filename: cameras-dashboard.yaml
