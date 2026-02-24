@@ -14,7 +14,8 @@ docker/
 │   │   └── security/        # Vaultwarden, Frigate
 │   └── nas/                 # NAS (Debian)
 │       ├── storage/         # Samba, Syncthing
-│       └── backup/          # Restic REST
+│       ├── backup/          # Restic REST
+│       └── git/             # Forgejo
 ├── mobile/                   # Mobile Kit (On-Demand)
 │   └── rpi5/
 │       └── networking/      # Pi-hole
@@ -23,7 +24,7 @@ docker/
 │   ├── monitoring/          # Uptime Kuma, ntfy
 │   ├── scraping/            # changedetection.io
 │   └── backup/              # Restic REST
-└── git/                      # MacBook (soft-serve)
+└── shared/                   # Shared env files
 ```
 
 ## Network Strategy

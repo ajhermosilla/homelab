@@ -32,7 +32,6 @@ Procedures for recovering from failures across all homelab environments. Created
 | **Home Assistant** | `/config/` | NAS | Daily | 14 days |
 | **Start9** | Built-in backup | NAS | Weekly | 4 weeks |
 | **Frigate** | Config only | NAS | Daily | 7 days |
-| **soft-serve** | Git repos | NAS | Daily | 14 days |
 
 ### Backup Locations
 
@@ -49,8 +48,7 @@ Procedures for recovering from failures across all homelab environments. Created
 │      │    ├── pihole/                                            │
 │      │    ├── vaultwarden/                                       │
 │      │    ├── homeassistant/                                     │
-│      │    ├── start9/                                            │
-│      │    └── soft-serve/                                        │
+│      │    └── start9/                                            │
 │      │                                                           │
 │      └──► [Cloud - Critical Only]                               │
 │           ├── headscale/ (B2/Backblaze or similar)              │

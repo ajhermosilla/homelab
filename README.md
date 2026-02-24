@@ -93,7 +93,7 @@ homelab/
 │   │   ├── docker-vm/        # Containers on Docker VM
 │   │   └── nas/              # Containers on NAS
 │   ├── vps/                  # VPS services
-│   └── git/                  # soft-serve (MacBook)
+│   └── shared/               # Shared env files
 ├── ansible/                   # Automation playbooks
 ├── docs/                      # Documentation
 │   └── sessions/             # Daily work logs
@@ -144,7 +144,7 @@ VLANs:
 |-------------|--------|
 | VPS | Active (Headscale, Caddy, Uptime Kuma, ntfy, headscale-backup) |
 | Fixed Homelab | Active (Proxmox + OPNsense gateway; Docker VM: Pi-hole, Caddy, Vaultwarden, Watchtower; RPi 5 pending physical setup; NAS pending deployment) |
-| Mobile Kit | Active (Beryl AX AdGuard, MacBook soft-serve) |
+| Mobile Kit | Active (Beryl AX AdGuard) |
 
 ---
 
