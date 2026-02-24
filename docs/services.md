@@ -7,7 +7,7 @@
 | Service | Category | Environment | Host | Status |
 |---------|----------|-------------|------|--------|
 | Headscale | Networking | VPS | Vultr | Active |
-| soft-serve | Git | Mobile | MacBook | Active |
+| Forgejo | Git | Fixed | NAS | Active |
 | Pi-hole | Networking | Fixed | Docker VM | Active |
 | OpenClaw | AI | Fixed | RPi 5 | Planned |
 | Caddy | Networking | Fixed | Docker VM | Active |
@@ -40,13 +40,7 @@
 
 ### Mobile Kit (On-Demand)
 
-*Operates 7AM-7PM or when traveling. Not 24/7.*
-
-| Service | Port(s) | Purpose |
-|---------|---------|---------|
-| **soft-serve** | 23231-23233 | Git server (on MacBook) |
-
-*Mobile DNS handled by Beryl AX AdGuard Home.*
+*No Docker services. Mobile DNS handled by Beryl AX AdGuard Home.*
 
 ### Fixed Homelab - Docker VM
 
@@ -90,6 +84,7 @@
 | **Samba** | 445 | Network file shares |
 | **Syncthing** | 8384, 22000 | Peer-to-peer file sync |
 | **Restic REST** | 8000 | Backup target |
+| **Forgejo** | 3000, 2222 | Git server (SSH + web) |
 | **NFS** | 2049 | Exports Purple 2TB for Frigate |
 
 ### VPS (Vultr) - 24/7
@@ -119,7 +114,7 @@
 | 7000-7999 | *arr stack |
 | 8000-8999 | Web interfaces |
 | 9000-9999 | Additional services |
-| 22000+ | Syncthing, soft-serve |
+| 22000+ | Syncthing |
 
 ### Full Port Map
 
@@ -148,34 +143,31 @@
 | 9696 | Prowlarr | Fixed |
 | 22000 | Syncthing Sync | NAS |
 | 18789 | OpenClaw Gateway | Fixed |
-| 23231 | soft-serve SSH | Mobile |
-| 23232 | soft-serve HTTP | Mobile |
-| 23233 | soft-serve Stats | Mobile |
+| 2222 | Forgejo SSH | NAS |
+| 3000 | Forgejo Web | NAS |
 
 ## Active Services
 
-### soft-serve
+### Forgejo
 
-Self-hosted Git server with SSH-based TUI.
+Self-hosted Git server (Gitea fork) with web UI and SSH access.
 
 | Property | Value |
 |----------|-------|
-| Location | `docker/git/` |
-| Image | `charmcli/soft-serve:latest` |
-| Host | Mobile (MacBook Air M1) |
-| Ports | 23231 (SSH), 23232 (HTTP), 23233 (Stats) |
-| Data | Docker volume `git_soft-serve-data` |
+| Location | `docker/fixed/nas/git/` |
+| Image | `codeberg.org/forgejo/forgejo:11` |
+| Host | NAS |
+| Ports | 3000 (Web), 2222 (SSH) |
+| Data | `/srv/forgejo` (NAS SSD) |
+| URL | https://git.cronova.dev |
 
 **Access:**
 ```bash
-# TUI
-ssh -p 23231 localhost
+# Clone via SSH
+git clone ssh://git@192.168.0.12:2222/augusto/<repo>.git
 
-# Clone
-git clone ssh://localhost:23231/<repo>.git
-
-# Create repo
-ssh -p 23231 localhost repo create <name>
+# Web UI
+https://git.cronova.dev
 ```
 
 ## Docker Directory Structure
@@ -197,8 +189,10 @@ docker/
 │   └── nas/
 │       ├── storage/
 │       │   └── docker-compose.yml  # Samba, Syncthing
-│       └── backup/
-│           └── docker-compose.yml  # Restic REST
+│       ├── backup/
+│       │   └── docker-compose.yml  # Restic REST
+│       └── git/
+│           └── docker-compose.yml  # Forgejo
 ├── vps/
 │   ├── networking/
 │   │   ├── derp/
@@ -209,8 +203,7 @@ docker/
 │   │   └── docker-compose.yml  # changedetection
 │   └── backup/
 │       └── docker-compose.yml  # Restic REST
-└── git/
-    └── docker-compose.yml  # soft-serve (MacBook)
+└── shared/                   # Shared env files
 ```
 
 ## Service Categories
@@ -227,7 +220,7 @@ docker/
 | Monitoring | Uptime Kuma, ntfy, Watchtower | 3 |
 | Backup | Restic REST (x2), headscale-backup | 3 |
 | Scraping | changedetection | 1 |
-| Git | soft-serve | 1 |
+| Git | Forgejo | 1 |
 | AI | OpenClaw | 1 |
 
 **Unique services:** 26 | **Total deployments:** 30
@@ -282,6 +275,7 @@ qBittorrent             ← Download client
 2. Samba → file shares
 3. Syncthing → file sync
 4. Restic REST → backup target
+5. Forgejo → git server
 
 **Fixed Homelab - Docker VM:**
 1. Pi-hole → local DNS
@@ -340,6 +334,7 @@ Services needed during active use.
 | Home Assistant | Docker VM | Automation offline |
 | Frigate | Docker VM | No camera recording |
 | Samba | NAS | File shares unavailable |
+| Forgejo | NAS | Git server offline |
 
 ### Optional (On-Demand)
 
@@ -351,7 +346,6 @@ Services used occasionally.
 | Sonarr/Radarr | Docker VM | No auto-downloads |
 | qBittorrent | Docker VM | Manual downloads only |
 | Syncthing | NAS | Sync paused |
-| soft-serve | Mobile | Git server offline |
 
 ## References
 
@@ -374,4 +368,4 @@ Services used occasionally.
 - [Uptime Kuma](https://github.com/louislam/uptime-kuma)
 - [ntfy](https://ntfy.sh/)
 - [changedetection.io](https://changedetection.io/)
-- [soft-serve](https://github.com/charmbracelet/soft-serve)
+- [Forgejo](https://forgejo.org/)
