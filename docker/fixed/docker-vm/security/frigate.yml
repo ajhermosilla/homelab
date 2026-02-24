@@ -11,7 +11,8 @@
 # Hardware:
 #   - Intel N150 QuickSync for video decode (VA-API)
 #   - Recordings stored on NAS via NFS mount
-#   - Future: Coral USB TPU for detection
+#   - OpenVINO GPU for object detection (~15ms inference)
+#   - VA-API for hardware video decoding
 
 auth:
   enabled: true
@@ -25,16 +26,22 @@ mqtt:
   password: "{FRIGATE_MQTT_PASS}"
 
 detectors:
-  cpu:
-    type: cpu
-    num_threads: 2
-  # Uncomment when Coral USB TPU is added:
-  # coral:
-  #   type: edgetpu
-  #   device: usb
+  ov:
+    type: openvino
+    device: CPU
+    # Use GPU once iGPU is passed through from Proxmox (requires IOMMU + vfio-pci)
 
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+# VAAPI requires iGPU passthrough — enable after Proxmox iGPU passthrough:
 # ffmpeg:
-#   hwaccel_args: preset-vaapi  # No GPU passthrough in Docker VM
+#   hwaccel_args: preset-vaapi
 
 # go2rtc restreams all cameras for WebRTC live view and single RTSP connection per stream
 # Also avoids Frigate's YAML parser URL-decoding %XX sequences in passwords
