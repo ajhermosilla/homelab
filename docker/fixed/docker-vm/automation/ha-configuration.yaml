@@ -17,6 +17,7 @@ http:
     - 172.16.0.0/12
 
 # ntfy push notifications
+# Extra fields (priority, tags, click, actions) passed via data in automations
 notify:
   - name: ntfy_homelab
     platform: rest
@@ -28,6 +29,12 @@ notify:
       topic: "homelab"
       title: "{{ title }}"
       message: "{{ message }}"
+      priority: "{{ data.priority | default(3) | int }}"
+      tags: "{{ data.tags | default('') }}"
+      click: "{{ data.click | default('') }}"
+      icon: "{{ data.icon | default('') }}"
+      actions: "{{ data.actions | default([]) }}"
+      markdown: true
 
 # Additional dashboards
 lovelace:

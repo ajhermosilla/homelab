@@ -1,6 +1,6 @@
 - id: frigate_person_front_door
   alias: "Frigate: Person at Front Door"
-  description: "Send ntfy notification when an unknown person is detected in the driveway zone"
+  description: "Send rich ntfy notification when an unknown person is detected in the driveway zone"
   trigger:
     - platform: mqtt
       topic: frigate/events
@@ -18,17 +18,30 @@
   action:
     - service: notify.ntfy_homelab
       data:
-        title: "Unknown Person in Driveway"
-        message: >
+        title: >
           {% if trigger.payload_json.after.sub_label is not none %}
-          {{ trigger.payload_json.after.sub_label[0] }} detected in driveway at {{ now().strftime('%H:%M') }}
+          {{ trigger.payload_json.after.sub_label[0] | title }} in Driveway
           {% else %}
-          Unknown person detected in driveway at {{ now().strftime('%H:%M') }}
+          Unknown Person in Driveway
           {% endif %}
+        message: >
+          **Front Door** — {{ now().strftime('%H:%M') }}
+
+          Person detected in the driveway zone.
+          Event ID: `{{ trigger.payload_json.after.id }}`
+        data:
+          priority: 4
+          tags: "rotating_light,camera"
+          click: "https://taguato.cronova.dev/review?id={{ trigger.payload_json.after.id }}"
+          icon: "https://docs.frigate.video/img/frigate.png"
+          actions:
+            - action: view
+              label: Open Frigate
+              url: "https://taguato.cronova.dev"
 
 - id: frigate_person_back_yard
   alias: "Frigate: Person in Back Yard"
-  description: "Send ntfy notification when an unknown person is detected in the terraza zone"
+  description: "Send rich ntfy notification when an unknown person is detected in the terraza zone"
   trigger:
     - platform: mqtt
       topic: frigate/events
@@ -46,17 +59,30 @@
   action:
     - service: notify.ntfy_homelab
       data:
-        title: "Unknown Person in Terraza"
-        message: >
+        title: >
           {% if trigger.payload_json.after.sub_label is not none %}
-          {{ trigger.payload_json.after.sub_label[0] }} detected in terraza at {{ now().strftime('%H:%M') }}
+          {{ trigger.payload_json.after.sub_label[0] | title }} in Terraza
           {% else %}
-          Unknown person detected in terraza at {{ now().strftime('%H:%M') }}
+          Unknown Person in Terraza
           {% endif %}
+        message: >
+          **Back Yard** — {{ now().strftime('%H:%M') }}
+
+          Person detected in the terraza zone.
+          Event ID: `{{ trigger.payload_json.after.id }}`
+        data:
+          priority: 4
+          tags: "rotating_light,camera"
+          click: "https://taguato.cronova.dev/review?id={{ trigger.payload_json.after.id }}"
+          icon: "https://docs.frigate.video/img/frigate.png"
+          actions:
+            - action: view
+              label: Open Frigate
+              url: "https://taguato.cronova.dev"
 
 - id: frigate_person_indoor
   alias: "Frigate: Person Indoors (Away Mode)"
-  description: "Send ntfy notification when an unknown person is detected indoors"
+  description: "Send urgent ntfy notification when an unknown person is detected indoors"
   trigger:
     - platform: mqtt
       topic: frigate/events
@@ -73,10 +99,23 @@
   action:
     - service: notify.ntfy_homelab
       data:
-        title: "Motion Indoors"
-        message: >
+        title: >
           {% if trigger.payload_json.after.sub_label is not none %}
-          {{ trigger.payload_json.after.sub_label[0] }} detected indoors at {{ now().strftime('%H:%M') }}
+          {{ trigger.payload_json.after.sub_label[0] | title }} Indoors
           {% else %}
-          Unknown person detected indoors at {{ now().strftime('%H:%M') }}
+          ALERT — Person Indoors
           {% endif %}
+        message: >
+          **Indoor Camera** — {{ now().strftime('%H:%M') }}
+
+          Person detected inside the house.
+          Event ID: `{{ trigger.payload_json.after.id }}`
+        data:
+          priority: 5
+          tags: "warning,house"
+          click: "https://taguato.cronova.dev/review?id={{ trigger.payload_json.after.id }}"
+          icon: "https://docs.frigate.video/img/frigate.png"
+          actions:
+            - action: view
+              label: Open Frigate
+              url: "https://taguato.cronova.dev"
