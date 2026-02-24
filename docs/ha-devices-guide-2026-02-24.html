@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Home Devices for Home Assistant — Paraguay Budget Guide</title>
+<style>
+  :root {
+    --ha-blue: #03a9f4;
+    --ha-dark: #0d47a1;
+    --ha-light: #e1f5fe;
+    --accent-green: #4caf50;
+    --accent-orange: #ff9800;
+    --accent-red: #ef5350;
+    --accent-purple: #7e57c2;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.06);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #0d47a1 0%, #1565c0 30%, #03a9f4 100%);
+    color: white;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.06) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-2%, 2%); }
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    position: relative;
+  }
+  .hero .meta {
+    margin-top: 1.2rem;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .hero .meta span {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(4px);
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2.5rem;
+    border-left: 4px solid var(--ha-blue);
+  }
+  .toc h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.8rem;
+  }
+  .toc ol {
+    columns: 2;
+    column-gap: 2rem;
+    padding-left: 1.2rem;
+  }
+  .toc li {
+    margin-bottom: 0.3rem;
+    break-inside: avoid;
+  }
+  .toc a {
+    color: var(--ha-dark);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .toc a:hover { color: var(--ha-blue); text-decoration: underline; }
+
+  /* Sections */
+  .section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: box-shadow 0.2s;
+  }
+  .section:hover { box-shadow: var(--shadow-lg); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .section-header .num {
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-right: 0.3rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.8rem;
+    color: var(--ha-dark);
+  }
+
+  p { margin-bottom: 0.8rem; }
+
+  a {
+    color: var(--ha-blue);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  a:hover { text-decoration: underline; }
+
+  strong { font-weight: 600; }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 1rem 0 1.2rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  thead {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e8eef5 100%);
+  }
+  th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+  tbody tr:hover { background: #f8fafc; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .device-name {
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .badge-yes {
+    background: #dcfce7;
+    color: #166534;
+  }
+  .badge-no {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  .badge-matter {
+    background: #ede9fe;
+    color: #5b21b6;
+  }
+  .badge-depends {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  .badge-wifi {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  .badge-zigbee {
+    background: #fce7f3;
+    color: #9d174d;
+  }
+  .badge-thread {
+    background: #ede9fe;
+    color: #5b21b6;
+  }
+  .badge-price {
+    background: #ecfdf5;
+    color: #065f46;
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  /* Info boxes */
+  .info-box {
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .info-box .icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .info-tip {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+  }
+  .info-warn {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+  }
+  .info-danger {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+  }
+  .info-note {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+  }
+
+  /* Project cards */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .project-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .project-card:hover {
+    border-color: var(--ha-blue);
+    box-shadow: 0 4px 12px rgba(3,169,244,0.1);
+  }
+  .project-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .project-card .cost {
+    margin-left: auto;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-green);
+  }
+  .project-card p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .project-card ul {
+    margin: 0.4rem 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .project-card li { margin-bottom: 0.2rem; }
+
+  /* Comparison grid */
+  .compare-table th:first-child {
+    width: 140px;
+  }
+  .compare-table .check { color: var(--accent-green); font-weight: 700; }
+  .compare-table .warn { color: var(--accent-orange); font-weight: 600; }
+  .compare-table .cross { color: var(--accent-red); font-weight: 600; }
+
+  /* Ordered list styling */
+  .integration-list {
+    counter-reset: item;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+  .integration-list li {
+    counter-increment: item;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+  .integration-list li:hover { border-color: var(--ha-blue); }
+  .integration-list li::before {
+    content: counter(item);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background: var(--ha-blue);
+    color: white;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .integration-list li:nth-child(2)::before { background: var(--accent-orange); }
+  .integration-list li:nth-child(3)::before { background: var(--text-muted); }
+
+  /* Phase cards */
+  .phase {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    margin: 1.2rem 0;
+    overflow: hidden;
+  }
+  .phase-header {
+    padding: 0.8rem 1.2rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .phase-1 .phase-header { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #065f46; border-bottom: 2px solid #a7f3d0; }
+  .phase-2 .phase-header { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border-bottom: 2px solid #93c5fd; }
+  .phase-3 .phase-header { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border-bottom: 2px solid #fcd34d; }
+  .phase .table-wrap { margin: 0; border: none; border-radius: 0; }
+  .phase table td, .phase table th { padding: 0.6rem 1rem; }
+
+  /* Total bar */
+  .total-bar {
+    background: linear-gradient(135deg, var(--ha-dark), var(--ha-blue));
+    color: white;
+    padding: 1.2rem 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+  .total-bar span {
+    font-size: 1.6rem;
+  }
+
+  /* Resource list */
+  .resource-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+  }
+  .resource-list li a {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    background: var(--ha-light);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    transition: background 0.15s;
+  }
+  .resource-list li a:hover {
+    background: #bbdefb;
+    text-decoration: none;
+  }
+
+  /* Source badges in availability */
+  .source-badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.3rem;
+  }
+  .source-ali { background: #fee2e2; color: #991b1b; }
+  .source-ml { background: #fef3c7; color: #92400e; }
+  .source-tm { background: #dbeafe; color: #1e40af; }
+  .source-cde { background: #ede9fe; color: #5b21b6; }
+
+  /* Buying guide boxes */
+  .buy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .buy-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+  }
+  .buy-card h4 {
+    font-size: 0.92rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .buy-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* Presence detection comparison */
+  .vs-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin: 1.2rem 0;
+  }
+  .vs-card {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .vs-card h4 { margin-bottom: 0.5rem; font-size: 1rem; }
+  .vs-card p { font-size: 0.88rem; color: var(--text-muted); margin: 0; }
+  .vs-card .tag { display: block; margin-top: 0.5rem; font-weight: 700; font-size: 0.85rem; }
+  .vs-plus {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-muted);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8rem; }
+    .toc ol { columns: 1; }
+    .section { padding: 1.5rem; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .vs-container { grid-template-columns: 1fr; }
+    .vs-plus { display: none; }
+    .buy-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>Smart Home Devices for Home Assistant</h1>
+  <p class="subtitle">Paraguay Budget Guide &mdash; Cheap, Hackable, Fully Local</p>
+  <div class="meta">
+    <span>&#128197; 2026-02-24</span>
+    <span>&#9889; Home Assistant on Docker</span>
+    <span>&#128247; Frigate NVR &middot; 3 Cameras</span>
+    <span>&#127477;&#127486; Type B Outlets (US-style)</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#sonoff">SONOFF Devices</a></li>
+      <li><a href="#esp32">ESP32 / ESPHome Projects</a></li>
+      <li><a href="#protocols">Zigbee vs WiFi vs Matter</a></li>
+      <li><a href="#plugs">Smart Plugs with Energy Monitoring</a></li>
+      <li><a href="#tuya">Tuya Ecosystem</a></li>
+      <li><a href="#presence">ESP32 BLE Presence Detection</a></li>
+      <li><a href="#diy">DIY Projects for the Homelab</a></li>
+      <li><a href="#availability">Availability in Paraguay</a></li>
+      <li><a href="#matter">Matter Protocol &mdash; Worth It?</a></li>
+      <li><a href="#kit">Recommended Starting Kit</a></li>
+    </ol>
+  </nav>
+
+  <!-- Section 1: SONOFF -->
+  <section id="sonoff" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fff3e0;color:#e65100;">&#128268;</div>
+      <h2><span class="num">1.</span> SONOFF Devices</h2>
+    </div>
+
+    <h3>WiFi Switches &amp; Relays (ESP-based, flashable)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Device</th><th>Chip</th><th>Flashable?</th><th>Price</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="device-name">SONOFF MINI R4</td>
+            <td>ESP32</td>
+            <td><span class="badge badge-yes">Yes</span> Tasmota / ESPHome</td>
+            <td><span class="badge badge-price">$10-15</span></td>
+            <td>In-wall relay, decoupled switch. Requires soldering to flash.</td>
+          </tr>
+          <tr>
+            <td class="device-name">SONOFF MINI R4M</td>
+            <td>ESP32-C3</td>
+            <td><span class="badge badge-matter">Matter</span> locked</td>
+            <td><span class="badge badge-price">$12-15</span></td>
+            <td>Matter-certified. Use via Matter integration, don't try to flash.</td>
+          </tr>
+          <tr>
+            <td class="device-name">SONOFF Basic R4</td>
+            <td>ESP32</td>
+            <td><span class="badge badge-yes">Yes</span> Tasmota / ESPHome</td>
+            <td><span class="badge badge-price">$8-12</span></td>
+            <td>Basic relay, well-documented flashing.</td>
+          </tr>
+          <tr>
+            <td class="device-name">SONOFF S31</td>
+            <td>ESP8266</td>
+            <td><span class="badge badge-yes">Yes</span> Tasmota / ESPHome</td>
+            <td><span class="badge badge-price">$10-13</span></td>
+            <td>Best flashable plug with energy monitoring. Exposed pin headers.</td>
+          </tr>
+          <tr>
+            <td class="device-name">SONOFF S26 R2</td>
+            <td>ESP8266</td>
+            <td><span class="badge badge-yes">Yes</span> Tasmota</td>
+            <td><span class="badge badge-price">$8-10</span></td>
+            <td>Simple plug, no energy monitoring. Multiple regional versions.</td>
+          </tr>
+          <tr>
+            <td class="device-name">SONOFF TX Ultimate</td>
+            <td>ESP32</td>
+            <td><span class="badge badge-yes">Yes</span> ESPHome</td>
+            <td><span class="badge badge-price">$30-40</span></td>
+            <td>Touch wall switch with LED effects.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box info-danger">
+      <span class="icon">&#9888;&#65039;</span>
+      <div><strong>S31 Safety Warning:</strong> GND is connected to live AC &mdash; always use an isolated USB-to-serial adapter when flashing.</div>
+    </div>
+
+    <div class="info-box info-tip">
+      <span class="icon">&#128161;</span>
+      <div><strong>Alternative to flashing:</strong> The <a href="https://github.com/AlexxIT/SonoffLAN">Sonoff LAN integration</a> (HACS) controls SONOFF devices locally on stock firmware via eWeLink LAN mode. No soldering required.</div>
+    </div>
+
+    <h3>Zigbee Sensors (no flashing needed)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Device</th><th>Type</th><th>Price</th><th>Battery Life</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="device-name">SNZB-04P</td>
+            <td>Door / Window</td>
+            <td><span class="badge badge-price">$10-16</span></td>
+            <td>5+ years (CR2477)</td>
+            <td>Zigbee 3.0, ZHA / Z2M compatible</td>
+          </tr>
+          <tr>
+            <td class="device-name">SNZB-03P</td>
+            <td>Motion</td>
+            <td><span class="badge badge-price">$10-16</span></td>
+            <td>~3 years</td>
+            <td>Includes ambient light sensor</td>
+          </tr>
+          <tr>
+            <td class="device-name">SNZB-02D</td>
+            <td>Temp / Humidity</td>
+            <td><span class="badge badge-price">$10-16</span></td>
+            <td>CR2032, LCD display</td>
+            <td>Great for room climate monitoring</td>
+          </tr>
+          <tr>
+            <td class="device-name">SNZB-02P</td>
+            <td>Temp / Humidity</td>
+            <td><span class="badge badge-price">$8-12</span></td>
+            <td>CR2032, no display</td>
+            <td>Budget option, smaller form factor</td>
+          </tr>
+          <tr>
+            <td class="device-name">SNZB-06P</td>
+            <td>Presence (mmWave)</td>
+            <td><span class="badge badge-price">$20-25</span></td>
+            <td>Mains powered</td>
+            <td>Zigbee mmWave presence sensor</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 2: ESP32 -->
+  <section id="esp32" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#e8f5e9;color:#2e7d32;">&#129516;</div>
+      <h2><span class="num">2.</span> ESP32 / ESPHome Projects</h2>
+    </div>
+
+    <p>Boards cost <strong>$2&ndash;4</strong> on AliExpress. ESPHome turns YAML configs into fully integrated Home Assistant devices.</p>
+
+    <h3>Recommended Boards</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Board</th><th>Price</th><th>WiFi</th><th>BLE</th><th>Thread</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="device-name">ESP32-C3 Super Mini</td>
+            <td><span class="badge badge-price">$2-3</span></td>
+            <td><span class="badge badge-wifi">WiFi 4</span></td>
+            <td>5.0</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td>BLE proxy, sensors, relays</td>
+          </tr>
+          <tr>
+            <td class="device-name">ESP32-S3 Super Mini</td>
+            <td><span class="badge badge-price">$3-4</span></td>
+            <td><span class="badge badge-wifi">WiFi 4</span></td>
+            <td>5.0</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td>Camera, heavy processing</td>
+          </tr>
+          <tr>
+            <td class="device-name">ESP32-C6 Super Mini</td>
+            <td><span class="badge badge-price">$3-5</span></td>
+            <td><span class="badge badge-wifi">WiFi 6</span></td>
+            <td>5.0</td>
+            <td><span class="badge badge-thread">Thread</span></td>
+            <td>Future-proof, Thread support</td>
+          </tr>
+          <tr>
+            <td class="device-name">D1 Mini (ESP8266)</td>
+            <td><span class="badge badge-price">$2</span></td>
+            <td><span class="badge badge-wifi">WiFi 4</span></td>
+            <td>&mdash;</td>
+            <td><span class="badge badge-no">No</span></td>
+            <td>Simple sensors, legacy projects</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box info-warn">
+      <span class="icon">&#9888;&#65039;</span>
+      <div><strong>QC Warning:</strong> Some ESP32-C3 Super Mini boards from AliExpress have a design flaw. Check spacing between capacitor C3 and processor tip &mdash; good: ~3.3mm gap, bad: ~1.5mm.</div>
+    </div>
+
+    <h3>Top Projects</h3>
+    <div class="projects-grid">
+      <div class="project-card">
+        <h4>&#128065;&#65039; Presence Detection (mmWave) <span class="cost">$5-8/room</span></h4>
+        <ul>
+          <li><strong>LD2410C</strong> sensor + ESP32-C3 Super Mini</li>
+          <li>Detects stationary humans (breathing), range up to 5m</li>
+          <li>Native ESPHome <code>ld2410</code> component</li>
+          <li>vs <strong>$167</strong> for Aqara FP2</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#128225; BLE Bluetooth Proxy <span class="cost">~$3/proxy</span></h4>
+        <ul>
+          <li>ESP32 with ESPHome BT Proxy firmware</li>
+          <li>Extends HA's BLE range throughout the house</li>
+          <li>Place 2&ndash;4 around the house</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#127777;&#65039; Temperature / Humidity <span class="cost">$5-7/node</span></h4>
+        <ul>
+          <li>ESP32 + BME280 sensor</li>
+          <li>Perfect for server room / rack monitoring</li>
+          <li>Temp, humidity, and pressure</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#128167; Water Leak Detection <span class="cost">$3-5/sensor</span></h4>
+        <ul>
+          <li>ESP32 + water sensor module</li>
+          <li>ESPHome <code>binary_sensor</code> with <code>device_class: moisture</code></li>
+          <li>Place near NAS, under water heater</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#128161; Smart Relay / Switch <span class="cost">$4-6</span></h4>
+        <ul>
+          <li>ESP32 + relay module</li>
+          <li>Controls any light or appliance</li>
+          <li>Full ESPHome integration</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-box info-tip">
+      <span class="icon">&#128230;</span>
+      <div><strong>Pre-flashed option:</strong> <a href="https://www.athom.tech/">Athom Technology</a> sells devices pre-flashed with ESPHome/Tasmota on AliExpress: smart plugs with energy monitoring (~$10-13), relay modules, bulbs. Ready to pair with HA out of the box.</div>
+    </div>
+  </section>
+
+  <!-- Section 3: Protocol Comparison -->
+  <section id="protocols" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f3e5f5;color:#7b1fa2;">&#128246;</div>
+      <h2><span class="num">3.</span> Zigbee vs WiFi vs Matter</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr><th>Factor</th><th><span class="badge badge-zigbee">Zigbee</span></th><th><span class="badge badge-wifi">WiFi (ESPHome)</span></th><th><span class="badge badge-thread">Matter (Thread)</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cost</strong></td>
+            <td class="check">Cheapest sensors</td>
+            <td class="check">Cheap (ESP-based)</td>
+            <td class="warn">Getting cheaper (IKEA)</td>
+          </tr>
+          <tr>
+            <td><strong>Battery life</strong></td>
+            <td class="check">Excellent (years)</td>
+            <td class="cross">Poor (mains only)</td>
+            <td class="check">Excellent</td>
+          </tr>
+          <tr>
+            <td><strong>Range</strong></td>
+            <td class="check">Mesh extends</td>
+            <td class="warn">Router-dependent</td>
+            <td class="check">Mesh extends</td>
+          </tr>
+          <tr>
+            <td><strong>Coordinator</strong></td>
+            <td class="warn">$15-25 dongle</td>
+            <td class="check">No (existing WiFi)</td>
+            <td class="warn">Thread border router</td>
+          </tr>
+          <tr>
+            <td><strong>Local control</strong></td>
+            <td class="check">Always local</td>
+            <td class="check">Local with ESPHome</td>
+            <td class="check">Always local</td>
+          </tr>
+          <tr>
+            <td><strong>Maturity</strong></td>
+            <td class="check">Very mature</td>
+            <td class="check">Very mature</td>
+            <td class="warn">Maturing rapidly</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box info-note">
+      <span class="icon">&#127919;</span>
+      <div><strong>Recommendation:</strong> Start with <strong>Zigbee</strong> for battery-powered sensors + <strong>SONOFF ZBDongle-P</strong> (~$15-20). Use <strong>WiFi/ESPHome</strong> for mains-powered DIY projects. <strong>Matter</strong> worth considering for new purchases (especially IKEA), but don't migrate existing setups.</div>
+    </div>
+
+    <h3>Zigbee Coordinators</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Coordinator</th><th>Chip</th><th>Price</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="device-name">SONOFF ZBDongle-P</td>
+            <td>CC2652P</td>
+            <td><span class="badge badge-price">$15-20</span></td>
+            <td>Most recommended, best Z2M support</td>
+          </tr>
+          <tr>
+            <td class="device-name">SONOFF ZBDongle-E</td>
+            <td>EFR32MG21</td>
+            <td><span class="badge badge-price">$15-20</span></td>
+            <td>Works great with ZHA</td>
+          </tr>
+          <tr>
+            <td class="device-name">HA Connect ZBT-2</td>
+            <td>&mdash;</td>
+            <td><span class="badge badge-price">~$30</span></td>
+            <td>Official, supports Zigbee + Thread</td>
+          </tr>
+          <tr>
+            <td class="device-name">SLZB-06</td>
+            <td>CC2652P</td>
+            <td><span class="badge badge-price">$35-40</span></td>
+            <td>Ethernet-based, best range</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box info-tip">
+      <span class="icon">&#128268;</span>
+      <div><strong>For Docker VM HA:</strong> ZBDongle-P is the budget choice. Plug into Proxmox host, pass through USB to the Docker VM.</div>
+    </div>
+  </section>
+
+  <!-- Section 4: Smart Plugs -->
+  <section id="plugs" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#e3f2fd;color:#1565c0;">&#128268;</div>
+      <h2><span class="num">4.</span> Smart Plugs with Energy Monitoring</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Plug</th><th>Protocol</th><th>Energy Monitor</th><th>Flashable?</th><th>Price</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="device-name">SONOFF S31</td>
+            <td><span class="badge badge-wifi">WiFi</span></td>
+            <td class="check">Yes</td>
+            <td><span class="badge badge-yes">Yes</span> ESPHome</td>
+            <td><span class="badge badge-price">$10-13</span></td>
+            <td>Best hackable plug. US / Type B.</td>
+          </tr>
+          <tr>
+            <td class="device-name">Athom Smart Plug V3</td>
+            <td><span class="badge badge-wifi">WiFi</span></td>
+            <td class="check">Yes (HLW8032)</td>
+            <td><span class="badge badge-yes">Pre-flashed</span> ESPHome</td>
+            <td><span class="badge badge-price">$10-13</span></td>
+            <td>Plug-and-play, US/EU/BR types</td>
+          </tr>
+          <tr>
+            <td class="device-name">SONOFF S40</td>
+            <td><span class="badge badge-wifi">WiFi</span></td>
+            <td class="check">Yes</td>
+            <td><span class="badge badge-no">No</span> BK chip</td>
+            <td><span class="badge badge-price">$13-16</span></td>
+            <td>Not flashable</td>
+          </tr>
+          <tr>
+            <td class="device-name">Tuya-based plugs</td>
+            <td><span class="badge badge-wifi">WiFi</span></td>
+            <td class="warn">Some models</td>
+            <td><span class="badge badge-depends">Depends</span></td>
+            <td><span class="badge badge-price">$5-10</span></td>
+            <td>Check chip before buying</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box info-note">
+      <span class="icon">&#127477;&#127486;</span>
+      <div><strong>For Paraguay (Type B):</strong> SONOFF S31 or Athom US plug. S31 gives full ESPHome control with real-time watt/volt/amp readings &mdash; perfect for monitoring homelab power consumption.</div>
+    </div>
+  </section>
+
+  <!-- Section 5: Tuya -->
+  <section id="tuya" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fff8e1;color:#f57f17;">&#127760;</div>
+      <h2><span class="num">5.</span> Tuya Ecosystem</h2>
+    </div>
+
+    <p>Most "generic" smart home products in Paraguay are Tuya-based (sold under many brand names, all use the Smart Life app).</p>
+
+    <h3>Integration Options (Best to Worst)</h3>
+    <ol class="integration-list">
+      <li>
+        <div>
+          <strong>LocalTuya (HACS)</strong> &mdash; Controls devices over local network, no cloud. Requires one-time <code>local_key</code> extraction from Tuya Developer Platform. Works with stock firmware.<br>
+          <a href="https://github.com/xZetsubou/hass-localtuya">GitHub &rarr;</a>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Flash with Cloudcutter + LibreTiny</strong> &mdash; For BK7231 chip devices (most newer Tuya). OTA flashing, no soldering, won't brick on failure. Then runs ESPHome via <a href="https://esphome.io/components/libretiny/">LibreTiny</a>.<br>
+          <a href="https://github.com/tuya-cloudcutter/tuya-cloudcutter">Cloudcutter GitHub &rarr;</a>
+        </div>
+      </li>
+      <li>
+        <div>
+          <strong>Official Tuya Integration (Cloud)</strong> &mdash; Easiest but depends on Tuya cloud. Slower, privacy concerns. Fallback only.
+        </div>
+      </li>
+    </ol>
+
+    <h3>Check Chip Before Buying</h3>
+    <ul class="resource-list">
+      <li><a href="https://templates.blakadder.com/">Blakadder's Device Database</a></li>
+      <li><a href="https://www.elektroda.com/rtvforum/topic3979215.html">Cloudcutter Device List</a></li>
+    </ul>
+
+    <div class="info-box info-danger">
+      <span class="icon">&#128683;</span>
+      <div><strong>Avoid</strong> Realtek RTL8710BN chips &mdash; they are not flashable.</div>
+    </div>
+  </section>
+
+  <!-- Section 6: Presence Detection -->
+  <section id="presence" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#e8eaf6;color:#283593;">&#128065;&#65039;</div>
+      <h2><span class="num">6.</span> ESP32 BLE Presence Detection</h2>
+    </div>
+
+    <div class="vs-container">
+      <div class="vs-card">
+        <h4>&#128225; Option A: Bermuda BLE Trilateration</h4>
+        <p>ESP32 Bluetooth Proxies + <a href="https://github.com/agittins/bermuda">Bermuda HACS integration</a>. Reads RSSI from each proxy to determine which room a BLE device is in. Tracks phones, watches, BLE beacons, pet tags.</p>
+        <span class="tag" style="color:var(--ha-blue);">~$2-3/room &middot; Tracks WHO</span>
+      </div>
+      <div class="vs-plus">+</div>
+      <div class="vs-card">
+        <h4>&#128065;&#65039; Option B: mmWave Per-Room</h4>
+        <p>ESP32 + LD2410C per room. Detects actual human presence (not just BLE signal). Best for occupancy automations (lights, HVAC). Can combine with BLE proxy on the same ESP32.</p>
+        <span class="tag" style="color:var(--accent-green);">~$5-8/room &middot; Detects IF ANYONE</span>
+      </div>
+    </div>
+
+    <div class="info-box info-note">
+      <span class="icon">&#129309;</span>
+      <div><strong>Use both:</strong> Bermuda for tracking <em>who</em> is in which room, mmWave for detecting <em>if anyone</em> is there. One ESP32 board can run both BLE proxy and LD2410C sensor simultaneously.</div>
+    </div>
+  </section>
+
+  <!-- Section 7: DIY Projects -->
+  <section id="diy" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fce4ec;color:#c62828;">&#128736;&#65039;</div>
+      <h2><span class="num">7.</span> DIY Projects for the Homelab</h2>
+    </div>
+
+    <div class="projects-grid">
+      <div class="project-card">
+        <h4>&#127777;&#65039; Server Room Temperature <span class="cost">$5-7</span></h4>
+        <ul>
+          <li>ESP32-C3 + BME280 (temp/humidity/pressure)</li>
+          <li>Place near Proxmox host, NAS, network switch</li>
+          <li>Alert via ntfy if temperature exceeds threshold</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#128167; Water Leak Detection <span class="cost">$3-5/sensor</span></h4>
+        <ul>
+          <li>ESP32-C3 + water sensor module</li>
+          <li>Place near NAS, under water heater, near AC units</li>
+          <li>Instant ntfy notification on detection</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#9889; UPS Monitoring <span class="cost">varies</span></h4>
+        <ul>
+          <li>USB/serial UPS: <a href="https://www.home-assistant.io/integrations/nut/">NUT integration</a></li>
+          <li>No USB (Forza): ESP32 + voltage divider, ESPHome <code>adc</code> sensor</li>
+          <li>Trigger graceful shutdown on power loss</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#128200; Power Monitoring <span class="cost">$10-13/plug</span></h4>
+        <ul>
+          <li>SONOFF S31 (flashed ESPHome) on each device</li>
+          <li>Real-time watt/volt/amp for Proxmox, NAS, switch</li>
+          <li>HA Energy Dashboard tracks consumption</li>
+          <li>Detect anomalies (disk failure = power spike)</li>
+        </ul>
+      </div>
+      <div class="project-card">
+        <h4>&#128663; Garage Door Controller <span class="cost">$6-10</span></h4>
+        <ul>
+          <li>ESP32 + relay + reed switch</li>
+          <li>ESPHome <code>cover</code> with <code>device_class: garage</code></li>
+          <li>Optional: HC-SR04 ultrasonic to detect parked car</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 8: Availability -->
+  <section id="availability" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#e0f2f1;color:#00695c;">&#128722;</div>
+      <h2><span class="num">8.</span> Availability in Paraguay</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Source</th><th>What You'll Find</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="device-name"><span class="source-badge source-ml">ML</span> MercadoLibre PY</td>
+            <td>Tuya-based plugs, bulbs, switches</td>
+            <td>Most common locally, use LocalTuya</td>
+          </tr>
+          <tr>
+            <td class="device-name"><span class="source-badge source-cde">CDE</span> Ciudad del Este</td>
+            <td>SONOFF via <a href="https://sonoff.tech/en-us/blogs/news/primer-proyecto-de-domotica-en-paraguay-mobile-zone">Mobile Zone</a> (Galeria Jebai)</td>
+            <td>Official SONOFF distributor in Paraguay</td>
+          </tr>
+          <tr>
+            <td class="device-name"><span class="source-badge source-tm">TM</span> TiendaMia</td>
+            <td>Full Amazon catalog</td>
+            <td>Handles import/customs, good for SONOFF S31</td>
+          </tr>
+          <tr>
+            <td class="device-name"><span class="source-badge source-ali">ALI</span> AliExpress</td>
+            <td>Everything: ESP32, sensors, Zigbee</td>
+            <td>2&ndash;4 week shipping, lowest prices</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What to Buy Where</h3>
+    <div class="buy-grid">
+      <div class="buy-card">
+        <h4><span class="source-badge source-ml">LOCAL</span> Buy Locally</h4>
+        <p>Tuya plugs/bulbs, USB power supplies, basic electronics</p>
+      </div>
+      <div class="buy-card">
+        <h4><span class="source-badge source-ali">ALIEXPRESS</span> Best for Bulk</h4>
+        <p>ESP32 boards, LD2410C, BME280, SONOFF Zigbee sensors, ZBDongle-P, Athom plugs</p>
+      </div>
+      <div class="buy-card">
+        <h4><span class="source-badge source-tm">TIENDAMIA</span> Faster Shipping</h4>
+        <p>SONOFF S31 (US plug = Paraguay Type B), items needing quicker delivery</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 9: Matter -->
+  <section id="matter" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#ede7f6;color:#4527a0;">&#127384;</div>
+      <h2><span class="num">9.</span> Matter Protocol &mdash; Worth It?</h2>
+    </div>
+
+    <ul style="margin: 0.5rem 0 1rem 1.2rem;">
+      <li>HA has <strong>official Matter certification</strong> (first open-source project to achieve this)</li>
+      <li><strong>IKEA</strong> launched 21 Matter-over-Thread devices at aggressive prices (temp ~$10, motion ~$7, water leak ~$8)</li>
+      <li>SONOFF MINIR4M works natively via Matter</li>
+      <li>Matter guarantees local control, no cloud dependency</li>
+    </ul>
+
+    <div class="info-box info-note">
+      <span class="icon">&#127919;</span>
+      <div><strong>Recommendation:</strong> Don't go all-in yet. Buy Matter for <em>new</em> purchases where cheap (IKEA). Keep Zigbee for existing investments. The <strong>HA Connect ZBT-2</strong> ($30) bridges both Zigbee and Thread.</div>
+    </div>
+  </section>
+
+  <!-- Section 10: Starting Kit -->
+  <section id="kit" class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#e8f5e9;color:#2e7d32;">&#127873;</div>
+      <h2><span class="num">10.</span> Recommended Starting Kit</h2>
+    </div>
+
+    <div class="phase phase-1">
+      <div class="phase-header">
+        <span>Phase 1: Foundation</span>
+        <span class="badge badge-price" style="font-size:0.95rem;">~$25-35</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Source</th><th>Price</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="device-name">SONOFF ZBDongle-P</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">~$15</span></td>
+              <td>Zigbee coordinator</td>
+            </tr>
+            <tr>
+              <td class="device-name">3x ESP32-C3 Super Mini</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$6-9</span></td>
+              <td>BLE proxy + sensors</td>
+            </tr>
+            <tr>
+              <td class="device-name">2x LD2410C mmWave</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$6-10</span></td>
+              <td>Presence detection</td>
+            </tr>
+            <tr>
+              <td class="device-name">BME280 sensor</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$2-3</span></td>
+              <td>Server room temp</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="phase phase-2">
+      <div class="phase-header">
+        <span>Phase 2: Sensors</span>
+        <span class="badge badge-price" style="font-size:0.95rem;">~$40-60</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Source</th><th>Price</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="device-name">2x SONOFF SNZB-04P</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$20-30</span></td>
+              <td>Door/window sensors</td>
+            </tr>
+            <tr>
+              <td class="device-name">1x SONOFF SNZB-03P</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$10-16</span></td>
+              <td>Motion sensor</td>
+            </tr>
+            <tr>
+              <td class="device-name">1x SONOFF SNZB-02D</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$10-16</span></td>
+              <td>Temp/humidity LCD</td>
+            </tr>
+            <tr>
+              <td class="device-name">Water sensor module</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$1-2</span></td>
+              <td>Leak detection (DIY)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="phase phase-3">
+      <div class="phase-header">
+        <span>Phase 3: Power &amp; Control</span>
+        <span class="badge badge-price" style="font-size:0.95rem;">~$30-50</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Source</th><th>Price</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="device-name">2x SONOFF S31</td>
+              <td><span class="source-badge source-tm">TM</span></td>
+              <td><span class="badge badge-price">$20-26</span></td>
+              <td>Energy monitoring</td>
+            </tr>
+            <tr>
+              <td class="device-name">2x SONOFF MINI R4</td>
+              <td><span class="source-badge source-ali">ALI</span></td>
+              <td><span class="badge badge-price">$20-30</span></td>
+              <td>In-wall switches</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="total-bar">
+      Total: <span>~$95 &ndash; $145</span> for a comprehensive setup with full local control
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  <p>Generated for the Hermosilla Homelab &middot; Home Assistant on Docker VM (Proxmox) &middot; 2026-02-24</p>
+</div>
+
+</body>
+</html>
