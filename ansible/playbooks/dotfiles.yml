@@ -1,0 +1,414 @@
+# Dotfiles deployment and interactive shell setup
+# Usage: ansible-playbook -i inventory.yml playbooks/dotfiles.yml
+#
+# Tiers:
+#   - dotfiles_base (vultr, oga): Config files only
+#   - dotfiles_interactive (docker, nas): Config files + CLI tools + zsh
+#
+# Tags: dotfiles (config files), tools (CLI tools), shell (zsh setup)
+#
+# Examples:
+#   ansible-playbook -i inventory.yml playbooks/dotfiles.yml
+#   ansible-playbook -i inventory.yml playbooks/dotfiles.yml -l docker
+#   ansible-playbook -i inventory.yml playbooks/dotfiles.yml --tags dotfiles
+#   ansible-playbook -i inventory.yml playbooks/dotfiles.yml --tags tools -e "dotfiles_force_tools=true"
+
+---
+# =============================================================================
+# Play 1: Deploy config files
+# =============================================================================
+- name: Deploy dotfiles configuration
+  hosts: dotfiles_hosts
+  become: true
+  tags: [dotfiles]
+
+  vars:
+    dotfiles_repo: "git@github.com:ajhermosilla/dotfiles.git"
+    dotfiles_tmp: /tmp/dotfiles-deploy
+    target_user: "{{ ansible_user }}"
+    target_home: "/home/{{ target_user }}"
+
+  pre_tasks:
+    - name: Clone dotfiles repo to temp directory
+      delegate_to: localhost
+      become: false
+      check_mode: false
+      git:
+        repo: "{{ dotfiles_repo }}"
+        dest: "{{ dotfiles_tmp }}"
+        version: main
+        force: yes
+      run_once: true
+
+  tasks:
+    # =========================================================================
+    # Create directories
+    # =========================================================================
+    - name: Create .config subdirectories
+      file:
+        path: "{{ target_home }}/{{ item }}"
+        state: directory
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0755'
+      loop:
+        - .config
+        - .config/bat
+        - .config/fd
+        - .config/ripgrep
+        - .config/lazygit
+        - .config/git
+        - .config/git/hooks
+
+    # =========================================================================
+    # Base config files
+    # =========================================================================
+    - name: Copy base config files
+      copy:
+        src: "{{ dotfiles_tmp }}/{{ item }}"
+        dest: "{{ target_home }}/{{ item }}"
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0644'
+      loop:
+        - .zshrc
+        - .gitconfig
+        - .vimrc
+        - .tmux.conf
+
+    # =========================================================================
+    # .config files
+    # =========================================================================
+    - name: Copy .config files
+      copy:
+        src: "{{ dotfiles_tmp }}/.config/{{ item }}"
+        dest: "{{ target_home }}/.config/{{ item }}"
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0644'
+      loop:
+        - starship.toml
+        - bat/config
+        - ripgrep/config
+        - fd/ignore
+        - lazygit/config.yml
+
+    # =========================================================================
+    # Git hooks
+    # =========================================================================
+    - name: Copy git hooks
+      copy:
+        src: "{{ dotfiles_tmp }}/.config/git/hooks/{{ item }}"
+        dest: "{{ target_home }}/.config/git/hooks/{{ item }}"
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0755'
+      loop:
+        - commit-msg
+        - pre-commit
+        - pre-push
+
+    # =========================================================================
+    # Local git config
+    # =========================================================================
+    - name: Create .gitconfig.local with credential helper (if missing)
+      copy:
+        dest: "{{ target_home }}/.gitconfig.local"
+        content: |
+          [credential]
+              helper = store
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0644'
+        force: no
+
+    # =========================================================================
+    # TPM (tmux plugin manager)
+    # =========================================================================
+    - name: Install TPM (tmux plugin manager)
+      git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: "{{ target_home }}/.tmux/plugins/tpm"
+        version: master
+      become_user: "{{ target_user }}"
+
+  post_tasks:
+    - name: Clean up temp directory
+      delegate_to: localhost
+      become: false
+      file:
+        path: "{{ dotfiles_tmp }}"
+        state: absent
+      run_once: true
+
+# =============================================================================
+# Play 2: Interactive shell environment
+# =============================================================================
+- name: Setup interactive shell environment
+  hosts: dotfiles_interactive
+  become: true
+
+  vars:
+    target_user: "{{ ansible_user }}"
+    target_home: "/home/{{ target_user }}"
+    zoxide_version: "0.9.9"
+    dust_version: "v1.2.4"
+    dotfiles_force_tools: false
+    interactive_packages:
+      - bat
+      - fd-find
+      - ripgrep
+      - fzf
+      - tmux
+      - xclip
+      - zsh-autosuggestions
+      - zsh-syntax-highlighting
+
+  tasks:
+    # =========================================================================
+    # Zsh setup
+    # =========================================================================
+    - name: Install zsh
+      apt:
+        name: zsh
+        state: present
+        update_cache: yes
+      tags: [shell]
+
+    - name: Set zsh as default shell
+      user:
+        name: "{{ target_user }}"
+        shell: /bin/zsh
+      tags: [shell]
+
+    # =========================================================================
+    # CLI tool packages (apt)
+    # =========================================================================
+    - name: Install CLI tool packages
+      apt:
+        name: "{{ interactive_packages }}"
+        state: present
+      tags: [tools]
+
+    - name: Create bat symlink (Debian batcat → bat)
+      file:
+        src: /usr/bin/batcat
+        dest: /usr/local/bin/bat
+        state: link
+        force: yes
+      tags: [tools]
+
+    - name: Create fd symlink (Debian fdfind → fd)
+      file:
+        src: /usr/bin/fdfind
+        dest: /usr/local/bin/fd
+        state: link
+        force: yes
+      tags: [tools]
+
+    # =========================================================================
+    # Static binaries — Architecture detection
+    # =========================================================================
+    - name: Set architecture for downloads
+      set_fact:
+        musl_arch: "{{ ansible_facts['architecture'] }}"
+      tags: [tools]
+
+    # =========================================================================
+    # Static binaries — Check existing installations
+    # =========================================================================
+    - name: Check eza installation
+      command: eza --version
+      register: eza_check
+      check_mode: false
+      ignore_errors: true
+      changed_when: false
+      tags: [tools]
+
+    - name: Check starship installation
+      command: starship --version
+      register: starship_check
+      check_mode: false
+      ignore_errors: true
+      changed_when: false
+      tags: [tools]
+
+    - name: Check zoxide installation
+      command: zoxide --version
+      register: zoxide_check
+      check_mode: false
+      ignore_errors: true
+      changed_when: false
+      tags: [tools]
+
+    - name: Check dust installation
+      command: dust --version
+      register: dust_check
+      check_mode: false
+      ignore_errors: true
+      changed_when: false
+      tags: [tools]
+
+    # =========================================================================
+    # Install eza
+    # =========================================================================
+    - name: Download eza
+      get_url:
+        url: "https://github.com/eza-community/eza/releases/latest/download/eza_{{ musl_arch }}-unknown-linux-musl.tar.gz"
+        dest: /tmp/eza.tar.gz
+      when: eza_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Extract eza to /usr/local/bin
+      unarchive:
+        src: /tmp/eza.tar.gz
+        dest: /usr/local/bin/
+        remote_src: yes
+      when: eza_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Clean up eza archive
+      file:
+        path: /tmp/eza.tar.gz
+        state: absent
+      when: eza_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    # =========================================================================
+    # Install starship
+    # =========================================================================
+    - name: Download starship
+      get_url:
+        url: "https://github.com/starship/starship/releases/latest/download/starship-{{ musl_arch }}-unknown-linux-musl.tar.gz"
+        dest: /tmp/starship.tar.gz
+      when: starship_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Extract starship to /usr/local/bin
+      unarchive:
+        src: /tmp/starship.tar.gz
+        dest: /usr/local/bin/
+        remote_src: yes
+      when: starship_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Clean up starship archive
+      file:
+        path: /tmp/starship.tar.gz
+        state: absent
+      when: starship_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    # =========================================================================
+    # Install zoxide
+    # =========================================================================
+    - name: Download zoxide
+      get_url:
+        url: "https://github.com/ajeetdsouza/zoxide/releases/latest/download/zoxide-{{ zoxide_version }}-{{ musl_arch }}-unknown-linux-musl.tar.gz"
+        dest: /tmp/zoxide.tar.gz
+      when: zoxide_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Create zoxide temp directory
+      file:
+        path: /tmp/zoxide-extract
+        state: directory
+      when: zoxide_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Extract zoxide
+      unarchive:
+        src: /tmp/zoxide.tar.gz
+        dest: /tmp/zoxide-extract/
+        remote_src: yes
+      when: zoxide_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Install zoxide binary
+      copy:
+        src: /tmp/zoxide-extract/zoxide
+        dest: /usr/local/bin/zoxide
+        mode: '0755'
+        remote_src: yes
+      when: zoxide_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Clean up zoxide temp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/zoxide.tar.gz
+        - /tmp/zoxide-extract
+      when: zoxide_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    # =========================================================================
+    # Install dust
+    # =========================================================================
+    - name: Download dust
+      get_url:
+        url: "https://github.com/bootandy/dust/releases/latest/download/dust-{{ dust_version }}-{{ musl_arch }}-unknown-linux-musl.tar.gz"
+        dest: /tmp/dust.tar.gz
+      when: dust_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Create dust temp directory
+      file:
+        path: /tmp/dust-extract
+        state: directory
+      when: dust_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Extract dust
+      unarchive:
+        src: /tmp/dust.tar.gz
+        dest: /tmp/dust-extract/
+        remote_src: yes
+      when: dust_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Install dust binary
+      shell: cp /tmp/dust-extract/*/dust /usr/local/bin/dust && chmod 0755 /usr/local/bin/dust
+      when: dust_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Clean up dust temp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/dust.tar.gz
+        - /tmp/dust-extract
+      when: dust_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    # =========================================================================
+    # Verify installations
+    # =========================================================================
+    - name: Verify tool installations
+      command: "{{ item.cmd }}"
+      register: tool_versions
+      check_mode: false
+      loop:
+        - { name: eza, cmd: "eza --version" }
+        - { name: bat, cmd: "bat --version" }
+        - { name: fd, cmd: "fd --version" }
+        - { name: rg, cmd: "rg --version" }
+        - { name: fzf, cmd: "fzf --version" }
+        - { name: starship, cmd: "starship --version" }
+        - { name: zoxide, cmd: "zoxide --version" }
+        - { name: dust, cmd: "dust --version" }
+        - { name: tmux, cmd: "tmux -V" }
+      ignore_errors: true
+      changed_when: false
+      tags: [tools]
+
+    - name: Display tool versions
+      debug:
+        msg: "{{ item.item.name }}: {{ item.stdout_lines[0] | default('not installed') }}"
+      loop: "{{ tool_versions.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      when: item.stdout_lines is defined
+      tags: [tools]

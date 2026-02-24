@@ -113,3 +113,18 @@ all:
         nas:
         rpi4:
         oga:
+
+    dotfiles_base:
+      hosts:
+        vultr:
+        oga:
+
+    dotfiles_interactive:
+      hosts:
+        docker:
+        nas:
+
+    dotfiles_hosts:
+      children:
+        dotfiles_base:
+        dotfiles_interactive:

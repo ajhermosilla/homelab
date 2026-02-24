@@ -136,6 +136,26 @@ Install OpenClaw AI assistant on Raspberry Pi 5.
 ansible-playbook -i inventory.yml playbooks/openclaw.yml -l openclaw
 ```
 
+### dotfiles.yml
+
+Deploy dotfiles and interactive shell environment. Two tiers:
+- **Base** (vultr, oga): Config files only (.zshrc, .gitconfig, .vimrc, .tmux.conf, starship, bat, ripgrep, fd, lazygit, git hooks)
+- **Interactive** (docker, nas): Config files + modern CLI tools (eza, bat, fd, ripgrep, fzf, starship, zoxide, dust) + zsh as default shell
+
+```bash
+# Full deployment
+ansible-playbook -i inventory.yml playbooks/dotfiles.yml
+
+# Single host
+ansible-playbook -i inventory.yml playbooks/dotfiles.yml -l docker
+
+# Config files only (no tool install)
+ansible-playbook -i inventory.yml playbooks/dotfiles.yml --tags dotfiles
+
+# Force re-download static binaries
+ansible-playbook -i inventory.yml playbooks/dotfiles.yml --tags tools -e "dotfiles_force_tools=true"
+```
+
 ### docker-compose-deploy.yml
 
 Deploy Docker Compose stacks from homelab repo.
@@ -198,6 +218,9 @@ ansible-playbook -i inventory.yml playbooks/common.yml --check --diff
 | `pihole_hosts` | vultr, docker | Hosts running Pi-hole |
 | `openclaw_hosts` | rpi5 | OpenClaw AI assistant (RPi 5) |
 | `tailscale_clients` | All except control | Tailscale mesh members |
+| `dotfiles_base` | vultr, oga | Dotfiles config only |
+| `dotfiles_interactive` | docker, nas | Dotfiles + CLI tools + zsh |
+| `dotfiles_hosts` | vultr, oga, docker, nas | All dotfiles targets |
 
 ## Variables
 
@@ -216,6 +239,9 @@ ansible-playbook -i inventory.yml playbooks/common.yml --check --diff
 | tailscale.yml | `authkey` | Headscale pre-auth key |
 | tailscale.yml | `headscale_url` | Headscale server URL |
 | docker.yml | `docker_users` | Users to add to docker group |
+| dotfiles.yml | `dotfiles_force_tools` | Force re-download static binaries (default: false) |
+| dotfiles.yml | `zoxide_version` | Zoxide release version (default: 0.9.9) |
+| dotfiles.yml | `dust_version` | Dust release version (default: v1.2.4) |
 
 ## Directory Structure
 
@@ -233,6 +259,7 @@ ansible/
 │   ├── caddy.yml                # Caddy reverse proxy
 │   ├── nfs-server.yml           # NFS exports
 │   ├── openclaw.yml             # OpenClaw AI assistant
+│   ├── dotfiles.yml             # Dotfiles + CLI tools
 │   └── docker-compose-deploy.yml # Stack deployment
 └── README.md           # This file
 ```
@@ -245,9 +272,10 @@ ansible/
 1. ssh-copy-id         → Copy SSH key (manual)
 2. tailscale.yml       → Connect to mesh (provides backup access)
 3. common.yml          → Basic setup (disables password auth!)
-4. docker.yml          → Docker installation
-5. nfs-server.yml      → NFS exports (NAS only)
-6. docker-compose-deploy.yml → Deploy stacks
+4. dotfiles.yml        → Dotfiles + shell environment
+5. docker.yml          → Docker installation
+6. nfs-server.yml      → NFS exports (NAS only)
+7. docker-compose-deploy.yml → Deploy stacks
 ```
 
 The `common.yml` playbook disables SSH password authentication. Always ensure
