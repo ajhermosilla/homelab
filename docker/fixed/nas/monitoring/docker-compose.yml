@@ -1,0 +1,60 @@
+# Monitoring Stack - Glances
+# Fixed Homelab - NAS (Debian)
+# System monitor with REST API for Home Assistant integration
+
+services:
+  # =========================================================================
+  # Glances - System Monitor
+  # https://github.com/nicolargo/glances
+  # =========================================================================
+  glances:
+    image: nicolargo/glances:latest-full
+    env_file:
+      - ../../../shared/common.env
+    container_name: glances
+    restart: unless-stopped
+    pid: host
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=monitoring"
+      - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:61208/api/4/cpu || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+    ports:
+      - "61208:61208"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      GLANCES_OPT: "-w --disable-webui"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Start service:
+#    docker compose up -d
+#
+# 2. Verify API:
+#    curl http://localhost:61208/api/4/cpu
+#
+# 3. Add to Home Assistant:
+#    Settings → Integrations → Add → Glances
+#    Host: 100.82.77.97 (or 192.168.0.12)
+#    Port: 61208
+#
+# =============================================================================
