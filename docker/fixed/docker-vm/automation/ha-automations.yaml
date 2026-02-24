@@ -1,6 +1,6 @@
 - id: frigate_person_front_door
   alias: "Frigate: Person at Front Door"
-  description: "Send ntfy notification when a person is detected at the front door"
+  description: "Send ntfy notification when a person is detected in the driveway zone"
   trigger:
     - platform: mqtt
       topic: frigate/events
@@ -10,16 +10,17 @@
     - condition: template
       value_template: >
         {{ trigger.payload_json.after.camera == 'front_door'
-           and trigger.payload_json.after.label == 'person' }}
+           and trigger.payload_json.after.label == 'person'
+           and 'driveway' in trigger.payload_json.after.current_zones }}
   action:
     - service: notify.ntfy_homelab
       data:
-        title: "Person at Front Door"
-        message: "Person detected at {{ now().strftime('%H:%M') }}"
+        title: "Person in Driveway"
+        message: "Person detected in driveway at {{ now().strftime('%H:%M') }}"
 
 - id: frigate_person_back_yard
   alias: "Frigate: Person in Back Yard"
-  description: "Send ntfy notification when a person is detected in the back yard"
+  description: "Send ntfy notification when a person is detected in the terraza zone"
   trigger:
     - platform: mqtt
       topic: frigate/events
@@ -29,16 +30,17 @@
     - condition: template
       value_template: >
         {{ trigger.payload_json.after.camera == 'back_yard'
-           and trigger.payload_json.after.label == 'person' }}
+           and trigger.payload_json.after.label == 'person'
+           and 'terraza' in trigger.payload_json.after.current_zones }}
   action:
     - service: notify.ntfy_homelab
       data:
-        title: "Person in Back Yard"
-        message: "Person detected in back yard at {{ now().strftime('%H:%M') }}"
+        title: "Person in Terraza"
+        message: "Person detected in terraza at {{ now().strftime('%H:%M') }}"
 
 - id: frigate_person_indoor
   alias: "Frigate: Person Indoors (Away Mode)"
-  description: "Send ntfy notification when a person is detected indoors and nobody is home"
+  description: "Send ntfy notification when a person is detected indoors"
   trigger:
     - platform: mqtt
       topic: frigate/events
