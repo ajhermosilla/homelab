@@ -43,6 +43,16 @@ model:
 # ffmpeg:
 #   hwaccel_args: preset-vaapi
 
+# Face recognition — assigns sub_label (e.g. "augusto") to detected persons
+# Train faces via Frigate UI → Faces tab, or auto-collected from detections
+face_recognition:
+  enabled: true
+  model_size: small
+  min_area: 500
+  min_faces: 1
+  save_attempts: 100
+  blur_confidence_filter: true
+
 # go2rtc restreams all cameras for WebRTC live view and single RTSP connection per stream
 # Also avoids Frigate's YAML parser URL-decoding %XX sequences in passwords
 go2rtc:

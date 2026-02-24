@@ -1,58 +1,82 @@
 - id: frigate_person_front_door
   alias: "Frigate: Person at Front Door"
-  description: "Send ntfy notification when a person is detected in the driveway zone"
+  description: "Send ntfy notification when an unknown person is detected in the driveway zone"
   trigger:
     - platform: mqtt
       topic: frigate/events
-      payload: "new"
+      payload: "update"
       value_template: "{{ value_json.type }}"
   condition:
     - condition: template
       value_template: >
         {{ trigger.payload_json.after.camera == 'front_door'
            and trigger.payload_json.after.label == 'person'
-           and 'driveway' in trigger.payload_json.after.current_zones }}
+           and 'driveway' in trigger.payload_json.after.current_zones
+           and (trigger.payload_json.after.sub_label is none
+                or trigger.payload_json.after.sub_label[0] not in
+                ['augusto', 'andre']) }}
   action:
     - service: notify.ntfy_homelab
       data:
-        title: "Person in Driveway"
-        message: "Person detected in driveway at {{ now().strftime('%H:%M') }}"
+        title: "Unknown Person in Driveway"
+        message: >
+          {% if trigger.payload_json.after.sub_label is not none %}
+          {{ trigger.payload_json.after.sub_label[0] }} detected in driveway at {{ now().strftime('%H:%M') }}
+          {% else %}
+          Unknown person detected in driveway at {{ now().strftime('%H:%M') }}
+          {% endif %}
 
 - id: frigate_person_back_yard
   alias: "Frigate: Person in Back Yard"
-  description: "Send ntfy notification when a person is detected in the terraza zone"
+  description: "Send ntfy notification when an unknown person is detected in the terraza zone"
   trigger:
     - platform: mqtt
       topic: frigate/events
-      payload: "new"
+      payload: "update"
       value_template: "{{ value_json.type }}"
   condition:
     - condition: template
       value_template: >
         {{ trigger.payload_json.after.camera == 'back_yard'
            and trigger.payload_json.after.label == 'person'
-           and 'terraza' in trigger.payload_json.after.current_zones }}
+           and 'terraza' in trigger.payload_json.after.current_zones
+           and (trigger.payload_json.after.sub_label is none
+                or trigger.payload_json.after.sub_label[0] not in
+                ['augusto', 'andre']) }}
   action:
     - service: notify.ntfy_homelab
       data:
-        title: "Person in Terraza"
-        message: "Person detected in terraza at {{ now().strftime('%H:%M') }}"
+        title: "Unknown Person in Terraza"
+        message: >
+          {% if trigger.payload_json.after.sub_label is not none %}
+          {{ trigger.payload_json.after.sub_label[0] }} detected in terraza at {{ now().strftime('%H:%M') }}
+          {% else %}
+          Unknown person detected in terraza at {{ now().strftime('%H:%M') }}
+          {% endif %}
 
 - id: frigate_person_indoor
   alias: "Frigate: Person Indoors (Away Mode)"
-  description: "Send ntfy notification when a person is detected indoors"
+  description: "Send ntfy notification when an unknown person is detected indoors"
   trigger:
     - platform: mqtt
       topic: frigate/events
-      payload: "new"
+      payload: "update"
       value_template: "{{ value_json.type }}"
   condition:
     - condition: template
       value_template: >
         {{ trigger.payload_json.after.camera == 'indoor'
-           and trigger.payload_json.after.label == 'person' }}
+           and trigger.payload_json.after.label == 'person'
+           and (trigger.payload_json.after.sub_label is none
+                or trigger.payload_json.after.sub_label[0] not in
+                ['augusto', 'andre']) }}
   action:
     - service: notify.ntfy_homelab
       data:
         title: "Motion Indoors"
-        message: "Person detected indoors at {{ now().strftime('%H:%M') }}"
+        message: >
+          {% if trigger.payload_json.after.sub_label is not none %}
+          {{ trigger.payload_json.after.sub_label[0] }} detected indoors at {{ now().strftime('%H:%M') }}
+          {% else %}
+          Unknown person detected indoors at {{ now().strftime('%H:%M') }}
+          {% endif %}
