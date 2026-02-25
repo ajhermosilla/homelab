@@ -13,6 +13,7 @@
 | Home Assistant / Docker VM | **jara** | owner, lord | `jara.cronova.dev` |
 | Frigate NVR | **taguato** | hawk | `taguato.cronova.dev` |
 | Jellyfin | **yrasema** | sound of waterfalls | `yrasema.cronova.dev` |
+| Coolify PaaS | **tajy** | lapacho tree | `tajy.cronova.dev` |
 
 ---
 
@@ -65,6 +66,7 @@
 | `okẽ.cronova.dev` | Authelia | Docker VM |
 | `papa.cronova.dev` | VictoriaMetrics + Grafana | Docker VM |
 | `vera.cronova.dev` | Immich | NAS |
+| `tajy.cronova.dev` | Coolify PaaS | NAS |
 | `aranduka.cronova.dev` | Paperless-ngx | Docker VM |
 | `pytyvõ.cronova.dev` | n8n | Docker VM |
 

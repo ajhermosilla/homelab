@@ -21,6 +21,7 @@ SSL/TLS certificate management for homelab services.
 | VPS Caddy + Let's Encrypt (HTTP-01) | Deployed | cronova.dev, hs, status, notify |
 | Cloudflare Edge | Deployed | DNS proxied |
 | Docker VM Caddy + Let's Encrypt (DNS-01) | Deployed | home, media, frigate, sonarr, radarr, prowlarr |
+| NAS Traefik + Let's Encrypt (DNS-01) | Planned | tajy (Coolify) |
 
 **Previous limitation:** `tailscale cert` doesn't work with self-hosted Headscale.
 
@@ -51,16 +52,16 @@ SSL/TLS certificate management for homelab services.
 │                           INTERNET                                   │
 └────────────────────────────────┬────────────────────────────────────┘
                                  │
-              ┌──────────────────┼──────────────────┐
-              │                  │                  │
-       [Cloudflare]        [VPS Caddy]       [Docker VM Caddy]
-       Edge Certs          LE (HTTP-01)       LE (DNS-01 via CF)
-              │                  │                  │
-    ┌─────────┴─────────┐       │           ┌──────┴──────┐
-    │                   │       │           │             │
-www.cronova.dev    docs.cronova.dev    jara.cronova.dev  yrasema.cronova.dev
-(Cloudflare Pages)                     taguato.cronova.dev
-                                       sonarr/radarr/aoao.cronova.dev
+              ┌──────────────────┼──────────────────┬──────────────────┐
+              │                  │                  │                  │
+       [Cloudflare]        [VPS Caddy]       [Docker VM Caddy]  [NAS Traefik]
+       Edge Certs          LE (HTTP-01)       LE (DNS-01 via CF) LE (DNS-01 via CF)
+              │                  │                  │                  │
+    ┌─────────┴─────────┐       │           ┌──────┴──────┐          │
+    │                   │       │           │             │          │
+www.cronova.dev    docs.cronova.dev    jara.cronova.dev  yrasema  tajy.cronova.dev
+(Cloudflare Pages)                     taguato.cronova.dev        (Coolify apps)
+                                       sonarr/radarr/aoao
 ```
 
 ---
@@ -205,6 +206,7 @@ www.verava.ai {
 | japysaka.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
 | taanga.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
 | aoao.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
+| tajy.cronova.dev | Let's Encrypt | NAS Traefik (Coolify) | DNS-01 (CF) | Yes |
 
 ---
 
