@@ -1,0 +1,135 @@
+# Tools Stack - Dozzle + Stirling-PDF + Homepage
+# Fixed Homelab - Docker VM
+# Log viewer, PDF tools, and dashboard
+
+services:
+  # =========================================================================
+  # Dozzle - Docker Log Viewer (Ysyry)
+  # https://dozzle.dev/
+  # =========================================================================
+  dozzle:
+    image: amir20/dozzle:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: dozzle
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=tools"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.5'
+    ports:
+      - "127.0.0.1:9999:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  # =========================================================================
+  # Stirling-PDF - PDF Tools (Kuatia)
+  # https://github.com/Stirling-Tools/Stirling-PDF
+  # =========================================================================
+  stirling-pdf:
+    image: frooodle/s-pdf:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: stirling-pdf
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=tools"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    ports:
+      - "127.0.0.1:8580:8080"
+    volumes:
+      - stirling-data:/usr/share/tessdata
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      DOCKER_ENABLE_SECURITY: "false"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # =========================================================================
+  # Homepage - Dashboard (Mbyja)
+  # https://gethomepage.dev/
+  # =========================================================================
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: homepage
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=tools"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+    ports:
+      - "127.0.0.1:3030:3000"
+    volumes:
+      - ./homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+volumes:
+  stirling-data:
+    name: stirling-data
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Start tools stack:
+#    docker compose up -d
+#
+# 2. Access services:
+#    - Dozzle: https://ysyry.cronova.dev
+#    - Stirling-PDF: https://kuatia.cronova.dev
+#    - Homepage: https://mbyja.cronova.dev
+#
+# 3. Homepage config files are in ./homepage/ directory.
+#    Edit services.yaml to customize the dashboard.
+#
+# =============================================================================
+# DNS ENTRIES (Pi-hole)
+# =============================================================================
+#
+# Add to Pi-hole local DNS:
+#   ysyry.cronova.dev → 192.168.0.10
+#   kuatia.cronova.dev → 192.168.0.10
+#   mbyja.cronova.dev → 192.168.0.10
+#
+# =============================================================================

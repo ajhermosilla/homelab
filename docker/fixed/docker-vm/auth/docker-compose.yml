@@ -1,0 +1,102 @@
+# Auth Stack - Authelia SSO
+# Fixed Homelab - Docker VM
+# Single sign-on with TOTP 2FA (Oke)
+
+services:
+  # =========================================================================
+  # Authelia - Authentication & Authorization
+  # https://www.authelia.com/
+  # =========================================================================
+  authelia:
+    image: authelia/authelia:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: authelia
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=auth"
+      - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    ports:
+      - "127.0.0.1:9091:9091"
+    volumes:
+      - ./config:/config:ro
+      - authelia-data:/data
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      AUTHELIA_JWT_SECRET_FILE: /config/secrets/jwt
+      AUTHELIA_SESSION_SECRET_FILE: /config/secrets/session
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /config/secrets/encryption
+    healthcheck:
+      test: ["CMD", "authelia", "healthcheck"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  authelia-data:
+    name: authelia-data
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Generate secrets:
+#    openssl rand -base64 32 > config/secrets/jwt
+#    openssl rand -base64 32 > config/secrets/session
+#    openssl rand -base64 32 > config/secrets/encryption
+#
+# 2. Generate user password hashes:
+#    docker run --rm authelia/authelia:latest \
+#      authelia crypto hash generate argon2 --password 'your-password'
+#
+# 3. Update config/users_database.yml with the hashes
+#
+# 4. Start Authelia:
+#    docker compose up -d
+#
+# 5. Access: https://auth.cronova.dev
+#    First login will prompt for TOTP enrollment.
+#
+# =============================================================================
+# DNS ENTRIES (Pi-hole)
+# =============================================================================
+#
+# Add to Pi-hole local DNS:
+#   auth.cronova.dev → 192.168.0.10
+#
+# =============================================================================
+# CADDY INTEGRATION
+# =============================================================================
+#
+# Authelia is used via forward_auth in Caddyfile.
+# Protected services get the (authelia) snippet imported.
+#
+# Services with their own auth (HA, Frigate, Vaultwarden) should NOT
+# be protected by Authelia to avoid double-authentication.
+#
+# =============================================================================
+# SECRETS (.gitignored)
+# =============================================================================
+#
+# config/secrets/jwt        - JWT signing secret
+# config/secrets/session    - Session encryption secret
+# config/secrets/encryption - Storage encryption key
+#
+# These files MUST exist before starting Authelia.
+# Generate with: openssl rand -base64 32
+#
+# =============================================================================

@@ -1,0 +1,13 @@
+# Homepage Bookmarks
+# https://gethomepage.dev/configs/bookmarks/
+
+- Management:
+    - Proxmox:
+        - icon: proxmox
+          href: https://192.168.0.237:8006
+    - OPNsense:
+        - icon: opnsense
+          href: https://192.168.0.1
+    - NAS:
+        - icon: synology-dsm
+          href: http://192.168.0.12

@@ -1,0 +1,228 @@
+# Photos Stack - Immich
+# Fixed Homelab - Docker VM
+# Self-hosted photo management with ML (Vera)
+
+services:
+  # =========================================================================
+  # Immich Server
+  # https://immich.app/
+  # =========================================================================
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    env_file:
+      - ../../../shared/common.env
+    container_name: immich-server
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=photos"
+      - "com.cronova.critical=true"
+      - "com.cronova.backup=true"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+    ports:
+      - "127.0.0.1:2283:2283"
+    volumes:
+      - ${UPLOAD_LOCATION:-immich-upload}:/usr/src/app/upload
+      - /mnt/nas/photos:/mnt/external:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      DB_HOSTNAME: immich-db
+      DB_USERNAME: ${DB_USERNAME:-immich}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE_NAME: ${DB_DATABASE_NAME:-immich}
+      REDIS_HOSTNAME: immich-valkey
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - photos-net
+    depends_on:
+      immich-db:
+        condition: service_healthy
+      immich-valkey:
+        condition: service_started
+
+  # =========================================================================
+  # Immich Machine Learning
+  # Face recognition, object detection, smart search
+  # =========================================================================
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    env_file:
+      - ../../../shared/common.env
+    container_name: immich-ml
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=photos"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+    volumes:
+      - immich-ml-cache:/cache
+    environment:
+      MACHINE_LEARNING_WORKERS: 1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - photos-net
+
+  # =========================================================================
+  # Valkey - Redis-compatible cache for Immich
+  # =========================================================================
+  immich-valkey:
+    image: valkey/valkey:8-bookworm
+    env_file:
+      - ../../../shared/common.env
+    container_name: immich-valkey
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=photos"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - photos-net
+
+  # =========================================================================
+  # PostgreSQL with pgvecto.rs - Vector search for Immich
+  # =========================================================================
+  immich-db:
+    image: tensorchord/pgvecto-rs:pg17-v0.4.0
+    env_file:
+      - ../../../shared/common.env
+    container_name: immich-db
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=photos"
+      - "com.cronova.backup=true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - immich-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-immich}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE_NAME:-immich}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB:-immich}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - photos-net
+
+volumes:
+  immich-upload:
+    name: immich-upload
+  immich-ml-cache:
+    name: immich-ml-cache
+  immich-db-data:
+    name: immich-db-data
+
+networks:
+  photos-net:
+    name: photos-net
+
+# =============================================================================
+# PREREQUISITES
+# =============================================================================
+#
+# 1. NFS mount from NAS for photo storage:
+#    sudo apt install nfs-common
+#    sudo mkdir -p /mnt/nas/photos
+#    sudo mount -t nfs 192.168.0.12:/srv/photos /mnt/nas/photos
+#
+# 2. Add to /etc/fstab for persistence:
+#    192.168.0.12:/srv/photos /mnt/nas/photos nfs defaults 0 0
+#
+# 3. Create NFS export on NAS:
+#    Add to /etc/exports: /srv/photos 192.168.0.10(rw,sync,no_subtree_check)
+#    exportfs -ra
+#
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# Copy .env.example to .env and configure:
+#   DB_PASSWORD=<generate-secure-password>
+#   UPLOAD_LOCATION=/mnt/nas/immich-upload  # or use default named volume
+#
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Set up NFS mount (see prerequisites)
+# 2. Create .env from .env.example
+# 3. docker compose up -d
+# 4. Access: https://vera.cronova.dev
+# 5. Create admin account on first login
+# 6. Add external library: /mnt/external (read-only NAS photos)
+#
+# =============================================================================
+# RAM CONSIDERATIONS
+# =============================================================================
+#
+# Immich adds ~4.5GB in resource limits:
+#   - immich-server: 2G
+#   - immich-ml: 2G
+#   - immich-db: 512M
+#   - immich-valkey: 128M
+#
+# Actual usage is typically much lower (Docker overcommits).
+# Monitor with `docker stats` after deployment.
+#
+# If RAM pressure occurs:
+#   1. Reduce ML workers or disable ML temporarily
+#   2. Increase Docker VM RAM in Proxmox (requires VM stop/start)
+#
+# =============================================================================
+# DNS ENTRIES (Pi-hole)
+# =============================================================================
+#
+# Add to Pi-hole local DNS:
+#   vera.cronova.dev → 192.168.0.10
+#
+# =============================================================================
