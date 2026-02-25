@@ -1,0 +1,103 @@
+# Coolify Backup Sidecar
+# Fixed Homelab - NAS (Debian)
+# Daily encrypted backups of Coolify data to restic REST server
+
+services:
+  # =========================================================================
+  # Coolify Backup Sidecar
+  # Daily encrypted backups to NAS restic REST server
+  # =========================================================================
+  coolify-backup:
+    image: restic/restic:0.16.4
+    env_file:
+      - ../../../shared/common.env
+    container_name: coolify-backup
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=backup"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    init: true  # Proper signal handling for cron daemon
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "30 3 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+        crond -f -l 2
+    volumes:
+      - /data/coolify/backups:/data/backups:ro
+      - /data/coolify/ssh/keys:/data/ssh-keys:ro
+      - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/restic-backup.sh:/backup.sh:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/coolify}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      BACKUP_PATH: /data
+      BACKUP_TAG: coolify
+      KEEP_DAILY: "7"
+      KEEP_WEEKLY: "4"
+      KEEP_MONTHLY: "12"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - backup-net
+
+networks:
+  backup-net:
+    external: true  # Created by backup stack (restic-rest)
+
+# =============================================================================
+# ENVIRONMENT VARIABLES (.env)
+# =============================================================================
+#
+# RESTIC_USER=augusto
+# RESTIC_PASS=<htpasswd-password>
+# RESTIC_PASSWORD=<restic-encryption-key>
+#
+# =============================================================================
+# BACKUP SCHEDULE
+# =============================================================================
+#
+# 3:30 AM PYT (America/Asuncion) — staggered with other backups:
+#   Vaultwarden:  2:00 AM (Docker VM)
+#   HA:           2:30 AM (Docker VM)
+#   Coolify:      3:30 AM (NAS)
+#
+# =============================================================================
+# WHAT GETS BACKED UP
+# =============================================================================
+#
+# /data/backups  - Coolify PostgreSQL dumps (configured in Coolify UI)
+# /data/ssh-keys - SSH keys for server management
+#
+# Both mounted read-only from /data/coolify/ on the NAS host.
+#
+# =============================================================================
+# SETUP
+# =============================================================================
+#
+# 1. Ensure backup-net exists (created by backup stack):
+#    docker network ls | grep backup-net
+#
+# 2. Create .env with restic credentials (same as other backup sidecars)
+#
+# 3. Start sidecar:
+#    docker compose -f docker-compose.backup.yml up -d
+#
+# 4. Initialize restic repo (first time):
+#    docker exec coolify-backup restic init
+#
+# 5. Test backup manually:
+#    docker exec coolify-backup /backup.sh
+#
+# =============================================================================
