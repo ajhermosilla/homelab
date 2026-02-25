@@ -118,11 +118,13 @@ all:
       hosts:
         vultr:
         oga:
+        rpi4:
 
     dotfiles_interactive:
       hosts:
         docker:
         nas:
+        rpi5:
 
     dotfiles_hosts:
       children:

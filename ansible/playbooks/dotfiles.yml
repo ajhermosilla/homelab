@@ -2,8 +2,8 @@
 # Usage: ansible-playbook -i inventory.yml playbooks/dotfiles.yml
 #
 # Tiers:
-#   - dotfiles_base (vultr, oga): Config files only
-#   - dotfiles_interactive (docker, nas): Config files + CLI tools + zsh
+#   - dotfiles_base (vultr, oga, rpi4): Config files only
+#   - dotfiles_interactive (docker, nas, rpi5): Config files + CLI tools + zsh
 #
 # Tags: dotfiles (config files), tools (CLI tools), shell (zsh setup)
 #
@@ -214,6 +214,11 @@
         musl_arch: "{{ ansible_facts['architecture'] }}"
       tags: [tools]
 
+    - name: Set eza libc variant (no aarch64 musl build)
+      set_fact:
+        eza_libc: "{{ 'gnu' if musl_arch == 'aarch64' else 'musl' }}"
+      tags: [tools]
+
     # =========================================================================
     # Static binaries — Check existing installations
     # =========================================================================
@@ -254,7 +259,7 @@
     # =========================================================================
     - name: Download eza
       get_url:
-        url: "https://github.com/eza-community/eza/releases/latest/download/eza_{{ musl_arch }}-unknown-linux-musl.tar.gz"
+        url: "https://github.com/eza-community/eza/releases/latest/download/eza_{{ musl_arch }}-unknown-linux-{{ eza_libc }}.tar.gz"
         dest: /tmp/eza.tar.gz
       when: eza_check.rc != 0 or dotfiles_force_tools | bool
       tags: [tools]
