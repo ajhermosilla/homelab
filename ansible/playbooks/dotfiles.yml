@@ -75,6 +75,7 @@
         - .gitconfig
         - .vimrc
         - .tmux.conf
+        - .gitignore_global
 
     # =========================================================================
     # .config files
@@ -153,6 +154,7 @@
     target_home: "/home/{{ target_user }}"
     zoxide_version: "0.9.9"
     dust_version: "v1.2.4"
+    delta_version: "0.18.2"
     dotfiles_force_tools: false
     interactive_packages:
       - bat
@@ -214,9 +216,9 @@
         musl_arch: "{{ ansible_facts['architecture'] }}"
       tags: [tools]
 
-    - name: Set eza libc variant (no aarch64 musl build)
+    - name: Set libc variant (no aarch64 musl builds for eza/delta)
       set_fact:
-        eza_libc: "{{ 'gnu' if musl_arch == 'aarch64' else 'musl' }}"
+        libc_variant: "{{ 'gnu' if musl_arch == 'aarch64' else 'musl' }}"
       tags: [tools]
 
     # =========================================================================
@@ -254,12 +256,20 @@
       changed_when: false
       tags: [tools]
 
+    - name: Check delta installation
+      command: delta --version
+      register: delta_check
+      check_mode: false
+      ignore_errors: true
+      changed_when: false
+      tags: [tools]
+
     # =========================================================================
     # Install eza
     # =========================================================================
     - name: Download eza
       get_url:
-        url: "https://github.com/eza-community/eza/releases/latest/download/eza_{{ musl_arch }}-unknown-linux-{{ eza_libc }}.tar.gz"
+        url: "https://github.com/eza-community/eza/releases/latest/download/eza_{{ musl_arch }}-unknown-linux-{{ libc_variant }}.tar.gz"
         dest: /tmp/eza.tar.gz
       when: eza_check.rc != 0 or dotfiles_force_tools | bool
       tags: [tools]
@@ -389,6 +399,50 @@
       tags: [tools]
 
     # =========================================================================
+    # Install delta
+    # =========================================================================
+    - name: Download delta
+      get_url:
+        url: "https://github.com/dandavison/delta/releases/latest/download/delta-{{ delta_version }}-{{ musl_arch }}-unknown-linux-{{ libc_variant }}.tar.gz"
+        dest: /tmp/delta.tar.gz
+      when: delta_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Create delta temp directory
+      file:
+        path: /tmp/delta-extract
+        state: directory
+      when: delta_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Extract delta
+      unarchive:
+        src: /tmp/delta.tar.gz
+        dest: /tmp/delta-extract/
+        remote_src: yes
+      when: delta_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Install delta binary
+      copy:
+        src: "/tmp/delta-extract/delta-{{ delta_version }}-{{ musl_arch }}-unknown-linux-{{ libc_variant }}/delta"
+        dest: /usr/local/bin/delta
+        mode: '0755'
+        remote_src: yes
+      when: delta_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    - name: Clean up delta temp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/delta.tar.gz
+        - /tmp/delta-extract
+      when: delta_check.rc != 0 or dotfiles_force_tools | bool
+      tags: [tools]
+
+    # =========================================================================
     # Verify installations
     # =========================================================================
     - name: Verify tool installations
@@ -404,6 +458,7 @@
         - { name: starship, cmd: "starship --version" }
         - { name: zoxide, cmd: "zoxide --version" }
         - { name: dust, cmd: "dust --version" }
+        - { name: delta, cmd: "delta --version" }
         - { name: tmux, cmd: "tmux -V" }
       ignore_errors: true
       changed_when: false
