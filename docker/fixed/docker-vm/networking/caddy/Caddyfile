@@ -46,6 +46,28 @@
 	}
 }
 
+# Authelia forward_auth snippet
+# Import this in any service block to require SSO authentication.
+# Do NOT use on services with their own auth (HA, Frigate, Vaultwarden, Immich).
+(authelia) {
+	forward_auth host.docker.internal:9091 {
+		uri /api/authz/forward-auth
+		copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+	}
+}
+
+# =============================================================================
+# AUTH
+# =============================================================================
+
+# Authelia - SSO Portal (Oke)
+# Access: https://auth.cronova.dev
+auth.cronova.dev {
+	import internal_tls
+	import security_headers
+	reverse_proxy host.docker.internal:9091
+}
+
 # =============================================================================
 # INTERNAL SERVICES
 # =============================================================================
@@ -59,6 +81,7 @@
 
 # Home Assistant - Automation (Jara)
 # Access: https://jara.cronova.dev
+# Own auth — no Authelia
 jara.cronova.dev {
 	import internal_tls
 	import security_headers
@@ -70,11 +93,13 @@ jara.cronova.dev {
 yrasema.cronova.dev {
 	import internal_tls
 	import security_headers
+	import authelia
 	reverse_proxy host.docker.internal:8096
 }
 
 # Frigate - NVR (Taguato)
 # Access: https://taguato.cronova.dev
+# Own auth — no Authelia
 taguato.cronova.dev {
 	import internal_tls
 	import security_headers
@@ -94,6 +119,15 @@ git.cronova.dev {
 	reverse_proxy 192.168.0.12:3000
 }
 
+# Immich - Photos (Vera)
+# Access: https://vera.cronova.dev
+# Own auth — no Authelia
+vera.cronova.dev {
+	import internal_tls
+	import security_headers
+	reverse_proxy host.docker.internal:2283
+}
+
 # =============================================================================
 # ARR STACK
 # =============================================================================
@@ -102,6 +136,7 @@ git.cronova.dev {
 japysaka.cronova.dev {
 	import internal_tls
 	import security_headers
+	import authelia
 	reverse_proxy host.docker.internal:8989
 }
 
@@ -109,6 +144,7 @@ japysaka.cronova.dev {
 taanga.cronova.dev {
 	import internal_tls
 	import security_headers
+	import authelia
 	reverse_proxy host.docker.internal:7878
 }
 
@@ -116,7 +152,52 @@ taanga.cronova.dev {
 aoao.cronova.dev {
 	import internal_tls
 	import security_headers
+	import authelia
 	reverse_proxy host.docker.internal:9696
+}
+
+# =============================================================================
+# TOOLS
+# =============================================================================
+
+# Dozzle - Docker Logs (Ysyry)
+# Access: https://ysyry.cronova.dev
+ysyry.cronova.dev {
+	import internal_tls
+	import security_headers
+	import authelia
+	reverse_proxy host.docker.internal:9999
+}
+
+# Stirling-PDF - PDF Tools (Kuatia)
+# Access: https://kuatia.cronova.dev
+kuatia.cronova.dev {
+	import internal_tls
+	import security_headers
+	import authelia
+	reverse_proxy host.docker.internal:8580
+}
+
+# Homepage - Dashboard (Mbyja)
+# Access: https://mbyja.cronova.dev
+mbyja.cronova.dev {
+	import internal_tls
+	import security_headers
+	import authelia
+	reverse_proxy host.docker.internal:3030
+}
+
+# =============================================================================
+# MONITORING
+# =============================================================================
+
+# Grafana - Metrics & Dashboards (Papa)
+# Access: https://papa.cronova.dev
+papa.cronova.dev {
+	import internal_tls
+	import security_headers
+	import authelia
+	reverse_proxy host.docker.internal:3000
 }
 
 # =============================================================================
@@ -125,7 +206,16 @@ aoao.cronova.dev {
 #
 # DNS Configuration:
 #   Pi-hole local DNS entries point *.cronova.dev → 192.168.0.10 (Docker VM).
-#   Required entries: jara, yrasema, taguato, japysaka, taanga, aoao
+#   Required entries: jara, yrasema, taguato, japysaka, taanga, aoao, git,
+#                     auth, ysyry, kuatia, mbyja, papa, vera
+#
+# Authelia-protected services:
+#   yrasema (Jellyfin), japysaka (Sonarr), taanga (Radarr), aoao (Prowlarr),
+#   ysyry (Dozzle), kuatia (Stirling-PDF), mbyja (Homepage), papa (Grafana)
+#
+# Services with their own auth (NOT protected by Authelia):
+#   jara (Home Assistant), taguato (Frigate), vault (Vaultwarden),
+#   vera (Immich), git (Forgejo)
 #
 # Direct Access (no reverse proxy needed):
 #   - Pi-hole: http://192.168.0.10:80/admin

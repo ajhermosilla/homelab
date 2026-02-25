@@ -1,0 +1,26 @@
+# Authelia Users Database
+# https://www.authelia.com/reference/guides/passwords/
+#
+# Generate password hashes:
+#   docker run --rm authelia/authelia:latest \
+#     authelia crypto hash generate argon2 --password 'your-password'
+#
+# Replace the placeholder hashes below with real ones before starting.
+
+users:
+  augusto:
+    displayname: Augusto Hermosilla
+    email: augusto@hermosilla.me
+    groups:
+      - admin
+      - homelab
+    # REPLACE: generate with `authelia crypto hash generate argon2`
+    password: "$argon2id$v=19$m=65536,t=3,p=4$REPLACE_WITH_REAL_HASH"
+
+  andre:
+    displayname: Andre
+    email: andre@hermosilla.me
+    groups:
+      - homelab
+    # REPLACE: generate with `authelia crypto hash generate argon2`
+    password: "$argon2id$v=19$m=65536,t=3,p=4$REPLACE_WITH_REAL_HASH"

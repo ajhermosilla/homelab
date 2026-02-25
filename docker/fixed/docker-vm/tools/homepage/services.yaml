@@ -1,0 +1,112 @@
+# Homepage Services
+# https://gethomepage.dev/configs/services/
+
+- Security:
+    - Vaultwarden:
+        icon: vaultwarden
+        href: https://vault.cronova.dev
+        description: Password Manager
+        server: local
+        container: vaultwarden
+    - Frigate:
+        icon: frigate
+        href: https://taguato.cronova.dev
+        description: NVR with AI Detection
+        server: local
+        container: frigate
+    - Authelia:
+        icon: authelia
+        href: https://auth.cronova.dev
+        description: SSO & 2FA
+        server: local
+        container: authelia
+
+- Automation:
+    - Home Assistant:
+        icon: home-assistant
+        href: https://jara.cronova.dev
+        description: Home Automation
+        server: local
+        container: homeassistant
+    - Mosquitto:
+        icon: mqtt
+        href: "#"
+        description: MQTT Broker
+        server: local
+        container: mosquitto
+
+- Media:
+    - Jellyfin:
+        icon: jellyfin
+        href: https://yrasema.cronova.dev
+        description: Media Server
+        server: local
+        container: jellyfin
+    - Sonarr:
+        icon: sonarr
+        href: https://japysaka.cronova.dev
+        description: TV Shows
+        server: local
+        container: sonarr
+    - Radarr:
+        icon: radarr
+        href: https://taanga.cronova.dev
+        description: Movies
+        server: local
+        container: radarr
+    - Prowlarr:
+        icon: prowlarr
+        href: https://aoao.cronova.dev
+        description: Indexers
+        server: local
+        container: prowlarr
+
+- Monitoring:
+    - Grafana:
+        icon: grafana
+        href: https://papa.cronova.dev
+        description: Metrics & Dashboards
+        server: local
+        container: grafana
+    - Uptime Kuma:
+        icon: uptime-kuma
+        href: https://status.cronova.dev
+        description: Service Monitoring
+    - Dozzle:
+        icon: dozzle
+        href: https://ysyry.cronova.dev
+        description: Docker Logs
+        server: local
+        container: dozzle
+
+- Tools:
+    - Stirling-PDF:
+        icon: stirling-pdf
+        href: https://kuatia.cronova.dev
+        description: PDF Tools
+        server: local
+        container: stirling-pdf
+    - Forgejo:
+        icon: forgejo
+        href: https://git.cronova.dev
+        description: Git Server
+    - Syncthing:
+        icon: syncthing
+        href: "#"
+        description: File Sync (NAS)
+
+- Infrastructure:
+    - Pi-hole:
+        icon: pi-hole
+        href: http://192.168.0.10/admin
+        description: DNS & Ad Blocking
+        server: local
+        container: pihole
+    - Headscale:
+        icon: headscale
+        href: "#"
+        description: Tailscale Coordinator
+    - OPNsense:
+        icon: opnsense
+        href: "#"
+        description: Firewall & Router

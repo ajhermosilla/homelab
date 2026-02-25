@@ -1,0 +1,29 @@
+# Homepage Settings
+# https://gethomepage.dev/configs/settings/
+
+title: Cronova Homelab
+
+theme: dark
+color: slate
+
+headerStyle: clean
+
+layout:
+  Security:
+    style: row
+    columns: 3
+  Automation:
+    style: row
+    columns: 2
+  Media:
+    style: row
+    columns: 4
+  Monitoring:
+    style: row
+    columns: 3
+  Tools:
+    style: row
+    columns: 3
+  Infrastructure:
+    style: row
+    columns: 3

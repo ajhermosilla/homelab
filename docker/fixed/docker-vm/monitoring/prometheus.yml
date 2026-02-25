@@ -1,0 +1,37 @@
+# vmagent Scrape Configuration
+# Prometheus-compatible format for VictoriaMetrics
+
+global:
+  scrape_interval: 30s
+
+scrape_configs:
+  # =========================================================================
+  # Docker VM - Node Exporter
+  # =========================================================================
+  - job_name: node-docker-vm
+    static_configs:
+      - targets: ['host.docker.internal:9100']
+        labels:
+          instance: docker-vm
+
+  # =========================================================================
+  # NAS - Node Exporter
+  # =========================================================================
+  - job_name: node-nas
+    static_configs:
+      - targets: ['100.82.77.97:9100']
+        labels:
+          instance: nas
+
+  # =========================================================================
+  # Home Assistant - Prometheus Endpoint
+  # =========================================================================
+  # Generate a long-lived access token in HA:
+  #   Profile → Long-Lived Access Tokens → Create
+  - job_name: home-assistant
+    bearer_token: '<HA_LONG_LIVED_TOKEN>'
+    metrics_path: /api/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:8123']
+        labels:
+          instance: home-assistant

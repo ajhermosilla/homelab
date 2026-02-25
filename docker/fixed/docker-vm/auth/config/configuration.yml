@@ -1,0 +1,80 @@
+# Authelia Configuration
+# https://www.authelia.com/configuration/
+
+# =============================================================================
+# Server
+# =============================================================================
+server:
+  address: 'tcp://0.0.0.0:9091'
+
+# =============================================================================
+# Logging
+# =============================================================================
+log:
+  level: info
+
+# =============================================================================
+# TOTP 2FA
+# =============================================================================
+totp:
+  issuer: cronova.dev
+  period: 30
+  digits: 6
+
+# =============================================================================
+# Authentication Backend (file-based)
+# =============================================================================
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: argon2id
+      iterations: 3
+      memory: 65536
+      parallelism: 4
+      key_length: 32
+      salt_length: 16
+
+# =============================================================================
+# Session
+# =============================================================================
+session:
+  cookies:
+    - domain: cronova.dev
+      authelia_url: https://auth.cronova.dev
+      default_redirection_url: https://mbyja.cronova.dev
+  expiration: 12h
+  inactivity: 2h
+  remember_me: 1M
+
+# =============================================================================
+# Storage (SQLite)
+# =============================================================================
+storage:
+  local:
+    path: /data/db.sqlite3
+
+# =============================================================================
+# Notifier (filesystem for TOTP codes)
+# =============================================================================
+notifier:
+  filesystem:
+    filename: /data/notification.txt
+
+# =============================================================================
+# Access Control
+# =============================================================================
+access_control:
+  default_policy: two_factor
+  rules:
+    # Authelia portal itself — bypass (it handles its own auth)
+    - domain: auth.cronova.dev
+      policy: bypass
+
+# =============================================================================
+# Regulation (brute-force protection)
+# =============================================================================
+regulation:
+  max_retries: 3
+  find_time: 5m
+  ban_time: 15m
