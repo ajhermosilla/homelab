@@ -52,7 +52,7 @@ services:
   # https://ntfy.sh/
   # =========================================================================
   ntfy:
-    image: binwiederhier/ntfy:v2.8
+    image: binwiederhier/ntfy:v2
     env_file:
       - ../../shared/common.env
     container_name: ntfy
@@ -88,6 +88,7 @@ services:
       - NTFY_BASE_URL=${NTFY_BASE_URL:-https://notify.cronova.dev}
       - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
       - NTFY_BEHIND_PROXY=true
+      - NTFY_AUTH_FILE=/etc/ntfy/user.db
       - NTFY_AUTH_DEFAULT_ACCESS=deny-all
       - NTFY_ENABLE_LOGIN=true
     logging:

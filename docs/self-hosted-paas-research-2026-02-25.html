@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Hosted PaaS Research: Definitive Guide — cronova.dev</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-alt: #1c2333;
+    --bg-code: #0d1117;
+    --border: #30363d;
+    --border-subtle: #21262d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent-cyan: #00d4aa;
+    --accent-teal: #39d2c0;
+    --accent-blue: #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-orange: #d29922;
+    --accent-red: #f85149;
+    --accent-green: #3fb950;
+    --accent-pink: #f778ba;
+    --accent-warm: #da7756;
+    --tier1: #58a6ff;
+    --tier2: #bc8cff;
+    --tier3: #d29922;
+    --tier-oos: #8b949e;
+    --pro-color: #3fb950;
+    --con-color: #f85149;
+    --gradient-hero: linear-gradient(135deg, #0d1117 0%, #0f1923 30%, #111d2b 60%, #0d1117 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--gradient-hero);
+    border-bottom: 1px solid var(--border);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 600px 300px at 30% 50%, rgba(0, 212, 170, 0.07), transparent),
+      radial-gradient(ellipse 500px 250px at 70% 40%, rgba(88, 166, 255, 0.06), transparent),
+      radial-gradient(ellipse 400px 200px at 50% 80%, rgba(188, 140, 255, 0.05), transparent);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+  .hero .subtitle {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+  .hero .tagline {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    max-width: 650px;
+    margin: 0.75rem auto 0;
+    font-style: italic;
+    position: relative;
+  }
+  .hero .accent-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 2rem;
+    height: 3px;
+    max-width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .accent-bar .seg1 { background: var(--accent-cyan); flex: 1; }
+  .accent-bar .seg2 { background: var(--accent-blue); flex: 1; }
+  .accent-bar .seg3 { background: var(--accent-purple); flex: 1; }
+
+  /* ── Container ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .toc h2 {
+    font-size: 1.2rem;
+    color: var(--accent-cyan);
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc-counter;
+    columns: 2;
+    column-gap: 2rem;
+  }
+  .toc ol li {
+    counter-increment: toc-counter;
+    margin-bottom: 0.4rem;
+    break-inside: avoid;
+  }
+  .toc ol li::before {
+    content: counter(toc-counter) ".";
+    color: var(--accent-teal);
+    font-weight: 600;
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .toc a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+  }
+  .toc a:hover {
+    color: var(--accent-cyan);
+  }
+  .toc .sub-items {
+    list-style: none;
+    padding-left: 1.5rem;
+    margin-top: 0.2rem;
+  }
+  .toc .sub-items li {
+    counter-increment: none;
+    margin-bottom: 0.25rem;
+  }
+  .toc .sub-items li::before {
+    content: "- ";
+    color: var(--text-dim);
+  }
+
+  /* ── Section Headers ── */
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin: 3rem 0 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--border);
+  }
+  h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin: 2rem 0 0.75rem;
+  }
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-purple);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  /* ── Horizontal Rule ── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* ── Paragraphs ── */
+  p {
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── Links ── */
+  a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.2s, border-bottom 0.2s;
+    border-bottom: 1px solid transparent;
+  }
+  a:hover {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--accent-cyan);
+  }
+
+  /* ── Platform Cards ── */
+  .platform-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .platform-card:hover {
+    border-color: var(--border-subtle);
+  }
+  .platform-card.tier-1 { border-left: 4px solid var(--tier1); }
+  .platform-card.tier-2 { border-left: 4px solid var(--tier2); }
+  .platform-card.tier-3 { border-left: 4px solid var(--tier3); }
+  .platform-card.tier-oos { border-left: 4px solid var(--tier-oos); }
+
+  .platform-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .platform-card .card-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .platform-card .one-liner {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .platform-card .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem 1.5rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+  }
+  .platform-card .meta-grid .meta-item {
+    color: var(--text-muted);
+  }
+  .platform-card .meta-grid .meta-item strong {
+    color: var(--text);
+  }
+
+  /* ── Tier Badges ── */
+  .tier-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    vertical-align: middle;
+  }
+  .tier-badge.t1 {
+    background: rgba(88, 166, 255, 0.15);
+    color: var(--tier1);
+    border: 1px solid rgba(88, 166, 255, 0.3);
+  }
+  .tier-badge.t2 {
+    background: rgba(188, 140, 255, 0.15);
+    color: var(--tier2);
+    border: 1px solid rgba(188, 140, 255, 0.3);
+  }
+  .tier-badge.t3 {
+    background: rgba(210, 153, 34, 0.15);
+    color: var(--tier3);
+    border: 1px solid rgba(210, 153, 34, 0.3);
+  }
+  .tier-badge.oos {
+    background: rgba(139, 148, 158, 0.15);
+    color: var(--tier-oos);
+    border: 1px solid rgba(139, 148, 158, 0.3);
+  }
+
+  /* ── Tables ── */
+  .table-wrapper {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  thead th {
+    background: var(--bg-card-alt);
+    color: var(--accent-cyan);
+    font-weight: 700;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) {
+    background: rgba(22, 27, 34, 0.5);
+  }
+  tbody tr:nth-child(odd) {
+    background: rgba(13, 17, 23, 0.5);
+  }
+  tbody tr:hover {
+    background: rgba(57, 210, 192, 0.04);
+  }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Master table specific styling */
+  .master-table {
+    border: 2px solid var(--accent-cyan);
+    box-shadow: 0 0 30px rgba(0, 212, 170, 0.05);
+  }
+  .master-table thead th {
+    background: linear-gradient(180deg, #1a2332, #161b22);
+    color: var(--accent-cyan);
+    font-size: 0.8rem;
+    padding: 1rem;
+  }
+  .master-table tbody td {
+    padding: 0.85rem 1rem;
+  }
+  .master-table tbody td:first-child {
+    font-weight: 600;
+    color: var(--accent-blue);
+    white-space: nowrap;
+  }
+
+  /* ── Pros / Cons ── */
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 1rem 0;
+  }
+  .pros-list, .cons-list {
+    background: var(--bg-card-alt);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+  .pros-list {
+    border: 1px solid rgba(63, 185, 80, 0.2);
+  }
+  .cons-list {
+    border: 1px solid rgba(248, 81, 73, 0.2);
+  }
+  .pros-list h4, .cons-list h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .pros-list h4 { color: var(--pro-color); }
+  .cons-list h4 { color: var(--con-color); }
+  .pros-list ul, .cons-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  .pros-list li, .cons-list li {
+    padding: 0.35rem 0;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .pros-list li::before {
+    content: "\2713 ";
+    color: var(--pro-color);
+    font-weight: 700;
+    margin-right: 0.4rem;
+  }
+  .cons-list li::before {
+    content: "\2717 ";
+    color: var(--con-color);
+    font-weight: 700;
+    margin-right: 0.4rem;
+  }
+
+  /* ── Blockquotes (community quotes) ── */
+  blockquote {
+    background: var(--bg-card);
+    border-left: 4px solid var(--accent-purple);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  blockquote strong {
+    color: var(--text);
+  }
+
+  .community-quotes {
+    margin: 1rem 0;
+  }
+  .community-quotes blockquote {
+    margin: 0.75rem 0;
+  }
+  .quote-source {
+    color: var(--text-dim);
+    font-style: normal;
+    font-size: 0.85rem;
+  }
+
+  /* ── Code ── */
+  code {
+    background: var(--bg-code);
+    color: var(--accent-teal);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.88em;
+    border: 1px solid var(--border-subtle);
+  }
+
+  /* ── Lists ── */
+  ul, ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  li {
+    margin-bottom: 0.3rem;
+    color: var(--text);
+  }
+
+  /* ── Context Callout ── */
+  .callout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent-cyan);
+    border-radius: 0 8px 8px 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  .callout strong {
+    color: var(--accent-cyan);
+  }
+
+  /* ── Recommendation Card ── */
+  .recommendation {
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.05), rgba(88, 166, 255, 0.03));
+    border: 1px solid rgba(0, 212, 170, 0.25);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+  .recommendation h3 {
+    color: var(--accent-cyan);
+    margin-top: 0;
+  }
+  .recommendation.runner-up {
+    background: linear-gradient(135deg, rgba(188, 140, 255, 0.05), rgba(88, 166, 255, 0.03));
+    border-color: rgba(188, 140, 255, 0.25);
+  }
+  .recommendation.runner-up h3 {
+    color: var(--accent-purple);
+  }
+  .recommendation.honorable {
+    background: linear-gradient(135deg, rgba(210, 153, 34, 0.05), rgba(218, 119, 86, 0.03));
+    border-color: rgba(210, 153, 34, 0.25);
+  }
+  .recommendation.honorable h3 {
+    color: var(--accent-orange);
+  }
+  .recommendation.watching {
+    background: linear-gradient(135deg, rgba(88, 166, 255, 0.04), rgba(139, 148, 158, 0.03));
+    border-color: rgba(88, 166, 255, 0.2);
+  }
+
+  /* ── Decision Framework ── */
+  .decision-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    transition: border-color 0.2s;
+  }
+  .decision-card:hover {
+    border-color: var(--accent-teal);
+  }
+  .decision-card h4 {
+    color: var(--accent-teal);
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+  }
+  .decision-card p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .decision-card p strong {
+    color: var(--accent-blue);
+  }
+
+  /* ── Feature List (key features, resource reqs) ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .feature-box {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+  .feature-box h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.95rem;
+  }
+  .feature-box ul {
+    padding-left: 1.25rem;
+    margin: 0;
+  }
+  .feature-box li {
+    font-size: 0.92rem;
+    margin-bottom: 0.25rem;
+  }
+
+  /* ── Resource Req Inline ── */
+  .resource-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .resource-stat {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+  .resource-stat strong {
+    color: var(--accent-teal);
+  }
+
+  /* ── Source Lists ── */
+  .sources-section h3 {
+    color: var(--accent-blue);
+    font-size: 1.15rem;
+    margin: 1.5rem 0 0.75rem;
+  }
+  .sources-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  .sources-section li {
+    padding: 0.4rem 0;
+    font-size: 0.92rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .sources-section li:last-child {
+    border-bottom: none;
+  }
+  .sources-section a {
+    color: var(--accent-blue);
+  }
+
+  /* ── Note/Footnote ── */
+  .footnote {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Best For Banner ── */
+  .best-for {
+    background: rgba(0, 212, 170, 0.05);
+    border: 1px solid rgba(0, 212, 170, 0.15);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .best-for strong {
+    color: var(--accent-cyan);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-top: 3rem;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .hero { padding: 3rem 1.5rem 2.5rem; }
+    .hero h1 { font-size: 1.8rem; }
+    .container { padding: 1.5rem 1rem; }
+    .toc ol { columns: 1; }
+    .pros-cons { grid-template-columns: 1fr; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .platform-card { padding: 1.5rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.2rem; }
+    .resource-stats { flex-direction: column; }
+  }
+
+  /* ── Print ── */
+  @media print {
+    :root {
+      --bg: #ffffff;
+      --bg-card: #f6f8fa;
+      --bg-card-alt: #f0f2f5;
+      --bg-code: #f6f8fa;
+      --border: #d0d7de;
+      --border-subtle: #e1e4e8;
+      --text: #1f2328;
+      --text-muted: #57606a;
+      --text-dim: #6e7781;
+      --accent-cyan: #0969da;
+      --accent-teal: #0969da;
+      --accent-blue: #0550ae;
+      --accent-purple: #6639ba;
+      --accent-orange: #9a6700;
+      --accent-red: #cf222e;
+      --accent-green: #1a7f37;
+      --tier1: #0550ae;
+      --tier2: #6639ba;
+      --tier3: #9a6700;
+      --tier-oos: #57606a;
+      --pro-color: #1a7f37;
+      --con-color: #cf222e;
+    }
+    body { font-size: 11pt; line-height: 1.5; }
+    .hero {
+      background: none;
+      border-bottom: 2px solid #d0d7de;
+      padding: 2rem 0;
+    }
+    .hero::before { display: none; }
+    .hero h1 {
+      -webkit-text-fill-color: #0550ae;
+      background: none;
+      font-size: 2rem;
+    }
+    .accent-bar { display: none; }
+    .platform-card { break-inside: avoid; page-break-inside: avoid; }
+    .table-wrapper { overflow: visible; }
+    a { color: #0550ae; border-bottom: none; }
+    a::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #57606a; }
+    a[href^="#"]::after { content: ""; }
+    .toc { break-inside: avoid; }
+    .master-table { border-color: #0969da; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<div class="hero">
+  <h1>Self-Hosted PaaS Research</h1>
+  <div class="subtitle">Definitive Guide &mdash; February 2026</div>
+  <div class="tagline">Comparing 13 platforms for deploying web apps on a homelab Docker VM with 9GB RAM and 2 cores on Proxmox.</div>
+  <div class="accent-bar">
+    <div class="seg1"></div>
+    <div class="seg2"></div>
+    <div class="seg3"></div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════ TOC ═══════════════════════════════ -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#executive-summary">Executive Summary</a></li>
+    <li><a href="#tier-classification">Tier Classification</a></li>
+    <li><a href="#master-comparison-table">Master Comparison Table</a></li>
+    <li><a href="#tier-1-full-paas-platforms">Tier 1: Full PaaS Platforms</a>
+      <ul class="sub-items">
+        <li><a href="#coolify">Coolify</a></li>
+        <li><a href="#dokploy">Dokploy</a></li>
+        <li><a href="#caprover">CapRover</a></li>
+        <li><a href="#dokku">Dokku</a></li>
+        <li><a href="#easypanel">Easypanel</a></li>
+        <li><a href="#cloudron">Cloudron</a></li>
+      </ul>
+    </li>
+    <li><a href="#tier-2-deploy-tools">Tier 2: Deploy Tools</a>
+      <ul class="sub-items">
+        <li><a href="#kamal">Kamal</a></li>
+        <li><a href="#komodo">Komodo</a></li>
+        <li><a href="#haloy">Haloy</a></li>
+      </ul>
+    </li>
+    <li><a href="#tier-3-docker-management">Tier 3: Docker Management</a>
+      <ul class="sub-items">
+        <li><a href="#portainer">Portainer</a></li>
+        <li><a href="#dockge">Dockge</a></li>
+      </ul>
+    </li>
+    <li><a href="#out-of-scope">Out of Scope</a>
+      <ul class="sub-items">
+        <li><a href="#sealos">Sealos</a></li>
+        <li><a href="#pockethost">PocketHost</a></li>
+      </ul>
+    </li>
+    <li><a href="#resource-footprint-analysis">Resource Footprint Analysis</a></li>
+    <li><a href="#decision-framework">Decision Framework for Your Homelab</a></li>
+    <li><a href="#final-recommendation">Final Recommendation</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ol>
+</nav>
+
+<!-- ═══════════════════════════════ EXECUTIVE SUMMARY ═══════════════════════════════ -->
+<h2 id="executive-summary">Executive Summary</h2>
+
+<p>The self-hosted PaaS landscape in 2026 is mature and competitive. <strong>Coolify</strong> has emerged as the community favorite with 51k+ GitHub stars and the most feature-rich offering, though it carries notable security baggage (11 CVEs disclosed in January 2026). <strong>Dokploy</strong> is the fast-rising challenger with a cleaner UI and Docker Swarm native support. <strong>Dokku</strong> remains the lightweight veteran for CLI-first developers. <strong>Kamal</strong> (from 37signals) is the minimalist's dream but requires more manual infrastructure management.</p>
+
+<p>For a homelab with 9GB RAM already running multiple services (Frigate, Home Assistant, Pi-hole, Caddy, Vaultwarden, Mosquitto), the key constraint is <strong>available RAM after existing services</strong>. A full PaaS like Coolify or Dokploy will consume 250&ndash;400MB at idle before deploying any apps. Dokku uses only ~95MB. The choice depends on whether you value a web UI or prefer CLI workflows.</p>
+
+<hr>
+
+<!-- ═══════════════════════════════ TIER CLASSIFICATION ═══════════════════════════════ -->
+<h2 id="tier-classification">Tier Classification</h2>
+
+<h3>Tier 1: Full PaaS (Heroku-like) <span class="tier-badge t1">Tier 1</span></h3>
+<p>Git-push deploy, managed databases, web UI, SSL automation, monitoring, one-click app templates.</p>
+
+<div class="table-wrapper">
+<table>
+  <thead>
+    <tr><th>Platform</th><th>Maturity</th><th>Stars</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Coolify</td><td>High</td><td>51k</td></tr>
+    <tr><td>Dokploy</td><td>Medium</td><td>28k</td></tr>
+    <tr><td>CapRover</td><td>High</td><td>14k</td></tr>
+    <tr><td>Dokku</td><td>Very High</td><td>32k</td></tr>
+    <tr><td>Easypanel</td><td>Medium</td><td>N/A (proprietary core)</td></tr>
+    <tr><td>Cloudron</td><td>High</td><td>N/A (proprietary, paid)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Tier 2: Deploy Tools <span class="tier-badge t2">Tier 2</span></h3>
+<p>Focused on getting containers to servers. No built-in DB management, minimal UI.</p>
+
+<div class="table-wrapper">
+<table>
+  <thead>
+    <tr><th>Platform</th><th>Maturity</th><th>Stars</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Kamal</td><td>High</td><td>11k+</td></tr>
+    <tr><td>Komodo</td><td>Medium</td><td>10k</td></tr>
+    <tr><td>Haloy</td><td>Low</td><td>New</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Tier 3: Docker Management <span class="tier-badge t3">Tier 3</span></h3>
+<p>GUI for managing existing Docker containers. Not a deploy pipeline.</p>
+
+<div class="table-wrapper">
+<table>
+  <thead>
+    <tr><th>Platform</th><th>Maturity</th><th>Stars</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Portainer</td><td>Very High</td><td>32k+</td></tr>
+    <tr><td>Dockge</td><td>Medium</td><td>22k</td></tr>
+  </tbody>
+</table>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ MASTER COMPARISON TABLE ═══════════════════════════════ -->
+<h2 id="master-comparison-table">Master Comparison Table</h2>
+
+<div class="table-wrapper master-table">
+<table>
+  <thead>
+    <tr>
+      <th>Platform</th>
+      <th>Type</th>
+      <th>Min RAM</th>
+      <th>Idle RAM</th>
+      <th>Git Deploy</th>
+      <th>Auto SSL</th>
+      <th>DB Mgmt</th>
+      <th>Web UI</th>
+      <th>GitHub Stars</th>
+      <th>Best For</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Coolify</strong></td>
+      <td>Full PaaS</td>
+      <td>2 GB</td>
+      <td>~380 MB</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>51k</td>
+      <td>Feature-hungry teams</td>
+    </tr>
+    <tr>
+      <td><strong>Dokploy</strong></td>
+      <td>Full PaaS</td>
+      <td>2 GB (4 rec.)</td>
+      <td>~300 MB</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>28k</td>
+      <td>Clean UI + Docker Swarm</td>
+    </tr>
+    <tr>
+      <td><strong>CapRover</strong></td>
+      <td>Full PaaS</td>
+      <td>1 GB</td>
+      <td>~210 MB</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Basic</td>
+      <td>Yes</td>
+      <td>14k</td>
+      <td>Simple + lightweight PaaS</td>
+    </tr>
+    <tr>
+      <td><strong>Dokku</strong></td>
+      <td>Full PaaS</td>
+      <td>1 GB</td>
+      <td>~95 MB</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Via plugins</td>
+      <td>CLI only</td>
+      <td>32k</td>
+      <td>CLI-first minimalists</td>
+    </tr>
+    <tr>
+      <td><strong>Easypanel</strong></td>
+      <td>Full PaaS</td>
+      <td>1 GB est.</td>
+      <td>Unknown</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Proprietary</td>
+      <td>Non-technical users</td>
+    </tr>
+    <tr>
+      <td><strong>Cloudron</strong></td>
+      <td>Full PaaS</td>
+      <td>2 GB</td>
+      <td>~500 MB</td>
+      <td>No (app store)</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Proprietary</td>
+      <td>Managed app hosting</td>
+    </tr>
+    <tr>
+      <td><strong>Kamal</strong></td>
+      <td>Deploy tool</td>
+      <td>2 GB</td>
+      <td>~0 MB*</td>
+      <td>Via CI/CD</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>11k+</td>
+      <td>Rails/Docker minimalists</td>
+    </tr>
+    <tr>
+      <td><strong>Komodo</strong></td>
+      <td>Deploy tool</td>
+      <td>1 GB est.</td>
+      <td>Low (Rust)</td>
+      <td>Webhook</td>
+      <td>No**</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>10k</td>
+      <td>Multi-server orchestration</td>
+    </tr>
+    <tr>
+      <td><strong>Haloy</strong></td>
+      <td>Deploy tool</td>
+      <td>512 MB est.</td>
+      <td>Low (Go)</td>
+      <td>No (CLI push)</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td>No</td>
+      <td>New</td>
+      <td>Indie devs, CLI-first</td>
+    </tr>
+    <tr>
+      <td><strong>Portainer</strong></td>
+      <td>Docker mgmt</td>
+      <td>512 MB</td>
+      <td>~100 MB</td>
+      <td>Webhooks</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>32k+</td>
+      <td>Docker beginners</td>
+    </tr>
+    <tr>
+      <td><strong>Dockge</strong></td>
+      <td>Docker mgmt</td>
+      <td>256 MB</td>
+      <td>~50 MB</td>
+      <td>No</td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes</td>
+      <td>22k</td>
+      <td>Compose file management</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p class="footnote">* Kamal runs nothing on server except your app + kamal-proxy (~10MB)<br>
+** Komodo requires external reverse proxy for HTTPS</p>
+
+<hr>
+
+<!-- ═══════════════════════════════ TIER 1 ═══════════════════════════════ -->
+<h2 id="tier-1-full-paas-platforms">Tier 1: Full PaaS Platforms <span class="tier-badge t1">Tier 1</span></h2>
+
+<!-- ──────────── COOLIFY ──────────── -->
+<div class="platform-card tier-1" id="coolify">
+  <div class="card-header">
+    <h3>1. Coolify</h3>
+    <span class="tier-badge t1">Tier 1</span>
+  </div>
+  <p class="one-liner">The most feature-rich self-hosted PaaS alternative to Vercel/Heroku/Netlify, with 280+ one-click services.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://coolify.io">coolify.io</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/coollabsio/coolify">coollabsio/coolify</a> &mdash; 51k stars</div>
+    <div class="meta-item"><strong>License:</strong> Apache 2.0 (fully open source)</div>
+    <div class="meta-item"><strong>Latest:</strong> v4.0.0-beta.463 (Feb 2026)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> PHP (Laravel), Traefik reverse proxy</li>
+    <li><strong>Database:</strong> PostgreSQL (internal)</li>
+    <li><strong>Multi-server:</strong> Docker Swarm-based, SSH connections to remote servers</li>
+    <li><strong>Build:</strong> Nixpacks, Dockerfiles, Docker Compose, Buildpacks</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Git push deploy from GitHub, GitLab, Bitbucket, Gitea</li>
+        <li>280+ one-click service templates (Supabase, Plausible, n8n, etc.)</li>
+        <li>Full Docker Compose stack support (unique among PaaS tools)</li>
+        <li>Managed databases with automated S3 backups</li>
+        <li>Preview deployments for pull requests (GitHub App integration)</li>
+        <li>Integrated Grafana monitoring</li>
+        <li>Multi-server management from single panel</li>
+        <li>Let's Encrypt automatic SSL</li>
+        <li>Webhook and API support</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> 2 vCPU, 2 GB RAM, 30 GB disk</li>
+        <li><strong>Recommended:</strong> 4 vCPU, 4 GB RAM, 40 GB+ disk</li>
+        <li><strong>Idle RAM:</strong> ~380 MB</li>
+        <li><strong>Disk footprint:</strong> ~1.2 GB</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Static sites, Node.js, Python, Go, Rust, PHP, Ruby, Java &mdash; anything with a Dockerfile or buildpack. Full Docker Compose stacks.</p>
+    </div>
+  </div>
+
+  <h4>Community</h4>
+  <ul>
+    <li>51,000+ GitHub stars (largest in category)</li>
+    <li>Very active development (multiple releases per week)</li>
+    <li>Large Discord community</li>
+    <li>Extensive video guides and LLM-optimized documentation</li>
+  </ul>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Most feature-rich option by far</li>
+        <li>Docker Compose support is a killer feature (deploy multi-container stacks)</li>
+        <li>Beautiful, modern web UI</li>
+        <li>Massive one-click app library</li>
+        <li>Active development with rapid iteration</li>
+        <li>Apache 2.0 license &mdash; truly open source</li>
+        <li>Preview deployments for PRs (Vercel-like workflow)</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li><strong>SECURITY:</strong> 11 critical CVEs (CVSS up to 10.0) disclosed January 2026, exposing 52,000+ instances to RCE and auth bypass. Patched quickly but reveals code quality concerns.</li>
+        <li>Highest resource consumption among PaaS options (~380 MB idle)</li>
+        <li>Web UI can feel clunky for complex setups</li>
+        <li>Docker Swarm scaling limitations (no Kubernetes migration path)</li>
+        <li>Database restores require manual SSH commands</li>
+        <li>Multi-server load balancing needs manual configuration</li>
+        <li>Frequent beta releases can introduce regressions (Docker layer caching bug in v432)</li>
+        <li>Still technically in "beta" (v4.0.0-beta.xxx)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Teams or solo developers who want a Vercel/Heroku-like experience with maximum features and don't mind the resource overhead. Ideal if you want to deploy full-stack apps, manage databases, and run one-click services all from one panel.
+  </div>
+
+  <div class="community-quotes">
+    <h4>Community Quotes</h4>
+    <blockquote>&ldquo;Coolify is basically a self-hosted Vercel/Netlify/Heroku that actually works&rdquo; <span class="quote-source">&mdash; r/selfhosted</span></blockquote>
+    <blockquote>&ldquo;Docker Compose support is a game-changer &mdash; unlike CapRover and Dokku, Coolify can deploy entire Docker Compose stacks&rdquo; <span class="quote-source">&mdash; selfhostable.dev</span></blockquote>
+    <blockquote>&ldquo;For most people in 2026, Coolify is the best choice. It's the most feature-rich, actively developed, and beginner-friendly&rdquo; <span class="quote-source">&mdash; community consensus</span></blockquote>
+    <blockquote>&ldquo;Coolify can be a good thing if you really want too much functionality &mdash; it has some bugs still&rdquo; <span class="quote-source">&mdash; Reddit user</span></blockquote>
+  </div>
+</div>
+
+<!-- ──────────── DOKPLOY ──────────── -->
+<div class="platform-card tier-1" id="dokploy">
+  <div class="card-header">
+    <h3>2. Dokploy</h3>
+    <span class="tier-badge t1">Tier 1</span>
+  </div>
+  <p class="one-liner">A cleaner, Docker-native PaaS alternative to Coolify with built-in Docker Swarm support and Traefik integration.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://dokploy.com">dokploy.com</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/Dokploy/dokploy">Dokploy/dokploy</a> &mdash; 28k stars</div>
+    <div class="meta-item"><strong>License:</strong> Apache 2.0 (with commercial restrictions &mdash; effectively source-available)</div>
+    <div class="meta-item"><strong>Latest:</strong> v0.25.0 (2026)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> TypeScript (Next.js)</li>
+    <li><strong>Database:</strong> PostgreSQL (internal) + Redis (deployment queue)</li>
+    <li><strong>Reverse proxy:</strong> Traefik (auto-configured with dynamic routing)</li>
+    <li><strong>Multi-server:</strong> Native Docker Swarm mesh networking</li>
+    <li><strong>Build:</strong> Nixpacks, Heroku Buildpacks, Paketo Buildpacks, Dockerfiles</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Clean, modern UI (widely praised as superior to Coolify's)</li>
+        <li>350+ one-click templates</li>
+        <li>Native Docker Swarm multi-server clustering (no manual load balancer config)</li>
+        <li>Real-time monitoring (CPU, memory, storage, network per resource)</li>
+        <li>Well-documented Swagger/OpenAPI specs</li>
+        <li>Multiple git provider support (GitHub, GitLab, Bitbucket)</li>
+        <li>Docker Compose deployment support</li>
+        <li>Traefik file editor for advanced routing</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> 2 vCPU, 2 GB RAM (4 GB recommended), 30 GB disk</li>
+        <li><strong>Recommended:</strong> 4 vCPU, 8 GB RAM, 40 GB+ disk</li>
+        <li><strong>Idle RAM (UI only):</strong> ~250 MB</li>
+        <li><strong>Idle RAM (with apps):</strong> ~300 MB+</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Same breadth as Coolify &mdash; any Docker-compatible app, static sites, databases. Multiple build method support.</p>
+    </div>
+  </div>
+
+  <h4>Community</h4>
+  <ul>
+    <li>28,000+ GitHub stars (growing fast)</li>
+    <li>200+ contributors</li>
+    <li>6M+ Docker Hub downloads</li>
+    <li>Active Discord community</li>
+  </ul>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Cleaner, more intuitive UI than Coolify</li>
+        <li>Docker Swarm clustering works out of the box (Traefik auto-discovers services)</li>
+        <li>Strong monitoring built in</li>
+        <li>Well-documented API</li>
+        <li>Faster-growing community momentum</li>
+        <li>Official MCP server for AI integration (67 tools)</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li>Licensing is murky &mdash; "Apache 2.0" but with restrictions on commercial use (effectively source-available)</li>
+        <li>Younger project with less battle-testing than Coolify</li>
+        <li>No preview deployments for pull requests</li>
+        <li>Fewer community resources, tutorials, and video guides</li>
+        <li>Similar resource overhead to Coolify</li>
+        <li>Smaller one-click template library (though 350+ is still substantial)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Developers who want a PaaS experience with a cleaner interface and value Docker Swarm native support. Good for teams wanting multi-server clustering without manual configuration.
+  </div>
+
+  <div class="community-quotes">
+    <h4>Community Quotes</h4>
+    <blockquote>&ldquo;I chose Dokploy for its modern UI, simplicity without sacrificing power, and active development&rdquo; <span class="quote-source">&mdash; Medium blog post</span></blockquote>
+    <blockquote>&ldquo;Dokploy shines with its modern, Docker-centric approach, superior monitoring capabilities, and better built-in scaling features&rdquo; <span class="quote-source">&mdash; Cherry Servers</span></blockquote>
+    <blockquote>&ldquo;Many users use Dokploy for critical production applications and Coolify for auxiliary services&rdquo; <span class="quote-source">&mdash; INTROSERV blog</span></blockquote>
+    <blockquote>&ldquo;Dokploy is a lighter and younger alternative with a fast UI and an active development team&rdquo; <span class="quote-source">&mdash; comparison review</span></blockquote>
+  </div>
+</div>
+
+<!-- ──────────── CAPROVER ──────────── -->
+<div class="platform-card tier-1" id="caprover">
+  <div class="card-header">
+    <h3>3. CapRover</h3>
+    <span class="tier-badge t1">Tier 1</span>
+  </div>
+  <p class="one-liner">A lightweight, battle-tested PaaS that sits between Coolify's feature-richness and Dokku's minimalism.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://caprover.com">caprover.com</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/caprover/caprover">caprover/caprover</a> &mdash; 14k stars</div>
+    <div class="meta-item"><strong>License:</strong> Apache 2.0</div>
+    <div class="meta-item"><strong>Originally:</strong> CaptainDuckDuck (since 2017)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> Node.js</li>
+    <li><strong>Reverse proxy:</strong> Nginx (auto-configured)</li>
+    <li><strong>Monitoring:</strong> NetData (built-in)</li>
+    <li><strong>Multi-server:</strong> Docker Swarm clustering</li>
+    <li><strong>Build:</strong> Captain file templates, Dockerfiles (limited Docker Compose support)</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Web dashboard + CLI tools</li>
+        <li>50+ one-click app templates</li>
+        <li>Docker Swarm cluster support</li>
+        <li>Automatic Let's Encrypt SSL</li>
+        <li>Custom Nginx configuration per app</li>
+        <li>In-place upgrades from web UI</li>
+        <li>NetData monitoring integration</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> 1 GB RAM</li>
+        <li><strong>Idle RAM:</strong> ~210 MB</li>
+        <li><strong>Disk footprint:</strong> ~800 MB</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Node.js, Python, PHP, Ruby, Go, Java, .NET, static sites, Docker images.</p>
+    </div>
+  </div>
+
+  <h4>Community</h4>
+  <ul>
+    <li>14,000 GitHub stars</li>
+    <li>Stable, mature community since 2017</li>
+    <li>Good documentation</li>
+    <li>Active but slower development pace than Coolify/Dokploy</li>
+  </ul>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Lighter resource footprint than Coolify (~210 MB vs ~380 MB)</li>
+        <li>Stable and mature (8 years of development)</li>
+        <li>Good web UI without being heavyweight</li>
+        <li>Docker Swarm clustering works well</li>
+        <li>Free and truly open source</li>
+        <li>In-place upgrades are trivial</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li><strong>No Docker Compose support</strong> (only subselection of Docker Compose parameters)</li>
+        <li>UI feels dated compared to Coolify and Dokploy</li>
+        <li>Less actively developed (slower release cadence)</li>
+        <li>Smaller and shrinking community (relative to Coolify/Dokploy)</li>
+        <li>Custom "Captain file" format adds learning overhead</li>
+        <li>Single-container limitation per app (no multi-container stacks)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Users who want a visual PaaS that's lighter than Coolify but more than Dokku. Good for teams managing simple containerized apps where Docker Compose support isn't needed.
+  </div>
+
+  <div class="community-quotes">
+    <h4>Community Quotes</h4>
+    <blockquote>&ldquo;I prefer CapRover because it does everything I need and is lighter weight than Coolify and has a GUI (unlike Dokku)&rdquo; <span class="quote-source">&mdash; Reddit user</span></blockquote>
+    <blockquote>&ldquo;CapRover works well if you like control and don't mind a bit of server work&rdquo; <span class="quote-source">&mdash; r/selfhosted</span></blockquote>
+    <blockquote>&ldquo;CapRover sits nicely between Coolify's feature-richness and Dokku's minimalism&rdquo; <span class="quote-source">&mdash; selfhostable.dev</span></blockquote>
+  </div>
+</div>
+
+<!-- ──────────── DOKKU ──────────── -->
+<div class="platform-card tier-1" id="dokku">
+  <div class="card-header">
+    <h3>4. Dokku</h3>
+    <span class="tier-badge t1">Tier 1</span>
+  </div>
+  <p class="one-liner">The original "mini Heroku" &mdash; a CLI-only, ultra-lightweight PaaS with 13 years of rock-solid stability.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://dokku.com">dokku.com</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/dokku/dokku">dokku/dokku</a> &mdash; 32k stars</div>
+    <div class="meta-item"><strong>License:</strong> MIT</div>
+    <div class="meta-item"><strong>Latest:</strong> v0.36.11 (2026) &mdash; <strong>Since:</strong> 2013</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> Go (rewritten from original Bash)</li>
+    <li><strong>Reverse proxy:</strong> Nginx (default), Caddy, or Traefik options</li>
+    <li><strong>Build:</strong> Heroku Buildpacks, Dockerfiles, Docker images</li>
+    <li><strong>Multi-server:</strong> Single server only (by design)</li>
+    <li><strong>Plugins:</strong> Extensive plugin ecosystem</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li><code>git push dokku main</code> deployment workflow (identical to Heroku)</li>
+        <li>Heroku-compatible buildpacks (no Dockerfile needed for most languages)</li>
+        <li>Plugin ecosystem: PostgreSQL, Redis, MongoDB, MariaDB, Elasticsearch, etc.</li>
+        <li>Automatic Let's Encrypt SSL (via plugin)</li>
+        <li>Multiple reverse proxy options</li>
+        <li>Process scaling per app</li>
+        <li>Zero-downtime deploys</li>
+        <li>Cron job scheduling</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> 1 GB RAM</li>
+        <li><strong>Idle RAM:</strong> ~95 MB (lowest of all PaaS options)</li>
+        <li><strong>Disk footprint:</strong> ~300 MB</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Any language supported by Heroku buildpacks (Node.js, Python, Ruby, Go, Java, PHP, Scala, Clojure) plus anything with a Dockerfile.</p>
+    </div>
+  </div>
+
+  <h4>Community</h4>
+  <ul>
+    <li>32,000 GitHub stars</li>
+    <li>13 years of development (most mature option)</li>
+    <li>Excellent, comprehensive documentation (among best in the space)</li>
+    <li>Rich plugin ecosystem</li>
+  </ul>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li><strong>Lowest resource usage</strong> &mdash; only ~95MB idle, ~300MB disk</li>
+        <li>Rock-solid stability from 13 years of development</li>
+        <li><code>git push</code> workflow is simple and elegant</li>
+        <li>Heroku buildpacks mean no Dockerfile knowledge needed</li>
+        <li>Excellent documentation</li>
+        <li>MIT license (most permissive)</li>
+        <li>Flexible reverse proxy choice (Nginx/Caddy/Traefik)</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li><strong>CLI only</strong> &mdash; no web UI whatsoever</li>
+        <li><strong>Single-server only</strong> &mdash; no multi-server, no clustering</li>
+        <li>No multi-user support or RBAC</li>
+        <li>Database management requires separate plugins</li>
+        <li>Plugin quality varies</li>
+        <li>No built-in monitoring</li>
+        <li>No Docker Compose support for deployments</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Solo developers, side projects, and small production workloads where resource efficiency matters. Perfect for someone running multiple apps on a RAM-constrained VM who prefers CLI workflows.
+  </div>
+
+  <div class="community-quotes">
+    <h4>Community Quotes</h4>
+    <blockquote>&ldquo;Dokku is the lightest and cheapest in terms of resource usage&rdquo; <span class="quote-source">&mdash; selfhostable.dev</span></blockquote>
+    <blockquote>&ldquo;Dokku is the veteran of this list, first released in 2013. It's a mini Heroku that gives you git-push deployments on a single server&rdquo; <span class="quote-source">&mdash; Haloy blog</span></blockquote>
+    <blockquote>&ldquo;Rock solid stability from long development history&rdquo; <span class="quote-source">&mdash; comparison review</span></blockquote>
+    <blockquote>&ldquo;If you're an advanced developer who values full control and lightweight deployment, choose Dokku&rdquo; <span class="quote-source">&mdash; EgyVps</span></blockquote>
+  </div>
+</div>
+
+<!-- ──────────── EASYPANEL ──────────── -->
+<div class="platform-card tier-1" id="easypanel">
+  <div class="card-header">
+    <h3>5. Easypanel</h3>
+    <span class="tier-badge t1">Tier 1</span>
+  </div>
+  <p class="one-liner">A modern, beginner-friendly server control panel with Docker under the hood, positioned as a simpler alternative to Coolify.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://easypanel.io">easypanel.io</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/easypanel-io">easypanel-io</a> (templates are open source; core is proprietary)</div>
+    <div class="meta-item"><strong>License:</strong> Proprietary (free "Developer Edition" available)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> Proprietary</li>
+    <li><strong>Build:</strong> Cloud Native Buildpacks</li>
+    <li><strong>Reverse proxy:</strong> Traefik</li>
+    <li><strong>Database:</strong> Built-in support for MySQL, PostgreSQL, MongoDB, Redis</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>One-click app templates</li>
+        <li>Automatic Let's Encrypt SSL</li>
+        <li>GitHub/GitLab/Bitbucket CI/CD integration</li>
+        <li>Built-in database management</li>
+        <li>Clean, modern UI designed for simplicity</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> ~1 GB RAM (estimated)</li>
+        <li><strong>Recommended:</strong> 2 GB+ RAM</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Node.js, Ruby, Python, PHP, Go, Java, Docker images, static sites.</p>
+    </div>
+  </div>
+
+  <h4>Community</h4>
+  <ul>
+    <li>Proprietary core &mdash; limited community contributions</li>
+    <li>Growing user base among VPS operators</li>
+  </ul>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Very clean, intuitive UI</li>
+        <li>Good one-click templates</li>
+        <li>Free developer edition</li>
+        <li>Low learning curve</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li><strong>Proprietary core</strong> &mdash; not truly open source</li>
+        <li>Limited community contributions and transparency</li>
+        <li>Paid tiers for advanced features</li>
+        <li>Smaller ecosystem than Coolify/Dokploy</li>
+        <li>Less flexibility for power users</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Non-technical users or beginners who want the simplest possible PaaS experience and don't mind proprietary software.
+  </div>
+</div>
+
+<!-- ──────────── CLOUDRON ──────────── -->
+<div class="platform-card tier-1" id="cloudron">
+  <div class="card-header">
+    <h3>6. Cloudron</h3>
+    <span class="tier-badge t1">Tier 1</span>
+  </div>
+  <p class="one-liner">A polished, all-in-one server app store with automatic updates, backups, user management, and email &mdash; but it costs money.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://www.cloudron.io">cloudron.io</a></div>
+    <div class="meta-item"><strong>License:</strong> Proprietary (paid)</div>
+    <div class="meta-item"><strong>Pricing:</strong> Free (2 apps, 2 users), Hobbyist ($15/mo), Standard ($30/mo), Premium ($90/mo)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> Proprietary</li>
+    <li><strong>App model:</strong> Curated app packages (not raw Docker)</li>
+    <li><strong>Updates:</strong> Fully automated</li>
+    <li><strong>Backups:</strong> Automated to S3, Google Cloud, etc.</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>App store model &mdash; install apps like WordPress, Nextcloud, GitLab with one click</li>
+        <li>Fully automated updates and security patches</li>
+        <li>Built-in email server</li>
+        <li>User management with SSO</li>
+        <li>Automated backup and restore</li>
+        <li>DNS management</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> 2 GB RAM</li>
+        <li><strong>Idle RAM:</strong> ~500 MB (heaviest of all options)</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Only apps that have been packaged for Cloudron. Limited to the curated catalog.</p>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Most "hands-off" option &mdash; updates, backups, and security are automatic</li>
+        <li>Excellent for non-developers who want to run standard apps</li>
+        <li>Built-in email server is unique</li>
+        <li>User management and SSO built in</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li><strong>Not free</strong> &mdash; $15&ndash;90/month</li>
+        <li><strong>Not open source</strong></li>
+        <li>Only curated apps (can't deploy arbitrary code)</li>
+        <li>No git push deploy workflow</li>
+        <li>Not a developer PaaS &mdash; more of a server app store</li>
+        <li>Highest idle RAM (~500 MB)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Non-technical users who want to run standard self-hosted apps (Nextcloud, WordPress, email) with zero maintenance. Not suitable as a developer PaaS.
+  </div>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ TIER 2 ═══════════════════════════════ -->
+<h2 id="tier-2-deploy-tools">Tier 2: Deploy Tools <span class="tier-badge t2">Tier 2</span></h2>
+
+<!-- ──────────── KAMAL ──────────── -->
+<div class="platform-card tier-2" id="kamal">
+  <div class="card-header">
+    <h3>7. Kamal</h3>
+    <span class="tier-badge t2">Tier 2</span>
+  </div>
+  <p class="one-liner">37signals' zero-overhead deployment tool that uses Docker and SSH to deploy containers with zero-downtime swaps.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://kamal-deploy.org">kamal-deploy.org</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/basecamp/kamal">basecamp/kamal</a> &mdash; 11k+ stars</div>
+    <div class="meta-item"><strong>License:</strong> MIT</div>
+    <div class="meta-item"><strong>From:</strong> 37signals (makers of Basecamp, HEY) &mdash; <strong>Latest:</strong> Kamal 2.x (2025)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> Ruby gem (CLI tool)</li>
+    <li><strong>On-server:</strong> Only your app container + kamal-proxy (~10MB binary)</li>
+    <li><strong>Reverse proxy:</strong> kamal-proxy (custom, built-in, handles SSL via Let's Encrypt)</li>
+    <li><strong>Deploys via:</strong> SSH (pulls Docker images from a registry)</li>
+    <li><strong>Requires:</strong> Docker registry (Docker Hub, GHCR, etc.)</li>
+    <li><strong>No daemon:</strong> Nothing runs on server except your app</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Zero-downtime rolling deploys</li>
+        <li>Automatic SSL via Let's Encrypt (kamal-proxy)</li>
+        <li>Multi-server deployments</li>
+        <li>Canary deployments</li>
+        <li>Rolling restarts</li>
+        <li>Maintenance mode</li>
+        <li>Accessory services (Redis, databases alongside app)</li>
+        <li>Secrets management (from 1Password, Bitwarden, LastPass, etc.)</li>
+        <li>Environment variable management</li>
+        <li>Bundled with Rails 8 as default deploy method</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> 2 GB RAM recommended</li>
+        <li><strong>Server overhead:</strong> ~0 MB (only kamal-proxy, ~10MB binary)</li>
+        <li><strong>Build:</strong> Local machine or CI server (not on deploy target)</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Any Docker container. Originally designed for Rails but works with any language that produces a Docker image (Python, Go, Node.js, etc.). Kamal is framework-agnostic.</p>
+    </div>
+  </div>
+
+  <h4>Community</h4>
+  <ul>
+    <li>11,000+ GitHub stars</li>
+    <li>Strong Rails/Ruby community adoption</li>
+    <li>Backed by 37signals (runs HEY email, Basecamp production)</li>
+    <li>Growing adoption outside Rails ecosystem</li>
+  </ul>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li><strong>Zero server overhead</strong> &mdash; nothing runs except your app + tiny proxy</li>
+        <li>Battle-tested at 37signals scale</li>
+        <li>Clean, simple deployment model</li>
+        <li>Built-in SSL without extra configuration</li>
+        <li>Multi-server and rolling deploys</li>
+        <li>Minimal attack surface on servers</li>
+        <li>MIT license</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li><strong>Requires Docker registry</strong> (no registry-free option)</li>
+        <li><strong>Requires Ruby</strong> installed on local machine (friction for non-Ruby devs)</li>
+        <li><strong>No web UI</strong> &mdash; entirely CLI-driven via <code>deploy.yml</code> config</li>
+        <li>No built-in monitoring, logging, or database management</li>
+        <li>Docker iptables bypass UFW (security gotcha for non-experts)</li>
+        <li>Health check complications with rate limiters</li>
+        <li>Best documentation/guides are paid products</li>
+        <li>Gap between marketing promise and production reality widens with infrastructure complexity</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Developers who want absolute minimal server overhead and are comfortable managing infrastructure manually. Excellent for Rails apps, good for any Docker app if you're comfortable with the CLI workflow.
+  </div>
+
+  <div class="community-quotes">
+    <h4>Community Quotes</h4>
+    <blockquote>&ldquo;If you are deploying a new application to a fresh server with no existing infrastructure to work around, Kamal is genuinely excellent&rdquo; <span class="quote-source">&mdash; Ivan Turkovic (Feb 2026 review)</span></blockquote>
+    <blockquote>&ldquo;The gap between Kamal's marketing promise and production reality widens substantially once infrastructure complexity increases&rdquo; <span class="quote-source">&mdash; honest review</span></blockquote>
+    <blockquote>&ldquo;Trying to layer nginx alongside kamal-proxy is not worth the complexity&rdquo; <span class="quote-source">&mdash; production experience report</span></blockquote>
+    <blockquote>&ldquo;Kamal is a strong choice, especially for Rails teams, with zero server overhead and is battle-tested at 37signals scale&rdquo; <span class="quote-source">&mdash; Evil Martians</span></blockquote>
+  </div>
+</div>
+
+<!-- ──────────── KOMODO ──────────── -->
+<div class="platform-card tier-2" id="komodo">
+  <div class="card-header">
+    <h3>8. Komodo</h3>
+    <span class="tier-badge t2">Tier 2</span>
+  </div>
+  <p class="one-liner">A Rust-based server management platform that treats servers, deployments, builds, and automation as interconnected resources &mdash; like Portainer on steroids.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://komo.do">komo.do</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/moghtech/komodo">moghtech/komodo</a> &mdash; 10k stars</div>
+    <div class="meta-item"><strong>License:</strong> GPL-3.0 (no feature gating)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> Rust (Komodo Core &mdash; web server + API + UI)</li>
+    <li><strong>Agents:</strong> Komodo Periphery (lightweight Rust agent on each server)</li>
+    <li><strong>Build:</strong> Docker image builds from git repos, auto-versioned</li>
+    <li><strong>Requires:</strong> Docker registry for builds</li>
+    <li><strong>No built-in reverse proxy</strong> &mdash; must configure externally</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Unified resource abstraction (servers, deployments, stacks, builds, procedures)</li>
+        <li>Docker container management across multiple servers</li>
+        <li>Docker Compose stack deployments (file in UI or git repo)</li>
+        <li>Auto-versioned Docker image builds with webhook triggers</li>
+        <li>Server monitoring (CPU, memory, disk)</li>
+        <li>Container log viewing and shell access</li>
+        <li>Declarative infrastructure via TOML sync files</li>
+        <li>TypeScript-based custom automation scripts</li>
+        <li>Alert system for resource usage</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> ~1 GB RAM (estimated, Rust is efficient)</li>
+        <li><strong>Idle RAM:</strong> Low (Rust binary, no interpreted runtime)</li>
+        <li><strong>Per-server agent:</strong> Lightweight, stateless</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Any Docker container or Docker Compose stack.</p>
+    </div>
+  </div>
+
+  <h4>Community</h4>
+  <ul>
+    <li>10,000 GitHub stars (growing rapidly)</li>
+    <li>45+ contributors</li>
+    <li>Active development (Feb 2026 releases)</li>
+    <li>Growing homelab adoption</li>
+  </ul>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Rust backend means excellent performance and low resource usage</li>
+        <li>Multi-server management without PaaS overhead</li>
+        <li>GPL-3.0 with no paid tier or feature gating</li>
+        <li>Declarative infrastructure (TOML sync files)</li>
+        <li>Flexible automation (TypeScript procedures)</li>
+        <li>Scales to many servers without artificial limits</li>
+        <li>Strong momentum in homelab community</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li>Steeper learning curve (broad scope)</li>
+        <li>Requires agent on every managed server</li>
+        <li>No built-in HTTPS or reverse proxy (must configure Caddy/Traefik/etc.)</li>
+        <li>Requires Docker registry for builds</li>
+        <li>Smaller community, sparser documentation</li>
+        <li>No git push deploy (webhook-triggered builds)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Homelabbers managing multiple servers who want a centralized platform for orchestration without the overhead of a full PaaS. Good Portainer replacement with build/deploy capabilities.
+  </div>
+
+  <div class="community-quotes">
+    <h4>Community Quotes</h4>
+    <blockquote>&ldquo;Komodo is the newest option for home labbers and arguably might be what they will lean toward in late 2025 going into 2026&rdquo; <span class="quote-source">&mdash; Virtualization Howto</span></blockquote>
+    <blockquote>&ldquo;Free, fast, and modern with great management features built in&rdquo; <span class="quote-source">&mdash; homelab review</span></blockquote>
+    <blockquote>&ldquo;Komodo takes a broader scope than most tools, treating servers, deployments, stacks, builds, and automation procedures as interconnected resources&rdquo; <span class="quote-source">&mdash; Haloy blog</span></blockquote>
+  </div>
+</div>
+
+<!-- ──────────── HALOY ──────────── -->
+<div class="platform-card tier-2" id="haloy">
+  <div class="card-header">
+    <h3>9. Haloy</h3>
+    <span class="tier-badge t2">Tier 2</span>
+  </div>
+  <p class="one-liner">A minimalist CLI tool that builds Docker images locally and uploads only changed layers to your server &mdash; no registry needed.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://haloy.dev">haloy.dev</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/haloydev/haloy">haloydev/haloy</a></div>
+    <div class="meta-item"><strong>License:</strong> Open source (Go)</div>
+    <div class="meta-item"><strong>Status:</strong> Very new (2025&ndash;2026)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>CLI:</strong> Go binary on local machine</li>
+    <li><strong>Server:</strong> Lightweight daemon (haloyd) running over HTTPS</li>
+    <li><strong>Build:</strong> Local Docker build, direct layer upload (no registry)</li>
+    <li><strong>Reverse proxy:</strong> Built-in with Let's Encrypt</li>
+    <li><strong>Deploy:</strong> Zero-downtime container swap</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Direct Docker layer upload (no registry required)</li>
+        <li>Smart layer caching (only upload changed layers)</li>
+        <li>Single YAML configuration</li>
+        <li>Automatic HTTPS via Let's Encrypt</li>
+        <li>Built-in health checks</li>
+        <li>Zero-downtime deployments</li>
+        <li>Multi-server deployment with staging/production targets</li>
+        <li>Container monitoring and auto-recovery</li>
+        <li>Designed for AI coding assistant integration</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> ~512 MB RAM (estimated)</li>
+        <li><strong>Server overhead:</strong> Lightweight Go daemon</li>
+      </ul>
+      <h4>Supported App Types</h4>
+      <p style="font-size:0.92rem; color: var(--text-muted);">Anything that can be containerized with Docker.</p>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>No Docker registry needed (unique selling point)</li>
+        <li>Minimal configuration (single YAML file)</li>
+        <li>Built-in SSL</li>
+        <li>Smart caching reduces deploy bandwidth</li>
+        <li>Lightweight</li>
+        <li>AI/LLM-friendly design</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li><strong>Newest tool in the space</strong> &mdash; least battle-tested</li>
+        <li><strong>CLI only</strong> &mdash; no web dashboard</li>
+        <li>Smallest community</li>
+        <li>Very few tutorials or guides</li>
+        <li>Unproven in production at scale</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Indie developers and small teams who want the simplest possible Docker deployment without a registry or PaaS overhead.
+  </div>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ TIER 3 ═══════════════════════════════ -->
+<h2 id="tier-3-docker-management">Tier 3: Docker Management <span class="tier-badge t3">Tier 3</span></h2>
+
+<!-- ──────────── PORTAINER ──────────── -->
+<div class="platform-card tier-3" id="portainer">
+  <div class="card-header">
+    <h3>10. Portainer</h3>
+    <span class="tier-badge t3">Tier 3</span>
+  </div>
+  <p class="one-liner">The most widely-used Docker management GUI, now supporting Docker, Kubernetes, Podman, and Swarm.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://www.portainer.io">portainer.io</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/portainer/portainer">portainer/portainer</a> &mdash; 32k+ stars</div>
+    <div class="meta-item"><strong>License:</strong> Zlib (CE free), Business Edition paid</div>
+    <div class="meta-item"><strong>Latest:</strong> Actively maintained (2026)</div>
+  </div>
+
+  <h4>Architecture</h4>
+  <ul>
+    <li><strong>Backend:</strong> Go</li>
+    <li><strong>Frontend:</strong> Angular</li>
+    <li><strong>Agent-based:</strong> Portainer Agent for remote Docker hosts</li>
+    <li><strong>Supports:</strong> Docker, Kubernetes, Podman, Docker Swarm, ACI</li>
+  </ul>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Visual Docker container management</li>
+        <li>Stack deployment from Docker Compose files</li>
+        <li>Container logs, stats, shell access</li>
+        <li>Image management</li>
+        <li>Network and volume management</li>
+        <li>Git-based stack deployments (webhooks)</li>
+        <li>User management (basic in CE)</li>
+        <li>Multi-environment management</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> ~512 MB RAM</li>
+        <li><strong>Idle RAM:</strong> ~100 MB</li>
+      </ul>
+      <h4>What It Is NOT</h4>
+      <ul>
+        <li>Not a PaaS &mdash; no git push deploy, no buildpacks, no SSL management</li>
+        <li>Not a CI/CD tool &mdash; no builds from source</li>
+        <li>A Docker management GUI, not a deployment platform</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Excellent for visualizing and managing existing Docker containers</li>
+        <li>Multi-platform support (Docker, K8s, Podman)</li>
+        <li>Mature and widely adopted</li>
+        <li>Good for teams transitioning from CLI to GUI</li>
+        <li>Stack deployment from compose files</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li>Not a PaaS &mdash; can't replace Heroku/Vercel workflows</li>
+        <li>CE (free) edition becoming more limited over time (RBAC, SSO moved to paid tier)</li>
+        <li>No build pipeline</li>
+        <li>No git push deployment</li>
+        <li>No automatic SSL certificate management</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Docker management visualization alongside a CLI-based PaaS like Dokku or Kamal. Complementary tool, not a replacement for PaaS.
+  </div>
+</div>
+
+<!-- ──────────── DOCKGE ──────────── -->
+<div class="platform-card tier-3" id="dockge">
+  <div class="card-header">
+    <h3>11. Dockge</h3>
+    <span class="tier-badge t3">Tier 3</span>
+  </div>
+  <p class="one-liner">A beautiful, reactive Docker Compose stack manager from the creator of Uptime Kuma &mdash; your compose files stay on disk, not locked in a database.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://dockge.kuma.pet">dockge.kuma.pet</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/louislam/dockge">louislam/dockge</a> &mdash; 22k stars</div>
+    <div class="meta-item"><strong>License:</strong> MIT</div>
+    <div class="meta-item"><strong>Creator:</strong> Louis Lam (Uptime Kuma)</div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <h4>Key Features</h4>
+      <ul>
+        <li>Docker Compose stack management via web UI</li>
+        <li>YAML editor with live preview</li>
+        <li>Container logs and terminal access</li>
+        <li>Files stay on disk (no database lock-in)</li>
+        <li>Multi-agent support (v1.5+) for multiple Docker hosts</li>
+        <li>Works alongside <code>docker compose</code> CLI</li>
+      </ul>
+    </div>
+    <div class="feature-box">
+      <h4>Resource Requirements</h4>
+      <ul>
+        <li><strong>Minimum:</strong> ~256 MB RAM</li>
+        <li><strong>Idle RAM:</strong> ~50 MB</li>
+      </ul>
+      <h4>What It Is NOT</h4>
+      <ul>
+        <li>Not a PaaS &mdash; no git deploy, no builds, no SSL, no databases</li>
+        <li>A compose file manager, not a deployment platform</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div class="pros-list">
+      <h4>Pros</h4>
+      <ul>
+        <li>Beautiful UI (from Uptime Kuma creator)</li>
+        <li>Compose files stay on disk &mdash; no lock-in</li>
+        <li>Extremely lightweight</li>
+        <li>MIT license</li>
+        <li>Multi-host support</li>
+      </ul>
+    </div>
+    <div class="cons-list">
+      <h4>Cons</h4>
+      <ul>
+        <li>No build pipeline, no CI/CD, no SSL, no RBAC</li>
+        <li>Only manages existing compose stacks</li>
+        <li>Not a PaaS replacement</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="best-for">
+    <strong>Best For:</strong> Managing existing Docker Compose stacks with a nice UI. Complementary to manual compose-based homelab workflows (like your current setup).
+  </div>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ OUT OF SCOPE ═══════════════════════════════ -->
+<h2 id="out-of-scope">Out of Scope <span class="tier-badge oos">Out of Scope</span></h2>
+
+<!-- ──────────── SEALOS ──────────── -->
+<div class="platform-card tier-oos" id="sealos">
+  <div class="card-header">
+    <h3>12. Sealos</h3>
+    <span class="tier-badge oos">Out of Scope</span>
+  </div>
+  <p class="one-liner">An AI-native Cloud Operating System built on 100% upstream Kubernetes.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://sealos.io">sealos.io</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/labring/sealos">labring/sealos</a> &mdash; 14k+ stars</div>
+  </div>
+
+  <p><strong>Why Out of Scope:</strong> Sealos requires a full Kubernetes cluster. With 9GB RAM on a Docker VM with 2 cores, running Kubernetes is impractical &mdash; K8s control plane alone consumes 2&ndash;4GB RAM. Sealos is designed for organizations with dedicated Kubernetes infrastructure, not single-node homelabs.</p>
+
+  <p><strong>Minimum Requirements:</strong> 4+ GB RAM for K8s control plane, 8+ GB for practical use with apps. A single-node K8s cluster on 9GB RAM leaves very little for actual workloads.</p>
+</div>
+
+<!-- ──────────── POCKETHOST ──────────── -->
+<div class="platform-card tier-oos" id="pockethost">
+  <div class="card-header">
+    <h3>13. PocketHost</h3>
+    <span class="tier-badge oos">Out of Scope</span>
+  </div>
+  <p class="one-liner">Multi-tenant PocketBase hosting platform (not a general-purpose PaaS).</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Website:</strong> <a href="https://pockethost.io">pockethost.io</a></div>
+    <div class="meta-item"><strong>GitHub:</strong> <a href="https://github.com/pockethost/pockethost">pockethost/pockethost</a></div>
+  </div>
+
+  <p><strong>Why Out of Scope:</strong> PocketHost is specifically for running PocketBase instances. It's not a general-purpose PaaS. If you need PocketBase, just run it directly &mdash; it's a single 14MB Go binary. Self-hosting PocketHost requires significant setup and is "not recommended for the faint of heart" per the project docs.</p>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ RESOURCE FOOTPRINT ═══════════════════════════════ -->
+<h2 id="resource-footprint-analysis">Resource Footprint Analysis</h2>
+
+<p>Given your Docker VM runs these services already:</p>
+<ul>
+  <li>Caddy (reverse proxy)</li>
+  <li>Vaultwarden + backup</li>
+  <li>Pi-hole</li>
+  <li>Watchtower</li>
+  <li>Frigate (resource-hungry: GPU detection)</li>
+  <li>Mosquitto</li>
+  <li>Home Assistant + backup</li>
+</ul>
+
+<p>Estimated current RAM usage: <strong>4&ndash;6 GB</strong> (Frigate is the elephant).</p>
+<p><strong>Available for PaaS:</strong> ~3&ndash;5 GB</p>
+
+<div class="table-wrapper">
+<table>
+  <thead>
+    <tr>
+      <th>PaaS</th>
+      <th>Idle Overhead</th>
+      <th>Remaining for Apps</th>
+      <th>Verdict</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Coolify</strong></td><td>~380 MB</td><td>~2.6&ndash;4.6 GB</td><td>Feasible but tight with Frigate</td></tr>
+    <tr><td><strong>Dokploy</strong></td><td>~300 MB</td><td>~2.7&ndash;4.7 GB</td><td>Feasible</td></tr>
+    <tr><td><strong>CapRover</strong></td><td>~210 MB</td><td>~2.8&ndash;4.8 GB</td><td>Comfortable</td></tr>
+    <tr><td><strong>Dokku</strong></td><td>~95 MB</td><td>~2.9&ndash;4.9 GB</td><td>Best fit for constrained RAM</td></tr>
+    <tr><td><strong>Kamal</strong></td><td>~0 MB (local)</td><td>~3&ndash;5 GB</td><td>Zero server impact</td></tr>
+    <tr><td><strong>Komodo</strong></td><td>~50&ndash;100 MB</td><td>~2.9&ndash;4.9 GB</td><td>Low impact</td></tr>
+    <tr><td><strong>Dockge</strong></td><td>~50 MB</td><td>~2.9&ndash;4.9 GB</td><td>Negligible</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+  <strong>Note:</strong> Consider running the PaaS on a separate server (e.g., NAS or RPi5) to avoid competing with Frigate for RAM on the Docker VM.
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ DECISION FRAMEWORK ═══════════════════════════════ -->
+<h2 id="decision-framework">Decision Framework for Your Homelab</h2>
+
+<div class="decision-card">
+  <h4>If you want a "set it and forget it" PaaS with UI:</h4>
+  <p><strong>Coolify</strong> or <strong>Dokploy</strong> &mdash; Pick Coolify for max features, Dokploy for a cleaner UI and native Swarm support.</p>
+</div>
+
+<div class="decision-card">
+  <h4>If you want maximum resource efficiency on the same Docker VM:</h4>
+  <p><strong>Dokku</strong> &mdash; At ~95MB idle, it leaves the most RAM for your existing services. CLI-only but pairs beautifully with your Vim/tmux/CLI-first workflow.</p>
+</div>
+
+<div class="decision-card">
+  <h4>If you want zero server overhead (deploy from laptop):</h4>
+  <p><strong>Kamal</strong> &mdash; Nothing runs on the server except your apps. Build locally, push via SSH.</p>
+</div>
+
+<div class="decision-card">
+  <h4>If you want to manage existing Docker services better:</h4>
+  <p><strong>Komodo</strong> or <strong>Dockge</strong> &mdash; Not a PaaS, but Komodo could centralize management of your Docker VM + NAS + VPS from one panel.</p>
+</div>
+
+<div class="decision-card">
+  <h4>If you want PaaS on a separate device:</h4>
+  <p>Run Coolify or Dokploy on the NAS or RPi5, deploying apps to the Docker VM as a "remote server." This avoids RAM competition with Frigate.</p>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ FINAL RECOMMENDATION ═══════════════════════════════ -->
+<h2 id="final-recommendation">Final Recommendation</h2>
+
+<p>For your specific setup (9GB Docker VM, 2 cores, already running Frigate/HA/Pi-hole/Caddy, CLI-first workflow, Guarani naming convention lover):</p>
+
+<div class="recommendation">
+  <h3>Primary Recommendation: Coolify</h3>
+  <p><strong>Why:</strong> Despite its warts (the January 2026 CVEs were concerning but quickly patched), Coolify is the most complete solution. With 280+ one-click services, Docker Compose support, and the ability to manage remote servers, it gives you a Vercel-like experience for deploying your Javya app and any future projects. The Docker Compose support is particularly valuable since your entire homelab already runs on Compose stacks.</p>
+  <p><strong>Deployment strategy:</strong> Install Coolify on a separate server (NAS or a cheap VPS) and add the Docker VM as a "remote server." This keeps the PaaS overhead off your resource-constrained Docker VM.</p>
+  <p><strong>Guarani name suggestion:</strong> <code>ypoti</code> (meaning "flower" &mdash; where your apps bloom).</p>
+</div>
+
+<div class="recommendation runner-up">
+  <h3>Runner-Up: Dokku</h3>
+  <p><strong>Why:</strong> If you decide to run the PaaS directly on the Docker VM alongside existing services, Dokku's 95MB footprint is unbeatable. Your CLI-first workflow matches perfectly &mdash; <code>git push dokku main</code> is as elegant as it gets. The 13-year stability track record means it won't break your existing services.</p>
+</div>
+
+<div class="recommendation honorable">
+  <h3>Honorable Mention: Kamal</h3>
+  <p><strong>Why:</strong> For deploying Javya (FastAPI + Python) specifically, Kamal's zero-overhead approach is compelling. Build locally on your MacBook Air, deploy via SSH. No PaaS daemon consuming RAM on your server. But you'll miss the database management and one-click services of a full PaaS.</p>
+</div>
+
+<div class="recommendation watching">
+  <h3>Worth Watching: Dokploy and Komodo</h3>
+  <p>Dokploy is growing fast and may surpass Coolify in UI quality. Komodo could be your "homelab control plane" for managing Docker across all three servers (Docker VM, NAS, VPS) from one panel.</p>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════ SOURCES ═══════════════════════════════ -->
+<h2 id="sources">Sources</h2>
+
+<div class="sources-section">
+
+  <h3>Comparison Articles</h3>
+  <ul>
+    <li><a href="https://haloy.dev/blog/self-hosted-deployment-tools-compared">Self-Hosted Deployment Tools Compared (Haloy Blog)</a></li>
+    <li><a href="https://selfhostable.dev/blog/coolify-vs-caprover-vs-dokku/">Coolify vs CapRover vs Dokku (selfhostable.dev)</a></li>
+    <li><a href="https://introserv.com/blog/dokploy-vs-coolify-complete-comparison-of-the-best-self-hosted-paas-platforms-for-vps-and-dedicated-servers-2026/">Dokploy vs Coolify 2026 (INTROSERV)</a></li>
+    <li><a href="https://www.cherryservers.com/blog/coolify-vs-dokploy">Coolify vs Dokploy (Cherry Servers)</a></li>
+    <li><a href="https://kloudshift.net/blog/comparing-self-hostable-paas-solutions-caprover-coolify-dokploy-reviewed/">CapRover, Coolify &amp; Dokploy Reviewed (KloudShift)</a></li>
+    <li><a href="https://northflank.com/blog/coolify-alternatives-in-2026">Coolify Alternatives 2026 (Northflank)</a></li>
+    <li><a href="https://northflank.com/blog/6-best-dokku-alternatives">Dokku Alternatives 2026 (Northflank)</a></li>
+    <li><a href="https://girff.medium.com/coolify-vs-dokploy-the-ultimate-comparison-for-self-hosted-in-2025-8c63f1bda088">Coolify vs Dokploy (Medium/Girff)</a></li>
+    <li><a href="https://contabo.com/blog/blog-coolify-vs-dokploy-comparison/">Coolify vs Dokploy (Contabo)</a></li>
+    <li><a href="https://openalternative.co/categories/paas-deployment-tools/self-hosted">Best Self-Hosted PaaS 2026 (OpenAlternative)</a></li>
+  </ul>
+
+  <h3>Official Project Sites</h3>
+  <ul>
+    <li><a href="https://coolify.io">Coolify</a> | <a href="https://github.com/coollabsio/coolify">GitHub</a></li>
+    <li><a href="https://dokploy.com">Dokploy</a> | <a href="https://github.com/Dokploy/dokploy">GitHub</a></li>
+    <li><a href="https://caprover.com">CapRover</a> | <a href="https://github.com/caprover/caprover">GitHub</a></li>
+    <li><a href="https://dokku.com">Dokku</a> | <a href="https://github.com/dokku/dokku">GitHub</a></li>
+    <li><a href="https://kamal-deploy.org">Kamal</a> | <a href="https://github.com/basecamp/kamal">GitHub</a></li>
+    <li><a href="https://komo.do">Komodo</a> | <a href="https://github.com/moghtech/komodo">GitHub</a></li>
+    <li><a href="https://haloy.dev">Haloy</a> | <a href="https://github.com/haloydev/haloy">GitHub</a></li>
+    <li><a href="https://www.portainer.io">Portainer</a> | <a href="https://github.com/portainer/portainer">GitHub</a></li>
+    <li><a href="https://dockge.kuma.pet">Dockge</a> | <a href="https://github.com/louislam/dockge">GitHub</a></li>
+    <li><a href="https://easypanel.io">Easypanel</a></li>
+    <li><a href="https://www.cloudron.io">Cloudron</a></li>
+    <li><a href="https://sealos.io">Sealos</a> | <a href="https://github.com/labring/sealos">GitHub</a></li>
+  </ul>
+
+  <h3>Reviews and Real-World Reports</h3>
+  <ul>
+    <li><a href="https://www.ivanturkovic.com/2026/02/06/honest-take-kamal-rails-deployment/">Honest Take on Kamal (Ivan Turkovic, Feb 2026)</a></li>
+    <li><a href="https://evilmartians.com/chronicles/mrsk-hot-deployment-tool-or-total-game-changer">Kamal: Hot Deployment Tool (Evil Martians)</a></li>
+    <li><a href="https://leonstaff.com/blogs/vercel-vs-coolify-cost-analysis/">Vercel vs Coolify Cost Analysis (Leon Consulting)</a></li>
+    <li><a href="https://thehackernews.com/2026/01/coolify-discloses-11-critical-flaws.html">Coolify 11 Critical CVEs (The Hacker News)</a></li>
+    <li><a href="https://www.loopwerk.io/articles/2025/coolify-docker-layer-caching/">Coolify Docker Layer Caching Bug (Loopwerk)</a></li>
+    <li><a href="https://anthonynsimon.com/blog/kamal-deploy/">Deploying Django with Kamal (Anthony Simon)</a></li>
+    <li><a href="https://chollinger.com/blog/2025/12/how-i-run-docker-services-and-deployments-with-komodo/">How I Run Docker with Komodo (Chollinger)</a></li>
+    <li><a href="https://www.virtualizationhowto.com/2025/12/ultimate-home-lab-starter-stack-for-2026-key-recommendations/">Homelab Starter Stack 2026 (Virtualization Howto)</a></li>
+    <li><a href="https://blog.elest.io/the-2026-homelab-stack-what-self-hosters-are-actually-running-this-year/">2026 Homelab Stack (Elest.io)</a></li>
+  </ul>
+
+  <h3>Community Discussions</h3>
+  <ul>
+    <li><a href="https://github.com/coollabsio/coolify/discussions/688">Why Coolify over CapRover or Dokku (GitHub Discussion)</a></li>
+    <li><a href="https://docs.dokploy.com/docs/core/comparison">Dokploy Comparison Table (Official Docs)</a></li>
+    <li><a href="https://dev.37signals.com/kamal-2/">Kamal 2.0 Released (37signals)</a></li>
+    <li><a href="https://forum.cloudron.io/topic/10000/a-list-of-cloudron-like-services-competitors">Cloudron Competitors List (Forum)</a></li>
+  </ul>
+
+</div>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<div class="footer">
+  <p>Self-Hosted PaaS Research &mdash; cronova.dev homelab &mdash; February 2026</p>
+</div>
+
+</div><!-- end .container -->
+</body>
+</html>
