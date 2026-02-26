@@ -299,6 +299,6 @@ Before deploying any stack:
 ## References
 
 - [setup-runbook.md](setup-runbook.md) - Detailed first-time setup
-- [disaster-recovery.md](disaster-recovery.md) - Recovery procedures
-- [services.md](services.md) - Service descriptions
-- [hardware.md](hardware.md) - Hardware inventory
+- [disaster-recovery.md](../strategy/disaster-recovery.md) - Recovery procedures
+- [services.md](../architecture/services.md) - Service descriptions
+- [hardware.md](../architecture/hardware.md) - Hardware inventory

@@ -215,7 +215,7 @@ Via web UI at https://status.cronova.dev:
 
 ### 4. Update Hardware Doc
 
-In `docs/hardware.md`, change RPi 5 status from "Pending setup" to "Active".
+In `docs/architecture/hardware.md`, change RPi 5 status from "Pending setup" to "Active".
 
 ### 5. Add Pi-hole DNS Entry
 
@@ -316,8 +316,8 @@ If something goes wrong:
 
 ## References
 
-- [docs/hardware.md](hardware.md) - Full hardware specs
-- [docs/mobile-homelab.md](mobile-homelab.md) - Mobile kit (RPi 5 migration history)
-- [ansible/playbooks/openclaw.yml](../ansible/playbooks/openclaw.yml) - OpenClaw Ansible playbook
+- [hardware.md](../architecture/hardware.md) - Full hardware specs
+- [mobile-homelab.md](../architecture/mobile-homelab.md) - Mobile kit (RPi 5 migration history)
+- [ansible/playbooks/openclaw.yml](../../ansible/playbooks/openclaw.yml) - OpenClaw Ansible playbook
 - [Raspberry Pi 5 Specs](https://www.raspberrypi.com/products/raspberry-pi-5/)
 - [OpenClaw Docs](https://docs.openclaw.ai/)

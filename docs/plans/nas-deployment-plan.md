@@ -559,7 +559,7 @@ Once NAS is running with NFS:
 
 ## References
 
-- [docs/hardware.md](hardware.md) - Full hardware specs
-- [docs/nfs-setup.md](nfs-setup.md) - NFS configuration details
-- [docs/deployment-order.md](deployment-order.md) - Service dependencies
-- [docker/fixed/nas/](../docker/fixed/nas/) - Docker compose files
+- [hardware.md](../architecture/hardware.md) - Full hardware specs
+- [nfs-setup.md](../guides/nfs-setup.md) - NFS configuration details
+- [deployment-order.md](../guides/deployment-order.md) - Service dependencies
+- [docker/fixed/nas/](../../docker/fixed/nas/) - Docker compose files

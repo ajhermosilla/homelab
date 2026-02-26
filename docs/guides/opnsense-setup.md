@@ -197,7 +197,7 @@ Password: opnsense
 
 ## VLAN Configuration
 
-See `docs/vlan-design.md` for detailed VLAN setup.
+See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 ### Create VLANs
 
@@ -317,7 +317,7 @@ For graceful shutdown on power loss:
 | Remote User | upsmon |
 | Remote Password | (from NAS NUT config) |
 
-See `docs/nut-config.md` for NUT server setup on NAS.
+See `docs/guides/nut-config.md` for NUT server setup on NAS.
 
 ---
 
@@ -383,7 +383,7 @@ Install telegraf plugin for metrics export.
 
 ## Related Documentation
 
-- `docs/vlan-design.md` - VLAN configuration details
-- `docs/fixed-homelab.md` - Overall architecture
-- `docs/nut-config.md` - UPS graceful shutdown
-- `docs/hardware.md` - Mini PC specs
+- `docs/guides/vlan-design.md` - VLAN configuration details
+- `docs/architecture/fixed-homelab.md` - Overall architecture
+- `docs/guides/nut-config.md` - UPS graceful shutdown
+- `docs/architecture/hardware.md` - Mini PC specs

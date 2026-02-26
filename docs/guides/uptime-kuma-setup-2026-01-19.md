@@ -224,4 +224,4 @@ ssh linuxuser@100.77.172.46 'sudo docker run --rm -v ntfy-data:/data -v /tmp:/ba
 
 - Docker compose: `docker/vps/monitoring/docker-compose.yml`
 - Caddy config: `docker/vps/networking/caddy/Caddyfile`
-- Monitoring strategy: `docs/monitoring-strategy.md`
+- Monitoring strategy: `docs/strategy/monitoring-strategy.md`
