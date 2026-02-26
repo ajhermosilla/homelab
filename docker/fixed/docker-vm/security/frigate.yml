@@ -28,8 +28,7 @@ mqtt:
 detectors:
   ov:
     type: openvino
-    device: CPU
-    # Use GPU once iGPU is passed through from Proxmox (requires IOMMU + vfio-pci)
+    device: GPU
 
 model:
   width: 300
@@ -39,9 +38,8 @@ model:
   path: /openvino-model/ssdlite_mobilenet_v2.xml
   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
 
-# VAAPI requires iGPU passthrough — enable after Proxmox iGPU passthrough:
-# ffmpeg:
-#   hwaccel_args: preset-vaapi
+ffmpeg:
+  hwaccel_args: preset-vaapi
 
 # Face recognition — assigns sub_label (e.g. "augusto") to detected persons
 # Train faces via Frigate UI → Faces tab, or auto-collected from detections
