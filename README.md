@@ -1,152 +1,171 @@
 # Homelab
 
-Personal infrastructure as code. Mobile kit, fixed homelab, and VPS.
+Personal infrastructure as code. Self-hosted services across three environments, connected by a Tailscale mesh network over cronova.dev.
 
-## Quick Links
+All services are named in **Guarani** (the indigenous language of Paraguay) as a nod to home. English descriptions follow each name.
 
-| Need to... | Go to... |
-|------------|----------|
-| See all services | [docs/services.md](docs/services.md) |
-| Check hardware specs | [docs/hardware.md](docs/hardware.md) |
-| Deploy fixed homelab | [docs/fixed-homelab.md](docs/fixed-homelab.md) |
-| Set up Proxmox | [docs/proxmox-setup.md](docs/proxmox-setup.md) |
-| Configure OPNsense | [docs/opnsense-setup.md](docs/opnsense-setup.md) |
+> 40+ services | 30+ containers | 3 environments | 8 Tailscale nodes
 
 ## Architecture
 
 ```
-[Mobile Kit]              [Fixed Homelab]              [VPS]
-On-demand                 24/7                         24/7
-├── MacBook Air           ├── Proxmox (Mini PC)        ├── Headscale
-├── Beryl AX Router       │   ├── OPNsense VM          ├── Caddy
-└── Samsung A13           │   └── Docker VM            ├── headscale-backup
-                          ├── RPi 5 (OpenClaw)         ├── Uptime Kuma
-                          ├── Start9 (RPi 4)           └── ntfy
-                          └── NAS (Mini-ITX)
+[Mobile Kit]              [Fixed Homelab]                     [VPS - Vultr]
+On-demand                 24/7                                24/7
+├── MacBook Air M1        ├── Oga — Proxmox VE (Mini PC)     ├── Headscale
+├── Beryl AX Router       │   ├── OPNsense VM (gateway)      ├── Caddy
+└── Samsung A13/A16       │   └── Docker VM (7GB RAM)         ├── Uptime Kuma
+                          │       ├── Pi-hole (DNS)           ├── ntfy
+                          │       ├── Caddy (reverse proxy)   └── headscale-backup
+                          │       ├── Taguato — Frigate NVR
+                          │       ├── Jara — Home Assistant
+                          │       ├── Okẽ — Authelia (SSO)
+                          │       ├── Vault — Vaultwarden
+                          │       ├── Yrasema — Jellyfin
+                          │       ├── Mbyja — Homepage
+                          │       ├── Ysyry — Dozzle
+                          │       ├── Kuatia — Stirling-PDF
+                          │       ├── Papa — VictoriaMetrics + Grafana
+                          │       ├── Vera — Immich
+                          │       ├── Aranduka — Paperless-ngx
+                          │       ├── Mosquitto, Watchtower
+                          │       └── Backup containers
+                          ├── NAS (Mini-ITX i3)
+                          │   ├── Forgejo (git)
+                          │   ├── Tajy — Coolify PaaS
+                          │   ├── Samba, Syncthing, NFS
+                          │   ├── Restic REST, Glances
+                          │   └── Coolify sub-containers
+                          ├── RPi 5 — OpenClaw (pending)
+                          └── Networking gear
+                              ├── MokerLink 2.5G switch
+                              ├── TP-Link PoE switch + 3 cameras
+                              └── TP-Link Archer AX50 AP
 ```
 
-**27 services** across 3 environments. See [docs/services.md](docs/services.md) for full list.
+## Environments
 
-## Documentation
+| Environment | Host | Status | Containers |
+|-------------|------|--------|------------|
+| **VPS** | Vultr (1 vCPU, 1GB) | Active | 5 |
+| **Docker VM** | Proxmox VM 101 (7GB RAM) | Active | 20+ |
+| **NAS** | Mini-ITX i3-3220T | Active | 11 |
+| **RPi 5** | OpenClaw | Pending (PSU in transit) | - |
+| **Mobile Kit** | MacBook + Beryl AX | Active | - |
 
-### Core
+## Key Services
 
-| Document | Description |
-|----------|-------------|
-| [services.md](docs/services.md) | Service inventory, ports, dependencies |
-| [hardware.md](docs/hardware.md) | Device specs, Tailscale IPs, power |
-| [fixed-homelab.md](docs/fixed-homelab.md) | Fixed site architecture |
-| [mobile-homelab.md](docs/mobile-homelab.md) | Portable kit setup |
-| [vps-architecture.md](docs/vps-architecture.md) | Cloud infrastructure |
+| Guarani Name | Service | Subdomain | Purpose |
+|--------------|---------|-----------|---------|
+| — | Headscale | hs.cronova.dev | Tailscale coordination server |
+| — | Pi-hole | local | DNS ad-blocking |
+| — | Caddy | — | Reverse proxy, auto-TLS |
+| Taguato | Frigate NVR | taguato.cronova.dev | AI camera surveillance |
+| Jara | Home Assistant | jara.cronova.dev | Home automation |
+| Okẽ | Authelia | auth.cronova.dev | SSO / forward auth |
+| — | Vaultwarden | vault.cronova.dev | Password manager |
+| Yrasema | Jellyfin | yrasema.cronova.dev | Media streaming |
+| Mbyja | Homepage | mbyja.cronova.dev | Dashboard |
+| Ysyry | Dozzle | ysyry.cronova.dev | Container log viewer |
+| Kuatia | Stirling-PDF | kuatia.cronova.dev | PDF tools |
+| Papa | VictoriaMetrics | papa.cronova.dev | Metrics + Grafana |
+| Vera | Immich | vera.cronova.dev | Photo management |
+| Aranduka | Paperless-ngx | aranduka.cronova.dev | Document management |
+| Tajy | Coolify | tajy.cronova.dev | PaaS (NAS) |
+| — | Forgejo | git.cronova.dev | Git server |
+| — | Uptime Kuma | tailscale only | External monitoring |
+| — | ntfy | tailscale only | Push notifications |
 
-### Setup Guides
+Full inventory: [docs/architecture/services.md](docs/architecture/services.md)
 
-| Document | Description |
-|----------|-------------|
-| [proxmox-setup.md](docs/proxmox-setup.md) | Proxmox VE installation |
-| [opnsense-setup.md](docs/opnsense-setup.md) | OPNsense router config |
-| [nfs-setup.md](docs/nfs-setup.md) | NFS for Frigate recordings |
-| [vlan-design.md](docs/vlan-design.md) | Network segmentation |
-| [nut-config.md](docs/nut-config.md) | UPS graceful shutdown |
+## Network
 
-### Strategy
-
-| Document | Description |
-|----------|-------------|
-| [architecture-review.md](docs/architecture-review.md) | Design decisions |
-| [domain-strategy.md](docs/domain-strategy.md) | DNS and domain plan |
-| [certificate-strategy.md](docs/certificate-strategy.md) | TLS certificates |
-| [dns-architecture.md](docs/dns-architecture.md) | DNS resolution flow |
-| [monitoring-strategy.md](docs/monitoring-strategy.md) | Alerting and metrics |
-| [disaster-recovery.md](docs/disaster-recovery.md) | Backup and restore |
-| [secrets-management.md](docs/secrets-management.md) | Credential handling |
-| [security-hardening.md](docs/security-hardening.md) | 2FA, firewall, fail2ban |
-
-### Operations
-
-| Document | Description |
-|----------|-------------|
-| [backup-test-procedure.md](docs/backup-test-procedure.md) | Monthly backup tests |
-| [home-devices.md](docs/home-devices.md) | Family device inventory |
-| [caddy-config.md](docs/caddy-config.md) | Reverse proxy patterns |
-
-### Reference
-
-| Document | Description |
-|----------|-------------|
-| [tailscale-primer.md](docs/tailscale-primer.md) | Tailscale/Headscale intro |
-| [homelab-evaluation.md](docs/homelab-evaluation.md) | Hardware comparisons |
-| [rpi5-case-research.md](docs/rpi5-case-research.md) | RPi 5 case options |
-| [branding.md](docs/branding.md) | cronova.dev identity |
-
-### Sessions
-
-Daily work logs in [docs/sessions/](docs/sessions/).
+- **Domain**: cronova.dev (Cloudflare DNS)
+- **Gateway**: OPNsense VM (replaced ISP router 2026-02-21)
+- **Mesh**: Headscale (self-hosted Tailscale) — 8 nodes
+- **DNS**: Pi-hole (Docker VM) + AdGuard Home (Beryl AX mobile)
+- **Reverse Proxy**: Caddy with DNS-01 Cloudflare TLS (Docker VM), Caddy (VPS), Traefik (Coolify/NAS)
+- **VLANs**: Management (default), IoT (VLAN 10), Guest (VLAN 20)
+- **LAN**: 192.168.0.0/24 via MokerLink 2.5G switch
+- **Auth**: Authelia (Okẽ) protects services behind Caddy forward_auth
 
 ## Directory Structure
 
 ```
 homelab/
 ├── docker/                    # Docker Compose files
-│   ├── mobile/               # Mobile kit services
-│   ├── fixed/                # Fixed homelab services
-│   │   ├── docker-vm/        # Containers on Docker VM
-│   │   └── nas/              # Containers on NAS
-│   ├── vps/                  # VPS services
-│   └── shared/               # Shared env files
+│   ├── fixed/
+│   │   ├── docker-vm/         # Docker VM stacks
+│   │   │   ├── networking/    #   Pi-hole, Caddy
+│   │   │   ├── security/      #   Vaultwarden, Frigate
+│   │   │   ├── automation/    #   Home Assistant, Mosquitto
+│   │   │   ├── media/         #   Jellyfin, *arr stack
+│   │   │   ├── auth/          #   Authelia (Okẽ)
+│   │   │   ├── tools/         #   Dozzle, Stirling-PDF, Homepage
+│   │   │   ├── monitoring/    #   VictoriaMetrics, Grafana
+│   │   │   ├── photos/        #   Immich (Vera)
+│   │   │   ├── documents/     #   Paperless-ngx (Aranduka)
+│   │   │   └── maintenance/   #   Watchtower
+│   │   └── nas/               # NAS stacks
+│   │       ├── storage/       #   Samba, Syncthing
+│   │       ├── backup/        #   Restic REST
+│   │       ├── git/           #   Forgejo
+│   │       ├── monitoring/    #   Glances
+│   │       └── paas/          #   Coolify (Tajy)
+│   ├── mobile/                # Mobile kit
+│   ├── vps/                   # VPS services
+│   └── shared/                # Shared env files
 ├── ansible/                   # Automation playbooks
 ├── docs/                      # Documentation
-│   └── sessions/             # Daily work logs
+│   ├── architecture/          #   Core infra docs
+│   ├── guides/                #   Setup & operational guides
+│   ├── strategy/              #   Design decisions
+│   ├── reference/             #   Device guides, research
+│   ├── plans/                 #   Future plans (dated)
+│   ├── journal/               #   Execution logs, sessions
+│   └── html/                  #   Generated HTML
 ├── scripts/                   # Utility scripts
 └── CLAUDE.md                  # AI assistant context
 ```
 
-See [docker/README.md](docker/README.md) for Docker network strategy and deployment order.
+## Documentation
 
-## Deployment Order
+| Category | Path | Contents |
+|----------|------|----------|
+| **Architecture** | [docs/architecture/](docs/architecture/) | Services inventory, hardware, network topology |
+| **Guides** | [docs/guides/](docs/guides/) | Proxmox, OPNsense, NFS, Caddy, NAS setup |
+| **Strategy** | [docs/strategy/](docs/strategy/) | DNS, certificates, monitoring, DR, security |
+| **Reference** | [docs/reference/](docs/reference/) | Guarani naming, devices, Tailscale primer |
+| **Plans** | [docs/plans/](docs/plans/) | iGPU passthrough, HA dashboard, expansion ideas |
+| **Journal** | [docs/journal/](docs/journal/) | Cutover logs, recovery reports, session notes |
 
-1. **VPS** - Headscale first (enables mesh network)
-2. **Fixed Homelab**
-   - Proxmox on Mini PC
-   - OPNsense VM
-   - Docker VM with services
-   - NAS services
-   - Start9 on RPi 4
-3. **Mobile Kit** - MacBook Air + Beryl AX
+See [docs/README.md](docs/README.md) for the full documentation index.
 
-## Key Services
+## Tech Stack
 
-| Service | Purpose | Access |
-|---------|---------|--------|
-| Headscale | Tailscale coordination | hs.cronova.dev |
-| Pi-hole | DNS ad-blocking | Local + Tailscale |
-| Jellyfin | Media streaming | yrasema.cronova.dev |
-| Home Assistant | Automation | jara.cronova.dev |
-| Vaultwarden | Passwords | vault.cronova.dev |
-| Frigate | NVR with AI | Local only |
-| Uptime Kuma | Monitoring | Tailscale |
+| Layer | Tools |
+|-------|-------|
+| **Virtualization** | Proxmox VE 8 |
+| **Firewall** | OPNsense |
+| **Containers** | Docker, Docker Compose v5 |
+| **PaaS** | Coolify (Tajy) |
+| **Reverse Proxy** | Caddy (DNS-01 Cloudflare), Traefik (Coolify) |
+| **DNS** | Pi-hole v6, AdGuard Home |
+| **VPN/Mesh** | Headscale (self-hosted Tailscale) |
+| **Auth** | Authelia, Vaultwarden |
+| **Monitoring** | VictoriaMetrics, Grafana, Uptime Kuma, Dozzle, Glances |
+| **Backup** | Restic REST Server |
+| **Automation** | Ansible, Home Assistant |
+| **Git** | Forgejo (self-hosted) |
+| **IaC** | This repo |
 
-## Network
+## Deployment
 
-- **Domain**: cronova.dev (Cloudflare)
-- **Internal**: cronova.local
-- **Tailscale**: 100.64.0.0/10
-- **Local**: 192.168.0.0/24
+1. **VPS** first — Headscale enables the mesh network
+2. **Fixed Homelab** — Proxmox → OPNsense → Docker VM → NAS
+3. **Mobile Kit** — Beryl AX connects via Tailscale
 
-VLANs:
-- VLAN 1: Management (servers)
-- VLAN 10: IoT (cameras, isolated)
-- VLAN 20: Guest (internet only)
-
-## Status
-
-| Environment | Status |
-|-------------|--------|
-| VPS | Active (Headscale, Caddy, Uptime Kuma, ntfy, headscale-backup) |
-| Fixed Homelab | Active (Proxmox + OPNsense gateway; Docker VM: Pi-hole, Caddy, Vaultwarden, Watchtower; RPi 5 pending physical setup; NAS pending deployment) |
-| Mobile Kit | Active (Beryl AX AdGuard) |
+See [docs/guides/deployment-order.md](docs/guides/deployment-order.md) for the full sequence.
 
 ---
 
-**Owner**: Augusto Hermosilla
-**Contact**: augusto@hermosilla.me
+**Owner**: Augusto Hermosilla — augusto@hermosilla.me
