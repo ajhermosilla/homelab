@@ -239,7 +239,7 @@ The first NIC (vmbr0) was added during VM creation. Now add the second:
 
 ### 4. Install OPNsense
 
-See `docs/opnsense-setup.md` for installation steps.
+See `docs/guides/opnsense-setup.md` for installation steps.
 
 ---
 
@@ -356,7 +356,7 @@ apt install -y vim git htop ncdu nfs-common
 
 ---
 
-**Note:** OpenClaw runs on a dedicated Raspberry Pi 5 (not a Proxmox VM). See `docs/hardware.md` for RPi 5 specs and `ansible/playbooks/openclaw.yml` for automated setup.
+**Note:** OpenClaw runs on a dedicated Raspberry Pi 5 (not a Proxmox VM). See `docs/architecture/hardware.md` for RPi 5 specs and `ansible/playbooks/openclaw.yml` for automated setup.
 
 ---
 
@@ -483,7 +483,7 @@ Add Proxmox health check:
 - [ ] VM created with correct resources
 - [ ] Dual bridged NICs configured (vmbr0 WAN, vmbr1 LAN)
 - [ ] Boots successfully
-- [ ] See `docs/opnsense-setup.md` for configuration
+- [ ] See `docs/guides/opnsense-setup.md` for configuration
 
 ### Docker VM
 
@@ -555,7 +555,7 @@ qm start 100 --debug
 
 ## Related Documentation
 
-- `docs/opnsense-setup.md` - OPNsense configuration
-- `docs/vlan-design.md` - Network segmentation
-- `docs/nfs-setup.md` - NFS for Frigate recordings
-- `docs/hardware.md` - Hardware specifications
+- `docs/guides/opnsense-setup.md` - OPNsense configuration
+- `docs/guides/vlan-design.md` - Network segmentation
+- `docs/guides/nfs-setup.md` - NFS for Frigate recordings
+- `docs/architecture/hardware.md` - Hardware specifications
