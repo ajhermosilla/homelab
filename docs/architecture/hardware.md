@@ -4,14 +4,15 @@
 
 ```
 [Mobile Kit - On Demand]        [Fixed Homelab - 24/7]          [VPS - 24/7]
-├── MacBook Air M1             ├── Mini PC (Proxmox)           ├── Headscale
-├── Beryl AX Router            ├── RPi 5 (OpenClaw)            ├── Caddy
-└── Samsung A13                ├── RPi 4 (Start9)              ├── Uptime Kuma
-                               ├── NAS (DIY Mini-ITX)          ├── ntfy
+├── MacBook Air M1             ├── Oga — Proxmox (AOOSTAR)     ├── Headscale
+├── Beryl AX Router            │   ├── OPNsense VM             ├── Caddy
+└── Samsung A13/A16            │   └── Docker VM (7GB RAM)     ├── headscale-backup
+                               ├── NAS (Mini-ITX i3)           ├── Uptime Kuma
+                               ├── RPi 5 — OpenClaw            ├── ntfy
                                ├── MokerLink 2.5G Switch       └── ~$6/mo
                                ├── TP-Link PoE Switch
                                ├── TP-Link Archer AX50 AP
-                               ├── 3x IP Cameras
+                               ├── 3x IP Cameras (deployed)
                                └── Forza UPS
 ```
 
@@ -25,7 +26,8 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 |--------|-------|------|--------|
 | MacBook Air M1 | 16GB RAM, 1TB SSD, macOS Sonoma | Workstation, Docker dev | Active |
 | Beryl AX | GL-MT3000 | Network gateway, DHCP, VPN, AdGuard DNS | Active |
-| Samsung A13 | Android | USB tethering for internet | Active |
+| Samsung A13 | Android | USB tethering for internet (travel) | Active |
+| Samsung A16 | Android | Daily phone, Tailscale client | Active |
 
 ### Mobile Network Topology
 
@@ -61,10 +63,10 @@ Always-on infrastructure at home.
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-| Mini PC | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
-| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | OpenClaw (AI assistant) | Pending setup |
+| AOOSTAR Mini PC (Oga) | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
+| NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian 13 (11 containers) | Active |
+| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | OpenClaw (AI assistant) | Pending (PSU in transit) |
 | Raspberry Pi 4 | 4GB RAM, 1TB external SSD | Start9 (Bitcoin node) | Pending setup |
-| NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian (Frigate, Samba, Syncthing) | Pending setup |
 
 ### Networking
 
@@ -78,8 +80,10 @@ Always-on infrastructure at home.
 
 | Model | Count | Specs | Status |
 |-------|-------|-------|--------|
-| Reolink RLC-520A | 2 | 5MP PoE | New in box |
-| TP-Link Tapo C110 | 1 | 3MP WiFi | New |
+| Reolink RLC-520A | 2 | 5MP PoE | Deployed — front_door (192.168.0.110), back_yard (192.168.0.111) |
+| TP-Link Tapo C110 | 1 | 3MP WiFi | Deployed — indoor (192.168.0.101) |
+
+All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured for detection areas. Face recognition enabled.
 
 ### Power
 
@@ -97,21 +101,25 @@ Always-on infrastructure at home.
 
 | Component | Spec | Notes |
 |-----------|------|-------|
-| Model | Aoostar N1 Pro | |
-| CPU | Intel N150 | VT-x for virtualization |
-| RAM | 12GB | ~1GB host + 2GB OPNsense + 9GB Docker |
+| Model | AOOSTAR N1 Pro | |
+| CPU | Intel N150 | VT-x, Intel UHD Graphics (iGPU) |
+| RAM | 12GB | ~1GB host + 2GB OPNsense + 7GB Docker (current) |
 | Storage | 512GB SSD | Proxmox + VMs |
-| NIC | Dual port required | WAN bridge (vmbr0) + LAN bridge (vmbr1) |
+| NIC | Dual port | WAN bridge (vmbr0) + LAN bridge (vmbr1) |
 | BIOS | Restore on AC Power Loss | Set to "Power On" for auto-boot |
 
 **VMs:**
 | VM | ID | vCPU | RAM | Disk | Start Order |
 |----|-----|------|-----|------|-------------|
 | OPNsense | 100 | 2 | 2GB | 20GB | 1 (delay: 0) |
-| Docker | 101 | 2 | 9GB | 100GB | 2 (delay: 30) |
+| Docker | 101 | 2 | 7GB | 100GB | 2 (delay: 30) |
 
-- **OPNsense** - Router/firewall
-- **Docker** - Pi-hole, Jellyfin, Frigate, Home Assistant, *arr stack, etc.
+- **OPNsense** (VM 100) — Gateway/firewall since 2026-02-21, LAN 192.168.0.1/24
+- **Docker** (VM 101) — 20+ containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, monitoring, tools
+
+**Network bridges:** nic0/vmbr0 = ISP modem (ARRIS bridge mode), nic1/vmbr1 = MokerLink switch. OPNsense has both NICs; Docker VM has vmbr1 only.
+
+iGPU passthrough (SR-IOV) planned for Frigate GPU acceleration — see [docs/plans/igpu-passthrough-plan-2026-02-25.md](../plans/igpu-passthrough-plan-2026-02-25.md).
 
 ### RPi 5 Details
 
@@ -121,7 +129,7 @@ Always-on infrastructure at home.
 | Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
 | PSU | Official 27W USB-C | In transit (Miami → Asunción) |
-| Case | TBD | See `docs/rpi5-case-research.md` |
+| Case | TBD | See [docs/reference/rpi5-case-research.md](../reference/rpi5-case-research.md) |
 
 ### RPi 4 Details
 
@@ -148,13 +156,19 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 | CPU | Intel Core i3-3220T | Dual-Core 2.8GHz, 35W TDP |
 | RAM | Kingston HyperX 8GB | 2x4GB DDR3-1600 |
 | PSU | picoPSU-160-XT + 220W brick | 192W DC-DC, 2013 vintage |
-| OS | Debian 12 | Docker, no mergerfs/snapraid initially |
+| Boot USB | Generic Flash Disk 3.7GB | EFI (512M FAT32) + /boot (3.1G ext4) — must stay plugged in |
+| OS | Debian 13 (Trixie) | Docker data-root at /data/docker (SSD) |
 
-**NAS Services:**
-- Samba (network shares)
-- Syncthing (file sync)
-- Restic REST (backup target)
-- NFS (exports Purple 2TB for Frigate on Docker VM)
+**NAS Containers (11 active):**
+- Samba (network shares) — justinpatchett/samba
+- Syncthing 2.0.14 (file sync)
+- Restic REST 0.14.0 (backup target, data at /mnt/purple/backup/restic/)
+- Forgejo 11 (git server, data at /srv/forgejo)
+- Glances (system monitoring)
+- NFS (kernel, exports Purple 2TB for Frigate on Docker VM)
+- Coolify + 6 sub-containers (PaaS, data at /data/coolify/)
+
+**Boot:** USB UEFI → GRUB → kernel/initramfs → SSD LVM root. USB only read during first 2s of boot.
 
 ### NAS Storage Strategy
 
@@ -176,7 +190,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Drive | Model | Size | Purpose |
 |-------|-------|------|---------|
-| SSD | Lexar NQ110 | 240GB | Debian OS, Docker, configs (boot) |
+| SSD | Lexar NQ100 | 240GB | Debian OS, Docker data-root (/data/docker), configs |
 | HDD | WD Purple | 2TB | Frigate NVR recordings (dedicated) |
 | HDD | WD Red Plus (WD80EFBX) | 8TB | Media, family backups, service backups |
 
@@ -203,35 +217,39 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 ### Fixed Network Topology
 
 ```
-                      [ISP Modem]
+              [ISP Modem - ARRIS bridge mode]
                            |
-                     [Mini PC - Proxmox]
+                  [Oga — Proxmox (AOOSTAR)]
+                      nic0/vmbr0 (WAN)
                            |
-                    [OPNsense VM - WAN]
+                    [OPNsense VM 100]
+                      nic1/vmbr1 (LAN 192.168.0.1)
                            |
-                  [Managed 2.5G Switch]
+                  [MokerLink 2.5G Switch]
                            |
-     +----------+----------+-----------+----------+-----------+
-     |          |          |           |          |           |
-[Docker VM] [RPi 5]  [Bitcoin]   [NAS]    [WiFi AP]  [PoE Switch]
-           OpenClaw    Node                              |
-                                          +----+----+
-                                          |         |
-                                     [PoE Cam]  [PoE Cam]
+     +----------+----------+-----------+-----------+-----------+
+     |          |          |           |           |           |
+[Docker VM] [NAS]    [RPi 5]    [WiFi AP]   [PoE Switch]  [Proxmox mgmt]
+ VM 101    .0.12    .0.20      AX50          .0.237
+ .0.10     11 cnt   pending                       |
+ 20+ cnt                              +-----------+-----------+
+                                      |           |           |
+                                 [front_door] [back_yard]  [indoor]
+                                  .0.110       .0.111     .0.101 (WiFi)
 
-                    [Tailscale Mesh]
+                         [Tailscale Mesh — 8 nodes]
 ```
 
 ### Fixed Homelab Services
 
-| Device | Services |
-|--------|----------|
-| Docker VM | Pi-hole, Caddy, Jellyfin, *arr stack, Home Assistant, Vaultwarden, Mosquitto, Frigate |
-| RPi 5 | OpenClaw (AI assistant) |
-| RPi 4 | Bitcoin Core, LND, Electrum Server (Start9) |
-| NAS | NFS (for Frigate), Samba, Syncthing, Restic REST |
+| Device | Running Containers | Key Services |
+|--------|-------------------|--------------|
+| Docker VM | 20+ | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (Stirling-PDF), Papa (VictoriaMetrics+Grafana), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower |
+| NAS | 11 | Forgejo, Tajy (Coolify + 6 sub-containers), Samba, Syncthing, Restic REST, Glances, NFS |
+| RPi 5 | — | OpenClaw (pending PSU) |
+| RPi 4 | — | Bitcoin Core, LND, Electrum Server (Start9) |
 
-*Frigate runs on Docker VM (Intel N150 QuickSync) with NFS mount to NAS Purple 2TB for recordings.*
+*Frigate runs on Docker VM with OpenVINO GPU detector and NFS mount to NAS Purple 2TB for recordings.*
 
 ---
 
@@ -243,33 +261,28 @@ Cloud helper node (not critical infrastructure).
 |----------|------|-------|------|
 | Vultr | High Frequency | 1 vCPU, 1GB RAM, 32GB NVMe | ~$6/mo |
 
-**Services (active):** Headscale, Caddy, Uptime Kuma, ntfy | **Planned:** DERP relay, changedetection, Restic REST
+**Services (5 active):** Headscale, Caddy, headscale-backup, Uptime Kuma, ntfy
 
-**See:** `docs/vps-architecture.md`
+**See:** [docs/architecture/vps-architecture.md](vps-architecture.md)
 
 ---
 
 ## Tailscale IP Allocation
 
-### IP Ranges
+### Current Nodes (verified 2026-02-09)
 
-| Range | Purpose |
-|-------|---------|
-| x.x.x.1-9 | Mobile devices |
-| x.x.x.10-19 | Fixed homelab servers |
-| x.x.x.20-29 | Client devices |
-| x.x.x.100-109 | Cloud/VPS |
-| x.x.x.200-254 | Reserved |
+| Node | Tailscale IP | Type |
+|------|-------------|------|
+| vps-vultr | 100.77.172.46 | VPS |
+| oga | 100.78.12.241 | Proxmox host |
+| docker | 100.68.63.168 | Docker VM |
+| opnsense | 100.79.230.235 | Firewall VM |
+| nas | 100.82.77.97 | NAS |
+| augustos-macbook-air | 100.86.220.9 | Workstation |
+| beryl-ax | 100.102.244.131 | Travel router |
+| mombeu | 100.110.253.126 | Phone |
 
-### Allocation Strategy
-
-Devices are organized by role:
-- **Mobile**: Phones, laptops, portable devices
-- **Fixed**: Servers, NAS, infrastructure
-- **Clients**: Family desktops, media devices
-- **Cloud**: VPS and external infrastructure
-
-*Actual allocations managed in Headscale admin.*
+*Managed via self-hosted Headscale on VPS.*
 
 ### Hostname Convention
 
@@ -353,7 +366,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 **Total estimated load:** ~180W (well under 1000VA capacity)
 
-**See:** `docs/nut-config.md` for NUT graceful shutdown configuration
+**See:** [docs/guides/nut-config.md](../guides/nut-config.md) for NUT graceful shutdown configuration
 
 ---
 
@@ -395,8 +408,8 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | MokerLink 2.5G Switch | 2026 | Owned |
 | TP-Link PoE Switch | 2026 | Owned |
 | Forza UPS 1000VA | 2026 | Owned |
-| Reolink RLC-520A (x2) | 2026 | New in box |
-| TP-Link Tapo C110 | 2026 | New |
+| Reolink RLC-520A (x2) | 2026 | Deployed (Frigate) |
+| TP-Link Tapo C110 | 2026 | Deployed (Frigate) |
 | AC Infinity Fans | 2026 | Owned |
 
 ---
@@ -405,12 +418,13 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 | Item | Purpose | Priority |
 |------|---------|----------|
+| iGPU passthrough (SR-IOV) | Frigate GPU acceleration on Docker VM | High |
 | NVMe HAT for RPi 5 | Faster storage | Low |
-| Coral USB TPU | Frigate ML acceleration (Mini PC) | Medium |
 | 8TB HDD (parity) | SnapRAID parity drive | Low |
 | 8TB HDD (external) | Larger local backup | Low |
 | 3D printed case | RPi 5 enclosure | Medium |
-| New NAS PSU | Replace 2013 PSU if needed | Medium |
+| New NAS PSU | Replace 2013 picoPSU if needed | Medium |
+| NAS SSD upgrade | Replace Lexar NQ100 (/var only 6.1G) | Medium |
 
 ---
 
