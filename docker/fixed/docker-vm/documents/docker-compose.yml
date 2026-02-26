@@ -1,0 +1,184 @@
+# Documents Stack - Paperless-ngx
+# Fixed Homelab - Docker VM
+# Document management with OCR (Aranduka)
+
+services:
+  # =========================================================================
+  # Paperless-ngx - Document Management (Aranduka)
+  # https://docs.paperless-ngx.com/
+  # =========================================================================
+  paperless-ngx:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: paperless-ngx
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=documents"
+      - "com.cronova.backup=true"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    ports:
+      - "127.0.0.1:8010:8000"
+    volumes:
+      - paperless-data:/usr/src/paperless/data
+      - paperless-media:/usr/src/paperless/media
+      - paperless-consume:/usr/src/paperless/consume
+      - paperless-export:/usr/src/paperless/export
+    environment:
+      PAPERLESS_REDIS: redis://paperless-redis:6379
+      PAPERLESS_DBHOST: paperless-db
+      PAPERLESS_DBNAME: ${PAPERLESS_DB_NAME:-paperless}
+      PAPERLESS_DBUSER: ${PAPERLESS_DB_USER:-paperless}
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD}
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER:-augusto}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY}
+      PAPERLESS_URL: https://aranduka.cronova.dev
+      PAPERLESS_OCR_LANGUAGE: spa+eng
+      PAPERLESS_TASK_WORKERS: 1
+      PAPERLESS_THREADS_PER_WORKER: 1
+      PAPERLESS_TIME_ZONE: ${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - documents-net
+    depends_on:
+      paperless-db:
+        condition: service_healthy
+      paperless-redis:
+        condition: service_healthy
+
+  # =========================================================================
+  # PostgreSQL - Database for Paperless-ngx
+  # =========================================================================
+  paperless-db:
+    image: postgres:17-alpine
+    env_file:
+      - ../../../shared/common.env
+    container_name: paperless-db
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=documents"
+      - "com.cronova.backup=true"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    volumes:
+      - paperless-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${PAPERLESS_DB_USER:-paperless}
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD}
+      POSTGRES_DB: ${PAPERLESS_DB_NAME:-paperless}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB:-paperless}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - documents-net
+
+  # =========================================================================
+  # Redis - Cache/broker for Paperless-ngx
+  # =========================================================================
+  paperless-redis:
+    image: redis:7-alpine
+    env_file:
+      - ../../../shared/common.env
+    container_name: paperless-redis
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=documents"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - documents-net
+
+volumes:
+  paperless-data:
+    name: paperless-data
+  paperless-media:
+    name: paperless-media
+  paperless-consume:
+    name: paperless-consume
+  paperless-export:
+    name: paperless-export
+  paperless-db-data:
+    name: paperless-db-data
+
+networks:
+  documents-net:
+    name: documents-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create .env from .env.example:
+#    cp .env.example .env
+#    # Generate secrets:
+#    openssl rand -base64 32  # for PAPERLESS_SECRET_KEY
+#    openssl rand -base64 16  # for PAPERLESS_DB_PASSWORD
+#    # Set PAPERLESS_ADMIN_PASSWORD to a strong password
+#
+# 2. Start stack:
+#    docker compose up -d
+#
+# 3. Access: https://aranduka.cronova.dev
+#    Login with PAPERLESS_ADMIN_USER / PAPERLESS_ADMIN_PASSWORD
+#
+# 4. Test: Upload a PDF and verify OCR processes it
+#    Check logs: docker logs paperless-ngx
+#
+# =============================================================================
+# DNS ENTRIES (Pi-hole)
+# =============================================================================
+#
+# Add to Pi-hole local DNS:
+#   aranduka.cronova.dev → 192.168.0.10
+#
+# =============================================================================
+# RAM CONSIDERATIONS
+# =============================================================================
+#
+# Resource limits: 896M total (512M server + 256M postgres + 128M redis)
+# Actual usage: ~500-600M typical
+#
+# Gotenberg and Tika are intentionally skipped to save ~768M RAM.
+# Built-in Tesseract OCR handles spa+eng adequately.
+#
+# =============================================================================

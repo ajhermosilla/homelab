@@ -22,6 +22,11 @@ DOCKER_TIMEOUT=60
 NETWORKING_STACKS=("${COMPOSE_BASE}/networking/pihole" "${COMPOSE_BASE}/networking/caddy")
 AUTOMATION_STACK="${COMPOSE_BASE}/automation"
 SECURITY_STACK="${COMPOSE_BASE}/security"
+AUTH_STACK="${COMPOSE_BASE}/auth"
+TOOLS_STACK="${COMPOSE_BASE}/tools"
+DOCUMENTS_STACK="${COMPOSE_BASE}/documents"
+MONITORING_STACK="${COMPOSE_BASE}/monitoring"
+PHOTOS_STACK="${COMPOSE_BASE}/photos"
 MEDIA_STACK="${COMPOSE_BASE}/media"
 MAINTENANCE_STACK="${COMPOSE_BASE}/maintenance"
 
@@ -185,16 +190,36 @@ main() {
     log "Phase 6: Starting security stack"
     compose_up "$SECURITY_STACK" || true
 
-    # Phase 7: Media (NFS-dependent — needs /mnt/nas/media and /mnt/nas/downloads)
-    log "Phase 7: Starting media stack"
+    # Phase 7: Auth (Authelia — must be up before forward_auth services)
+    log "Phase 7: Starting auth stack"
+    compose_up "$AUTH_STACK" || true
+
+    # Phase 8: Tools (Dozzle, Stirling-PDF, Homepage)
+    log "Phase 8: Starting tools stack"
+    compose_up "$TOOLS_STACK" || true
+
+    # Phase 9: Documents (Paperless-ngx)
+    log "Phase 9: Starting documents stack"
+    compose_up "$DOCUMENTS_STACK" || true
+
+    # Phase 10: Monitoring (VictoriaMetrics, vmagent, Grafana)
+    log "Phase 10: Starting monitoring stack"
+    compose_up "$MONITORING_STACK" || true
+
+    # Phase 11: Photos (Immich)
+    log "Phase 11: Starting photos stack"
+    compose_up "$PHOTOS_STACK" || true
+
+    # Phase 12: Media (NFS-dependent — needs /mnt/nas/media and /mnt/nas/downloads)
+    log "Phase 12: Starting media stack"
     compose_up "$MEDIA_STACK" || true
 
-    # Phase 8: Maintenance (Watchtower — last)
-    log "Phase 8: Starting maintenance stack"
+    # Phase 13: Maintenance (Watchtower — always last)
+    log "Phase 13: Starting maintenance stack"
     compose_up "$MAINTENANCE_STACK" || true
 
-    # Phase 9: Final status
-    log "Phase 9: Final container status"
+    # Phase 14: Final status
+    log "Phase 14: Final container status"
     log "=== Container Status ==="
     docker ps --format 'table {{.Names}}\t{{.Status}}' | while IFS= read -r line; do
         log "$line"

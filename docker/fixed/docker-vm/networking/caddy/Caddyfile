@@ -188,6 +188,19 @@ mbyja.cronova.dev {
 }
 
 # =============================================================================
+# DOCUMENTS
+# =============================================================================
+
+# Paperless-ngx - Document Management (Aranduka)
+# Access: https://aranduka.cronova.dev
+aranduka.cronova.dev {
+	import internal_tls
+	import security_headers
+	import authelia
+	reverse_proxy host.docker.internal:8010
+}
+
+# =============================================================================
 # MONITORING
 # =============================================================================
 
@@ -207,11 +220,12 @@ papa.cronova.dev {
 # DNS Configuration:
 #   Pi-hole local DNS entries point *.cronova.dev → 192.168.0.10 (Docker VM).
 #   Required entries: jara, yrasema, taguato, japysaka, taanga, aoao, git,
-#                     auth, ysyry, kuatia, mbyja, papa, vera
+#                     auth, ysyry, kuatia, mbyja, aranduka, papa, vera
 #
 # Authelia-protected services:
 #   yrasema (Jellyfin), japysaka (Sonarr), taanga (Radarr), aoao (Prowlarr),
-#   ysyry (Dozzle), kuatia (Stirling-PDF), mbyja (Homepage), papa (Grafana)
+#   ysyry (Dozzle), kuatia (Stirling-PDF), mbyja (Homepage), aranduka (Paperless),
+#   papa (Grafana)
 #
 # Services with their own auth (NOT protected by Authelia):
 #   jara (Home Assistant), taguato (Frigate), vault (Vaultwarden),

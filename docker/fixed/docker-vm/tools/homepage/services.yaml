@@ -86,6 +86,12 @@
         description: PDF Tools
         server: local
         container: stirling-pdf
+    - Paperless-ngx:
+        icon: paperless-ngx
+        href: https://aranduka.cronova.dev
+        description: Document Management
+        server: local
+        container: paperless-ngx
     - Forgejo:
         icon: forgejo
         href: https://git.cronova.dev

@@ -5,7 +5,7 @@
 
 ---
 
-## Existing Names
+## Active Names
 
 | Service | Guarani Name | Meaning | Subdomain |
 |---------|-------------|---------|-----------|
@@ -14,6 +14,13 @@
 | Frigate NVR | **taguato** | hawk | `taguato.cronova.dev` |
 | Jellyfin | **yrasema** | sound of waterfalls | `yrasema.cronova.dev` |
 | Coolify PaaS | **tajy** | lapacho tree | `tajy.cronova.dev` |
+| Homepage | **mbyja** | star | `mbyja.cronova.dev` |
+| Dozzle | **ysyry** | river, stream | `ysyry.cronova.dev` |
+| Stirling-PDF | **kuatia** | paper, document | `kuatia.cronova.dev` |
+| Authelia | **okẽ** | door | `auth.cronova.dev` |
+| VictoriaMetrics + Grafana | **papa** | to count, measure | `papa.cronova.dev` |
+| Immich | **vera** | shine, flash | `vera.cronova.dev` |
+| Paperless-ngx | **aranduka** | book, library | `aranduka.cronova.dev` |
 
 ---
 
