@@ -372,9 +372,9 @@ verava.ai {
 | # | Task | Deliverable | Status |
 |---|------|-------------|--------|
 | 1 | Increase Headscale backup frequency | Backup sidecar in docker-compose | ✅ Done |
-| 2 | Create disaster recovery runbook | `docs/disaster-recovery.md` | ✅ Done |
+| 2 | Create disaster recovery runbook | `docs/strategy/disaster-recovery.md` | ✅ Done |
 | 3 | Add MQTT broker to services | Update `services.md`, compose file | ✅ Done |
-| 4 | Document Caddy configuration | `docs/caddy-config.md` | ✅ Done |
+| 4 | Document Caddy configuration | `docs/guides/caddy-config.md` | ✅ Done |
 
 ### Phase 2: High Priority (During Deployment)
 
@@ -392,7 +392,7 @@ verava.ai {
 |---|------|-------------|----------|
 | 10 | Document VLAN strategy | `docs/network-security.md` | Medium |
 | 11 | Configure monitoring alerts | Uptime Kuma + ntfy rules | Medium |
-| 12 | Create backup test procedure | `docs/backup-testing.md` | Medium |
+| 12 | Create backup test procedure | `docs/guides/backup-test-procedure.md` | Medium |
 | 13 | Resolve port 8080 conflict | Update `services.md` | Medium |
 
 ### Phase 4: Future Enhancements

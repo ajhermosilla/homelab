@@ -11,11 +11,19 @@ docker/
 │   │   ├── networking/      # Pi-hole, Caddy
 │   │   ├── media/           # Jellyfin, *arr stack
 │   │   ├── automation/      # Home Assistant, Mosquitto
-│   │   └── security/        # Vaultwarden, Frigate
+│   │   ├── security/        # Vaultwarden, Frigate
+│   │   ├── auth/            # Authelia (Okẽ)
+│   │   ├── tools/           # Dozzle, Stirling-PDF, Homepage
+│   │   ├── monitoring/      # VictoriaMetrics, Grafana
+│   │   ├── photos/          # Immich (Vera)
+│   │   ├── documents/       # Paperless-ngx (Aranduka)
+│   │   └── maintenance/     # Watchtower
 │   └── nas/                 # NAS (Debian)
 │       ├── storage/         # Samba, Syncthing
 │       ├── backup/          # Restic REST
-│       └── git/             # Forgejo
+│       ├── git/             # Forgejo
+│       ├── monitoring/      # Glances
+│       └── paas/            # Coolify (Tajy)
 ├── mobile/                   # Mobile Kit (On-Demand)
 │   └── rpi5/
 │       └── networking/      # Pi-hole
@@ -169,4 +177,4 @@ docker run --rm -v volume_name:/data alpine tar -czf - /data | \
 restic backup /var/lib/docker/volumes/
 ```
 
-See `docs/disaster-recovery.md` for full backup procedures.
+See `docs/strategy/disaster-recovery.md` for full backup procedures.

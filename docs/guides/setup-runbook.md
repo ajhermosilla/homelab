@@ -160,7 +160,7 @@ docker compose up -d
 
 ### 2.2 Install Proxmox VE
 
-See `docs/proxmox-setup.md` for detailed steps.
+See `docs/guides/proxmox-setup.md` for detailed steps.
 
 1. Boot Mini PC from Proxmox USB
 2. Complete installation wizard
@@ -170,7 +170,7 @@ See `docs/proxmox-setup.md` for detailed steps.
 
 ### 2.3 Create OPNsense VM
 
-See `docs/opnsense-setup.md` for detailed steps.
+See `docs/guides/opnsense-setup.md` for detailed steps.
 
 1. Upload OPNsense ISO to Proxmox
 2. Create VM with dual bridged NICs (vmbr0 WAN, vmbr1 LAN)
@@ -181,7 +181,7 @@ See `docs/opnsense-setup.md` for detailed steps.
 
 ### 2.4 Configure VLANs
 
-See `docs/vlan-design.md` for detailed steps.
+See `docs/guides/vlan-design.md` for detailed steps.
 
 1. Create VLANs in OPNsense (10, 20)
 2. Configure VLAN interfaces
@@ -202,7 +202,7 @@ tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 
 ### 3.1 Create Docker VM
 
-See `docs/proxmox-setup.md` for VM creation.
+See `docs/guides/proxmox-setup.md` for VM creation.
 
 1. Create VM (9GB RAM, 100GB disk)
 2. Install Debian 13 (trixie)
@@ -337,7 +337,7 @@ tailscale up --login-server=https://hs.cronova.dev --authkey=<key>
 
 ### 4.4 Configure NFS
 
-See `docs/nfs-setup.md` for detailed steps.
+See `docs/guides/nfs-setup.md` for detailed steps.
 
 ```bash
 # Install NFS server
@@ -491,7 +491,7 @@ crontab -e
 
 ### 7.4 Configure UPS
 
-See `docs/nut-config.md` for NUT setup.
+See `docs/guides/nut-config.md` for NUT setup.
 
 ### 7.5 Final Verification
 
@@ -581,5 +581,5 @@ sudo mount -v -t nfs 192.168.0.12:/mnt/purple/frigate /mnt/frigate
 - [nfs-setup.md](nfs-setup.md)
 - [nut-config.md](nut-config.md)
 - [backup-test-procedure.md](backup-test-procedure.md)
-- [services.md](services.md)
-- [hardware.md](hardware.md)
+- [services.md](../architecture/services.md)
+- [hardware.md](../architecture/hardware.md)

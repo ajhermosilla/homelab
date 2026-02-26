@@ -335,7 +335,7 @@ sudo cat /var/lib/nfs/etab
 
 ## Related Documentation
 
-- `docs/hardware.md` - NAS drive layout (Purple 2TB for Frigate)
-- `docs/fixed-homelab.md` - Docker VM and NAS setup
-- `docs/security-hardening.md` - General security practices
+- `docs/architecture/hardware.md` - NAS drive layout (Purple 2TB for Frigate)
+- `docs/architecture/fixed-homelab.md` - Docker VM and NAS setup
+- `docs/strategy/security-hardening.md` - General security practices
 - `docker/fixed/docker-vm/security/docker-compose.yml` - Frigate config

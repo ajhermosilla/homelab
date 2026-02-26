@@ -4,7 +4,7 @@ Always-on infrastructure at home for media, automation, storage, and Bitcoin sov
 
 ## Hardware
 
-*Full specifications in `docs/hardware.md`*
+*Full specifications in `docs/architecture/hardware.md`*
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
@@ -187,7 +187,7 @@ Virtualization host running network gateway and Docker services.
 
 **Management:** Use `lazydocker` (TUI) or `docker compose` CLI - no web GUI needed.
 
-**See also:** `docs/caddy-config.md` for reverse proxy configuration.
+**See also:** `docs/guides/caddy-config.md` for reverse proxy configuration.
 
 ### Docker Structure
 
@@ -255,7 +255,7 @@ If Mini PC fails, RPi 4 can run essential services:
 
 Debian-based storage server. Repurposed 2013 build, compact and low-power.
 
-*Full hardware specs in `docs/hardware.md`*
+*Full hardware specs in `docs/architecture/hardware.md`*
 
 ### Hardware
 
@@ -474,7 +474,7 @@ See Headscale admin for current allocations.
 - 2 different media types (SSD/HDD + cloud)
 - 1 offsite (Google Drive)
 
-*Full procedures in `docs/disaster-recovery.md`*
+*Full procedures in `docs/strategy/disaster-recovery.md`*
 
 ### Critical Services (Hourly)
 
@@ -548,9 +548,9 @@ All critical devices connected to **Forza NT-1012U 1000VA UPS**.
 - [ ] Replace NAS PSU (2013, aging)
 
 ### Infrastructure
-- [x] VLANs for IoT/camera isolation (see `docs/vlan-design.md`)
+- [x] VLANs for IoT/camera isolation (see `docs/guides/vlan-design.md`)
 - [ ] Proxmox Backup Server on NAS
-- [ ] NUT for UPS graceful shutdown (see `docs/nut-config.md`)
+- [ ] NUT for UPS graceful shutdown (see `docs/guides/nut-config.md`)
 - [ ] HA cluster (second Proxmox node)
 
 ### Automation
