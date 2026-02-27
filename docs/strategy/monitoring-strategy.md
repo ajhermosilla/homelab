@@ -1,307 +1,209 @@
 # Monitoring Strategy
 
-Uptime Kuma + ntfy for homelab monitoring and alerting.
+How the homelab is monitored, alerted, and observed.
 
-## Overview
+## Monitoring Stack Overview
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Uptime Kuma** | VPS | External health checks (HTTP, TCP, ping) |
+| **ntfy** | VPS | Push notifications (alerts, backup status) |
+| **VictoriaMetrics** (Papa) | Docker VM | Time-series metrics database |
+| **vmagent** | Docker VM | Prometheus-compatible metrics scraper |
+| **Grafana** (Papa) | Docker VM | Dashboards and visualization |
+| **Dozzle** (Ysyry) | Docker VM | Real-time container log viewer |
+| **Glances** | NAS | System resource monitor (HA integration) |
+| **Watchtower** | Docker VM | Auto-update monitoring (Sunday 4 AM) |
+
+---
+
+## Metrics Pipeline
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     VPS (Vultr) - 24/7                       │
-│  ┌─────────────┐    ┌─────────┐    ┌───────────┐           │
-│  │ Uptime Kuma │───▶│  ntfy   │    │ Headscale │           │
-│  │ :3001       │    │ :80     │    │ :443      │           │
-│  └──────┬──────┘    └─────────┘    └───────────┘           │
-│         │                                                    │
-│         │ Monitor                                            │
-└─────────┼───────────────────────────────────────────────────┘
-          │
-          │ Tailscale Mesh
-          │
-    ┌─────┴─────────────────────────────────────────┐
-    │                                               │
-    ▼                                               ▼
-┌───────────────┐                          ┌───────────────┐
-│  Mobile Kit   │                          │ Fixed Homelab │
-│  (On-Demand)  │                          │ (24/7)        │
-│  RPi 5        │                          │ Mini PC, NAS  │
-│  Pi-hole      │                          │ RPi 4         │
-└───────────────┘                          └───────────────┘
+node_exporter (Docker VM :9100) ──┐
+node_exporter (NAS :9100) ────────┼──► vmagent ──► VictoriaMetrics ──► Grafana
+Home Assistant (/api/prometheus) ──┘    (30s scrape)    (90d retention)    (papa.cronova.dev)
 ```
+
+**Config:** `docker/fixed/docker-vm/monitoring/prometheus.yml`
+
+### Scrape Targets
+
+| Job | Target | Labels |
+|-----|--------|--------|
+| node-docker-vm | `host.docker.internal:9100` | instance: docker-vm |
+| node-nas | `100.82.77.97:9100` | instance: nas |
+| home-assistant | `host.docker.internal:8123/api/prometheus` | instance: home-assistant |
+
+### VictoriaMetrics
+
+- Image: `victoriametrics/victoria-metrics:latest`
+- Port: 8428 (localhost only)
+- Retention: 90 days
+- Memory limit: 1GB
+- Data volume: `vm-data`
+
+### Grafana
+
+- Image: `grafana/grafana:latest`
+- Port: 3000 (localhost only, behind Caddy + Authelia)
+- URL: `https://papa.cronova.dev`
+- Plugin: `victoriametrics-metrics-datasource`
 
 ---
 
 ## Uptime Kuma Monitors
 
-### Critical Services (60s interval)
+Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. Alerts route to ntfy topics by priority.
 
-Must be online 24/7. Alert immediately on failure.
+### Critical (60s interval, ntfy urgent)
 
-| Service | Type | Target | Expected |
-|---------|------|--------|----------|
-| Headscale (VPS) | HTTPS | `https://hs.cronova.dev/health` | 200 OK |
-| Vaultwarden | HTTPS | `https://vault.cronova.dev/alive` | 200 OK |
-| Pi-hole (Fixed) | TCP | `100.68.63.168:53` | Open |
-| NUT Server | TCP | `100.82.77.97:3493` | Open |
+| Monitor | Type | Target |
+|---------|------|--------|
+| Headscale | HTTP | `https://hs.cronova.dev/health` |
+| Vaultwarden | HTTP | `https://vault.cronova.dev/alive` |
+| Pi-hole (Docker VM) | TCP | `100.68.63.168:53` |
+| Caddy (Docker VM) | HTTP | `https://cronova.dev` |
+| OPNsense | Ping | `192.168.0.1` |
 
-### High Priority Services (5m interval)
+### High Priority (5m interval, ntfy high)
 
-Core homelab services. Alert after 2 failures.
+| Monitor | Type | Target |
+|---------|------|--------|
+| Home Assistant (Jara) | HTTP | `https://jara.cronova.dev` |
+| Frigate (Taguato) | HTTP | `https://taguato.cronova.dev/api/version` |
+| Forgejo | HTTP | `https://git.cronova.dev/api/healthz` |
+| NAS (Samba) | TCP | `100.82.77.97:445` |
+| Restic REST | HTTP | `http://100.82.77.97:8000/` (expect 401) |
+| Coolify (Tajy) | HTTP | `https://tajy.cronova.dev` |
+| Authelia (Oke) | HTTP | `https://auth.cronova.dev` |
 
-| Service | Type | Target | Expected |
-|---------|------|--------|----------|
-| Home Assistant | HTTP | `http://100.68.63.168:8123` | 200 OK |
-| Jellyfin | HTTP | `http://100.68.63.168:8096` | 200 OK |
-| Frigate | HTTP | `http://100.68.63.168:5000` | 200 OK |
-| Start9 | HTTP | `http://100.64.0.11` | 200 OK |
-| NAS Samba | TCP | `100.82.77.97:445` | Open |
-| NAS Syncthing | HTTP | `http://100.82.77.97:8384` | 200 OK |
-| Restic REST (NAS) | TCP | `100.82.77.97:8000` | Open |
+### Standard (5m interval, ntfy default)
 
-### VPS Services (5m interval)
+| Monitor | Type | Target |
+|---------|------|--------|
+| Jellyfin (Yrasema) | HTTP | `https://yrasema.cronova.dev/health` |
+| Grafana (Papa) | HTTP | `https://papa.cronova.dev` |
+| Immich (Vera) | HTTP | `https://vera.cronova.dev` |
+| Syncthing | HTTP | `http://100.82.77.97:8384/rest/noauth/health` |
+| Glances | HTTP | `http://100.82.77.97:61208/api/4/cpu` |
 
-Running on VPS. Alert after 2 failures.
+### External (15m interval)
 
-| Service | Type | Target | Expected |
-|---------|------|--------|----------|
-| DERP Relay | TCP | `localhost:443` | Open |
-| Pi-hole (VPS) | TCP | `localhost:53` | Open |
-| changedetection | HTTP | `http://localhost:5000` | 200 OK |
-| Restic REST (VPS) | TCP | `localhost:8000` | Open |
+| Monitor | Type | Target |
+|---------|------|--------|
+| cronova.dev | HTTPS | `https://cronova.dev` |
+| verava.ai | HTTPS | `https://verava.ai` |
 
-### Mobile Kit - On-Demand (15m interval)
+### Planned Monitors (not yet configured)
 
-**These services are NOT 24/7.** Expected to be offline nights and hot days.
-Alert level: **info** (not critical). Just for awareness.
-
-| Service | Type | Target | Expected |
-|---------|------|--------|----------|
-| Pi-hole (RPi 5) | TCP | `100.64.0.1:53` | Open when on |
-
-**Configure in Uptime Kuma:**
-- Notification: `cronova-info` topic (not critical)
-- Retries: 5 (allow time for expected downtime)
-- Description: "On-demand - expected offline nights/hot days"
-
-### External Checks (15m interval)
-
-Public-facing. Alert after 3 failures.
-
-| Service | Type | Target | Expected |
-|---------|------|--------|----------|
-| cronova.dev | HTTPS | `https://cronova.dev` | 200/301/302 |
-| verava.ai | HTTPS | `https://verava.ai` | 200/301/302 |
-| status.cronova.dev | HTTPS | `https://status.cronova.dev` | 200 OK |
-| notify.cronova.dev | HTTPS | `https://notify.cronova.dev` | 200 OK |
+| Monitor | Type | Target | Notes |
+|---------|------|--------|-------|
+| Paperless-ngx (Aranduka) | HTTP | `https://aranduka.cronova.dev` | After deployment |
+| Stirling-PDF (Kuatia) | HTTP | `https://kuatia.cronova.dev` | After deployment |
+| Homepage (Mbyja) | HTTP | `https://mbyja.cronova.dev` | After deployment |
+| Dozzle (Ysyry) | HTTP | `https://ysyry.cronova.dev` | After deployment |
 
 ---
 
-## ntfy Topic Structure
+## ntfy Notification Architecture
+
+**URL:** `https://notify.cronova.dev` (VPS, Caddy reverse proxy)
 
 ### Topics
 
 | Topic | Purpose | Priority |
 |-------|---------|----------|
-| `cronova-critical` | Service down, data loss risk | Urgent |
-| `cronova-warning` | Degraded performance, attention needed | High |
-| `cronova-info` | Backups completed, maintenance | Default |
+| `cronova-critical` | Service down, data loss risk | Urgent (wakes phone) |
+| `cronova-warning` | Degraded performance | High |
+| `cronova-info` | Backups completed, maintenance | Default (silent) |
 | `cronova-test` | Testing notifications | Low |
+
+### Auth
+
+- Anonymous access: deny-all
+- Service tokens for automation (backup sidecars, scripts)
+- User `augusto` has full read/write on all topics
+
+### Integration Points
+
+| Source | Topic | Trigger |
+|--------|-------|---------|
+| Uptime Kuma | `cronova-critical` / `cronova-warning` | Service down/degraded |
+| Backup sidecars | `cronova-critical` / `cronova-info` | Backup failure / success |
+| `scripts/backup-notify.sh` | Per-service routing | Backup event notifications |
+| `scripts/backup-verify.sh` | `cronova-info` | Monthly verification results |
 
 ### Subscribe on Phone
 
-```bash
-# Android/iOS ntfy app
-# Subscribe to: https://notify.cronova.dev/cronova-critical
 ```
-
-### Topic Access Control
-
-Configure in ntfy (VPS):
-
-```bash
-# Create admin user
-docker exec -it ntfy ntfy user add --role=admin augusto
-
-# Set topic permissions
-docker exec -it ntfy ntfy access augusto '*' rw
-docker exec -it ntfy ntfy access '*' 'cronova-test' rw  # Public test topic
+Android/iOS ntfy app → Subscribe to:
+  https://notify.cronova.dev/cronova-critical
+  https://notify.cronova.dev/cronova-warning
 ```
 
 ---
 
-## Alert Configuration
+## Container Log Monitoring — Dozzle (Ysyry)
 
-### Uptime Kuma → ntfy Integration
-
-In Uptime Kuma (Settings → Notifications):
-
-| Field | Value |
-|-------|-------|
-| Type | ntfy |
-| Server URL | `https://notify.cronova.dev` |
-| Topic | `cronova-critical` |
-| Priority | urgent |
-| Username | augusto |
-| Password | (your password) |
-
-### Alert Rules
-
-| Event | Topic | Priority | Action |
-|-------|-------|----------|--------|
-| Critical service down | cronova-critical | urgent | Wake phone |
-| High priority service down | cronova-warning | high | Notification |
-| Service recovered | cronova-info | default | Silent |
-| Backup completed | cronova-info | low | Silent |
-| SSL expiry < 14 days | cronova-warning | high | Notification |
+- URL: `https://ysyry.cronova.dev` (Caddy + Authelia)
+- Real-time Docker log viewer for all containers on Docker VM
+- No persistent storage — live view only
+- Useful for debugging container startup issues, watching Frigate detections, checking backup logs
 
 ---
 
-## Notification Scripts
+## Auto-Update Monitoring — Watchtower
 
-### Backup Completion Notification
-
-```bash
-#!/bin/bash
-# /usr/local/bin/notify-backup.sh
-
-NTFY_URL="https://notify.cronova.dev/cronova-info"
-
-curl -H "Title: Backup Completed" \
-     -H "Priority: low" \
-     -H "Tags: white_check_mark" \
-     -d "Homelab backup completed successfully at $(date)" \
-     "$NTFY_URL"
-```
-
-### Service Recovery Notification
-
-```bash
-#!/bin/bash
-# Called by Uptime Kuma on recovery
-
-NTFY_URL="https://notify.cronova.dev/cronova-info"
-SERVICE="$1"
-
-curl -H "Title: Service Recovered" \
-     -H "Priority: default" \
-     -H "Tags: green_circle" \
-     -d "$SERVICE is back online" \
-     "$NTFY_URL"
-```
-
-### Test Notification
-
-```bash
-# Quick test
-curl -d "Test notification from homelab" \
-     https://notify.cronova.dev/cronova-test
-```
+- Schedule: **Sunday 4:00 AM** (label-enabled, opt-in via `com.centurylinklabs.watchtower.enable=true`)
+- Image: `nicholas-fedor/watchtower:1.14.2` (maintained fork — official containrrr is abandoned/Docker 29+ incompatible)
+- Behavior: Rolling restarts, old image cleanup
+- **Excluded from auto-update** (manual only): vaultwarden, frigate, headscale
 
 ---
 
-## Status Page Configuration
+## Home Assistant Integrations (Monitoring-Related)
 
-### Public Status Page
-
-Uptime Kuma supports public status pages:
-
-1. Settings → Status Pages → Create
-2. Name: `Homelab Status`
-3. Slug: `status`
-4. Add monitors for public services:
-   - Vaultwarden
-   - status.cronova.dev
-   - notify.cronova.dev
-
-Access at: `https://status.cronova.dev/status/status`
-
-### Incident Management
-
-When services go down:
-1. Uptime Kuma creates incident automatically
-2. Update status page with details
-3. Resolve when service recovers
-
----
-
-## Maintenance Windows
-
-### Configure Scheduled Maintenance
-
-In Uptime Kuma:
-1. Select monitor
-2. Maintenance → Add
-3. Set schedule (e.g., Sunday 3-5 AM)
-4. Alerts suppressed during window
-
-### Common Maintenance Tasks
-
-| Task | Frequency | Duration |
-|------|-----------|----------|
-| Proxmox updates | Monthly | 30 min |
-| Docker image updates | Weekly | 15 min |
-| NAS backup verification | Monthly | 1 hour |
-| Certificate renewal | Auto | - |
+| Integration | Source | What It Monitors |
+|-------------|--------|------------------|
+| System Monitor | Docker VM | CPU, RAM, disk usage |
+| Glances | NAS (100.82.77.97:61208) | NAS system metrics |
+| Proxmox VE (HACS) | Oga (100.78.12.241) | Host and VM status |
+| Frigate | MQTT (mqtt-net) | Camera events, detection counts |
 
 ---
 
 ## Monitoring Checklist
 
-### Initial Setup
+### Weekly
 
-- [ ] Deploy Uptime Kuma on VPS
-- [ ] Configure ntfy authentication
-- [ ] Create notification integration
-- [ ] Add all critical monitors
-- [ ] Subscribe to topics on phone
-- [ ] Test alert delivery
-- [ ] Create public status page
+- [ ] Check Uptime Kuma dashboard — all monitors green
+- [ ] Review ntfy alert history — any unexpected alerts
+- [ ] Spot-check Dozzle for container error logs
 
-### Weekly Verification
+### Monthly (1st Sunday)
 
-- [ ] Check all monitors are green
-- [ ] Review alert history
-- [ ] Verify notification delivery
-- [ ] Check certificate expiry warnings
+- [ ] Run `backup-verify.sh` on Docker VM
+- [ ] Check Grafana dashboards — disk usage trends, RAM pressure
+- [ ] Verify vmagent scrape targets are all up (`/targets` endpoint)
+- [ ] Review Watchtower update logs
+- [ ] Check NAS Purple 2TB usage (97% — monitor closely)
 
-### Monthly Review
+### Quarterly
 
-- [ ] Analyze uptime reports
-- [ ] Adjust alert thresholds if needed
-- [ ] Test disaster recovery procedures
-- [ ] Update monitors for new services
+- [ ] Full backup restore drill (`backup-verify.sh --full`)
+- [ ] Review and update Uptime Kuma monitors for new/removed services
+- [ ] Test ntfy notification delivery (all priority levels)
+- [ ] Review VictoriaMetrics retention and disk usage
 
 ---
 
-## Prometheus Integration (Future)
+## References
 
-For advanced metrics, consider adding:
-
-```yaml
-# docker-compose.yml addition
-prometheus:
-  image: prom/prometheus:latest
-  ports:
-    - "9090:9090"
-  volumes:
-    - ./prometheus.yml:/etc/prometheus/prometheus.yml
-
-grafana:
-  image: grafana/grafana:latest
-  ports:
-    - "3000:3000"
-```
-
-Exporters to consider:
-- node_exporter (system metrics)
-- cadvisor (container metrics)
-- nut_exporter (UPS metrics)
-- blackbox_exporter (probe endpoints)
-
----
-
-## Reference
-
-- [Uptime Kuma Docs](https://github.com/louislam/uptime-kuma/wiki)
+- [VictoriaMetrics Docs](https://docs.victoriametrics.com/)
+- [Grafana Documentation](https://grafana.com/docs/grafana/latest/)
+- [Uptime Kuma Wiki](https://github.com/louislam/uptime-kuma/wiki)
 - [ntfy Documentation](https://docs.ntfy.sh/)
-- [ntfy Android App](https://play.google.com/store/apps/details?id=io.heckel.ntfy)
-- [ntfy iOS App](https://apps.apple.com/app/ntfy/id1625396347)
+- [Dozzle](https://dozzle.dev/)
+- [Watchtower](https://github.com/nicholas-fedor/watchtower)
+- [Glances](https://nicolargo.github.io/glances/)
