@@ -80,16 +80,14 @@ All times in PYT (America/Asuncion).
 |--------|----------|----------|--------|
 | Restic REST (NAS) | `/mnt/purple/backup/restic/` | Vaultwarden, HA, Coolify | Active (WD Purple 2TB, **97% full**) |
 | VPS local | `/backup/` in headscale-backup container | Headscale SQLite + config | Active (hourly) |
+| Google Drive (encrypted) | `gdrive-crypt:homelab/` | Restic repos + Headscale backups | Active (4:30 AM daily, rclone crypt) |
 
 **Known gaps — documented honestly:**
 
 - **WD Purple at 97% capacity** — Restic pruning keeps it in check, but monitor closely
 - **WD Red Plus 8TB** installed in NAS but partition needs recovery/reformatting (see `journal/red-8tb-recovery-2026-02-22.md`)
-- **No offsite backup** — Google Drive (rclone crypt) planned but not configured
-- **No cross-site replication** — VPS Headscale backups are VPS-local only
-- **3-2-1 strategy not yet complete** — requires: (1) Red 8TB reformatted, (2) second 8TB drive, (3) rclone offsite configured
-
-**Future 3-2-1 plan:** Live config + Restic on NAS + Google Drive encrypted offsite
+- **Offsite backup configured** — verify monthly that GDrive sync is current and restorable
+- **3-2-1 strategy partially complete** — offsite configured; still needs: (1) Red 8TB reformatted, (2) second 8TB drive
 
 ### Notification Integration
 
@@ -326,7 +324,25 @@ rm -rf /tmp/ha-restore
 - Git history: clone from GitHub mirror (TODO: set up Forgejo → GitHub mirror)
 - Compose files: in this git repo
 - Secrets: in Vaultwarden (cached on devices) + .env.example templates
-- Data: **unrecoverable** without offsite backup (not yet configured)
+- Restic data: restore from Google Drive offsite (see below)
+
+**Restoring from Google Drive offsite:**
+```bash
+# 1. Install rclone, restore rclone.conf from Vaultwarden backup
+brew install rclone  # or apt install rclone
+# Recreate rclone config with crypt password + salt from Vaultwarden
+
+# 2. Download Restic repos
+rclone copy gdrive-crypt:homelab/restic /tmp/restic-restore
+
+# 3. Restore individual services
+export RESTIC_PASSWORD="<from Vaultwarden>"
+restic -r /tmp/restic-restore/augusto/vaultwarden snapshots
+restic -r /tmp/restic-restore/augusto/vaultwarden restore latest --target /tmp/vw-data
+
+# 4. Download Headscale backups
+rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
+```
 
 ### Scenario 7: Restic Password Lost
 
@@ -371,12 +387,12 @@ See `docs/guides/backup-test-procedure.md` for detailed test procedures.
 ## Critical Warnings
 
 - **RESTIC_PASSWORD** is identical across all stacks — lose it = lose all backups
+- **rclone crypt password + salt** — lose either = Google Drive data unreadable (store both in Vaultwarden)
+- **Restoring from offsite requires ALL THREE:** rclone crypt password, rclone crypt salt, AND RESTIC_PASSWORD
 - **NAS Purple 2TB at 97%** — Restic pruning manages space, but monitor closely
-- **No offsite backup yet** — if NAS hardware dies, all backup data is lost
 - **WD Red 8TB partition recovery still pending** — media storage not yet available
 - **Forgejo runs on NAS** — if NAS dies, git history is only on local clones (set up GitHub mirror)
 - **NAS boots from USB** — Generic Flash Disk 3.7GB must stay plugged in
-- **Headscale backups are VPS-local only** — not replicated to NAS Restic
 
 ---
 
