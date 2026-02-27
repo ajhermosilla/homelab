@@ -1,603 +1,382 @@
 # Disaster Recovery Runbook
 
-Procedures for recovering from failures across all homelab environments. Created 2026-01-14.
+Procedures for recovering from failures across all homelab environments.
 
-## Critical Services Priority
+## Quick Reference — Emergency Cheat Sheet
 
+**Recovery priority order:**
+
+1. **Headscale** (VPS) — mesh network dies without it
+2. **Pi-hole** (Docker VM) — DNS resolution
+3. **Caddy** (Docker VM) — reverse proxy for all services
+4. **Vaultwarden** (Docker VM) — password access
+5. **Home Assistant** (Docker VM) — automations
+6. Everything else
+
+**SSH access:**
+
+| Host | Command | User |
+|------|---------|------|
+| VPS | `ssh vps` | `linuxuser` |
+| Docker VM | `ssh docker-vm` | `augusto` |
+| NAS | `ssh nas` | `augusto` |
+| Proxmox | `ssh proxmox` | `root` |
+
+**Restic REST server:**
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    RECOVERY PRIORITY ORDER                       │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  1. HEADSCALE (VPS)       ← Mesh dies without this              │
-│  2. Pi-hole (any)         ← DNS resolution                      │
-│  3. VPS Services          ← Public endpoints                    │
-│  4. Vaultwarden           ← Password access                     │
-│  5. Everything else       ← Nice to have                        │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+http://augusto:<PASS>@192.168.0.12:8000/augusto/<service>
 ```
+
+**ntfy alerts:** `https://notify.cronova.dev` (topics: `cronova-critical`, `cronova-warning`, `cronova-info`)
+
+**Compose file locations:**
+- Docker VM: `/opt/homelab/repo/docker/fixed/docker-vm/`
+- NAS: `/opt/homelab/repo/docker/fixed/nas/`
+- VPS: `/opt/homelab/headscale/`, `/opt/homelab/caddy/`
 
 ---
 
-## Backup Strategy
+## Backup Architecture
 
-### What's Backed Up
+### How Backups Work
 
-| Service | Data Location | Backup Target | Frequency | Retention |
-|---------|---------------|---------------|-----------|-----------|
-| **Headscale** | `/etc/headscale/` | NAS + Cloud | Hourly | 30 days |
-| **Pi-hole** | `/etc/pihole/` | NAS | Daily | 7 days |
-| **Vaultwarden** | `/var/lib/vaultwarden/` | NAS + Cloud | Hourly | 30 days |
-| **Home Assistant** | `/config/` | NAS | Daily | 14 days |
-| **Start9** | Built-in backup | NAS | Weekly | 4 weeks |
-| **Frigate** | Config only | NAS | Daily | 7 days |
-
-### Backup Locations
+All backups use **Restic** with a centralized REST server on the NAS. Each backed-up service has a dedicated **sidecar container** that runs the shared backup script on a cron schedule.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      BACKUP TOPOLOGY                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  [Services]                                                      │
-│      │                                                           │
-│      ├──► [NAS - Primary Backup]                                │
-│      │    /backups/                                              │
-│      │    ├── headscale/                                         │
-│      │    ├── pihole/                                            │
-│      │    ├── vaultwarden/                                       │
-│      │    ├── homeassistant/                                     │
-│      │    └── start9/                                            │
-│      │                                                           │
-│      └──► [Cloud - Critical Only]                               │
-│           ├── headscale/ (B2/Backblaze or similar)              │
-│           └── vaultwarden/                                       │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+[Vaultwarden Sidecar]──┐
+[HA Sidecar]────────────┼──► Restic REST Server (NAS :8000) ──► /mnt/purple/backup/restic/
+[Coolify Sidecar]───────┘
+                              ▲
+[Headscale Sidecar]──► Local backup on VPS (separate — hourly tar.gz)
 ```
 
-### Backup Scripts
+**Components:**
 
-#### Headscale Backup (Hourly Cron)
+| Component | Details |
+|-----------|---------|
+| REST server | `restic/rest-server:0.14.0` on NAS, port 8000 |
+| Data path | `/mnt/purple/backup/restic/` (WD Purple 2TB) |
+| Auth | htpasswd file, `--private-repos` (forces `/username/` prefix) |
+| Shared script | `docker/shared/backup/restic-backup.sh` |
+| Default retention | 7 daily, 4 weekly, 12 monthly |
+| Integrity check | Weekly on Sundays (automatic in backup script) |
 
-```bash
-#!/bin/bash
-# /opt/scripts/backup-headscale.sh
-# Run: 0 * * * * /opt/scripts/backup-headscale.sh
+### Backup Schedule
 
-TIMESTAMP=$(date +%Y%m%d_%H%M)
-BACKUP_DIR="/mnt/nas/backups/headscale"
-SOURCE="/etc/headscale"
+All times in PYT (America/Asuncion).
 
-# Create backup
-tar -czf "${BACKUP_DIR}/headscale_${TIMESTAMP}.tar.gz" \
-    -C /etc headscale/
+| Service | Container | Schedule | Repository | What's Backed Up |
+|---------|-----------|----------|------------|------------------|
+| Headscale | headscale-backup | Hourly | VPS local (`/backup/`) | SQLite DB + noise key + config |
+| Vaultwarden | vaultwarden-backup | 2:00 AM daily | `/augusto/vaultwarden` | vaultwarden-data volume |
+| Home Assistant | homeassistant-backup | 2:30 AM daily | `/augusto/homeassistant` | homeassistant-config volume |
+| Coolify | coolify-backup | 3:30 AM daily | `/augusto/coolify` | PostgreSQL dumps + SSH keys |
 
-# Keep only last 720 backups (30 days * 24 hours)
-ls -t ${BACKUP_DIR}/headscale_*.tar.gz | tail -n +721 | xargs -r rm
+**Home Assistant exclusions:** `*.log`, `*.db-shm`, `*.db-wal`, `home-assistant_v2.db`
 
-# Sync critical to cloud (if configured)
-# rclone sync ${BACKUP_DIR} b2:homelab-backups/headscale --max-age 24h
-```
+### Backup Storage — Current State
 
-#### Vaultwarden Backup (Hourly Cron)
+| Target | Location | Contents | Status |
+|--------|----------|----------|--------|
+| Restic REST (NAS) | `/mnt/purple/backup/restic/` | Vaultwarden, HA, Coolify | Active (WD Purple 2TB, **97% full**) |
+| VPS local | `/backup/` in headscale-backup container | Headscale SQLite + config | Active (hourly) |
 
-```bash
-#!/bin/bash
-# /opt/scripts/backup-vaultwarden.sh
-# Run: 30 * * * * /opt/scripts/backup-vaultwarden.sh
+**Known gaps — documented honestly:**
 
-TIMESTAMP=$(date +%Y%m%d_%H%M)
-BACKUP_DIR="/mnt/nas/backups/vaultwarden"
-SOURCE="/var/lib/vaultwarden"
+- **WD Purple at 97% capacity** — Restic pruning keeps it in check, but monitor closely
+- **WD Red Plus 8TB** installed in NAS but partition needs recovery/reformatting (see `journal/red-8tb-recovery-2026-02-22.md`)
+- **No offsite backup** — Google Drive (rclone crypt) planned but not configured
+- **No cross-site replication** — VPS Headscale backups are VPS-local only
+- **3-2-1 strategy not yet complete** — requires: (1) Red 8TB reformatted, (2) second 8TB drive, (3) rclone offsite configured
 
-# Stop container briefly for consistent backup
-docker stop vaultwarden
+**Future 3-2-1 plan:** Live config + Restic on NAS + Google Drive encrypted offsite
 
-# Create backup
-tar -czf "${BACKUP_DIR}/vaultwarden_${TIMESTAMP}.tar.gz" \
-    -C /var/lib vaultwarden/
+### Notification Integration
 
-# Restart container
-docker start vaultwarden
-
-# Keep only last 720 backups
-ls -t ${BACKUP_DIR}/vaultwarden_*.tar.gz | tail -n +721 | xargs -r rm
-```
+Backup success/failure notifications use `scripts/backup-notify.sh`:
+- Failures → `cronova-critical` (urgent priority)
+- Success → `cronova-info` (default priority)
+- Script sends to `https://notify.cronova.dev` with service-specific tags
 
 ---
 
-## Scenario 1: Headscale Failure
+## Recovery Scenarios
 
-### Symptoms
-- Tailscale clients show "Unable to connect to coordination server"
-- New devices cannot join mesh
-- Existing connections may work briefly (cached)
+### Scenario 1: VPS Failure
 
-### Impact
-- **Critical**: All mesh networking degraded
-- Existing peer-to-peer connections continue working
-- No new connections or re-authentication possible
+**Impact:** Headscale (mesh network), Uptime Kuma (monitoring), ntfy (notifications), public Caddy endpoints
 
-### Recovery Procedure
+**Symptoms:** Tailscale clients show "Unable to connect to coordination server", no ntfy alerts
 
-#### Option A: Restore on VPS (Primary Location)
+**Recovery:**
 
 ```bash
-# 1. SSH to VPS
-ssh linuxuser@vps
-
-# 2. Check Headscale container status
-docker ps -a | grep headscale
-docker logs headscale --tail 50
-
-# 3. If config corrupted, restore from backup
-cd /opt/homelab/headscale
-docker compose down
-LATEST_BACKUP=$(ls -t /mnt/nas/backups/headscale/*.tar.gz | head -1)
-sudo tar -xzf ${LATEST_BACKUP} -C ./config/
-docker compose up -d
-
-# 4. Verify
-docker exec headscale headscale nodes list
-docker exec headscale headscale users list
-```
-
-#### Option B: Rebuild VPS from Scratch
-
-```bash
-# 1. Provision new VPS (Vultr, Debian)
-# 2. Basic setup
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl wget docker.io docker-compose-plugin
-
-# 3. Deploy Headscale via Docker Compose
-mkdir -p /opt/homelab/headscale && cd /opt/homelab/headscale
-# Copy docker-compose.yml and config from repo
-
-# 4. Restore configuration from backup
-LATEST_BACKUP=$(ls -t /mnt/nas/backups/headscale/*.tar.gz | head -1)
-# Or download from cloud: rclone copy b2:homelab-backups/headscale/latest.tar.gz /tmp/
-sudo tar -xzf ${LATEST_BACKUP} -C ./config/
-
-# 5. Start service
-docker compose up -d
-
-# 6. Verify all nodes reconnect
-docker exec headscale headscale nodes list
-```
-
-#### Option C: Emergency Alternative Host
-
-If VPS is unavailable:
-
-```bash
-# 1. SSH to VPS
-ssh admin@vps.cronova.dev
-
-# 2. Install Headscale on VPS (temporary)
-wget https://github.com/juanfont/headscale/releases/latest/download/headscale_linux_amd64.deb
-sudo dpkg -i headscale_linux_amd64.deb
-
-# 3. Restore config from cloud backup
-rclone copy b2:homelab-backups/headscale/latest.tar.gz /tmp/
-sudo tar -xzf /tmp/latest.tar.gz -C /etc/
-
-# 4. Update config for VPS IP
-sudo nano /etc/headscale/config.yaml
-# Change server_url to VPS public IP
-
-# 5. Update DNS
-# Point hs.cronova.dev to VPS IP (Cloudflare)
-
-# 6. Start service
-sudo systemctl enable headscale
-sudo systemctl start headscale
-
-# 7. Force clients to reconnect
-# On each client: tailscale up --login-server=https://hs.cronova.dev
-```
-
-### Prevention
-- Hourly backups to NAS
-- Daily sync to cloud storage
-- Monitor with Uptime Kuma (check every 60s)
-
----
-
-## Scenario 2: Pi-hole Failure
-
-### Symptoms
-- DNS resolution fails
-- Devices show "DNS server not responding"
-- Web browsing stops working
-
-### Impact
-- **High**: No DNS = no internet (feels like)
-- Tailscale mesh still works (uses IPs internally)
-
-### Recovery Procedure
-
-#### Quick Fix: Use Backup DNS
-
-```bash
-# On affected device, temporarily use public DNS
-# Linux/Mac
-echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
-
-# Or configure router DHCP to use 1.1.1.1 temporarily
-```
-
-#### Restore Pi-hole
-
-```bash
-# 1. SSH to Pi-hole host
-ssh admin@pihole.local
-
-# 2. Check Pi-hole status
-pihole status
-docker logs pihole
-
-# 3. If container issue, restart
-docker restart pihole
-
-# 4. If data corrupted, restore
-docker stop pihole
-LATEST_BACKUP=$(ls -t /mnt/nas/backups/pihole/*.tar.gz | head -1)
-sudo tar -xzf ${LATEST_BACKUP} -C /etc/
-docker start pihole
-
-# 5. Verify
-pihole -t  # Watch live queries
-dig @localhost google.com
-```
-
-#### Rebuild Pi-hole (Docker)
-
-```bash
-# 1. Pull fresh image
-docker pull pihole/pihole:latest
-
-# 2. Remove old container (keeps data if volumes correct)
-docker rm -f pihole
-
-# 3. Recreate from compose
-cd /opt/docker/networking
-docker compose up -d pihole
-
-# 4. Restore config if needed
-docker exec -it pihole pihole -r  # Repair
-```
-
-### Prevention
-- Run Pi-hole on multiple hosts (Mobile + Fixed + VPS)
-- Configure DHCP with multiple DNS servers
-- Daily config backups
-
----
-
-## Scenario 3: VPS Failure
-
-### Symptoms
-- Public services unreachable (status.cronova.dev, notify.cronova.dev)
-- DERP relay unavailable (Tailscale direct connections still work)
-- Uptime Kuma alerts stop (ironic)
-
-### Impact
-- **Medium**: Public services down
-- Tailscale mesh continues (peer-to-peer)
-- No external notifications (ntfy)
-
-### Recovery Procedure
-
-#### Option A: Vultr Recovery
-
-```bash
-# 1. Check Vultr console
-# https://my.vultr.com/
-
-# 2. If VM crashed, try restart from console
-
-# 3. If disk corrupt, restore from snapshot
-# Vultr Dashboard > Snapshots > Restore
-
-# 4. SSH and verify services
-ssh admin@vps.cronova.dev
-docker ps
-docker compose -f /opt/docker/monitoring/docker-compose.yml up -d
-```
-
-#### Option B: Rebuild VPS
-
-```bash
-# 1. Create new Vultr instance
-# - Ubuntu 24.04 LTS
-# - $6/mo plan
-# - US region
-
+# 1. Provision new Vultr instance (Debian, $6/mo, any region)
 # 2. Initial setup
 ssh root@NEW_IP
 apt update && apt upgrade -y
 apt install -y docker.io docker-compose-plugin
 
-# 3. Clone homelab repo
-git clone git@github.com:cronova/homelab.git /opt/homelab
+# 3. Create user and deploy
+useradd -m -s /bin/bash linuxuser
+usermod -aG docker linuxuser
 
-# 4. Decrypt secrets
-cd /opt/homelab
-sops -d secrets/vps.enc.yaml > .env
+# 4. Clone homelab repo
+su - linuxuser
+git clone git@github.com:ajhermosilla/homelab.git /opt/homelab
+# Or from Forgejo if accessible: git@git.cronova.dev:augusto/homelab.git
 
-# 5. Deploy services
-cd /opt/docker/vps
-docker compose up -d
+# 5. Restore Headscale from backup
+# If NAS accessible, copy backups from NAS:
+scp augusto@nas:/backup/headscale/*.tar.gz /tmp/
+tar -xzf /tmp/headscale_latest.tar.gz -C /opt/homelab/headscale/config/
 
-# 6. Update DNS
-# Point status.cronova.dev, notify.cronova.dev to NEW_IP
+# 6. Create .env files from .env.example templates
+cd /opt/homelab/headscale && cp .env.example .env
+# Edit .env with secrets from Vaultwarden
 
-# 7. Re-join Tailscale
+# 7. Start services
+cd /opt/homelab/headscale && docker compose up -d
+cd /opt/homelab/caddy && docker compose up -d
+
+# 8. Update DNS — point hs.cronova.dev, notify.cronova.dev to NEW_IP (Cloudflare)
+
+# 9. Install Tailscale and join mesh
+curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up --login-server=https://hs.cronova.dev
 
-# 8. Update Uptime Kuma monitors
+# 10. Deploy remaining VPS services (uptime-kuma, ntfy)
 ```
 
-### Prevention
-- Weekly Vultr snapshots
-- All configs in git (homelab repo)
-- Secrets encrypted with SOPS
+### Scenario 2: Docker VM Failure
 
----
+**Impact:** All Docker VM services (20+ containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
 
-## Scenario 4: Vaultwarden Failure
-
-### Symptoms
-- Password manager clients show sync errors
-- Cannot access passwords
-- Browser extensions fail
-
-### Impact
-- **Critical for productivity**: No password access
-- Can use cached passwords on devices temporarily
-
-### Recovery Procedure
+**Recovery:**
 
 ```bash
-# 1. SSH to Docker host
-ssh admin@docker.home.cronova.dev
+# 1. Recreate VM in Proxmox (VM 101)
+#    - 4 vCPU, 9GB RAM, 100GB disk
+#    - vmbr1 only (LAN), static IP 192.168.0.10
+#    - Install Debian 13
 
-# 2. Check container
-docker logs vaultwarden
-docker inspect vaultwarden
+# 2. Install Docker
+ssh augusto@docker-vm
+sudo apt update && sudo apt install -y docker.io docker-compose-plugin
+sudo usermod -aG docker augusto
 
-# 3. If container crashed, restart
-docker restart vaultwarden
+# 3. Clone repo
+sudo mkdir -p /opt/homelab && sudo chown augusto:augusto /opt/homelab
+git clone git@git.cronova.dev:augusto/homelab.git /opt/homelab/repo
 
-# 4. If data corrupted, restore from backup
+# 4. Install Tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up --login-server=https://hs.cronova.dev
+
+# 5. Set up NFS mounts
+sudo mkdir -p /mnt/nas/{frigate,media,downloads,photos}
+# Add fstab entries (see docs/guides/nfs-setup.md)
+sudo mount -a
+
+# 6. Create .env files for each stack from .env.example
+# Secrets are in Vaultwarden (cached on devices if Vaultwarden is down)
+
+# 7. Run boot orchestrator
+sudo /opt/homelab/repo/scripts/docker-boot-orchestrator.sh
+# This starts all 10 stacks in correct dependency order
+
+# 8. Restore Vaultwarden data from Restic
+export RESTIC_REPOSITORY="rest:http://augusto:PASS@192.168.0.12:8000/augusto/vaultwarden"
+export RESTIC_PASSWORD="<password>"
+restic restore latest --target /tmp/vaultwarden-restore --tag vaultwarden
 docker stop vaultwarden
-LATEST_BACKUP=$(ls -t /mnt/nas/backups/vaultwarden/*.tar.gz | head -1)
-sudo rm -rf /var/lib/vaultwarden/*
-sudo tar -xzf ${LATEST_BACKUP} -C /var/lib/
+# Copy restored data into vaultwarden-data volume
+docker run --rm -v vaultwarden-data:/data -v /tmp/vaultwarden-restore:/restore alpine \
+    sh -c "rm -rf /data/* && cp -a /restore/data/* /data/"
 docker start vaultwarden
 
+# 9. Restore Home Assistant config similarly
+export RESTIC_REPOSITORY="rest:http://augusto:PASS@192.168.0.12:8000/augusto/homeassistant"
+restic restore latest --target /tmp/ha-restore --tag homeassistant
+docker stop homeassistant
+docker run --rm -v homeassistant-config:/config -v /tmp/ha-restore:/restore alpine \
+    sh -c "rm -rf /config/* && cp -a /restore/config/* /config/"
+docker start homeassistant
+```
+
+### Scenario 3: NAS Failure
+
+**Impact:** Forgejo (git), Coolify (PaaS), Samba (file shares), Syncthing (sync), Restic REST (backup target), NFS exports (Frigate recordings, media)
+
+**Recovery:**
+
+```bash
+# 1. NAS boots from USB (Generic Flash Disk 3.7GB) — must stay plugged in
+#    Boot flow: USB UEFI → GRUB → kernel/initramfs → SSD LVM root
+#    If USB is lost, use SystemRescue 12.03 on Lexar 128GB USB to rebuild boot
+
+# 2. Once booted, check Docker
+ssh augusto@nas
+sudo systemctl status docker
+# Docker data-root is /data/docker (NOT /var/lib/docker)
+
+# 3. If Docker corruption (ghost containers):
+sudo systemctl stop docker docker.socket containerd
+sudo sh -c 'rm -rf /data/docker/containers/*'
+sudo systemctl start containerd && sudo systemctl start docker
+# Named volumes survive in /data/docker/volumes/
+
+# 4. Clone/pull repo
+cd /opt/homelab/repo && git pull
+# Or fresh clone: git clone git@git.cronova.dev:augusto/homelab.git /opt/homelab/repo
+
+# 5. Recreate all containers from compose files
+cd /opt/homelab/repo/docker/fixed/nas/backup && docker compose up -d
+cd /opt/homelab/repo/docker/fixed/nas/git && docker compose up -d
+cd /opt/homelab/repo/docker/fixed/nas/storage && docker compose up -d
+cd /opt/homelab/repo/docker/fixed/nas/monitoring && docker compose up -d
+
+# 6. Coolify has its own compose at /data/coolify/source/
+cd /data/coolify/source
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+# 7. Verify NFS exports are active for Docker VM
+sudo exportfs -ra
+```
+
+### Scenario 4: Vaultwarden Corruption
+
+**Impact:** Password access (cached copies work temporarily on devices)
+
+**Recovery:**
+
+```bash
+ssh docker-vm
+
+# 1. Stop the corrupted container
+cd /opt/homelab/repo/docker/fixed/docker-vm/security
+docker compose stop vaultwarden
+
+# 2. Restore from Restic
+export RESTIC_REPOSITORY="rest:http://augusto:<PASS>@192.168.0.12:8000/augusto/vaultwarden"
+export RESTIC_PASSWORD="<password>"
+
+# List snapshots to pick the right one
+restic snapshots --tag vaultwarden
+
+# Restore latest
+restic restore latest --target /tmp/vw-restore --tag vaultwarden
+
+# 3. Replace volume contents
+docker run --rm -v vaultwarden-data:/data -v /tmp/vw-restore:/restore alpine \
+    sh -c "rm -rf /data/* && cp -a /restore/data/* /data/"
+
+# 4. Restart
+docker compose start vaultwarden
+
 # 5. Verify
-curl -I https://vault.cronova.dev
-# Test login in browser
+curl -s https://vault.cronova.dev/alive
+# Clean up
+rm -rf /tmp/vw-restore
 ```
 
-### Emergency Access
-- Export passwords periodically to encrypted file
-- Store master password in physical safe
-- Keep KeePassXC backup of critical passwords
+### Scenario 5: Home Assistant Corruption
 
-### Prevention
-- Hourly backups (data changes frequently)
-- Cloud backup for offsite copy
-- Regular export to encrypted backup
+**Recovery:**
+
+```bash
+ssh docker-vm
+
+# 1. Stop HA
+cd /opt/homelab/repo/docker/fixed/docker-vm/automation
+docker compose stop homeassistant
+
+# 2. Restore from Restic
+export RESTIC_REPOSITORY="rest:http://augusto:<PASS>@192.168.0.12:8000/augusto/homeassistant"
+export RESTIC_PASSWORD="<password>"
+
+restic restore latest --target /tmp/ha-restore --tag homeassistant
+
+# 3. Replace volume contents
+docker run --rm -v homeassistant-config:/config -v /tmp/ha-restore:/restore alpine \
+    sh -c "rm -rf /config/* && cp -a /restore/config/* /config/"
+
+# 4. Restart
+docker compose start homeassistant
+
+# 5. Verify
+curl -s https://jara.cronova.dev | head -5
+rm -rf /tmp/ha-restore
+```
+
+### Scenario 6: Complete Site Failure (Power/Fire/Theft)
+
+**What survives:** VPS keeps running (Headscale, Uptime Kuma, ntfy, Caddy)
+
+**Recovery plan:**
+
+1. VPS services continue operating — mesh network and external monitoring intact
+2. Once power/access restored, boot Proxmox (auto-boot on AC power loss)
+3. OPNsense VM starts first (start order 1), then Docker VM (start order 2, 30s delay)
+4. Docker boot orchestrator runs automatically — starts all 13 phases
+5. NAS boots from USB — all containers recreated from compose files
+6. If hardware destroyed: rebuild from Forgejo repo + Restic backups on NAS
+
+**If NAS is also destroyed:**
+- Git history: clone from GitHub mirror (TODO: set up Forgejo → GitHub mirror)
+- Compose files: in this git repo
+- Secrets: in Vaultwarden (cached on devices) + .env.example templates
+- Data: **unrecoverable** without offsite backup (not yet configured)
+
+### Scenario 7: Restic Password Lost
+
+**All backups become unrecoverable.** Restic encryption is AES-256 — no backdoor.
+
+**Prevention:**
+- Password stored in Vaultwarden
+- Physical copy in secure location
+- RESTIC_PASSWORD is identical across all stacks (one password to remember, but one password to lose)
 
 ---
 
-## Scenario 5: Start9 (Bitcoin Node) Failure
+## Verification
 
-### Symptoms
-- Bitcoin/Lightning services unavailable
-- Electrum wallet cannot connect
-- Start9 web UI inaccessible
+### Automated Scripts
 
-### Impact
-- **Medium**: Bitcoin services down
-- No financial loss (funds safe on blockchain)
-- Wallet access via other Electrum servers temporarily
+| Script | Purpose | Location |
+|--------|---------|----------|
+| `scripts/backup-verify.sh` | Monthly backup audit (6 test suites) | Docker VM |
+| `scripts/backup-verify.sh --full` | Quarterly full restore drill | Docker VM |
+| `scripts/backup-notify.sh` | ntfy notifications for backup events | Docker VM |
 
-### Recovery Procedure
-
-```bash
-# 1. Access Start9 directly (keyboard/monitor on RPi 4)
-# Or SSH if still accessible
-
-# 2. Check Start9 status
-# Web UI: http://start9.local
-
-# 3. If services crashed, restart via UI
-# Services > Bitcoin Core > Restart
-
-# 4. If OS corrupt, reflash
-# Download Start9 OS: https://start9.com/latest
-# Flash to SD card
-# Restore from Start9 backup (stored on NAS)
-
-# 5. Restore wallet
-# Import seed phrase (stored securely offline)
-```
-
-### Prevention
-- Weekly Start9 backups to NAS
-- Seed phrases stored offline (paper/metal)
-- Don't keep large amounts on hot wallet
-
----
-
-## Scenario 6: NAS Failure
-
-### Symptoms
-- Syncthing sync fails
-- Frigate recordings unavailable
-- Backups failing
-
-### Impact
-- **Medium**: Storage and backups affected
-- Services continue running (data on local disks)
-
-### Recovery Procedure
-
-#### Disk Failure (Single Disk)
-
-```bash
-# 1. Check disk status
-sudo smartctl -a /dev/sdX
-cat /proc/mdstat  # If using RAID
-
-# 2. SnapRAID can recover single disk failure
-snapraid status
-snapraid fix -d diskX
-
-# 3. Replace failed disk
-# Power down, swap disk
-# Rebuild: snapraid fix
-```
-
-#### Complete NAS Failure
-
-```bash
-# 1. Install fresh Debian on replacement hardware
-# 2. Install mergerfs + snapraid
-# 3. Restore data from cloud backup (if critical)
-# 4. Rebuild from service hosts (they have local copies)
-```
-
-### Prevention
-- SnapRAID parity for disk failure protection
-- Critical data also in cloud
-- Monitor disk health with smartmontools
-
----
-
-## Scenario 7: Complete Site Failure
-
-### Symptoms
-- All services at one location unreachable
-- Power outage, fire, theft, etc.
-
-### Impact
-- **Variable**: Depends on which site
-
-### Mobile Kit Lost/Stolen
-
-```bash
-# 1. Revoke Tailscale keys immediately
-headscale nodes delete rpi5-mobile
-headscale nodes delete macbook
-
-# 2. Change all passwords (via backup Vaultwarden export)
-
-# 3. Rebuild from:
-#    - Git repo (homelab configs)
-#    - Cloud backup (Headscale DB)
-#    - New hardware
-```
-
-### Fixed Homelab Down
-
-```bash
-# 1. VPS continues operating
-# 2. Mobile kit can become temporary primary
-# 3. Rebuild when power/access restored
-```
-
-### VPS Provider Failure
-
-```bash
-# 1. Spin up on different provider (DigitalOcean, Hetzner)
-# 2. Restore from git repo
-# 3. Update DNS
-```
-
----
-
-## Recovery Checklist
-
-### Before Any Recovery
-
-- [ ] Identify the failure scope
-- [ ] Check if recent backup exists
-- [ ] Document what happened (for post-mortem)
-- [ ] Communicate with family/users if extended downtime
-
-### After Recovery
-
-- [ ] Verify service functionality
-- [ ] Check backup jobs running
-- [ ] Update monitoring if IPs changed
-- [ ] Document any config changes
-- [ ] Schedule post-mortem review
-
----
-
-## Backup Verification Schedule
+### Verification Schedule
 
 | Task | Frequency | Procedure |
 |------|-----------|-----------|
-| List backups | Weekly | `ls -la /mnt/nas/backups/*/` |
-| Test restore | Monthly | Restore Headscale to test VM |
-| Verify cloud sync | Weekly | Check rclone logs |
-| Test DR procedure | Quarterly | Full recovery drill |
+| Repository health check | Weekly (auto, Sundays) | Built into `restic-backup.sh` |
+| Snapshot freshness | Monthly (1st Sunday) | `backup-verify.sh` |
+| Test restore (Headscale, Vaultwarden, HA) | Monthly (1st Sunday) | `backup-verify.sh` |
+| Full restore drill | Quarterly | `backup-verify.sh --full` |
 
-### Monthly Backup Test Script
+See `docs/guides/backup-test-procedure.md` for detailed test procedures.
 
-```bash
-#!/bin/bash
-# /opt/scripts/test-backup-restore.sh
+### Notifications
 
-echo "=== Backup Verification $(date) ==="
-
-# Check backup freshness
-for service in headscale vaultwarden pihole; do
-    LATEST=$(ls -t /mnt/nas/backups/${service}/*.tar.gz 2>/dev/null | head -1)
-    if [ -z "$LATEST" ]; then
-        echo "FAIL: No backup for ${service}"
-    else
-        AGE=$(( ($(date +%s) - $(stat -c %Y "$LATEST")) / 3600 ))
-        if [ $AGE -gt 48 ]; then
-            echo "WARN: ${service} backup is ${AGE} hours old"
-        else
-            echo "OK: ${service} backup is ${AGE} hours old"
-        fi
-    fi
-done
-
-# Test Headscale restore (to temp directory)
-echo "Testing Headscale restore..."
-LATEST_HS=$(ls -t /mnt/nas/backups/headscale/*.tar.gz | head -1)
-rm -rf /tmp/headscale-test
-mkdir -p /tmp/headscale-test
-tar -xzf ${LATEST_HS} -C /tmp/headscale-test
-if [ -f /tmp/headscale-test/headscale/config.yaml ]; then
-    echo "OK: Headscale backup valid"
-else
-    echo "FAIL: Headscale backup corrupt"
-fi
-rm -rf /tmp/headscale-test
-```
+- Backup failures → ntfy `cronova-critical` (urgent)
+- Backup success → ntfy `cronova-info` (default)
+- Monthly verification results → ntfy `cronova-info`
 
 ---
 
-## Emergency Contacts
+## Critical Warnings
 
-| Service | Support |
-|---------|---------|
-| Vultr | support@vultr.com |
-| Cloudflare | Dashboard tickets |
-| Start9 | community.start9.com |
-| Tailscale/Headscale | GitHub issues |
+- **RESTIC_PASSWORD** is identical across all stacks — lose it = lose all backups
+- **NAS Purple 2TB at 97%** — Restic pruning manages space, but monitor closely
+- **No offsite backup yet** — if NAS hardware dies, all backup data is lost
+- **WD Red 8TB partition recovery still pending** — media storage not yet available
+- **Forgejo runs on NAS** — if NAS dies, git history is only on local clones (set up GitHub mirror)
+- **NAS boots from USB** — Generic Flash Disk 3.7GB must stay plugged in
+- **Headscale backups are VPS-local only** — not replicated to NAS Restic
 
 ---
 
@@ -617,10 +396,10 @@ rm -rf /tmp/headscale-test
 [What was affected]
 
 ### Timeline
-- HH:MM - Issue detected
-- HH:MM - Investigation started
-- HH:MM - Root cause identified
-- HH:MM - Recovery complete
+- HH:MM — Issue detected
+- HH:MM — Investigation started
+- HH:MM — Root cause identified
+- HH:MM — Recovery complete
 
 ### Root Cause
 [Why it happened]
@@ -638,8 +417,9 @@ rm -rf /tmp/headscale-test
 
 ## References
 
+- [Restic Documentation](https://restic.readthedocs.io/)
+- [Restic REST Server](https://github.com/restic/rest-server)
 - [Headscale Documentation](https://headscale.net/)
-- [Pi-hole Documentation](https://docs.pi-hole.net/)
 - [Vaultwarden Wiki](https://github.com/dani-garcia/vaultwarden/wiki)
-- [Start9 Documentation](https://docs.start9.com/)
-- [SnapRAID Manual](https://www.snapraid.it/manual)
+- [Home Assistant Backup](https://www.home-assistant.io/common-tasks/general/#backups)
+- [ntfy Documentation](https://docs.ntfy.sh/)
