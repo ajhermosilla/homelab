@@ -6,7 +6,7 @@
 [Mobile Kit - On Demand]        [Fixed Homelab - 24/7]          [VPS - 24/7]
 ├── MacBook Air M1             ├── Oga — Proxmox (AOOSTAR)     ├── Headscale
 ├── Beryl AX Router            │   ├── OPNsense VM             ├── Caddy
-└── Samsung A13/A16            │   └── Docker VM (7GB RAM)     ├── headscale-backup
+└── Samsung A13/A16            │   └── Docker VM (9GB RAM)     ├── headscale-backup
                                ├── NAS (Mini-ITX i3)           ├── Uptime Kuma
                                ├── RPi 5 — OpenClaw            ├── ntfy
                                ├── MokerLink 2.5G Switch       └── ~$6/mo
@@ -103,7 +103,7 @@ All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured
 |-----------|------|-------|
 | Model | AOOSTAR N1 Pro | |
 | CPU | Intel N150 | VT-x, Intel UHD Graphics (iGPU) |
-| RAM | 12GB | ~1GB host + 2GB OPNsense + 7GB Docker (current) |
+| RAM | 12GB | ~1GB host + 2GB OPNsense + 9GB Docker (current) |
 | Storage | 512GB SSD | Proxmox + VMs |
 | NIC | Dual port | WAN bridge (vmbr0) + LAN bridge (vmbr1) |
 | BIOS | Restore on AC Power Loss | Set to "Power On" for auto-boot |
@@ -112,7 +112,7 @@ All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured
 | VM | ID | vCPU | RAM | Disk | Start Order |
 |----|-----|------|-----|------|-------------|
 | OPNsense | 100 | 2 | 2GB | 20GB | 1 (delay: 0) |
-| Docker | 101 | 2 | 7GB | 100GB | 2 (delay: 30) |
+| Docker | 101 | 2 | 9GB | 100GB | 2 (delay: 30) |
 
 - **OPNsense** (VM 100) — Gateway/firewall since 2026-02-21, LAN 192.168.0.1/24
 - **Docker** (VM 101) — 20+ containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, monitoring, tools
