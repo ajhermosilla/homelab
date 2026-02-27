@@ -52,9 +52,84 @@ services:
     networks:
       - backup-net
 
+  # =========================================================================
+  # Offsite Sync — Google Drive via rclone crypt
+  # Pulls Headscale backups from VPS, syncs everything to encrypted GDrive
+  # Schedule: 4:30 AM PYT daily (after all Restic backups finish by ~3:45 AM)
+  # =========================================================================
+  #
+  # MANUAL SETUP REQUIRED (run once before starting):
+  #
+  # 1. Configure rclone on Mac:
+  #    brew install rclone && rclone config
+  #    - Create "gdrive" remote (type: drive, OAuth in browser)
+  #    - Create "gdrive-crypt" remote (type: crypt, remote: gdrive:backup/homelab)
+  #    - STORE crypt password + salt in Vaultwarden
+  #
+  # 2. Copy rclone.conf to NAS Docker volume:
+  #    scp ~/.config/rclone/rclone.conf nas:/tmp/rclone.conf
+  #    ssh nas "docker volume create rclone-config && \
+  #      docker run --rm -v rclone-config:/config -v /tmp/rclone.conf:/tmp/rclone.conf alpine \
+  #        cp /tmp/rclone.conf /config/rclone.conf && \
+  #      rm /tmp/rclone.conf"
+  #
+  # 3. Set up SSH key for VPS pull:
+  #    ssh nas "sudo ssh-keygen -t ed25519 -f /root/.ssh/offsite-key -N '' -C 'offsite-sync-nas'"
+  #    ssh nas "cat /root/.ssh/offsite-key.pub" | ssh vps "cat >> ~/.ssh/authorized_keys"
+  #
+  offsite-sync:
+    image: rclone/rclone:latest
+    container_name: offsite-sync
+    restart: unless-stopped
+    init: true
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache openssh-client rsync
+        echo "30 4 * * * /sync.sh >> /proc/1/fd/1 2>&1" | crontab -
+        crond -f -l 2
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=backup"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    volumes:
+      - ${BACKUP_DATA:-/srv/backup/restic}:/data/restic:ro
+      - offsite-headscale:/data/headscale
+      - ${OFFSITE_SSH_KEY:-/root/.ssh/offsite-key}:/root/.ssh/id_ed25519:ro
+      - rclone-config:/config/rclone
+      - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/offsite-sync.sh:/sync.sh:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      RCLONE_CONFIG: /config/rclone/rclone.conf
+      VPS_HOST: ${VPS_HOST:-100.77.172.46}
+      VPS_USER: ${VPS_USER:-linuxuser}
+      VPS_BACKUP_PATH: ${VPS_BACKUP_PATH:-/opt/homelab/headscale/backups}
+      RCLONE_REMOTE: ${RCLONE_REMOTE:-gdrive-crypt:homelab}
+      RCLONE_BWLIMIT: ${RCLONE_BWLIMIT:-5M}
+      NTFY_URL: ${NTFY_URL:-https://notify.cronova.dev}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - backup-net
+
 networks:
   backup-net:
     name: backup-net
+
+volumes:
+  offsite-headscale:
+    name: offsite-headscale
+  rclone-config:
+    name: rclone-config
 
 # =============================================================================
 # ENVIRONMENT VARIABLES (.env)
