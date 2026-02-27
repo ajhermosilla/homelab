@@ -10,7 +10,7 @@ Core infrastructure documentation — what runs where, hardware specs, network t
 |----------|-------------|
 | [services.md](architecture/services.md) | Definitive service inventory (40+ services, ports, dependencies, Guarani names) |
 | [hardware.md](architecture/hardware.md) | Device specs, Tailscale IPs, power budget, storage strategy |
-| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site architecture (Proxmox, Docker VM, NAS) |
+| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (28 containers), NAS (12 containers), OPNsense |
 | [mobile-homelab.md](architecture/mobile-homelab.md) | Portable kit (MacBook + Beryl AX + phone) |
 | [vps-architecture.md](architecture/vps-architecture.md) | VPS infrastructure (Headscale, Caddy, monitoring) |
 | [network-topology.md](architecture/network-topology.md) | Network diagrams and connectivity |
@@ -44,8 +44,8 @@ Design decisions and policies — why things are done a certain way.
 | [domain-strategy.md](strategy/domain-strategy.md) | cronova.dev DNS and domain plan |
 | [certificate-strategy.md](strategy/certificate-strategy.md) | TLS certificates (DNS-01 Cloudflare) |
 | [dns-architecture.md](strategy/dns-architecture.md) | DNS resolution flow (Pi-hole, AdGuard, Cloudflare) |
-| [monitoring-strategy.md](strategy/monitoring-strategy.md) | Alerting, metrics, and notification tiers |
-| [disaster-recovery.md](strategy/disaster-recovery.md) | Backup and restore for all critical services |
+| [monitoring-strategy.md](strategy/monitoring-strategy.md) | VictoriaMetrics + Grafana metrics, Uptime Kuma monitors, ntfy alerts |
+| [disaster-recovery.md](strategy/disaster-recovery.md) | Restic backup procedures, recovery scenarios, verification schedule |
 | [secrets-management.md](strategy/secrets-management.md) | Credential handling (.env, SOPS, age) |
 | [security-hardening.md](strategy/security-hardening.md) | 2FA, firewall rules, SSH hardening, fail2ban |
 | [domain-research.md](strategy/domain-research.md) | Domain comparison (archived — see domain-strategy) |
