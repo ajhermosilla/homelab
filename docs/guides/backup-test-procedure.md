@@ -4,23 +4,24 @@ Monthly verification that backups work and can be restored.
 
 ## Backup Overview
 
-### 3-2-1 Strategy
+### Backup Architecture
 
-| Copy | Location | Type |
-|------|----------|------|
-| 1 | Original data | Live |
-| 2 | NAS Restic | Local backup |
-| 3 | Google Drive | Offsite (encrypted) |
+All backups use Restic with a centralized REST server on the NAS. See `docs/strategy/disaster-recovery.md` for full details.
 
-### Critical Data
+| Copy | Location | Status |
+|------|----------|--------|
+| 1 | Original data (live volumes) | Active |
+| 2 | NAS Restic REST (`/mnt/purple/backup/restic/`) | Active |
+| 3 | Google Drive (rclone crypt) | Not yet configured |
 
-| Service | Data Path | Backup Frequency |
-|---------|-----------|------------------|
-| Headscale | `/var/lib/headscale/` | Hourly |
-| Vaultwarden | `/var/lib/vaultwarden/` | Daily |
-| Home Assistant | `/config/` | Daily |
-| Pi-hole | `/etc/pihole/` | Weekly |
-| Frigate config | `/config/` | Weekly |
+### Backed-Up Services
+
+| Service | Container | Schedule | Repository |
+|---------|-----------|----------|------------|
+| Headscale | headscale-backup | Hourly (VPS local) | VPS `/backup/` (tar.gz) |
+| Vaultwarden | vaultwarden-backup | 2:00 AM daily | `/augusto/vaultwarden` |
+| Home Assistant | homeassistant-backup | 2:30 AM daily | `/augusto/homeassistant` |
+| Coolify | coolify-backup | 3:30 AM daily | `/augusto/coolify` |
 
 ---
 
@@ -48,9 +49,9 @@ Monthly verification that backups work and can be restored.
 **Purpose:** Verify backup integrity
 
 ```bash
-# Set environment
-export RESTIC_REPOSITORY="rest:http://$RESTIC_USER:$RESTIC_HTPASSWD@192.168.0.12:8000/homelab"
-export RESTIC_PASSWORD_FILE=/root/.restic-password
+# Set environment (use the specific service repository)
+export RESTIC_REPOSITORY="rest:http://augusto:<PASS>@192.168.0.12:8000/augusto/vaultwarden"
+export RESTIC_PASSWORD="<restic-password>"
 
 # Check repository integrity
 restic check
@@ -88,44 +89,51 @@ restic snapshots
 ```
 
 **Pass criteria:**
-- [ ] Headscale snapshot within last 2 hours
-- [ ] Vaultwarden snapshot within last 25 hours
-- [ ] Home Assistant snapshot within last 25 hours
+- [ ] Vaultwarden snapshot within last 25 hours (2:00 AM daily)
+- [ ] Home Assistant snapshot within last 25 hours (2:30 AM daily)
+- [ ] Coolify snapshot within last 25 hours (3:30 AM daily)
+
+*Note: Headscale backups are VPS-local (hourly tar.gz), not in Restic REST.*
 
 ---
 
-### Test 3: Headscale Restore (Critical)
+### Test 3: Headscale Backup Verify (Critical)
 
 **Purpose:** Verify mesh network can be recovered
 
+Headscale backups are VPS-local tar.gz (not Restic REST). Run this on the VPS:
+
 ```bash
-# Create test restore directory
+ssh vps
+
+# List backups (hourly, 30-day retention)
+ls -lt /backup/headscale/*.tar.gz | head -5
+
+# Extract latest to temp
+LATEST=$(ls -t /backup/headscale/*.tar.gz | head -1)
 mkdir -p /tmp/restore-test/headscale
+tar -xzf "$LATEST" -C /tmp/restore-test/headscale
 
-# Restore latest Headscale backup
-restic restore latest --target /tmp/restore-test/headscale --tag headscale
-
-# Verify files exist
-ls -la /tmp/restore-test/headscale/var/lib/headscale/
+# Verify critical files
+ls -la /tmp/restore-test/headscale/
 
 # Expected files:
 # - db.sqlite (the critical file)
-# - config.yaml
 # - noise_private.key
-# - derp.yaml (if exists)
 ```
 
 **Verify database integrity:**
 ```bash
-sqlite3 /tmp/restore-test/headscale/var/lib/headscale/db.sqlite "SELECT COUNT(*) FROM nodes;"
+sqlite3 /tmp/restore-test/headscale/db.sqlite "SELECT COUNT(*) FROM nodes;"
 
-# Should return number of registered nodes (e.g., 5)
+# Should return number of registered nodes (e.g., 8)
 ```
 
 **Pass criteria:**
 - [ ] db.sqlite exists and is not empty
 - [ ] SQLite query returns expected node count
 - [ ] noise_private.key exists
+- [ ] Latest backup is less than 2 hours old
 
 **Cleanup:**
 ```bash
@@ -139,14 +147,18 @@ rm -rf /tmp/restore-test/headscale
 **Purpose:** Verify password vault can be recovered
 
 ```bash
+# Set Restic environment for Vaultwarden
+export RESTIC_REPOSITORY="rest:http://augusto:<PASS>@192.168.0.12:8000/augusto/vaultwarden"
+export RESTIC_PASSWORD="<restic-password>"
+
 # Create test restore directory
 mkdir -p /tmp/restore-test/vaultwarden
 
 # Restore latest Vaultwarden backup
 restic restore latest --target /tmp/restore-test/vaultwarden --tag vaultwarden
 
-# Verify files exist
-ls -la /tmp/restore-test/vaultwarden/var/lib/vaultwarden/
+# Verify files exist (paths match volume mount in container)
+ls -la /tmp/restore-test/vaultwarden/data/
 
 # Expected files:
 # - db.sqlite3 (main database)
@@ -158,7 +170,7 @@ ls -la /tmp/restore-test/vaultwarden/var/lib/vaultwarden/
 
 **Verify database:**
 ```bash
-sqlite3 /tmp/restore-test/vaultwarden/var/lib/vaultwarden/db.sqlite3 "SELECT COUNT(*) FROM users;"
+sqlite3 /tmp/restore-test/vaultwarden/data/db.sqlite3 "SELECT COUNT(*) FROM users;"
 
 # Should return number of users (e.g., 1)
 ```
@@ -180,28 +192,32 @@ rm -rf /tmp/restore-test/vaultwarden
 **Purpose:** Verify automations and history can be recovered
 
 ```bash
+# Set Restic environment for Home Assistant
+export RESTIC_REPOSITORY="rest:http://augusto:<PASS>@192.168.0.12:8000/augusto/homeassistant"
+export RESTIC_PASSWORD="<restic-password>"
+
 # Create test restore directory
 mkdir -p /tmp/restore-test/homeassistant
 
 # Restore latest Home Assistant backup
 restic restore latest --target /tmp/restore-test/homeassistant --tag homeassistant
 
-# Verify critical files
+# Verify critical files (paths match volume mount)
 ls -la /tmp/restore-test/homeassistant/config/
 
 # Expected files:
 # - configuration.yaml
 # - automations.yaml
 # - secrets.yaml
-# - home-assistant_v2.db (history database)
 # - .storage/ directory
+# Note: home-assistant_v2.db is excluded from backups (*.db-shm, *.db-wal, home-assistant_v2.db)
 ```
 
 **Pass criteria:**
 - [ ] configuration.yaml exists
 - [ ] automations.yaml exists
 - [ ] .storage/ directory exists
-- [ ] home-assistant_v2.db exists (optional, can be recreated)
+- [ ] custom_components/ directory exists (HACS integrations)
 
 **Cleanup:**
 ```bash
@@ -214,6 +230,9 @@ rm -rf /tmp/restore-test/homeassistant
 
 **Purpose:** Verify Google Drive encrypted backup
 
+**Status:** Not yet configured. Google Drive offsite via rclone crypt is planned but not active.
+
+When configured:
 ```bash
 # List remote files
 rclone ls gdrive-crypt:homelab/ | head -20
@@ -227,6 +246,8 @@ rclone check /srv/backup/critical gdrive-crypt:homelab --one-way
 **Pass criteria:**
 - [ ] Files exist on remote
 - [ ] No sync differences
+
+*Skip this test until offsite backup is configured.*
 
 ---
 
@@ -314,8 +335,7 @@ Add monitors for backup infrastructure:
 
 | Check | Type | Target |
 |-------|------|--------|
-| Restic REST (NAS) | TCP | 192.168.0.12:8000 |
-| Restic REST (VPS) | TCP | localhost:8000 |
+| Restic REST (NAS) | HTTP | `http://100.82.77.97:8000/` (expect 401) |
 
 ---
 
@@ -339,9 +359,12 @@ If backup restore fails during actual disaster:
 
 | Issue | Action |
 |-------|--------|
-| Restic corruption | Check VPS backup copy |
-| All local backups lost | Restore from Google Drive |
-| Encryption key lost | Check Vaultwarden (paper backup) |
+| Restic corruption | Run `restic repair index` + `restic repair snapshots` |
+| Restic REST unreachable | Check NAS, Docker, `/data/docker` filesystem |
+| All local backups lost | Restore from Google Drive (when configured) |
+| Encryption key lost | Check Vaultwarden (paper backup) — all stacks share one password |
+
+See `docs/strategy/disaster-recovery.md` for full recovery procedures.
 
 ---
 
