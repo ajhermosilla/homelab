@@ -13,7 +13,7 @@ All services are named in **Guarani** (the indigenous language of Paraguay) as a
 On-demand                 24/7                                24/7
 ├── MacBook Air M1        ├── Oga — Proxmox VE (Mini PC)     ├── Headscale
 ├── Beryl AX Router       │   ├── OPNsense VM (gateway)      ├── Caddy
-└── Samsung A13/A16       │   └── Docker VM (7GB RAM)         ├── Uptime Kuma
+└── Samsung A13/A16       │   └── Docker VM (9GB RAM)         ├── Uptime Kuma
                           │       ├── Pi-hole (DNS)           ├── ntfy
                           │       ├── Caddy (reverse proxy)   └── headscale-backup
                           │       ├── Taguato — Frigate NVR
@@ -47,7 +47,7 @@ On-demand                 24/7                                24/7
 | Environment | Host | Status | Containers |
 |-------------|------|--------|------------|
 | **VPS** | Vultr (1 vCPU, 1GB) | Active | 5 |
-| **Docker VM** | Proxmox VM 101 (7GB RAM) | Active | 20+ |
+| **Docker VM** | Proxmox VM 101 (9GB RAM) | Active | 20+ |
 | **NAS** | Mini-ITX i3-3220T | Active | 11 |
 | **RPi 5** | OpenClaw | Pending (PSU in transit) | - |
 | **Mobile Kit** | MacBook + Beryl AX | Active | - |
