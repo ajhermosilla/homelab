@@ -97,7 +97,7 @@ if [ -d "$RESTIC_DIR" ] && [ "$(ls -A "$RESTIC_DIR" 2>/dev/null)" ]; then
         --transfers 4 \
         --log-level INFO \
         --stats 1m; then
-        RESTIC_SIZE=$(rclone size "${RCLONE_REMOTE}/restic/" --json 2>/dev/null | grep -o '"bytes":[0-9]*' | cut -d: -f2)
+        RESTIC_SIZE=$(rclone size "${RCLONE_REMOTE}/restic/" --json 2>/dev/null | grep -o '"bytes":[0-9]*' | cut -d: -f2 || true)
         RESTIC_SIZE_MB=$((${RESTIC_SIZE:-0} / 1048576))
         log "Restic sync complete: ${RESTIC_SIZE_MB}MB on GDrive"
     else
