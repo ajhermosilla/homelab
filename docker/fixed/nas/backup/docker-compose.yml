@@ -101,7 +101,7 @@ services:
     volumes:
       - ${BACKUP_DATA:-/srv/backup/restic}:/data/restic:ro
       - offsite-headscale:/data/headscale
-      - ${OFFSITE_SSH_KEY:-/root/.ssh/offsite-key}:/root/.ssh/id_ed25519:ro
+      - offsite-ssh:/root/.ssh:ro
       - rclone-config:/config/rclone
       - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/offsite-sync.sh:/sync.sh:ro
     environment:
@@ -128,6 +128,9 @@ networks:
 volumes:
   offsite-headscale:
     name: offsite-headscale
+  offsite-ssh:
+    name: offsite-ssh
+    external: true
   rclone-config:
     name: rclone-config
 
