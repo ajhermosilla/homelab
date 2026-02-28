@@ -71,7 +71,7 @@ log "Step 1: Pulling Headscale backups from VPS ($VPS_HOST)"
 mkdir -p "$HEADSCALE_DIR"
 
 if rsync -az --delete \
-    -e "ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30" \
+    -e "ssh -i /root/.ssh/offsite-key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30" \
     --include='*/' \
     --include='*.tar.gz' \
     --include='*.sqlite' \
