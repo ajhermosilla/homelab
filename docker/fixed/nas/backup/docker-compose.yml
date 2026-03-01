@@ -113,6 +113,7 @@ services:
       RCLONE_REMOTE: ${RCLONE_REMOTE:-gdrive-crypt:homelab}
       RCLONE_BWLIMIT: ${RCLONE_BWLIMIT:-5M}
       NTFY_URL: ${NTFY_URL:-https://notify.cronova.dev}
+      NTFY_TOKEN: ${NTFY_TOKEN:-}
     logging:
       driver: "json-file"
       options:
