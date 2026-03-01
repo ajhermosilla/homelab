@@ -41,7 +41,7 @@ services:
       WATCHTOWER_NOTIFICATIONS: ${WATCHTOWER_NOTIFICATIONS:-}
       WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL:-}
       # Rolling restarts (one at a time)
-      WATCHTOWER_ROLLING_RESTART: "true"
+      WATCHTOWER_ROLLING_RESTART: "false"
       # Timeout for stopping containers
       WATCHTOWER_TIMEOUT: "60s"
       # Include stopped containers
