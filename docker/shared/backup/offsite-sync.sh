@@ -44,12 +44,22 @@ notify() {
         priority="default"
     fi
 
-    curl -sf \
-        -H "Title: $title" \
-        -H "Priority: $priority" \
-        -H "Tags: $tags" \
-        -d "$message" \
-        "${NTFY_URL}/${topic}" >/dev/null 2>&1 || log "WARNING: ntfy notification failed"
+    if [ -n "$NTFY_TOKEN" ]; then
+        curl -sf \
+            -H "Authorization: Bearer ${NTFY_TOKEN}" \
+            -H "Title: $title" \
+            -H "Priority: $priority" \
+            -H "Tags: $tags" \
+            -d "$message" \
+            "${NTFY_URL}/${topic}" >/dev/null 2>&1 || log "WARNING: ntfy notification failed"
+    else
+        curl -sf \
+            -H "Title: $title" \
+            -H "Priority: $priority" \
+            -H "Tags: $tags" \
+            -d "$message" \
+            "${NTFY_URL}/${topic}" >/dev/null 2>&1 || log "WARNING: ntfy notification failed"
+    fi
 }
 
 # Validate required variables
