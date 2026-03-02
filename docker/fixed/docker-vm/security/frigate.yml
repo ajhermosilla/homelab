@@ -70,7 +70,7 @@ go2rtc:
 record:
   enabled: true
   retain:
-    days: 2
+    days: 1
     mode: motion
 
 # Global snapshot settings
@@ -82,7 +82,7 @@ snapshots:
 # Global detection settings
 detect:
   enabled: true
-  fps: 2
+  fps: 5
 
 # Object detection settings
 objects:
@@ -95,6 +95,16 @@ objects:
     person:
       min_score: 0.5
       threshold: 0.7
+    car:
+      min_score: 0.5
+      threshold: 0.7
+      min_area: 2000
+    dog:
+      min_score: 0.6
+      threshold: 0.75
+    cat:
+      min_score: 0.6
+      threshold: 0.75
 
 # =============================================================================
 # CAMERAS
@@ -138,11 +148,13 @@ cameras:
     detect:
       width: 640
       height: 480
-      fps: 2
+      fps: 5
     record:
       enabled: true
     snapshots:
       enabled: true
+    motion:
+      contour_area: 25
     objects:
       track:
         - person
@@ -190,11 +202,13 @@ cameras:
     detect:
       width: 640
       height: 480
-      fps: 2
+      fps: 5
     record:
       enabled: true
     snapshots:
       enabled: true
+    motion:
+      contour_area: 25
     objects:
       track:
         - person
@@ -242,11 +256,9 @@ cameras:
     detect:
       width: 1080
       height: 1920
-      fps: 2
+      fps: 5
     record:
-      enabled: true
-      retain:
-        days: 1
+      enabled: false
     snapshots:
       enabled: true
     objects:
