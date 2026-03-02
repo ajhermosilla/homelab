@@ -1,7 +1,7 @@
 # Forgejo → GitHub Push Mirror for DR
 
 **Date**: 2026-03-02
-**Status**: Pending
+**Status**: Active — SSH push mirrors configured, sync-on-commit enabled
 **Goal**: Automatic push mirror from Forgejo (git.cronova.dev) to GitHub for disaster recovery
 
 ## Overview
