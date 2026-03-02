@@ -64,7 +64,7 @@ go2rtc:
     back_yard_main:
       - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.0.111:554/h264Preview_01_main"
     indoor:
-      - "ffmpeg:rtsp://{FRIGATE_TAPO_USER}:{FRIGATE_TAPO_PASS}@192.168.0.101:554/stream1#raw=-vf transpose=2#video=h264"
+      - "ffmpeg:rtsp://{FRIGATE_TAPO_USER}:{FRIGATE_TAPO_PASS}@192.168.0.101:554/stream1#raw=-init_hw_device vaapi=va:/dev/dri/renderD128 -vf transpose=2,format=nv12,hwupload -c:v h264_vaapi"
 
 # Global recording settings
 record:
