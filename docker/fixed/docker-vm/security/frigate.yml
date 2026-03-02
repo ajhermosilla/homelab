@@ -76,6 +76,8 @@ record:
 # Global snapshot settings
 snapshots:
   enabled: true
+  timestamp: true
+  quality: 85
   retain:
     default: 2
 
@@ -173,10 +175,12 @@ cameras:
           - person
           - car
         inertia: 3
+        loitering_time: 8
     review:
       alerts:
         labels:
           - person
+          - car
         required_zones:
           - driveway
       detections:
@@ -228,6 +232,7 @@ cameras:
         objects:
           - person
         inertia: 3
+        loitering_time: 8
     review:
       alerts:
         labels:
