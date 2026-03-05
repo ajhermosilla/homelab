@@ -39,7 +39,7 @@ model:
   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
 
 ffmpeg:
-  hwaccel_args: preset-vaapi
+  hwaccel_args: preset-intel-qsv-h264
 
 # Face recognition — assigns sub_label (e.g. "augusto") to detected persons
 # Train faces via Frigate UI → Faces tab, or auto-collected from detections
