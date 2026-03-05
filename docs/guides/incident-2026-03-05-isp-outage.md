@@ -24,7 +24,7 @@ A 4-hour ISP outage took the entire homelab offline. After the ISP restored serv
 | ~05:00 | OPNsense WAN auto-renews DHCP lease (181.127.152.105) |
 | ~05:00 | Tailscale tunnels begin reconnecting on Docker VM, NAS, Proxmox |
 | 05:20 | Investigation begins — Mac on phone hotspot, USB-C ethernet to MokerLink switch |
-| 05:22 | Mac gets 192.168.2.100 on LAN (OPNsense DHCP not responding to new adapter) — manually set 192.168.0.200 |
+| 05:22 | Mac gets 192.168.2.100 on LAN (OPNsense DHCP not responding to new adapter) — manually set 192.168.0.300 |
 | 05:25 | Confirmed: OPNsense has WAN IP, can ping 8.8.8.8. Proxmox and Docker VM also have internet |
 | 05:28 | Found 3 containers crash-looping: `immich-db`, `paperless-db`, `authelia` |
 | 05:30 | Root cause: missing `.env` files for 5 stacks (photos, documents, auth, media, monitoring) |
@@ -82,7 +82,7 @@ During investigation, OPNsense WAN (`vtnet0`) showed `mtu 576` — far below the
 | # | Action | Status |
 |---|--------|--------|
 | 1 | Power-cycled ARRIS modem | Done |
-| 2 | Set static IP on Mac (192.168.0.200) for LAN access | Done |
+| 2 | Set static IP on Mac (192.168.0.300) for LAN access | Done |
 | 3 | Verified OPNsense WAN lease and internet via `ping 8.8.8.8` | Done |
 | 4 | Verified Proxmox and Docker VM have internet | Done |
 | 5 | Generated `photos/.env` with DB credentials | Done |
@@ -147,32 +147,23 @@ From OPNsense web UI: **Interfaces → WAN → MTU** — verify if this is ISP-i
 
 ### P1 — Short Term (this month)
 
-#### 5. 4G/LTE Failover WAN (~$30-50)
+#### 5. 4G/LTE Failover WAN — PLANNED
 
-The single biggest resilience improvement. Add a USB LTE modem or tethered phone as a secondary WAN on OPNsense. This provides:
-- Remote access via Tailscale during ISP outages
-- Automatic failover for critical services (Headscale, Vaultwarden, DNS)
-- No need to be physically present to diagnose issues
+**Status**: Design complete, hardware pending purchase.
 
-**Options (cheapest first):**
+Two-layer failover approach:
+- **Layer 1 (automatic)**: TP-Link TL-MR100 LTE router (~$32, Flytec CDE) + prepaid SIM, connected to MokerLink switch as a LAN-side gateway on `192.168.0.3`. OPNsense gateway group routes Tailscale + DNS over LTE during ISP outage. Family doesn't notice
+- **Layer 2 (manual)**: GL.iNet Opal in repeater mode + phone hotspot → `EmergencyWiFi` for streaming. Family activates in <5 minutes, no cable swapping
 
-| Option | Cost | Pros | Cons |
-|--------|------|------|------|
-| **USB tethering (existing phone)** | $0 | Free, already have Samsung A13/A16 | Manual, phone must stay plugged in |
-| **GL.iNet Beryl AX as WAN2** | $0 (already own) | Can bridge cellular to ethernet | Repurposes travel router |
-| **USB LTE dongle (Huawei E3372)** | ~$25 | Plug-and-play, OPNsense detects as `ue0` | Needs SIM with data plan |
-| **Dedicated 4G router** | ~$40 | Always-on, no config | Extra device, power draw |
+**Hardware**: ~$42 one-time (MR100 $32 + Opal $35 via Amazon/Miami) + ~$3/month (LTE prepaid SIM)
 
-**Recommended**: USB LTE dongle with a cheap prepaid SIM (Tigo/Personal, 5GB/month for ~$3). Configure OPNsense multi-WAN with the LTE interface as failover (gateway group, tier 2). Only Tailscale and DNS traffic need to flow over LTE during failover — not high bandwidth.
+**Design choice**: LAN-side gateway (MR100 on switch) instead of USB LTE dongle with Proxmox passthrough. Avoids FreeBSD driver issues, USB passthrough complexity, and rack cable mess. Double NAT is irrelevant — Tailscale handles NAT traversal via DERP relays.
 
-**OPNsense configuration:**
-```
-Interfaces → Assign → New: LTE_WAN (ue0)
-System → Gateways → Groups → WAN_FAILOVER:
-  - ISP_WAN: Tier 1 (primary)
-  - LTE_WAN: Tier 2 (failover)
-System → Routes → Default Gateway: WAN_FAILOVER group
-```
+**Documentation**:
+- Full dual-WAN setup: `docs/guides/opnsense-setup.md` → "Dual-WAN / LTE Failover" section
+- Family runbook: `docs/reference/family-emergency-internet.md` (rewritten for two-layer approach)
+
+**Blocked on**: Hardware purchase (TL-MR100 from Flytec CDE, Opal from Amazon US via Miami)
 
 #### 6. UPS for Network Stack (~$40-60)
 
@@ -241,7 +232,7 @@ Add a quick-reference card to `docs/guides/`:
 ```
 ISP Outage Recovery Checklist:
 1. Connect to LAN (ethernet or home WiFi)
-2. Set static IP if DHCP not working: sudo ifconfig en16 192.168.0.200/24
+2. Set static IP if DHCP not working: sudo ifconfig en16 192.168.0.300/24
 3. Ping OPNsense: ping 192.168.0.1
 4. SSH to OPNsense: ssh root@192.168.0.1
 5. Check WAN: ifconfig vtnet0 | grep inet
@@ -280,25 +271,30 @@ CURRENT STATE:
 
 
 PROPOSED STATE:
-                    ┌──────────┐    ┌──────────┐
-   ISP ────────────►│  ARRIS   │    │ LTE USB  │◄──── Failover WAN ($25)
-                    │ (bridge) │    │  dongle  │
-                    └────┬─────┘    └────┬─────┘
-                         │               │
-                    ┌────▼───────────────▼┐
-                    │     OPNsense        │──── Multi-WAN failover
-                    │  (gateway group)    │──── SSH key auth
-                    └─────────┬───────────┘
-                              │
-                    ┌─────────▼───────────┐
-             ┌──────┤   MokerLink switch  ├──────┐
-             │      │     (on UPS)        │      │
-             │      └─────────────────────┘      │
-             │                │                  │
-        ┌────▼───┐      ┌────▼────┐        ┌────▼───┐
-        │Proxmox │      │Docker VM│        │  NAS   │
-        │(on UPS)│      │ (VM101) │        │(on UPS)│
-        └────────┘      └─────────┘        └────────┘
+                    ┌──────────┐
+   ISP ────────────►│  ARRIS   │
+                    │ (bridge) │
+                    └────┬─────┘
+                         │
+                    ┌────▼─────────────────┐
+                    │   Aoostar / Proxmox  │──── OPNsense VM
+                    │   (on UPS)           │──── Multi-WAN failover
+                    └────┬─────────────────┘     (gateway group)
+                         │
+                    ┌────▼─────────────────┐
+             ┌──────┤  MokerLink switch    ├──────┐
+             │      │  (on UPS)            │      │
+             │      └──┬───────────────────┘      │
+             │         │                          │
+             │    ┌────▼────┐                     │
+             │    │ TL-MR100│◄── LTE SIM ($32)    │
+             │    │ .0.2    │    Tier 2 failover   │
+             │    └─────────┘                     │
+             │                                    │
+        ┌────▼────┐                          ┌────▼───┐
+        │Docker VM│                          │  NAS   │
+        │ (VM101) │                          │(on UPS)│
+        └─────────┘                          └────────┘
 ```
 
 ---
@@ -319,5 +315,7 @@ PROPOSED STATE:
 - [OPNsense Gateway Groups](https://docs.opnsense.org/manual/gateways.html)
 - [NUT on Proxmox](https://pve.proxmox.com/wiki/Network_UPS_Tools)
 - `docs/guides/nut-config.md` — existing UPS configuration guide
+- `docs/guides/opnsense-setup.md` — includes Dual-WAN / LTE Failover setup
+- `docs/reference/family-emergency-internet.md` — family emergency internet runbook
 - `docs/strategy/monitoring-strategy.md` — monitoring architecture
 - `docs/guides/deployment-order.md` — service dependency graph
