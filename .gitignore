@@ -6,6 +6,7 @@
 secrets/
 secrets.yaml
 htpasswd
+env-backup/
 
 # Editor
 .idea/
