@@ -1,7 +1,7 @@
 # Uptime Kuma Monitor Setup Plan
 
 **Date**: 2026-03-02
-**Status**: Pending
+**Status**: Done (2026-03-05) — 14 monitors created, 5 pre-existing skipped
 **Tool**: kuma-cli (Rust) — `cargo install kuma-cli` or download binary
 **Uptime Kuma**: v1.23.17 on VPS at `https://status.cronova.dev`
 
