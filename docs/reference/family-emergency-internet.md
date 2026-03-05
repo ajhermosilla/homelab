@@ -1,197 +1,185 @@
 # Family Emergency Internet Runbook
 
-**For:** Family members when Augusto is unavailable and internet is down.
+**For:** Family members when internet is down and Augusto is unavailable.
 
-**Time to restore:** ~5 minutes
-
----
-
-## Quick Check First
-
-Before doing anything, check these:
-
-| Check | How |
-|-------|-----|
-| Is the power out? | Look at the UPS (black box) - is it beeping? |
-| Is the ISP down? | Check neighbors or use mobile data |
-| Did the Mini PC crash? | Small black box near the switch - any lights? |
-
-**If power is out:** Wait for power to return. The UPS will keep things running for ~30 minutes.
-
-**If ISP is down:** Nothing we can do - use mobile data until it's back.
-
-**If Mini PC is the problem:** Follow this guide!
+**Good news:** Most outages fix themselves automatically. You only need this guide for streaming/Netflix during an ISP outage.
 
 ---
 
-## What You Need
+## Which Scenario Are You In?
 
-The **Opal** backup router (small white box) is your emergency internet device.
+| What you see | Likely cause | What to do |
+|---|---|---|
+| **No internet, Mini PC lights ON** | ISP is down | → **Scenario A** (most common) |
+| **No internet, Mini PC lights OFF** | Proxmox/power issue | → **Scenario B** |
+| **Internet is slow or keeps dropping** | ISP issue | → **Scenario C** |
+
+---
+
+## Scenario A: No Internet, Mini PC Lights Are ON
+
+**This is the most common case — the ISP (Tigo) is down.**
+
+Augusto's remote access works automatically via LTE backup (he gets an alert on his phone). But for **Netflix, YouTube, and video calls**, the family needs to activate the emergency WiFi:
+
+### What You Need
+
+1. **Your phone** — turn on WiFi hotspot
+2. **The Opal** — small white router on the shelf near the switch
 
 ```
 ┌───────────────────┐
-│    GL-SFT1200     │  ← White color
-│      (Opal)       │     with retractable
-│                   │     antennas
-│ [WAN][LAN] [PWR]  │
+│    GL-SFT1200     │  ← Small white box
+│      (Opal)       │     with antennas
+│                   │
+│     [USB-C PWR]   │  ← Just plug in power
 └───────────────────┘
 
-Location: Office drawer (dedicated backup router)
+Location: Shelf near the network switch (NOT in a drawer)
+Label: "Emergency Internet"
 ```
 
-You also need:
-- 1x Ethernet cable (blue/gray cable with plastic clips on ends)
-- USB-C power cable
+### Steps (< 5 minutes)
+
+1. **Turn on your phone's WiFi hotspot**
+   - iPhone: Settings → Personal Hotspot → Allow Others
+   - Android: Settings → Connections → Mobile Hotspot → Turn on
+   - Hotspot name should be the one pre-configured in the Opal
+
+2. **Plug in the Opal's power cable (USB-C)**
+   - That's it — just power. No other cables to connect
+   - Wait ~1 minute for it to boot (lights go solid)
+
+3. **Connect your devices to EmergencyWiFi**
+
+   | Network | Password |
+   |---------|----------|
+   | `EmergencyWiFi` (2.4GHz) | *(written on the label)* |
+   | `EmergencyWiFi-5G` (faster) | *(same password)* |
+
+   **Tip:** Use 5G for streaming — it's faster.
+
+4. **Test it** — open Netflix or YouTube
+
+**No cable swapping. No touching the modem or switch. Just power + phone hotspot.**
+
+### When ISP Comes Back
+
+1. Unplug the Opal
+2. Turn off phone hotspot
+3. Reconnect devices to normal WiFi
+4. Put the Opal back on the shelf
 
 ---
 
-## Step-by-Step Recovery
+## Scenario B: No Internet, Mini PC Lights Are OFF
 
-### Step 1: Find the Opal
+**The Mini PC (Proxmox) has crashed or lost power.**
 
-Look in the **office drawer** where the backup router is kept.
+This is rarer. The Opal needs to connect directly to the ISP modem:
 
-It's a **small white box** with retractable antennas and "GL-iNet" on it.
+### Steps
 
----
-
-### Step 2: Unplug the Mini PC from the ISP Modem
-
-Find the cable going from the **ISP modem** (the box from Tigo/Personal/Claro) to the **Mini PC** (small black computer).
+1. Find the Opal (shelf near the switch)
+2. **Unplug the ethernet cable from the Mini PC** (black box) — leave the ISP modem end connected
+3. **Plug that cable into the Opal's WAN port** (left side port)
+4. **Connect Opal LAN port** (middle) to the switch with another ethernet cable
+5. **Plug in Opal power** (USB-C)
+6. Wait 1-2 minutes
+7. Connect devices to the Opal's WiFi (`EmergencyWiFi` or `EmergencyWiFi-5G`)
 
 ```
-BEFORE (not working):
+NORMAL (not working):
+[ISP Modem] ──cable──► [Mini PC] ──► [Switch] ──► WiFi
+                            ✗ DEAD
 
-[ISP Modem] ----cable----> [Mini PC] ----> [Switch] ----> [WiFi]
-                              ^
-                              |
-                         THIS IS DOWN
-```
-
-**Unplug the cable from the Mini PC side** (not from the ISP modem).
-
----
-
-### Step 3: Connect the Opal
-
-1. **Plug the cable from ISP modem into Opal "WAN" port**
-   - It's the port on the left side
-   - Should click when inserted
-
-2. **Connect Opal to the switch**
-   - Use another Ethernet cable
-   - Plug one end into Opal "LAN" port (middle port)
-   - Plug other end into any free port on the big switch
-
-3. **Power on the Opal**
-   - Plug in USB-C power cable
-   - Extend the antennas upward for better signal
-   - Wait for lights to turn solid (about 1 minute)
-
-```
-AFTER (working):
-
-[ISP Modem] ----cable----> [Opal] ----> [Switch] ----> [WiFi]
-                              ^
-                              |
-                         BACKUP ROUTER
+EMERGENCY:
+[ISP Modem] ──cable──► [Opal WAN] ──► [Switch] ──► WiFi
+                         ✓ BACKUP
 ```
 
 ---
 
-### Step 4: Reconnect to WiFi
+## Scenario C: Internet Is Slow or Keeps Dropping
 
-The WiFi network name might change. Look for:
+**Don't touch anything.** This usually fixes itself.
 
-| Network Name | Password |
-|--------------|----------|
-| `GL-SFT1200-xxx` | On sticker under Opal |
-| Or same as before | Same password |
-
-**On your phone/laptop:**
-1. Go to WiFi settings
-2. Forget the old network if it's not connecting
-3. Connect to the Opal network (look for GL-SFT1200)
-4. Enter password from sticker
-5. **Tip:** Connect to 5GHz network for faster speeds if available
+1. Wait 10-15 minutes
+2. If still bad, text/call Augusto
+3. If you can't reach Augusto, try restarting the ISP modem:
+   - Unplug the modem power for 10 seconds
+   - Plug it back in
+   - Wait 3-5 minutes
 
 ---
 
-### Step 5: Test Internet
+## What Works / What Doesn't
 
-Open a browser and go to any website (google.com).
+### With Emergency WiFi (Opal + phone hotspot)
 
-**If it works:** You're done! Netflix and YouTube should work now.
+| Service | Status | Notes |
+|---------|--------|-------|
+| Netflix | ✓ Works | Uses phone data |
+| YouTube | ✓ Works | Uses phone data |
+| Web browsing | ✓ Works | |
+| Video calls | ✓ Works | May use lots of data |
+| Social media | ✓ Works | |
 
-**If it doesn't work:**
-- Wait 2 more minutes for Opal to get internet from ISP
-- Try restarting the ISP modem (unplug for 10 seconds, plug back in)
-- Check that all cables are clicked in firmly
-
----
-
-## What Works / What Doesn't Work
-
-### Works with Opal (backup)
-
-| Service | Status |
-|---------|--------|
-| Netflix | Works |
-| YouTube | Works |
-| Web browsing | Works |
-| Email | Works |
-| Video calls | Works |
-
-### Doesn't Work (needs Augusto to fix)
+### Needs Augusto to Fix
 
 | Service | Why |
 |---------|-----|
-| Ad blocking | Pi-hole is on Mini PC |
-| Smart home controls | Home Assistant is down |
-| Jellyfin (local movies) | Server is down |
-| Security cameras | Frigate is down |
+| Ad blocking | Pi-hole runs on Mini PC |
+| Smart home | Home Assistant is on Mini PC |
+| Security cameras | Frigate is on Mini PC |
+| Local movies (Jellyfin) | Server is on Mini PC |
 
 ---
 
-## Diagram: Where Everything Is
+## How the Automatic Backup Works (FYI)
+
+You don't need to do anything for this — it's automatic:
+
+- A small **LTE router** (TP-Link, white box with antennas) is plugged into the network switch
+- When the ISP goes down, it automatically switches to mobile data
+- This keeps Augusto's remote access working (so he can fix things from anywhere)
+- It does NOT provide enough bandwidth for Netflix — that's why the Opal + phone hotspot exists for streaming
+
+```
+Layer 1 (automatic, invisible):
+  ISP down → LTE modem takes over → Augusto has remote access
+
+Layer 2 (manual, family activates):
+  Family needs Netflix → Phone hotspot + Opal → EmergencyWiFi
+```
+
+---
+
+## Where Everything Is
 
 ```
                     ┌─────────────────────┐
                     │     ISP Modem       │
-                    │  (Tigo/Personal)    │
+                    │  (Tigo — ARRIS)     │
                     └─────────┬───────────┘
                               │
                     ┌─────────▼───────────┐
-    NORMALLY ───────│     Mini PC         │ ◄── If this is dead,
-                    │   (black box)       │     use Opal instead
+                    │     Mini PC         │
+                    │   (black box)       │
                     └─────────┬───────────┘
                               │
                     ┌─────────▼───────────┐
-                    │    Big Switch       │
-                    │  (8 port, silver)   │
+                    │   MokerLink Switch  │ ← Opal + LTE router
+                    │   (8 port, silver)  │   on the shelf nearby
                     └─────────┬───────────┘
                               │
               ┌───────────────┼───────────────┐
               │               │               │
       ┌───────▼───────┐ ┌─────▼─────┐ ┌───────▼───────┐
       │   WiFi AP     │ │    NAS    │ │  Other stuff  │
-      │ (TP-Link)     │ │ (storage) │ │               │
+      │  (TP-Link)    │ │ (storage) │ │               │
       └───────────────┘ └───────────┘ └───────────────┘
 ```
-
----
-
-## When Augusto Gets Back
-
-Let him know:
-1. The Mini PC stopped working
-2. You used the Opal as backup
-3. When it happened (date/time if you remember)
-
-He'll need to:
-- Fix the Mini PC / OPNsense
-- Reconnect everything properly
-- Put the Opal back in the drawer
 
 ---
 
@@ -206,62 +194,64 @@ He'll need to:
 
 ## Quick Reference Card
 
-Print this and keep near the router:
+**Print this, laminate it, and keep it on the shelf near the Opal.**
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│           EMERGENCY INTERNET - QUICK STEPS              │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  1. Find Opal (small WHITE router in office drawer)     │
-│                                                         │
-│  2. Unplug cable from Mini PC (black box)               │
-│                                                         │
-│  3. Plug that cable into Opal "WAN" port (left side)    │
-│                                                         │
-│  4. Connect Opal "LAN" (middle) to Switch               │
-│                                                         │
-│  5. Power on Opal (USB-C), extend antennas up           │
-│                                                         │
-│  6. Connect to WiFi: GL-SFT1200-xxx (5GHz faster)       │
-│     Password: (on sticker under router)                 │
-│                                                         │
-│  7. Wait 1-2 minutes, test google.com                   │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│          🌐 EMERGENCY INTERNET — QUICK STEPS                 │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ❓ Is the Mini PC (black box) ON?                           │
+│     Lights visible = YES                                     │
+│                                                              │
+│  ✅ YES (ISP is down — most common):                         │
+│                                                              │
+│     1. Turn on phone WiFi hotspot                            │
+│     2. Plug in Opal power (USB-C) — NO other cables          │
+│     3. Connect to "EmergencyWiFi-5G"                         │
+│        Password: ______________________                      │
+│     4. Wait 1 min, test Netflix                              │
+│                                                              │
+│  ❌ NO (Mini PC is dead — rare):                              │
+│                                                              │
+│     1. Unplug cable from Mini PC                             │
+│     2. Plug that cable into Opal "WAN" (left port)           │
+│     3. Connect Opal "LAN" (middle) to switch                 │
+│     4. Plug in Opal power (USB-C)                            │
+│     5. Connect to "EmergencyWiFi-5G"                         │
+│     6. Wait 2 min, test Netflix                              │
+│                                                              │
+│  ⏳ Internet is just SLOW? Don't touch anything.              │
+│     Wait 15 min. If still bad, call Augusto.                 │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Troubleshooting
 
-### "No internet" after connecting to Opal WiFi
+### "No internet" after connecting to EmergencyWiFi
 
-1. Wait 2 minutes - it takes time to connect to ISP
-2. Check ISP modem has lights on
-3. Unplug ISP modem for 10 seconds, plug back in
-4. Try again in 5 minutes
+1. Is your phone hotspot still on? Check it
+2. Is the phone connected to mobile data? (Check signal bars)
+3. Move the phone closer to the Opal
+4. Wait 2 minutes — the Opal may still be connecting
+5. Try turning the phone hotspot off and on again
 
-### Can't find Opal WiFi network
+### Can't see EmergencyWiFi network
 
-1. Make sure Opal has power (lights on)
-2. Make sure USB-C cable is plugged in firmly
-3. Try moving closer to the Opal
-4. Wait 2 minutes for it to boot up
+1. Check the Opal has power (lights on?)
+2. Wait 1-2 minutes for it to boot
+3. Move closer to the Opal
 
-### Opal lights are blinking but no internet
+### I made things worse!
 
-1. Check the cable from ISP modem is in "WAN" port (not "LAN")
-2. Make sure cable clicks in firmly
-3. ISP might be down - check with neighbors
-
-### I made it worse!
-
-Don't worry! Nothing is permanently broken.
+Don't worry — nothing is permanently broken.
 1. Unplug everything you connected
 2. Put cables back where they were
-3. Wait for Augusto
-4. Use mobile data in the meantime
+3. Use mobile data on your phone for now
+4. Wait for Augusto
 
 ---
 
@@ -269,16 +259,17 @@ Don't worry! Nothing is permanently broken.
 
 | Item | Details |
 |------|---------|
-| **Backup Router** | GL-iNet GL-SFT1200 (Opal) |
-| **Color** | White |
-| **Antennas** | Retractable (extend for better signal) |
+| **Emergency Router** | GL-iNet GL-SFT1200 (Opal) |
+| **Color** | White, small box with antennas |
 | **Power** | USB-C (5V/2A) |
 | **Ports** | WAN (left), LAN (middle) |
-| **WiFi** | Dual-band: 2.4GHz (300Mbps) + 5GHz (867Mbps) |
+| **WiFi** | `EmergencyWiFi` (2.4GHz) + `EmergencyWiFi-5G` (5GHz) |
+| **Mode** | Repeater (connects to phone hotspot wirelessly) |
+| **LTE Router** | TP-Link TL-MR100 (plugged into switch — don't touch) |
 
 *Note: The Beryl AX stays in the mobile kit for travel.*
 
 ---
 
-*Last updated: 2026-01-22*
+*Last updated: 2026-03-05*
 *Created by: Augusto for family use*

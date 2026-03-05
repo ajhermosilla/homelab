@@ -321,6 +321,204 @@ See `docs/guides/nut-config.md` for NUT server setup on NAS.
 
 ---
 
+## Dual-WAN / LTE Failover
+
+Automatic WAN failover using a TP-Link TL-MR100 LTE router on the LAN as a secondary gateway. When the ISP goes down, OPNsense routes critical traffic (Tailscale, DNS) over LTE within ~60 seconds. The family doesn't notice — Augusto retains remote access.
+
+### Design: LAN-Side Gateway
+
+The Aoostar N1 Pro has only 2 NICs (both occupied: WAN + LAN). Instead of adding a third NIC via USB adapter, the TL-MR100 connects to the MokerLink switch alongside all other LAN devices. OPNsense uses it as a failover gateway on the LAN interface — no extra interfaces, no Proxmox USB passthrough, no cable mess.
+
+The MR100 is a standalone LTE router with a built-in SIM slot. It handles the cellular connection internally and presents a clean Ethernet interface. Double NAT is irrelevant since Tailscale handles NAT traversal via DERP relays.
+
+### Hardware
+
+| Item | Details |
+|------|---------|
+| **LTE Router** | TP-Link TL-MR100 (~$32, Flytec CDE) |
+| **SIM** | Tigo or Personal prepaid, 5GB/month (~$3/mo) |
+| **Connection** | Ethernet from MR100 LAN port → MokerLink switch |
+
+### Prerequisites: MR100 Setup
+
+Before connecting to the homelab, configure the MR100 standalone (connect via WiFi or direct Ethernet to a laptop):
+
+1. **Insert SIM** into the MR100's micro-SIM slot (bottom of device)
+2. **Access admin UI** at `http://192.168.1.1` (MR100 default)
+   - Default password: `admin`
+3. **Set APN** if not auto-detected:
+   - Tigo: `internet.tigo.py`
+   - Personal: `internet`
+4. **Change MR100 LAN IP** to `192.168.0.3/24`:
+   - **Network > LAN Settings** → IP Address: `192.168.0.3`, Subnet: `255.255.255.0`
+   - This puts the MR100 on the same subnet as OPNsense LAN
+5. **Disable DHCP server** on the MR100:
+   - **Network > LAN Settings > DHCP** → Disable
+   - OPNsense remains the only DHCP server on the network
+6. **Disable MR100 WiFi** (both bands):
+   - **Wireless > Wireless Settings** → Disable
+   - No rogue SSID on the network
+7. **Set admin password** to something strong (store in Vaultwarden)
+8. **Verify LTE connection**: check signal bars and test browsing via the MR100's admin UI
+
+### Physical Connection
+
+Plug the MR100's LAN/WAN Ethernet port into any free port on the MokerLink switch. Connect power. Done.
+
+```
+Rack / Shelf:
+  [ARRIS modem] ──eth──► [MokerLink switch] ◄──eth── [Aoostar nic1 (LAN)]
+  [TL-MR100]    ──eth──┘        │            ◄──eth── [Aoostar nic0 (WAN) ← ARRIS]
+   (power + SIM)                ├── NAS
+                                ├── WiFi AP
+                                └── other devices
+```
+
+### OPNsense Configuration
+
+#### 1. Add LTE Gateway
+
+The MR100 is at `192.168.0.3` on the LAN. Add it as a gateway manually.
+
+**System > Gateways > Configuration > Add**
+
+| Setting | Value |
+|---------|-------|
+| Name | LTE_GW |
+| Description | TP-Link MR100 LTE failover |
+| Interface | LAN |
+| Address Family | IPv4 |
+| IP Address | 192.168.0.3 |
+| Upstream Gateway | Yes |
+| Far Gateway | Yes |
+| Monitor IP | 9.9.9.9 |
+| Priority | 255 (default) |
+
+**Important:** Enable **Far Gateway** — this tells OPNsense the gateway is not directly connected (it's a router on the LAN, not a point-to-point link). Without this, gateway monitoring may not work correctly.
+
+Verify the existing ISP gateway:
+
+| Setting | Value |
+|---------|-------|
+| Name | ISP_WAN_DHCP |
+| Interface | WAN |
+| Monitor IP | 1.1.1.1 |
+
+Use different monitor IPs (1.1.1.1 vs 9.9.9.9) so both gateways are health-checked independently.
+
+#### 2. Create Gateway Group
+
+**System > Gateways > Group > Add**
+
+| Setting | Value |
+|---------|-------|
+| Group Name | WAN_FAILOVER |
+| ISP_WAN_DHCP | Tier 1 (primary) |
+| LTE_GW | Tier 2 (failover) |
+| Trigger Level | Member Down |
+
+#### 3. Enable Gateway Switching
+
+**System > Settings > General**
+- Enable: **Allow default gateway switching**
+
+#### 4. Update Firewall Rules
+
+**Firewall > Rules > LAN**
+- Edit the default "Allow all outbound" rule
+- Set **Gateway** to `WAN_FAILOVER` (instead of default)
+
+#### 5. Prevent LAN Devices from Using MR100 Directly
+
+LAN devices should never use `192.168.0.3` as a gateway — only OPNsense should route through it. The MR100's DHCP is disabled (step 5 in prerequisites), so devices won't discover it. As an extra safeguard, add a firewall rule:
+
+**Firewall > Rules > LAN** (add at top):
+
+| # | Action | Source | Dest | Port | Description |
+|---|--------|--------|------|------|-------------|
+| 1 | Block | !OPNsense | 192.168.0.3 | any | Only OPNsense can reach MR100 |
+
+This ensures only OPNsense itself routes traffic through the MR100.
+
+#### 6. DHCP Static Mapping (Optional but Recommended)
+
+Reserve `192.168.0.3` for the MR100 in OPNsense DHCP so nothing else gets that IP:
+
+**Services > DHCPv4 > LAN > DHCP Static Mappings > Add**
+
+| Setting | Value |
+|---------|-------|
+| MAC Address | (MR100's MAC — check sticker on bottom) |
+| IP Address | 192.168.0.3 |
+| Description | TP-Link MR100 LTE failover |
+
+### Testing Failover
+
+1. **Verify both gateways are online**:
+   - **System > Gateways > Configuration** — both should show "Online"
+   - ISP_WAN_DHCP monitors 1.1.1.1 via ISP, LTE_GW monitors 9.9.9.9 via MR100
+
+2. **Simulate ISP failure**:
+   ```
+   # Unplug ARRIS modem (or disable WAN interface in OPNsense)
+   # Interfaces > WAN > Disable → Save → Apply
+   ```
+
+3. **Verify failover** (~30-60 seconds):
+   - **System > Gateways > Configuration** — ISP_WAN should show "Offline", LTE_GW "Online"
+   - From a LAN device: `ping 8.8.8.8` should work (routed via MR100 LTE)
+   - Tailscale should reconnect within 1-2 minutes
+   - ntfy alert should fire (Uptime Kuma detects WAN change)
+
+4. **Verify failback**:
+   - Re-enable WAN / plug ARRIS back in
+   - ISP_WAN goes back to "Online"
+   - Traffic automatically returns to ISP (Tier 1)
+
+5. **Check LTE data usage**:
+   - Access MR100 admin UI at `http://192.168.0.3`
+   - **Advanced > System Tools > Statistics** → check monthly data
+
+### WAN Watchdog Integration
+
+The existing `/root/wan_watchdog.sh` on OPNsense handles DHCP recovery for the primary WAN. With multi-WAN, the gateway group handles failover automatically — the watchdog is complementary (it tries to recover ISP before failover kicks in).
+
+### Architecture
+
+```
+                    ┌──────────┐
+   ISP ────────────►│  ARRIS   │
+   (Tier 1)         │ (bridge) │
+                    └────┬─────┘
+                         │ nic0/vmbr0
+                    ┌────▼─────────────────────┐
+                    │   Aoostar N1 Pro          │
+                    │   (Proxmox)               │
+                    │                           │
+                    │   ┌───────────────────┐   │
+                    │   │    OPNsense VM    │   │
+                    │   │  WAN_FAILOVER:    │   │
+                    │   │  vtnet0 = Tier 1  │   │
+                    │   │  LAN GW = Tier 2  │   │
+                    │   └───────────────────┘   │
+                    │                           │
+                    └────┬─────────────────────┘
+                         │ nic1/vmbr1
+                    ┌────▼─────────────────────┐
+                    │    MokerLink Switch       │
+                    │                           │
+                    │  ┌─────────┐              │
+                    │  │ TL-MR100│◄── LTE SIM   │
+                    │  │ .0.2    │   (Tier 2)   │
+                    │  └─────────┘              │
+                    └────┬────────┬────────┬───┘
+                         │        │        │
+                    [Docker VM] [NAS]  [Devices]
+                      .0.10     .0.12
+```
+
+---
+
 ## Backup Configuration
 
 **System > Configuration > Backups**
@@ -387,3 +585,5 @@ Install telegraf plugin for metrics export.
 - `docs/architecture/fixed-homelab.md` - Overall architecture
 - `docs/guides/nut-config.md` - UPS graceful shutdown
 - `docs/architecture/hardware.md` - Mini PC specs
+- `docs/reference/family-emergency-internet.md` - Family emergency internet runbook
+- `docs/guides/incident-2026-03-05-isp-outage.md` - ISP outage incident that motivated dual-WAN
