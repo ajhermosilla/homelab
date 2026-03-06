@@ -117,10 +117,10 @@ services:
       - photos-net
 
   # =========================================================================
-  # PostgreSQL with pgvecto.rs - Vector search for Immich
+  # PostgreSQL with VectorChord - Vector search for Immich
   # =========================================================================
   immich-db:
-    image: tensorchord/pgvecto-rs:pg17-v0.4.0
+    image: ghcr.io/immich-app/postgres:17-vectorchord0.5.3
     env_file:
       - ../../../shared/common.env
     container_name: immich-db
