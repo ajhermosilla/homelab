@@ -30,6 +30,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       TZ: ${TZ:-America/Asuncion}
+    networks:
+      - caddy-net
     logging:
       driver: "json-file"
       options:
@@ -64,6 +66,8 @@ services:
     environment:
       TZ: ${TZ:-America/Asuncion}
       DOCKER_ENABLE_SECURITY: "false"
+    networks:
+      - caddy-net
     logging:
       driver: "json-file"
       options:
@@ -98,6 +102,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       TZ: ${TZ:-America/Asuncion}
+    networks:
+      - caddy-net
     logging:
       driver: "json-file"
       options:
@@ -107,6 +113,10 @@ services:
 volumes:
   stirling-data:
     name: stirling-data
+
+networks:
+  caddy-net:
+    external: true
 
 # =============================================================================
 # SETUP INSTRUCTIONS
