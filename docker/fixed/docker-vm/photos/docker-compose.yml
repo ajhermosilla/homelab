@@ -45,6 +45,7 @@ services:
         max-file: "3"
     networks:
       - photos-net
+      - caddy-net
     depends_on:
       immich-db:
         condition: service_healthy
@@ -165,6 +166,8 @@ volumes:
 networks:
   photos-net:
     name: photos-net
+  caddy-net:
+    external: true
 
 # =============================================================================
 # PREREQUISITES

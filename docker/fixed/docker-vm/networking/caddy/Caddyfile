@@ -50,7 +50,7 @@
 # Import this in any service block to require SSO authentication.
 # Do NOT use on services with their own auth (HA, Frigate, Vaultwarden, Immich).
 (authelia) {
-	forward_auth host.docker.internal:9091 {
+	forward_auth authelia:9091 {
 		uri /api/authz/forward-auth
 		copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
 	}
@@ -65,7 +65,7 @@
 auth.cronova.dev {
 	import internal_tls
 	import security_headers
-	reverse_proxy host.docker.internal:9091
+	reverse_proxy authelia:9091
 }
 
 # =============================================================================
@@ -73,9 +73,11 @@ auth.cronova.dev {
 # =============================================================================
 
 # Vaultwarden - Password Manager
-# Access: https://vault.cronova.dev (via VPS proxy) or http://192.168.0.10:8843
-# Plain HTTP on port 8843 — TLS terminates at VPS Caddy
-:8843 {
+# Access: https://vault.cronova.dev (internal only, via Tailscale/LAN)
+# Own auth — no Authelia
+vault.cronova.dev {
+	import internal_tls
+	import security_headers
 	reverse_proxy host.docker.internal:8843
 }
 
@@ -125,7 +127,7 @@ git.cronova.dev {
 vera.cronova.dev {
 	import internal_tls
 	import security_headers
-	reverse_proxy host.docker.internal:2283
+	reverse_proxy immich-server:2283
 }
 
 # =============================================================================
@@ -166,7 +168,7 @@ ysyry.cronova.dev {
 	import internal_tls
 	import security_headers
 	import authelia
-	reverse_proxy host.docker.internal:9999
+	reverse_proxy dozzle:8080
 }
 
 # Stirling-PDF - PDF Tools (Kuatia)
@@ -175,7 +177,7 @@ kuatia.cronova.dev {
 	import internal_tls
 	import security_headers
 	import authelia
-	reverse_proxy host.docker.internal:8580
+	reverse_proxy stirling-pdf:8080
 }
 
 # Homepage - Dashboard (Mbyja)
@@ -184,7 +186,7 @@ mbyja.cronova.dev {
 	import internal_tls
 	import security_headers
 	import authelia
-	reverse_proxy host.docker.internal:3030
+	reverse_proxy homepage:3000
 }
 
 # =============================================================================
@@ -197,7 +199,7 @@ aranduka.cronova.dev {
 	import internal_tls
 	import security_headers
 	import authelia
-	reverse_proxy host.docker.internal:8010
+	reverse_proxy paperless-ngx:8000
 }
 
 # =============================================================================
@@ -210,7 +212,7 @@ papa.cronova.dev {
 	import internal_tls
 	import security_headers
 	import authelia
-	reverse_proxy host.docker.internal:3000
+	reverse_proxy grafana:3000
 }
 
 # =============================================================================
@@ -219,8 +221,8 @@ papa.cronova.dev {
 #
 # DNS Configuration:
 #   Pi-hole local DNS entries point *.cronova.dev → 192.168.0.10 (Docker VM).
-#   Required entries: jara, yrasema, taguato, japysaka, taanga, aoao, git,
-#                     auth, ysyry, kuatia, mbyja, aranduka, papa, vera
+#   Required entries: vault, jara, yrasema, taguato, japysaka, taanga, aoao,
+#                     git, auth, ysyry, kuatia, mbyja, aranduka, papa, vera
 #
 # Authelia-protected services:
 #   yrasema (Jellyfin), japysaka (Sonarr), taanga (Radarr), aoao (Prowlarr),
@@ -238,7 +240,8 @@ papa.cronova.dev {
 #   - Frigate: https://taguato.cronova.dev (port 5000 localhost-only)
 #
 # Docker Network:
-#   Caddy uses host.docker.internal to reach services on Docker VM.
+#   Caddy uses caddy-net to reach services bound to 127.0.0.1 (by container name).
+#   Services on 0.0.0.0 (HA, Vaultwarden, Jellyfin, *arr) use host.docker.internal.
 #   Requires: extra_hosts: ["host.docker.internal:host-gateway"]
 #
 # =============================================================================
