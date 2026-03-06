@@ -40,6 +40,8 @@ services:
       interval: 30s
       timeout: 3s
       retries: 3
+    networks:
+      - caddy-net
     logging:
       driver: "json-file"
       options:
@@ -49,6 +51,10 @@ services:
 volumes:
   authelia-data:
     name: authelia-data
+
+networks:
+  caddy-net:
+    external: true
 
 # =============================================================================
 # SETUP INSTRUCTIONS

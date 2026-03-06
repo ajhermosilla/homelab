@@ -117,6 +117,7 @@ services:
         max-file: "3"
     networks:
       - monitoring-net
+      - caddy-net
     depends_on:
       - victoriametrics
 
@@ -131,6 +132,8 @@ volumes:
 networks:
   monitoring-net:
     name: monitoring-net
+  caddy-net:
+    external: true
 
 # =============================================================================
 # PREREQUISITES
