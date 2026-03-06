@@ -1,0 +1,39 @@
+http:
+  routers:
+    javya-http:
+      entryPoints:
+        - http
+      service: javya-frontend
+      rule: Host(`javya.cronova.dev`)
+      middlewares:
+        - redirect-to-https
+    javya-https:
+      entryPoints:
+        - https
+      service: javya-frontend
+      rule: Host(`javya.cronova.dev`)
+      tls:
+        certresolver: letsencrypt
+    javya-api-http:
+      entryPoints:
+        - http
+      service: javya-backend
+      rule: Host(`javya-api.cronova.dev`)
+      middlewares:
+        - redirect-to-https
+    javya-api-https:
+      entryPoints:
+        - https
+      service: javya-backend
+      rule: Host(`javya-api.cronova.dev`)
+      tls:
+        certresolver: letsencrypt
+  services:
+    javya-frontend:
+      loadBalancer:
+        servers:
+          - url: http://javya-frontend:80
+    javya-backend:
+      loadBalancer:
+        servers:
+          - url: http://javya-backend:8000
