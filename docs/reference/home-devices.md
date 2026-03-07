@@ -17,7 +17,7 @@ Devices served by homelab services.
 
 | Device | Owner | OS | Homelab Services |
 |--------|-------|-----|------------------|
-| Samsung A16 | Augusto | Android | Tailscale, Vaultwarden, Jellyfin, ntfy |
+| Samsung A16 | Augusto | Android | Tailscale, Vaultwarden, Jellyfin, ntfy, HA Companion |
 | Google Pixel 6 | Andre | Android | Vaultwarden, Jellyfin |
 | iPhone 14 Pro Max | Anna Pau | iOS | Vaultwarden, Jellyfin |
 | Samsung A16 | Mauri | Android | Vaultwarden, Jellyfin |
@@ -48,10 +48,12 @@ Devices served by homelab services.
 
 ## Entertainment (2)
 
-| Device | Year | Platform | Homelab Services |
-|--------|------|----------|------------------|
-| LG Smart TV UM7100PSA | 2021 | WebOS | Jellyfin, Pi-hole DNS |
-| Apple TV 4th Gen 32GB | 2016 | tvOS | Jellyfin (via Infuse), Pi-hole DNS |
+| Device | Year | Platform | IP | MAC | Homelab Services |
+|--------|------|----------|----|-----|------------------|
+| LG Smart TV UM7100PSA | 2021 | WebOS | 192.168.0.51 | 74:40:be:da:6f:10 | Jellyfin, Pi-hole DNS, HA (pending) |
+| Apple TV 4th Gen 32GB | 2016 | tvOS 26.3 | 192.168.0.50 | d0:03:4b:4b:24:91 | Jellyfin (via Infuse), Pi-hole DNS, HA (pending) |
+
+**DHCP:** Static reservations in OPNsense (outside pool range .100-.250)
 
 **Jellyfin clients:**
 - LG TV: Native Jellyfin app (WebOS)
@@ -74,7 +76,7 @@ Devices served by homelab services.
 
 | Device | Year | Connection | Notes |
 |--------|------|------------|-------|
-| HP Deskjet Ink Advantage 3545 | ~2016 | WiFi | Printer |
+| HP Deskjet Ink Advantage 3545 | ~2016 | WiFi (5c:b9:01:56:34:58) | Printer |
 | Brother ADS-1700W | 2021 | WiFi | Document scanner |
 
 ---
@@ -86,7 +88,8 @@ Devices served by homelab services.
 | Tailscale | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Vaultwarden | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Jellyfin | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Home Assistant | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Home Assistant | ✅ | ✅ | ❌ | ❌ | ✅ (pending) |
+| HA Companion | ✅ (pending) | ❌ | ❌ | ❌ | ❌ |
 | Pi-hole DNS | ✅ | ✅ | ✅ | ✅ | ✅ |
 | ntfy | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Frigate | ✅ | ✅ | ❌ | ❌ | ❌ |
