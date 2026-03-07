@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAS App Deployment Guide &mdash; cronova.dev</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-alt: #1c2333;
+    --bg-code: #0d1117;
+    --border: #30363d;
+    --border-subtle: #21262d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent-cyan: #00d4aa;
+    --accent-teal: #39d2c0;
+    --accent-blue: #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-orange: #d29922;
+    --accent-red: #f85149;
+    --accent-green: #3fb950;
+    --accent-pink: #f778ba;
+    --accent-warm: #da7756;
+    --pro-color: #3fb950;
+    --con-color: #f85149;
+    --gradient-hero: linear-gradient(135deg, #0d1117 0%, #0f1923 30%, #111d2b 60%, #0d1117 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--gradient-hero);
+    border-bottom: 1px solid var(--border);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 600px 300px at 30% 50%, rgba(0, 212, 170, 0.07), transparent),
+      radial-gradient(ellipse 500px 250px at 70% 40%, rgba(88, 166, 255, 0.06), transparent),
+      radial-gradient(ellipse 400px 200px at 50% 80%, rgba(188, 140, 255, 0.05), transparent);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+  .hero .subtitle {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+  .hero .tagline {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    max-width: 650px;
+    margin: 0.75rem auto 0;
+    font-style: italic;
+    position: relative;
+  }
+  .hero .accent-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 2rem;
+    height: 3px;
+    max-width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .accent-bar .seg1 { background: var(--accent-cyan); flex: 1; }
+  .accent-bar .seg2 { background: var(--accent-blue); flex: 1; }
+  .accent-bar .seg3 { background: var(--accent-purple); flex: 1; }
+
+  /* ── Container ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 2.5rem;
+  }
+  .toc h2 {
+    font-size: 1.2rem;
+    color: var(--accent-cyan);
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: none;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc-counter;
+    columns: 2;
+    column-gap: 2rem;
+  }
+  .toc ol li {
+    counter-increment: toc-counter;
+    margin-bottom: 0.4rem;
+    break-inside: avoid;
+  }
+  .toc ol li::before {
+    content: counter(toc-counter) ".";
+    color: var(--accent-teal);
+    font-weight: 600;
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .toc a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+  }
+  .toc a:hover {
+    color: var(--accent-cyan);
+  }
+
+  /* ── Section Headers ── */
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin: 3rem 0 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--border);
+  }
+  h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin: 2rem 0 0.75rem;
+  }
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-purple);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  /* ── Paragraphs ── */
+  p {
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* ── Links ── */
+  a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.2s, border-bottom 0.2s;
+    border-bottom: 1px solid transparent;
+  }
+  a:hover {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--accent-cyan);
+  }
+
+  /* ── Code ── */
+  code {
+    background: var(--bg-code);
+    color: var(--accent-teal);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.88em;
+    border: 1px solid var(--border-subtle);
+  }
+  pre {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0 1.5rem;
+    overflow-x: auto;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: inherit;
+  }
+  pre .comment { color: var(--text-dim); }
+  pre .cmd { color: var(--accent-teal); }
+  pre .flag { color: var(--accent-purple); }
+  pre .string { color: var(--accent-green); }
+  pre .key { color: var(--accent-blue); }
+  pre .value { color: var(--accent-orange); }
+  pre .placeholder { color: var(--accent-pink); font-style: italic; }
+
+  /* ── Lists ── */
+  ul, ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  li {
+    margin-bottom: 0.3rem;
+    color: var(--text);
+  }
+
+  /* ── Tables ── */
+  .table-wrapper {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  thead th {
+    background: var(--bg-card-alt);
+    color: var(--accent-cyan);
+    font-weight: 700;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) { background: rgba(22, 27, 34, 0.5); }
+  tbody tr:nth-child(odd) { background: rgba(13, 17, 23, 0.5); }
+  tbody tr:hover { background: rgba(57, 210, 192, 0.04); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:first-child { font-weight: 600; color: var(--accent-blue); }
+
+  /* ── Blockquotes ── */
+  blockquote {
+    background: var(--bg-card);
+    border-left: 4px solid var(--accent-purple);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  blockquote strong { color: var(--text); }
+
+  /* ── Callout ── */
+  .callout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent-cyan);
+    border-radius: 0 8px 8px 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  .callout strong { color: var(--accent-cyan); }
+  .callout.warning {
+    border-left-color: var(--accent-orange);
+  }
+  .callout.warning strong { color: var(--accent-orange); }
+  .callout.danger {
+    border-left-color: var(--accent-red);
+  }
+  .callout.danger strong { color: var(--accent-red); }
+
+  /* ── Step Cards ── */
+  .step-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin: 1.5rem 0;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .step-card:hover { border-color: var(--accent-teal); }
+  .step-card .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+    color: var(--bg);
+    font-weight: 800;
+    font-size: 0.85rem;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+  .step-card h3 {
+    display: inline;
+    margin: 0;
+    font-size: 1.25rem;
+    vertical-align: middle;
+  }
+  .step-card .step-header {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  .step-card p, .step-card ul { font-size: 0.95rem; }
+
+  /* ── Architecture Diagram ── */
+  .arch-diagram {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+    overflow-x: auto;
+  }
+  .arch-diagram .layer { margin: 0.5rem 0; }
+  .arch-diagram .arrow { color: var(--text-dim); }
+  .arch-diagram .node-external { color: var(--accent-orange); font-weight: 600; }
+  .arch-diagram .node-infra { color: var(--accent-cyan); font-weight: 600; }
+  .arch-diagram .node-app { color: var(--accent-blue); font-weight: 600; }
+  .arch-diagram .node-url { color: var(--accent-green); font-size: 0.8rem; }
+
+  /* ── Lesson Cards ── */
+  .lesson-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin: 1.5rem 0;
+  }
+  .lesson-card.warning { border-left: 4px solid var(--accent-orange); }
+  .lesson-card.danger { border-left: 4px solid var(--accent-red); }
+  .lesson-card.info { border-left: 4px solid var(--accent-blue); }
+  .lesson-card h4 { margin-top: 0; }
+
+  /* ── Checklist ── */
+  .checklist {
+    list-style: none;
+    padding-left: 0;
+  }
+  .checklist li {
+    padding: 0.5rem 0;
+    padding-left: 1.75rem;
+    position: relative;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "\25A1";
+    position: absolute;
+    left: 0;
+    color: var(--accent-teal);
+    font-size: 1.1rem;
+  }
+
+  /* ── Quick Ref ── */
+  .quick-ref {
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.05), rgba(88, 166, 255, 0.03));
+    border: 1px solid rgba(0, 212, 170, 0.25);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+  .quick-ref h2 {
+    color: var(--accent-cyan);
+    border-bottom-color: rgba(0, 212, 170, 0.25);
+    margin-top: 0;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8rem; }
+    .toc ol { columns: 1; }
+    .container { padding: 1.5rem 1rem; }
+    .step-card { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <h1>NAS App Deployment Guide</h1>
+  <p class="subtitle">FastAPI + React + PostgreSQL on Docker Compose with Coolify Traefik</p>
+  <p class="tagline">A proven pattern for deploying web apps on NAS &mdash; born from trial, error, and one very stubborn PaaS beta.</p>
+  <div class="accent-bar">
+    <div class="seg1"></div>
+    <div class="seg2"></div>
+    <div class="seg3"></div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- ── TOC ── -->
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#background">Background</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#prerequisites">Prerequisites</a></li>
+      <li><a href="#deployment">Step-by-Step Deployment</a></li>
+      <li><a href="#updating">Updating an App</a></li>
+      <li><a href="#reference">Deployed Apps Reference</a></li>
+      <li><a href="#lessons">Lessons Learned</a></li>
+      <li><a href="#quickref">Quick Reference</a></li>
+    </ol>
+  </nav>
+
+  <!-- ── Background ── -->
+  <h2 id="background">Background</h2>
+  <p>The NAS runs <strong>Coolify</strong> (tajy) as its PaaS, but Coolify v4 beta cannot deploy from a local Forgejo instance (see <a href="#lessons">Lessons Learned</a>). Instead, apps are deployed as standalone Docker Compose stacks that share Coolify's <code>coolify</code> Docker network and Traefik reverse proxy.</p>
+
+  <div class="callout">
+    <strong>Deployed apps using this pattern:</strong>
+    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+      <li><strong>Katupyry</strong> &mdash; Personal finance (FastAPI + React + PostgreSQL)</li>
+      <li><strong>Javya</strong> &mdash; Worship planning (FastAPI + React + PostgreSQL)</li>
+    </ul>
+  </div>
+
+  <!-- ── Architecture ── -->
+  <h2 id="architecture">Architecture</h2>
+
+  <div class="arch-diagram">
+    <div class="layer"><span class="node-external">Internet</span> <span class="arrow">&rarr;</span> <span class="node-external">Cloudflare DNS</span> <span class="arrow">&rarr;</span> <span class="node-infra">Tailscale (Headscale)</span> <span class="arrow">&rarr;</span> <span class="node-infra">NAS</span></div>
+    <div class="layer"><span class="arrow">&darr;</span></div>
+    <div class="layer"><span class="node-infra">Traefik (Coolify) :443</span> <span class="arrow">&rarr;</span> <code>coolify</code> Docker network</div>
+    <div class="layer"><span class="arrow">&darr;</span></div>
+    <div class="layer">
+      <span class="node-app">app-frontend:80</span> <span class="node-url">(javya.cronova.dev)</span>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span class="node-app">app-backend:8000</span> <span class="node-url">(javya-api.cronova.dev)</span>
+    </div>
+    <div class="layer">
+      <span class="node-app">app-frontend:80</span> <span class="node-url">(katupyry.cronova.dev, backend internal)</span>
+    </div>
+  </div>
+
+  <ul>
+    <li><strong>No published ports</strong> &mdash; containers are only reachable via Traefik through the <code>coolify</code> network</li>
+    <li><strong>TLS termination</strong> &mdash; Traefik handles Let's Encrypt certificates (DNS-01 via Cloudflare)</li>
+    <li><strong>Two routing patterns:</strong> frontend-only (Katupyry) or frontend + API (Javya)</li>
+  </ul>
+
+  <!-- ── Prerequisites ── -->
+  <h2 id="prerequisites">Prerequisites</h2>
+
+  <ul class="checklist">
+    <li>App repo exists on Forgejo (<code>git.cronova.dev</code>)</li>
+    <li>App has a <code>docker-compose.prod.yml</code> and Dockerfiles for backend/frontend</li>
+    <li>DNS records exist in <strong>Pi-hole</strong> (LAN) and <strong>Headscale extra_records</strong> (Tailscale)</li>
+    <li>Secrets generated and stored in Vaultwarden</li>
+    <li>NAS has enough resources (~900MB RAM per app: 512M DB + 256M backend + 128M frontend)</li>
+  </ul>
+
+  <!-- ── Step-by-Step ── -->
+  <h2 id="deployment">Step-by-Step Deployment</h2>
+
+  <!-- Step 1 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">1</span>
+      <h3>Clone the repo on NAS</h3>
+    </div>
+    <pre><code><span class="cmd">ssh</span> nas
+<span class="cmd">cd</span> ~/deploy
+<span class="cmd">git clone</span> <span class="string">http://localhost:3000/augusto/<span class="placeholder">&lt;app&gt;</span>.git</span>
+<span class="cmd">cd</span> <span class="placeholder">&lt;app&gt;</span></code></pre>
+    <blockquote>Forgejo runs on NAS at <code>localhost:3000</code> (HTTP). No SSH key needed for clone.</blockquote>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">2</span>
+      <h3>Create the .env file</h3>
+    </div>
+    <p>Generate secrets:</p>
+    <pre><code><span class="cmd">openssl</span> rand <span class="flag">-hex</span> <span class="value">32</span>  <span class="comment"># POSTGRES_PASSWORD</span>
+<span class="cmd">openssl</span> rand <span class="flag">-hex</span> <span class="value">32</span>  <span class="comment"># SECRET_KEY</span></code></pre>
+    <p>Create <code>.env</code>:</p>
+    <pre><code><span class="cmd">cat</span> &gt; .env &lt;&lt; <span class="string">'EOF'</span>
+<span class="key">POSTGRES_PASSWORD</span>=<span class="placeholder">&lt;generated&gt;</span>
+<span class="key">SECRET_KEY</span>=<span class="placeholder">&lt;generated&gt;</span>
+<span class="key">CORS_ORIGINS</span>=<span class="value">https://<span class="placeholder">&lt;app&gt;</span>.cronova.dev</span>
+<span class="key">VITE_API_URL</span>=<span class="value">https://<span class="placeholder">&lt;app&gt;</span>-api.cronova.dev/api/v1</span>
+<span class="string">EOF</span></code></pre>
+    <div class="callout warning">
+      <strong>Store all secrets in Vaultwarden immediately.</strong> These are the only copy outside the NAS.
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">3</span>
+      <h3>Modify docker-compose.prod.yml</h3>
+    </div>
+    <p>Adapt the compose file for the Coolify/Traefik pattern:</p>
+    <p><strong>Remove</strong> from all services:</p>
+    <ul><li><code>ports:</code> &mdash; Traefik routes traffic, no host port publishing needed</li></ul>
+    <p><strong>Add</strong> to services that Traefik needs to reach (frontend always, backend if API is exposed externally):</p>
+    <pre><code><span class="key">services:</span>
+  <span class="key">backend:</span>  <span class="comment"># only if API is exposed externally</span>
+    <span class="comment"># ... existing config ...</span>
+    <span class="key">networks:</span>
+      <span class="value">default:</span>
+      <span class="value">coolify:</span>
+        <span class="key">aliases:</span>
+          - <span class="string"><span class="placeholder">&lt;app&gt;</span>-backend</span>
+
+  <span class="key">frontend:</span>
+    <span class="comment"># ... existing config ...</span>
+    <span class="key">networks:</span>
+      <span class="value">default:</span>
+      <span class="value">coolify:</span>
+        <span class="key">aliases:</span>
+          - <span class="string"><span class="placeholder">&lt;app&gt;</span>-frontend</span>
+
+<span class="key">networks:</span>
+  <span class="key">coolify:</span>
+    <span class="value">external: true</span></code></pre>
+    <p><strong>Remove</strong> <code>version: '3.8'</code> (deprecated in Compose v5).</p>
+    <p><strong>Fix healthchecks</strong> &mdash; <code>python:3.12-slim</code> images don't have <code>curl</code>:</p>
+    <pre><code><span class="comment"># Bad (curl not available in slim images)</span>
+<span class="key">healthcheck:</span>
+  <span class="key">test:</span> [<span class="string">"CMD"</span>, <span class="string">"curl"</span>, <span class="string">"-f"</span>, <span class="string">"http://localhost:8000/health"</span>]
+
+<span class="comment"># Good</span>
+<span class="key">healthcheck:</span>
+  <span class="key">test:</span> [<span class="string">"CMD"</span>, <span class="string">"python"</span>, <span class="string">"-c"</span>, <span class="string">"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"</span>]</code></pre>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">4</span>
+      <h3>Create Traefik dynamic config</h3>
+    </div>
+    <p>Create via a Docker alpine container (NAS sudo requires password):</p>
+    <pre><code><span class="cmd">docker run</span> <span class="flag">--rm</span> <span class="flag">-v</span> <span class="value">/data/coolify/proxy/dynamic:/dynamic</span> alpine sh -c <span class="string">'cat &gt; /dynamic/<span class="placeholder">&lt;app&gt;</span>.yaml &lt;&lt; "EOF"
+http:
+  routers:
+    <span class="placeholder">&lt;app&gt;</span>-http:
+      entryPoints: [http]
+      service: <span class="placeholder">&lt;app&gt;</span>-frontend
+      rule: Host(`<span class="placeholder">&lt;app&gt;</span>.cronova.dev`)
+      middlewares: [redirect-to-https]
+    <span class="placeholder">&lt;app&gt;</span>-https:
+      entryPoints: [https]
+      service: <span class="placeholder">&lt;app&gt;</span>-frontend
+      rule: Host(`<span class="placeholder">&lt;app&gt;</span>.cronova.dev`)
+      tls:
+        certresolver: letsencrypt
+  services:
+    <span class="placeholder">&lt;app&gt;</span>-frontend:
+      loadBalancer:
+        servers:
+          - url: http://<span class="placeholder">&lt;app&gt;</span>-frontend:80
+EOF'</span></code></pre>
+    <p>If the backend API is exposed externally (like Javya), add additional routers/services for <code>&lt;app&gt;-api.cronova.dev</code> pointing to <code>&lt;app&gt;-backend:8000</code>.</p>
+    <div class="callout">
+      <strong>Traefik picks up new files automatically</strong> &mdash; no restart needed.
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">5</span>
+      <h3>Configure DNS</h3>
+    </div>
+    <h4>Pi-hole (LAN resolution)</h4>
+    <p>Add entries pointing to NAS LAN IP (<code>192.168.0.12</code>):</p>
+    <pre><code><span class="cmd">ssh</span> docker-vm <span class="string">"docker exec pihole pihole-FTL --config dns.hosts"</span>
+<span class="comment"># Add: "192.168.0.12 &lt;app&gt;.cronova.dev"</span></code></pre>
+    <h4>Headscale (Tailscale resolution)</h4>
+    <p>Add extra_records pointing to NAS Tailscale IP (<code>100.82.77.97</code>):</p>
+    <pre><code><span class="cmd">ssh</span> vps <span class="string">"sudo vi /opt/homelab/headscale/config/config.yaml"</span>
+<span class="comment"># Add under dns_config.extra_records:</span>
+<span class="comment">#   - name: "&lt;app&gt;.cronova.dev"</span>
+<span class="comment">#     type: "A"</span>
+<span class="comment">#     value: "100.82.77.97"</span>
+<span class="cmd">ssh</span> vps <span class="string">"cd /opt/homelab/headscale && sudo docker compose restart headscale"</span></code></pre>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">6</span>
+      <h3>Build and deploy</h3>
+    </div>
+    <pre><code><span class="cmd">ssh</span> nas <span class="string">"cd ~/deploy/<span class="placeholder">&lt;app&gt;</span> && docker compose -f docker-compose.prod.yml up -d --build"</span></code></pre>
+    <p>Wait ~60s, then verify:</p>
+    <pre><code><span class="comment"># Check container health</span>
+<span class="cmd">ssh</span> nas <span class="string">"docker ps --filter name=<span class="placeholder">&lt;app&gt;</span> --format 'table {{.Names}}\t{{.Status}}'"</span>
+
+<span class="comment"># Test HTTPS</span>
+<span class="cmd">curl</span> <span class="flag">-s -o /dev/null -w</span> <span class="string">'%{http_code}'</span> https://<span class="placeholder">&lt;app&gt;</span>.cronova.dev</code></pre>
+  </div>
+
+  <!-- Step 7 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">7</span>
+      <h3>Add Uptime Kuma monitors</h3>
+    </div>
+    <p>Add via the web UI at <code>https://status.cronova.dev</code> (username: <code>ajhermosilla</code>):</p>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Type</td><td>HTTP(s)</td></tr>
+          <tr><td>URL</td><td><code>https://&lt;app&gt;.cronova.dev</code></td></tr>
+          <tr><td>Interval</td><td>60s</td></tr>
+          <tr><td>Notification</td><td>ntfy (Warning)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <blockquote>kuma-cli v2.0.0 is installed on VPS but incompatible with Uptime Kuma 1.23.17 (<code>conditions</code> column mismatch). Use the web UI until Uptime Kuma is upgraded.</blockquote>
+  </div>
+
+  <!-- Step 8 -->
+  <div class="step-card">
+    <div class="step-header">
+      <span class="step-number">8</span>
+      <h3>Commit config to homelab repo</h3>
+    </div>
+    <p>Add compose and Traefik config under <code>docker/fixed/nas/&lt;app&gt;/</code>:</p>
+    <pre><code>docker/fixed/nas/<span class="placeholder">&lt;app&gt;</span>/
+<span class="string">├──</span> docker-compose.yml    <span class="comment"># Reference copy of production compose</span>
+<span class="string">├──</span> .env.example          <span class="comment"># Template (no secrets)</span>
+<span class="string">└──</span> traefik-dynamic.yaml  <span class="comment"># Copy of /data/coolify/proxy/dynamic/&lt;app&gt;.yaml</span></code></pre>
+  </div>
+
+  <!-- ── Updating ── -->
+  <h2 id="updating">Updating an App</h2>
+  <pre><code><span class="cmd">ssh</span> nas
+<span class="cmd">cd</span> ~/deploy/<span class="placeholder">&lt;app&gt;</span>
+<span class="cmd">git pull</span>
+<span class="cmd">docker compose</span> <span class="flag">-f</span> docker-compose.prod.yml <span class="cmd">up -d --build</span></code></pre>
+  <p>For <code>.env</code> changes, force-recreate (Compose v5 doesn't detect <code>.env</code> changes):</p>
+  <pre><code><span class="cmd">docker compose</span> <span class="flag">-f</span> docker-compose.prod.yml <span class="cmd">up -d</span> <span class="flag">--force-recreate</span></code></pre>
+
+  <!-- ── Reference ── -->
+  <h2 id="reference">Deployed Apps Reference</h2>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>App</th><th>URL</th><th>API URL</th><th>Deploy Path</th><th>Traefik Config</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Katupyry</td>
+          <td><code>katupyry.cronova.dev</code></td>
+          <td><span style="color: var(--text-dim);">(internal)</span></td>
+          <td><code>~/deploy/katupyry/</code></td>
+          <td><code>/data/coolify/proxy/dynamic/katupyry.yaml</code></td>
+        </tr>
+        <tr>
+          <td>Javya</td>
+          <td><code>javya.cronova.dev</code></td>
+          <td><code>javya-api.cronova.dev</code></td>
+          <td><code>~/deploy/javya/</code></td>
+          <td><code>/data/coolify/proxy/dynamic/javya.yaml</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Differences Between Apps</h3>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Aspect</th><th>Katupyry</th><th>Javya</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>API routing</td><td>Internal only (frontend proxies)</td><td>External (<code>javya-api.cronova.dev</code>)</td></tr>
+        <tr><td>Coolify network</td><td>Frontend only</td><td>Frontend + backend</td></tr>
+        <tr><td>Container names</td><td>Default (compose-generated)</td><td>Explicit (<code>container_name:</code>)</td></tr>
+        <tr><td>Backend healthcheck</td><td>Python urllib</td><td>Python urllib</td></tr>
+        <tr><td>Extra volumes</td><td><code>uploads_data</code></td><td>None</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Lessons Learned ── -->
+  <h2 id="lessons">Lessons Learned</h2>
+
+  <div class="lesson-card danger">
+    <h4>Coolify v4 Beta Is Not Viable for Local Forgejo</h4>
+    <p>We spent significant time trying to deploy Javya via Coolify's UI. The blockers are architectural:</p>
+    <ol>
+      <li><strong>URL validation</strong> &mdash; Rejects <code>localhost</code>, IP addresses, and <code>ssh://</code> scheme. Only accepts <code>https://</code>, <code>http://</code>, <code>git://</code>, or <code>git@host:repo</code> format.</li>
+      <li><strong>SSH helper containers</strong> &mdash; Coolify clones repos inside helper containers that use Docker's embedded DNS, not the host's <code>/etc/hosts</code>.</li>
+      <li><strong>GIT_SSH_COMMAND wrapping</strong> &mdash; Even HTTP URLs get wrapped with SSH when a Deploy Key is configured, making HTTP-based workarounds fail too.</li>
+      <li><strong>Port mismatch</strong> &mdash; Forgejo SSH runs on port 2222, but <code>git@git.cronova.dev:2222/...</code> syntax doesn't work as expected in Coolify.</li>
+    </ol>
+    <p style="margin-top: 1rem;"><strong>Conclusion:</strong> Until Coolify v4 supports local/private git servers properly, use manual Docker Compose. The manual approach is actually simpler and more transparent.</p>
+  </div>
+
+  <div class="lesson-card warning">
+    <h4>Healthcheck Gotchas</h4>
+    <ul>
+      <li><code>python:3.12-slim</code> does not include <code>curl</code>. Use <code>python -c "import urllib.request; ..."</code> for healthchecks.</li>
+      <li><code>nginx:alpine</code> includes <code>curl</code> &mdash; frontend healthchecks with curl are fine.</li>
+      <li>An unhealthy container still serves traffic &mdash; healthcheck status is informational for Docker and monitoring, not a circuit breaker.</li>
+    </ul>
+  </div>
+
+  <div class="lesson-card warning">
+    <h4>NAS-Specific Issues</h4>
+    <ul>
+      <li><strong>sudo requires password</strong> &mdash; Use <code>docker run --rm -v /path:/mount alpine</code> to write root-owned files.</li>
+      <li><strong><code>sed -i</code> creates new inode</strong> &mdash; Can't use it on bind-mounted files like <code>/etc/hosts</code>. Use <code>grep -v &gt; tmp && cat tmp &gt; file</code> pattern instead.</li>
+      <li><strong>Docker data-root is <code>/data/docker</code></strong> &mdash; Not the default <code>/var/lib/docker</code> (only 6G on <code>/var</code>).</li>
+    </ul>
+  </div>
+
+  <div class="lesson-card info">
+    <h4>Compose v5 Behavior</h4>
+    <ul>
+      <li><code>.env</code> changes are not detected by <code>docker compose up -d</code>. Use <code>--force-recreate</code>.</li>
+      <li><code>.env</code> vars auto-inject into containers. Escape <code>$</code> as <code>$$</code> for Argon2 hashes.</li>
+      <li><code>version:</code> key is deprecated &mdash; omit it.</li>
+    </ul>
+  </div>
+
+  <!-- ── Quick Reference ── -->
+  <div class="quick-ref" id="quickref">
+    <h2>Quick Reference: Deploy a New App</h2>
+    <pre><code><span class="comment"># 1. Clone</span>
+<span class="cmd">ssh</span> nas <span class="string">"cd ~/deploy && git clone http://localhost:3000/augusto/<span class="placeholder">&lt;app&gt;</span>.git"</span>
+
+<span class="comment"># 2. Create .env (from Mac, paste secrets)</span>
+<span class="cmd">ssh</span> nas <span class="string">'printf "POSTGRES_PASSWORD=<span class="placeholder">&lt;pw&gt;</span>\nSECRET_KEY=<span class="placeholder">&lt;key&gt;</span>\nCORS_ORIGINS=https://<span class="placeholder">&lt;app&gt;</span>.cronova.dev\nVITE_API_URL=https://<span class="placeholder">&lt;app&gt;</span>-api.cronova.dev/api/v1\n" &gt; ~/deploy/<span class="placeholder">&lt;app&gt;</span>/.env'</span>
+
+<span class="comment"># 3. Edit compose: remove ports, add coolify network + aliases, fix healthchecks</span>
+
+<span class="comment"># 4. Create Traefik config</span>
+<span class="cmd">ssh</span> nas <span class="string">"docker run --rm -v /data/coolify/proxy/dynamic:/dynamic alpine sh -c 'cat &gt; /dynamic/<span class="placeholder">&lt;app&gt;</span>.yaml &lt;&lt; \"EOF\"
+...
+EOF'"</span>
+
+<span class="comment"># 5. DNS: add to Pi-hole (LAN) + Headscale extra_records (Tailscale), restart Headscale</span>
+
+<span class="comment"># 6. Deploy</span>
+<span class="cmd">ssh</span> nas <span class="string">"cd ~/deploy/<span class="placeholder">&lt;app&gt;</span> && docker compose -f docker-compose.prod.yml up -d --build"</span>
+
+<span class="comment"># 7. Verify</span>
+<span class="cmd">curl</span> <span class="flag">-s -o /dev/null -w</span> <span class="string">'%{http_code}'</span> https://<span class="placeholder">&lt;app&gt;</span>.cronova.dev
+
+<span class="comment"># 8. Add Uptime Kuma monitors via UI</span>
+
+<span class="comment"># 9. Commit config to homelab repo under docker/fixed/nas/<span class="placeholder">&lt;app&gt;</span>/</span></code></pre>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    cronova.dev homelab &mdash; 2026-03-06 &mdash; Augusto Hermosilla
+  </div>
+
+</div>
+</body>
+</html>
