@@ -171,13 +171,16 @@ ysyry.cronova.dev {
 	reverse_proxy dozzle:8080
 }
 
-# Stirling-PDF - PDF Tools (Kuatia)
+# BentoPDF - PDF Tools (Kuatia)
 # Access: https://kuatia.cronova.dev
+# COOP/COEP headers required for Office conversion (SharedArrayBuffer/WASM)
 kuatia.cronova.dev {
 	import internal_tls
 	import security_headers
 	import authelia
-	reverse_proxy stirling-pdf:8080
+	header Cross-Origin-Opener-Policy "same-origin"
+	header Cross-Origin-Embedder-Policy "require-corp"
+	reverse_proxy bentopdf:8080
 }
 
 # Homepage - Dashboard (Mbyja)
@@ -226,7 +229,7 @@ papa.cronova.dev {
 #
 # Authelia-protected services:
 #   yrasema (Jellyfin), japysaka (Sonarr), taanga (Radarr), aoao (Prowlarr),
-#   ysyry (Dozzle), kuatia (Stirling-PDF), mbyja (Homepage), aranduka (Paperless),
+#   ysyry (Dozzle), kuatia (BentoPDF), mbyja (Homepage), aranduka (Paperless),
 #   papa (Grafana)
 #
 # Services with their own auth (NOT protected by Authelia):
