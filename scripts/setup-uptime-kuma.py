@@ -72,7 +72,10 @@ NOTIFICATIONS = [
 # ---------------------------------------------------------------------------
 # notification_tier: "critical" | "warning" | "info"
 MONITORS = [
-    # === Critical (60s interval) ===
+    # =========================================================================
+    # CRITICAL — 60s interval, ntfy critical priority
+    # Core infrastructure: if these go down, everything is affected.
+    # =========================================================================
     {
         "type": MonitorType.HTTP,
         "name": "Headscale",
@@ -114,7 +117,44 @@ MONITORS = [
         "maxretries": 3,
         "notification_tier": "critical",
     },
-    # === High Priority (5m interval) ===
+    {
+        "type": MonitorType.HTTP,
+        "name": "Uptime Kuma",
+        "url": "https://status.cronova.dev",
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "critical",
+    },
+    {
+        "type": MonitorType.HTTP,
+        "name": "ntfy",
+        "url": "https://notify.cronova.dev",
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "critical",
+    },
+    {
+        "type": MonitorType.PORT,
+        "name": "Caddy (VPS)",
+        "hostname": "100.77.172.46",
+        "port": 443,
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "critical",
+    },
+    {
+        "type": MonitorType.PORT,
+        "name": "VPS Pi-hole",
+        "hostname": "127.0.0.1",
+        "port": 53,
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "critical",
+    },
+    # =========================================================================
+    # WARNING — 60-300s interval, ntfy high priority
+    # Important services: security, automation, backups.
+    # =========================================================================
     {
         "type": MonitorType.HTTP,
         "name": "Home Assistant (Jara)",
@@ -127,16 +167,16 @@ MONITORS = [
         "type": MonitorType.HTTP,
         "name": "Frigate (Taguato)",
         "url": "https://taguato.cronova.dev/api/version",
-        "interval": 300,
-        "maxretries": 2,
+        "interval": 60,
+        "maxretries": 3,
         "notification_tier": "warning",
     },
     {
         "type": MonitorType.HTTP,
         "name": "Forgejo",
-        "url": "https://git.cronova.dev/api/healthz",
-        "interval": 300,
-        "maxretries": 2,
+        "url": "http://100.82.77.97:3000",
+        "interval": 60,
+        "maxretries": 3,
         "notification_tier": "warning",
     },
     {
@@ -149,12 +189,13 @@ MONITORS = [
         "notification_tier": "warning",
     },
     {
-        "type": MonitorType.HTTP,
+        "type": MonitorType.KEYWORD,
         "name": "Restic REST",
-        "url": "http://100.82.77.97:8000/",
-        "interval": 300,
-        "maxretries": 2,
+        "url": "http://100.82.77.97:8000",
+        "keyword": "Unauthorized",
         "accepted_statuscodes": ["401"],
+        "interval": 60,
+        "maxretries": 3,
         "notification_tier": "warning",
     },
     {
@@ -173,7 +214,50 @@ MONITORS = [
         "maxretries": 2,
         "notification_tier": "warning",
     },
-    # === Standard (5m interval) ===
+    {
+        "type": MonitorType.HTTP,
+        "name": "Javya",
+        "url": "https://javya.cronova.dev",
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "warning",
+    },
+    {
+        "type": MonitorType.HTTP,
+        "name": "Javya API",
+        "url": "https://javya-api.cronova.dev/health",
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "warning",
+    },
+    {
+        "type": MonitorType.PING,
+        "name": "NAS",
+        "hostname": "100.82.77.97",
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "warning",
+    },
+    {
+        "type": MonitorType.PING,
+        "name": "Docker VM",
+        "hostname": "100.68.63.168",
+        "interval": 300,
+        "maxretries": 3,
+        "notification_tier": "warning",
+    },
+    {
+        "type": MonitorType.PING,
+        "name": "Watchtower",
+        "hostname": "100.68.63.168",
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "warning",
+    },
+    # =========================================================================
+    # INFO — 300-900s interval, ntfy normal priority
+    # Standard services and external sites.
+    # =========================================================================
     {
         "type": MonitorType.HTTP,
         "name": "Jellyfin (Yrasema)",
@@ -207,11 +291,49 @@ MONITORS = [
         "notification_tier": "info",
     },
     {
-        "type": MonitorType.HTTP,
+        "type": MonitorType.KEYWORD,
         "name": "Glances",
         "url": "http://100.82.77.97:61208/api/4/cpu",
+        "keyword": "total",
+        "interval": 60,
+        "maxretries": 3,
+        "notification_tier": "info",
+    },
+    {
+        "type": MonitorType.PORT,
+        "name": "Pi-hole Fixed",
+        "hostname": "100.68.63.168",
+        "port": 53,
         "interval": 300,
-        "maxretries": 2,
+        "maxretries": 3,
+        "notification_tier": "info",
+    },
+    {
+        "type": MonitorType.DNS,
+        "name": "DNS - cronova.dev",
+        "hostname": "cronova.dev",
+        "port": 53,
+        "dns_resolve_server": "1.1.1.1",
+        "interval": 300,
+        "maxretries": 3,
+        "notification_tier": "info",
+    },
+    # === Mobile Kit (may be offline when not traveling) ===
+    {
+        "type": MonitorType.PING,
+        "name": "Beryl AX",
+        "hostname": "100.102.244.131",
+        "interval": 120,
+        "maxretries": 3,
+        "notification_tier": "info",
+    },
+    {
+        "type": MonitorType.PORT,
+        "name": "Beryl AX - Admin",
+        "hostname": "100.102.244.131",
+        "port": 80,
+        "interval": 120,
+        "maxretries": 3,
         "notification_tier": "info",
     },
     # === External (15m interval) ===
@@ -221,6 +343,14 @@ MONITORS = [
         "url": "https://cronova.dev",
         "interval": 900,
         "maxretries": 2,
+        "notification_tier": "critical",
+    },
+    {
+        "type": MonitorType.HTTP,
+        "name": "hermosilla.me",
+        "url": "https://hermosilla.me/",
+        "interval": 900,
+        "maxretries": 3,
         "notification_tier": "info",
     },
     {
