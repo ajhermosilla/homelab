@@ -1,4 +1,4 @@
-# Tools Stack - Dozzle + Stirling-PDF + Homepage
+# Tools Stack - Dozzle + BentoPDF + Homepage
 # Fixed Homelab - Docker VM
 # Log viewer, PDF tools, and dashboard
 
@@ -39,14 +39,16 @@ services:
         max-file: "3"
 
   # =========================================================================
-  # Stirling-PDF - PDF Tools (Kuatia)
-  # https://github.com/Stirling-Tools/Stirling-PDF
+  # BentoPDF - PDF Tools (Kuatia)
+  # https://github.com/alam00000/bentopdf
+  # Client-side PDF processing via WebAssembly — no server-side overhead.
+  # Replaces Stirling-PDF (Java/Spring Boot had 85% idle CPU, ~500MB RAM).
   # =========================================================================
-  stirling-pdf:
-    image: frooodle/s-pdf:latest
+  bentopdf:
+    image: ghcr.io/alam00000/bentopdf:latest
     env_file:
       - ../../../shared/common.env
-    container_name: stirling-pdf
+    container_name: bentopdf
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -57,21 +59,18 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
-          cpus: '1'
+          memory: 128M
+          cpus: '0.25'
     ports:
       - "127.0.0.1:8580:8080"
-    volumes:
-      - stirling-data:/usr/share/tessdata
     environment:
       TZ: ${TZ:-America/Asuncion}
-      DOCKER_ENABLE_SECURITY: "false"
     networks:
       - caddy-net
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
+        max-size: "5m"
         max-file: "3"
 
   # =========================================================================
@@ -110,10 +109,6 @@ services:
         max-size: "5m"
         max-file: "3"
 
-volumes:
-  stirling-data:
-    name: stirling-data
-
 networks:
   caddy-net:
     external: true
@@ -127,7 +122,7 @@ networks:
 #
 # 2. Access services:
 #    - Dozzle: https://ysyry.cronova.dev
-#    - Stirling-PDF: https://kuatia.cronova.dev
+#    - BentoPDF: https://kuatia.cronova.dev
 #    - Homepage: https://mbyja.cronova.dev
 #
 # 3. Homepage config files are in ./homepage/ directory.
