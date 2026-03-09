@@ -50,8 +50,8 @@ Devices served by homelab services.
 
 | Device | Year | Platform | IP | MAC | Homelab Services |
 |--------|------|----------|----|-----|------------------|
-| LG Smart TV UM7100PSA | 2021 | WebOS | 192.168.0.51 | 74:40:be:da:6f:10 | Jellyfin, Pi-hole DNS, HA (pending) |
-| Apple TV 4th Gen 32GB | 2016 | tvOS 26.3 | 192.168.0.50 | d0:03:4b:4b:24:91 | Jellyfin (via Infuse), Pi-hole DNS, HA (pending) |
+| LG Smart TV UM7100PSA | 2021 | WebOS | 192.168.0.51 | 74:40:be:da:6f:10 | Jellyfin, Pi-hole DNS, HA |
+| Apple TV 4th Gen 32GB | 2016 | tvOS 26.3 | 192.168.0.50 | d0:03:4b:4b:24:91 | Jellyfin (via Infuse), Pi-hole DNS, HA |
 
 **DHCP:** Static reservations in OPNsense (outside pool range .100-.250)
 
@@ -88,8 +88,8 @@ Devices served by homelab services.
 | Tailscale | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Vaultwarden | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Jellyfin | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Home Assistant | ✅ | ✅ | ❌ | ❌ | ✅ (pending) |
-| HA Companion | ✅ (pending) | ❌ | ❌ | ❌ | ❌ |
+| Home Assistant | ✅ | ✅ | ❌ | ❌ | ✅ |
+| HA Companion | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Pi-hole DNS | ✅ | ✅ | ✅ | ✅ | ✅ |
 | ntfy | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Frigate | ✅ | ✅ | ❌ | ❌ | ❌ |
