@@ -92,13 +92,13 @@ HA picks these up via MQTT sensor config. Useful for temperatures that Proxmox A
 
 ## Implementation Order
 
-| Phase | Action | Can Do Remotely? |
-|-------|--------|-----------------|
-| **Now** | System Monitor integration (browser) | Yes |
-| **Now** | Proxmox VE HACS integration (browser + Proxmox web UI) | Yes |
-| **Later** | Glances on NAS (SSH + compose) | Yes |
-| **Optional** | MQTT scripts on Proxmox (SSH) | Yes |
-| **Optional** | Glances on Docker VM | Yes |
+| Phase | Action | Can Do Remotely? | Status |
+|-------|--------|-----------------|--------|
+| **Now** | System Monitor integration (browser) | Yes | Done |
+| **Now** | Proxmox VE HACS integration (browser + Proxmox web UI) | Yes | Done |
+| **Later** | Glances on NAS (SSH + compose) | Yes | Done |
+| **Optional** | MQTT scripts on Proxmox (SSH) | Yes | Pending |
+| **Optional** | Glances on Docker VM | Yes | Pending |
 
 ---
 
@@ -118,8 +118,10 @@ Once sensors are available, add to the Home Overview Dashboard:
 ## Prerequisites
 
 - [x] HACS installed on Home Assistant
-- [ ] System Monitor integration added (browser)
-- [ ] Proxmox API token created (Proxmox web UI)
-- [ ] Proxmox VE HACS integration installed and configured
-- [ ] Glances container deployed on NAS
-- [ ] Glances HA integration configured
+- [x] System Monitor integration added
+- [x] Proxmox API token created (Proxmox web UI)
+- [x] Proxmox VE HACS integration installed and configured
+- [x] Glances container deployed on NAS
+- [x] Glances HA integration configured
+
+**Status (2026-03-10):** All tiers (1-2) complete. Tier 3 (MQTT scripts) remains optional. VictoriaMetrics + Grafana (Papa) also deployed separately for historical metrics.
