@@ -80,6 +80,44 @@ services:
       - victoriametrics
 
   # =========================================================================
+  # cAdvisor - Container Metrics Exporter
+  # https://github.com/google/cadvisor
+  # =========================================================================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: cadvisor
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=monitoring"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.5'
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - "--housekeeping_interval=30s"
+      - "--docker_only=true"
+      - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,hugetlb,referenced_memory,resctrl,process"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - monitoring-net
+
+  # =========================================================================
   # Grafana - Visualization & Dashboards
   # https://grafana.com/
   # =========================================================================

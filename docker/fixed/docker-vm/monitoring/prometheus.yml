@@ -24,11 +24,6 @@ scrape_configs:
           instance: nas
 
   # =========================================================================
-  # Home Assistant - Prometheus Endpoint
-  # =========================================================================
-  # Generate a long-lived access token in HA:
-  #   Profile → Long-Lived Access Tokens → Create
-  # =========================================================================
   # VictoriaMetrics - Self-monitoring
   # =========================================================================
   - job_name: victoriametrics
@@ -38,8 +33,19 @@ scrape_configs:
           instance: victoriametrics
 
   # =========================================================================
+  # cAdvisor - Docker Container Metrics
+  # =========================================================================
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          instance: docker-vm
+
+  # =========================================================================
   # Home Assistant - Prometheus Endpoint
   # =========================================================================
+  # Generate a long-lived access token in HA:
+  #   Profile → Long-Lived Access Tokens → Create
   - job_name: home-assistant
     bearer_token: '<HA_LONG_LIVED_TOKEN>'
     metrics_path: /api/prometheus
