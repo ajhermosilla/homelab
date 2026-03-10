@@ -54,7 +54,7 @@ Home Assistant (/api/prometheus) ──┘    (30s scrape)    (90d retention)   
 
 ## Uptime Kuma Monitors
 
-Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. Alerts route to ntfy topics by priority.
+Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. **35 monitors** managed via `scripts/setup-uptime-kuma.py` (single source of truth). Alerts route to ntfy topics by priority tier.
 
 ### Critical (60s interval, ntfy urgent)
 
@@ -62,23 +62,33 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. Alerts
 |---------|------|--------|
 | Headscale | HTTP | `https://hs.cronova.dev/health` |
 | Vaultwarden | HTTP | `https://vault.cronova.dev/alive` |
-| Pi-hole (Docker VM) | TCP | `100.68.63.168:53` |
+| Pi-hole DNS | TCP | `100.68.63.168:53` |
 | Caddy (Docker VM) | HTTP | `https://cronova.dev` |
-| OPNsense | Ping | `192.168.0.1` |
+| OPNsense Gateway | Ping | `192.168.0.1` |
+| Uptime Kuma | HTTP | `https://status.cronova.dev` |
+| ntfy | HTTP | `https://notify.cronova.dev` |
+| Caddy (VPS) | TCP | `100.77.172.46:443` |
+| VPS Pi-hole | TCP | `127.0.0.1:53` |
+| cronova.dev | HTTP | `https://cronova.dev` (900s interval) |
 
-### High Priority (5m interval, ntfy high)
+### Warning (60-300s interval, ntfy high)
 
 | Monitor | Type | Target |
 |---------|------|--------|
-| Home Assistant (Jara) | HTTP | `https://jara.cronova.dev` |
-| Frigate (Taguato) | HTTP | `https://taguato.cronova.dev/api/version` |
-| Forgejo | HTTP | `https://git.cronova.dev/api/healthz` |
-| NAS (Samba) | TCP | `100.82.77.97:445` |
-| Restic REST | HTTP | `http://100.82.77.97:8000/` (expect 401) |
-| Coolify (Tajy) | HTTP | `https://tajy.cronova.dev` |
-| Authelia (Oke) | HTTP | `https://auth.cronova.dev` |
+| Home Assistant (Jara) | HTTP | `https://jara.cronova.dev` (300s) |
+| Frigate (Taguato) | HTTP | `https://taguato.cronova.dev/api/version` (60s) |
+| Forgejo | HTTP | `http://100.82.77.97:3000` (60s) |
+| NAS Samba | TCP | `100.82.77.97:445` (300s) |
+| Restic REST | Keyword | `http://100.82.77.97:8000` (keyword: "Unauthorized", expect 401) |
+| Coolify (Tajy) | HTTP | `https://tajy.cronova.dev` (300s) |
+| Authelia (Okẽ) | HTTP | `https://auth.cronova.dev` (300s) |
+| Javya | HTTP | `https://javya.cronova.dev` (60s) |
+| Javya API | HTTP | `https://javya-api.cronova.dev/health` (60s) |
+| NAS | Ping | `100.82.77.97` (60s) |
+| Docker VM | Ping | `100.68.63.168` (300s) |
+| Watchtower | Ping | `100.68.63.168` (60s) |
 
-### Standard (5m interval, ntfy default)
+### Info (300-900s interval, ntfy default)
 
 | Monitor | Type | Target |
 |---------|------|--------|
@@ -86,23 +96,13 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. Alerts
 | Grafana (Papa) | HTTP | `https://papa.cronova.dev` |
 | Immich (Vera) | HTTP | `https://vera.cronova.dev` |
 | Syncthing | HTTP | `http://100.82.77.97:8384/rest/noauth/health` |
-| Glances | HTTP | `http://100.82.77.97:61208/api/4/cpu` |
-
-### External (15m interval)
-
-| Monitor | Type | Target |
-|---------|------|--------|
-| cronova.dev | HTTPS | `https://cronova.dev` |
-| verava.ai | HTTPS | `https://verava.ai` |
-
-### Planned Monitors (not yet configured)
-
-| Monitor | Type | Target | Notes |
-|---------|------|--------|-------|
-| Paperless-ngx (Aranduka) | HTTP | `https://aranduka.cronova.dev` | After deployment |
-| Stirling-PDF (Kuatia) | HTTP | `https://kuatia.cronova.dev` | After deployment |
-| Homepage (Mbyja) | HTTP | `https://mbyja.cronova.dev` | After deployment |
-| Dozzle (Ysyry) | HTTP | `https://ysyry.cronova.dev` | After deployment |
+| Glances | Keyword | `http://100.82.77.97:61208/api/4/cpu` (keyword: "total") |
+| Pi-hole Fixed | TCP | `100.68.63.168:53` (300s) |
+| DNS - cronova.dev | DNS | `cronova.dev` via `1.1.1.1` |
+| Beryl AX | Ping | `100.102.244.131` (120s, may be offline) |
+| Beryl AX - Admin | TCP | `100.102.244.131:80` (120s) |
+| hermosilla.me | HTTP | `https://hermosilla.me/` (900s) |
+| verava.ai | HTTP | `https://verava.ai` (900s) |
 
 ---
 

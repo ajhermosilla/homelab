@@ -115,11 +115,11 @@ All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured
 | Docker | 101 | 2 | 9GB | 100GB | 2 (delay: 30) |
 
 - **OPNsense** (VM 100) — Gateway/firewall since 2026-02-21, LAN 192.168.0.1/24
-- **Docker** (VM 101) — 20+ containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, monitoring, tools
+- **Docker** (VM 101) — 28 containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, monitoring, tools, media
 
 **Network bridges:** nic0/vmbr0 = ISP modem (ARRIS bridge mode), nic1/vmbr1 = MokerLink switch. OPNsense has both NICs; Docker VM has vmbr1 only.
 
-iGPU passthrough (SR-IOV) planned for Frigate GPU acceleration — see [docs/plans/igpu-passthrough-plan-2026-02-25.md](../plans/igpu-passthrough-plan-2026-02-25.md).
+iGPU passthrough completed (2026-03-02): OpenVINO GPU inference ~15ms, VA-API hardware decode for all cameras. See [docs/plans/igpu-passthrough-plan-2026-02-25.md](../plans/igpu-passthrough-plan-2026-02-25.md).
 
 ### RPi 5 Details
 
@@ -244,7 +244,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Device | Running Containers | Key Services |
 |--------|-------------------|--------------|
-| Docker VM | 20+ | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (Stirling-PDF), Papa (VictoriaMetrics+Grafana), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower |
+| Docker VM | 28 | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (BentoPDF), Papa (VictoriaMetrics+Grafana), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower |
 | NAS | 11 | Forgejo, Tajy (Coolify + 6 sub-containers), Samba, Syncthing, Restic REST, Glances, NFS |
 | RPi 5 | — | OpenClaw (pending PSU) |
 | RPi 4 | — | Bitcoin Core, LND, Electrum Server (Start9) |
@@ -418,7 +418,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 | Item | Purpose | Priority |
 |------|---------|----------|
-| iGPU passthrough (SR-IOV) | Frigate GPU acceleration on Docker VM | High |
+| ~~iGPU passthrough (SR-IOV)~~ | ~~Frigate GPU acceleration on Docker VM~~ | Done (2026-03-02) |
 | NVMe HAT for RPi 5 | Faster storage | Low |
 | 8TB HDD (parity) | SnapRAID parity drive | Low |
 | 8TB HDD (external) | Larger local backup | Low |

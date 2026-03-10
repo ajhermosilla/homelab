@@ -65,7 +65,7 @@ Debian 13 (Trixie) | 4 vCPU | 9GB RAM | 100GB disk | vmbr1 (LAN only)
 ├── automation/          # Home Assistant (Jara), Mosquitto, HA backup sidecar
 ├── security/            # Vaultwarden, Frigate (Taguato), Vaultwarden backup sidecar
 ├── auth/                # Authelia (Okẽ)
-├── tools/               # Dozzle (Ysyry), Stirling-PDF (Kuatia), Homepage (Mbyja)
+├── tools/               # Dozzle (Ysyry), BentoPDF (Kuatia), Homepage (Mbyja)
 ├── documents/           # Paperless-ngx (Aranduka), PostgreSQL, Redis
 ├── monitoring/          # VictoriaMetrics, vmagent, Grafana (Papa)
 ├── photos/              # Immich (Vera): server, ML, Valkey, PostgreSQL
@@ -81,7 +81,7 @@ Debian 13 (Trixie) | 4 vCPU | 9GB RAM | 100GB disk | vmbr1 (LAN only)
 | **automation** | homeassistant, mosquitto, homeassistant-backup | 8123 (HA), 1883 (MQTT) |
 | **security** | vaultwarden, frigate, vaultwarden-backup | 8843 (VW), 5000/8554/8555 (Frigate) |
 | **auth** | authelia | 9091 |
-| **tools** | dozzle, stirling-pdf, homepage | 9999, 8580, 3030 |
+| **tools** | dozzle, bentopdf, homepage | 9999, 8080, 3030 |
 | **documents** | paperless-ngx, paperless-db, paperless-redis | 8000 |
 | **monitoring** | victoriametrics, vmagent, grafana | 8428, 3000 (localhost only) |
 | **photos** | immich-server, immich-ml, immich-valkey, immich-db | 2283 |
@@ -103,7 +103,7 @@ Debian 13 (Trixie) | 4 vCPU | 9GB RAM | 100GB disk | vmbr1 (LAN only)
 | 5 | Automation (HA + Mosquitto) | Creates mqtt-net, waits for Mosquitto healthy |
 | 6 | Security (Vaultwarden + Frigate) | Frigate joins mqtt-net |
 | 7 | Auth (Authelia) | Must be up before forward_auth services |
-| 8 | Tools (Dozzle, Stirling-PDF, Homepage) | — |
+| 8 | Tools (Dozzle, BentoPDF, Homepage) | — |
 | 9 | Documents (Paperless-ngx) | — |
 | 10 | Monitoring (VictoriaMetrics, Grafana) | — |
 | 11 | Photos (Immich) | — |
@@ -127,7 +127,7 @@ Docker VM mounts NAS storage for services that need shared data:
 Custom build: `caddy:2` + `caddy-dns/cloudflare` for DNS-01 TLS challenges.
 
 - All `.cronova.dev` subdomains terminate TLS at Caddy
-- Authelia forward auth protects: Yrasema, Ysyry, Kuatia, Mbyja, Papa, Aranduka
+- Authelia forward auth protects: Yrasema, Ysyry, Kuatia (BentoPDF), Mbyja, Papa, Aranduka. TOTP 2FA via Authy.
 - Services with own auth (not protected): Jara (HA), Taguato (Frigate), Vaultwarden, Vera (Immich), Forgejo
 
 ---
@@ -226,23 +226,23 @@ ssh -L 8443:192.168.0.1:443 augusto@100.78.12.241
 | 12 | Tailscale mesh (8 nodes) | Done |
 | 13 | Backup sidecars (Vaultwarden, HA, Coolify) | Done |
 | 14 | Authelia (SSO) | Done |
-| 15 | Tools (Dozzle, Stirling-PDF, Homepage) | Done |
-| 16 | Monitoring (VictoriaMetrics, Grafana) | Config ready |
-| 17 | Photos (Immich) | Config ready |
-| 18 | Documents (Paperless-ngx) | Config ready |
-| 19 | Media (Jellyfin, *arr stack) | Config ready (NFS mounts pending) |
+| 15 | Tools (Dozzle, BentoPDF, Homepage) | Done |
+| 16 | Monitoring (VictoriaMetrics, Grafana) | Done |
+| 17 | Photos (Immich) | Done |
+| 18 | Documents (Paperless-ngx) | Done |
+| 19 | Media (Jellyfin, *arr stack) | Done |
 | 20 | Coolify PaaS on NAS | Done |
 | 21 | Boot orchestrator (systemd) | Done |
 | — | RPi 5 (OpenClaw) | Pending (PSU in transit) |
 | — | OPNsense firewall rules, CrowdSec | Pending |
 | — | VLAN hardening | Pending |
-| — | iGPU passthrough (SR-IOV) for Frigate | Pending |
+| 22 | iGPU passthrough for Frigate | Done (2026-03-02) |
 
 ---
 
 ## Power & UPS
 
-All critical devices connected to **CyberPower 1500VA UPS**.
+All critical devices connected to **Forza NT-1012U 1000VA UPS**.
 
 | Device | Power | UPS Protected |
 |--------|-------|---------------|
