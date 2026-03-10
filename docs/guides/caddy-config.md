@@ -2,6 +2,14 @@
 
 Caddy configuration for cronova.dev and verava.ai across all environments. Created 2026-01-14.
 
+> **WARNING (2026-03-10):** This doc is a pre-deployment design from January 2026 and does NOT reflect the current Caddyfile. Key differences:
+> - Docker VM Caddy is a **custom build** with `caddy-dns/cloudflare` for DNS-01 TLS (not Let's Encrypt ACME)
+> - **Authelia forward auth** protects 6 services (not shown below)
+> - **BentoPDF** replaced Stirling-PDF (Kuatia)
+> - Many subdomains below (api.cronova.dev, saas.cronova.dev, app.verava.ai) are speculative and don't exist
+> - Actual Caddyfile: `docker/fixed/docker-vm/networking/caddy/Caddyfile`
+> - See `services.md` for the current access matrix
+
 ## Overview
 
 ```
