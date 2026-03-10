@@ -28,6 +28,18 @@ scrape_configs:
   # =========================================================================
   # Generate a long-lived access token in HA:
   #   Profile → Long-Lived Access Tokens → Create
+  # =========================================================================
+  # VictoriaMetrics - Self-monitoring
+  # =========================================================================
+  - job_name: victoriametrics
+    static_configs:
+      - targets: ['victoriametrics:8428']
+        labels:
+          instance: victoriametrics
+
+  # =========================================================================
+  # Home Assistant - Prometheus Endpoint
+  # =========================================================================
   - job_name: home-assistant
     bearer_token: '<HA_LONG_LIVED_TOKEN>'
     metrics_path: /api/prometheus
