@@ -34,6 +34,9 @@ Setup and operational guides — how to deploy, configure, and maintain.
 | [backup-test-procedure.md](guides/backup-test-procedure.md) | Monthly backup verification |
 | [mobile-homelab-kit.md](guides/mobile-homelab-kit.md) | Mobile kit packing and travel setup |
 | [uptime-kuma-setup-2026-01-19.md](guides/uptime-kuma-setup-2026-01-19.md) | Uptime Kuma deployment |
+| [nas-app-deployment.md](guides/nas-app-deployment.md) | NAS application deployment guide |
+| [incident-2026-03-05-isp-outage.md](guides/incident-2026-03-05-isp-outage.md) | ISP outage incident report |
+| [incident-2026-03-05-frigate-crash.md](guides/incident-2026-03-05-frigate-crash.md) | Frigate crash incident report |
 
 ## Strategy
 
@@ -75,7 +78,11 @@ Future plans and proposals — what's next.
 
 | Document | Description |
 |----------|-------------|
-| [igpu-passthrough-plan-2026-02-25.md](plans/igpu-passthrough-plan-2026-02-25.md) | SR-IOV iGPU passthrough for Frigate |
+| [frigate-improvement-plan-2026-03-02.md](plans/frigate-improvement-plan-2026-03-02.md) | Frigate NVR improvements (Phase 1 done, Phase 2 blocked on 8TB HDD) |
+| [uptime-kuma-monitors-2026-03-02.md](plans/uptime-kuma-monitors-2026-03-02.md) | Uptime Kuma monitor setup (complete — 35 monitors) |
+| [igpu-passthrough-plan-2026-02-25.md](plans/igpu-passthrough-plan-2026-02-25.md) | SR-IOV iGPU passthrough for Frigate (done 2026-03-02) |
+| [javya-deploy-nas-2026-03-02.md](plans/javya-deploy-nas-2026-03-02.md) | Javya deployment on NAS |
+| [forgejo-github-mirror-2026-03-02.md](plans/forgejo-github-mirror-2026-03-02.md) | Forgejo → GitHub mirror setup |
 | [ha-dashboard-plan-2026-02-24.md](plans/ha-dashboard-plan-2026-02-24.md) | Home Assistant dashboard design |
 | [ha-monitoring-plan-2026-02-24.md](plans/ha-monitoring-plan-2026-02-24.md) | HA monitoring integrations |
 | [homelab-expansion-ideas-2026-02-24.md](plans/homelab-expansion-ideas-2026-02-24.md) | Service expansion roadmap |
@@ -96,6 +103,7 @@ Execution logs, reports, and session notes — what happened.
 | [pre-nas-audit-2026-02-21.md](journal/pre-nas-audit-2026-02-21.md) | Pre-NAS deployment audit |
 | [red-8tb-recovery-2026-02-22.md](journal/red-8tb-recovery-2026-02-22.md) | WD Red 8TB recovery |
 | [improvement-report-2026-02-22.md](journal/improvement-report-2026-02-22.md) | Improvement report |
+| [documentation-review-2026-02-26.md](journal/documentation-review-2026-02-26.md) | Documentation review and gap analysis |
 | [frigate-ha-optimization-2026-02-24.md](journal/frigate-ha-optimization-2026-02-24.md) | Frigate + HA optimization |
 
 ### Sessions

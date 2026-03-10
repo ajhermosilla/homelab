@@ -1,9 +1,10 @@
 # Uptime Kuma Monitor Setup Plan
 
 **Date**: 2026-03-02
-**Status**: Done (2026-03-05) — 14 monitors created, 5 pre-existing skipped
-**Tool**: kuma-cli (Rust) — `cargo install kuma-cli` or download binary
-**Uptime Kuma**: v1.23.17 on VPS at `https://status.cronova.dev`
+**Updated**: 2026-03-10
+**Status**: Complete — 35 monitors, all managed via `scripts/setup-uptime-kuma.py` (single source of truth)
+**Tool**: Python `uptime-kuma-api` library (WebSocket API) — replaced kuma-cli which was incompatible with Kuma 1.23
+**Uptime Kuma**: v1.23.17 on VPS at `https://status.cronova.dev`, username `ajhermosilla`
 
 ## Prerequisites
 

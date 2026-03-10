@@ -20,19 +20,19 @@
 | 12 | Jara | Home Assistant | Automation | Docker VM | Active |
 | 13 | — | homeassistant-backup | Backup | Docker VM | Active |
 | 14 | — | Mosquitto | Messaging | Docker VM | Active |
-| 15 | Okẽ | Authelia | Auth / SSO | Docker VM | Config ready |
+| 15 | Okẽ | Authelia | Auth / SSO | Docker VM | Active |
 | 16 | Yrasema | Jellyfin | Media | Docker VM | Active |
-| 17 | Mbyja | Homepage | Dashboard | Docker VM | Config ready |
-| 18 | Ysyry | Dozzle | Log viewer | Docker VM | Config ready |
-| 19 | Kuatia | Stirling-PDF | Tools | Docker VM | Config ready |
-| 20 | Papa | VictoriaMetrics | Monitoring | Docker VM | Config ready |
-| 21 | Papa | Grafana | Monitoring | Docker VM | Config ready |
-| 22 | Papa | vmagent | Monitoring | Docker VM | Config ready |
-| 23 | Vera | Immich Server | Photos | Docker VM | Config ready |
-| 24 | Vera | Immich ML | Photos | Docker VM | Config ready |
-| 25 | Vera | Immich Valkey | Photos | Docker VM | Config ready |
-| 26 | Vera | Immich DB | Photos | Docker VM | Config ready |
-| 27 | Aranduka | Paperless-ngx | Documents | Docker VM | Config ready |
+| 17 | Mbyja | Homepage | Dashboard | Docker VM | Active |
+| 18 | Ysyry | Dozzle | Log viewer | Docker VM | Active |
+| 19 | Kuatia | BentoPDF | Tools | Docker VM | Active |
+| 20 | Papa | VictoriaMetrics | Monitoring | Docker VM | Active |
+| 21 | Papa | Grafana | Monitoring | Docker VM | Active |
+| 22 | Papa | vmagent | Monitoring | Docker VM | Active |
+| 23 | Vera | Immich Server | Photos | Docker VM | Active |
+| 24 | Vera | Immich ML | Photos | Docker VM | Active |
+| 25 | Vera | Immich Valkey | Photos | Docker VM | Active |
+| 26 | Vera | Immich DB | Photos | Docker VM | Active |
+| 27 | Aranduka | Paperless-ngx | Documents | Docker VM | Active |
 | 28 | — | Sonarr | Media | Docker VM | Planned |
 | 29 | — | Radarr | Media | Docker VM | Planned |
 | 30 | — | Prowlarr | Media | Docker VM | Planned |
@@ -52,7 +52,7 @@
 | 44 | Tajy | coolify-backup | PaaS | NAS | Active |
 | 45 | — | OpenClaw | AI | RPi 5 | Pending |
 
-**Active:** 30 | **Config ready:** 11 | **Planned:** 4 | **Pending:** 1
+**Active:** 41 | **Planned:** 4 | **Pending:** 1
 
 ## By Environment
 
@@ -85,7 +85,7 @@ Caddy on Docker VM is a custom build with the Cloudflare DNS module for DNS-01 T
 | — | **vaultwarden-backup** | — | — | bruceforce/vaultwarden-backup |
 | Taguato | **Frigate NVR** | 5000, 8554, 8555, 1984 | taguato.cronova.dev | ghcr.io/blakeblackshear/frigate |
 
-Frigate uses OpenVINO GPU detector with VAAPI hwaccel. NFS mount to NAS Purple 2TB for recordings. 3 cameras: front_door (192.168.0.110), back_yard (192.168.0.111), indoor Tapo (192.168.0.101). Face recognition enabled.
+Frigate uses OpenVINO GPU detector (iGPU passthrough, ~15ms inference) with VA-API hwaccel. NFS mount to NAS Purple 2TB for recordings. 3 cameras: front_door (192.168.0.110), back_yard (192.168.0.111), indoor Tapo (192.168.0.101, downscaled to 360x640 for CPU-efficient rotation). Face recognition enabled.
 
 #### Automation
 
@@ -95,7 +95,7 @@ Frigate uses OpenVINO GPU detector with VAAPI hwaccel. NFS mount to NAS Purple 2
 | — | **homeassistant-backup** | — | — | custom restic script |
 | — | **Mosquitto** | 1883 | — | eclipse-mosquitto:2.0 |
 
-HA integrations: System Monitor (Docker VM), Proxmox VE (HACS), Glances (NAS), MQTT (Frigate events). HACS v2026.2.3 installed.
+HA integrations: System Monitor (Docker VM), Proxmox VE (HACS), Glances (NAS), MQTT (Frigate events), Apple TV, LG TV (webOS), HA Companion App. SgtBatten Frigate blueprint for rich push notifications. HACS v2026.2.3 installed.
 
 #### Auth
 
@@ -103,7 +103,7 @@ HA integrations: System Monitor (Docker VM), Proxmox VE (HACS), Glances (NAS), M
 |---------|---------|---------|-----------|-------|
 | Okẽ | **Authelia** | 9091 | auth.cronova.dev | authelia/authelia |
 
-Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (Stirling-PDF), Mbyja (Homepage), Papa (Grafana). NOT protecting (own auth): Jara, Taguato, Vault, Vera, Forgejo.
+Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx). NOT protecting (own auth): Jara, Taguato, Vault, Vera, Forgejo. TOTP 2FA via Authy, filesystem notifier (not SMTP).
 
 #### Media
 
@@ -121,7 +121,7 @@ Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (Stirling-PDF), Mbyja (Home
 |---------|---------|---------|-----------|-------|
 | Mbyja | **Homepage** | 3030 | mbyja.cronova.dev | ghcr.io/gethomepage/homepage |
 | Ysyry | **Dozzle** | 9999 | ysyry.cronova.dev | amir20/dozzle |
-| Kuatia | **Stirling-PDF** | 8580 | kuatia.cronova.dev | frooodle/s-pdf |
+| Kuatia | **BentoPDF** | 8080 | kuatia.cronova.dev | bentopdf (client-side WASM) |
 
 #### Monitoring
 
@@ -217,7 +217,7 @@ No Docker services. DNS handled by Beryl AX AdGuard Home.
 | 8429 | vmagent | Docker VM | — |
 | 8554 | Frigate RTSP | Docker VM | — |
 | 8555 | Frigate WebRTC | Docker VM | — |
-| 8580 | Stirling-PDF (Kuatia) | Docker VM | kuatia.cronova.dev |
+| 8080 | BentoPDF (Kuatia) | Docker VM | kuatia.cronova.dev |
 | 8843 | Vaultwarden | Docker VM | vault.cronova.dev |
 | 8888 | Coolify (Tajy) | NAS | tajy.cronova.dev |
 | 9091 | Authelia (Okẽ) | Docker VM | auth.cronova.dev |
@@ -255,7 +255,8 @@ All HTTPS services go through Caddy on Docker VM (DNS-01 TLS via Cloudflare). Pi
 | Yrasema (Jellyfin) | yrasema.cronova.dev | Yes | Forward auth |
 | Mbyja (Homepage) | mbyja.cronova.dev | Yes | Forward auth |
 | Ysyry (Dozzle) | ysyry.cronova.dev | Yes | Forward auth |
-| Kuatia (Stirling-PDF) | kuatia.cronova.dev | Yes | Forward auth |
+| Kuatia (BentoPDF) | kuatia.cronova.dev | Yes | Forward auth |
+| Aranduka (Paperless-ngx) | aranduka.cronova.dev | Yes | Forward auth |
 | Papa (Grafana) | papa.cronova.dev | Yes | Forward auth |
 
 ## Service Dependencies
@@ -269,7 +270,7 @@ Pi-hole (Docker VM)          ← DNS resolution for *.cronova.dev
 
 Caddy (Docker VM)            ← Reverse proxy + TLS
     ├── Authelia (Okẽ)       ← forward_auth middleware
-    │   └── Protected services (Yrasema, Mbyja, Ysyry, Kuatia, Papa)
+    │   └── Protected services (Yrasema, Mbyja, Ysyry, Kuatia, Papa, Aranduka)
     └── Direct proxy (Jara, Taguato, Vault, Vera, Forgejo)
 
 Mosquitto                    ← MQTT broker
@@ -346,7 +347,7 @@ Coolify (Tajy)               ← PaaS on NAS
 | Yrasema | Jellyfin | Docker VM | Media streaming unavailable |
 | Vera | Immich | Docker VM | Photo management unavailable |
 | Aranduka | Paperless-ngx | Docker VM | Document management unavailable |
-| Kuatia | Stirling-PDF | Docker VM | PDF tools unavailable |
+| Kuatia | BentoPDF | Docker VM | PDF tools unavailable |
 | Mbyja | Homepage | Docker VM | Dashboard unavailable |
 | Ysyry | Dozzle | Docker VM | Log viewer unavailable |
 | Papa | VictoriaMetrics | Docker VM | Metrics collection paused |
@@ -369,7 +370,7 @@ docker/
 │   │   ├── auth/
 │   │   │   └── docker-compose.yml  # Authelia (Okẽ)
 │   │   ├── tools/
-│   │   │   └── docker-compose.yml  # Dozzle, Stirling-PDF, Homepage
+│   │   │   └── docker-compose.yml  # Dozzle, BentoPDF, Homepage
 │   │   ├── monitoring/
 │   │   │   └── docker-compose.yml  # VictoriaMetrics, Grafana, vmagent
 │   │   ├── photos/
@@ -409,7 +410,7 @@ docker/
 | Media | Jellyfin (Yrasema) | 1 |
 | Photos | Immich (Vera) — 4 containers | 4 |
 | Documents | Paperless-ngx (Aranduka) | 1 |
-| Tools | Dozzle (Ysyry), Stirling-PDF (Kuatia), Homepage (Mbyja) | 3 |
+| Tools | Dozzle (Ysyry), BentoPDF (Kuatia), Homepage (Mbyja) | 3 |
 | Monitoring | VictoriaMetrics + Grafana + vmagent (Papa), Uptime Kuma, ntfy, Glances, Watchtower | 7 |
 | Storage | Samba, Syncthing, NFS | 3 |
 | Backup | Restic REST, headscale-backup, vaultwarden-backup, homeassistant-backup, coolify-backup | 5 |
@@ -427,7 +428,7 @@ docker/
 | Yrasema | Nightingale | Jellyfin |
 | Mbyja | Firefly | Homepage |
 | Ysyry | Stream/Creek | Dozzle |
-| Kuatia | Document/Paper | Stirling-PDF |
+| Kuatia | Document/Paper | BentoPDF |
 | Okẽ | Door | Authelia (auth gateway) |
 | Papa | Ancestor/Wise one | VictoriaMetrics + Grafana |
 | Vera | Shine/Glow | Immich |
