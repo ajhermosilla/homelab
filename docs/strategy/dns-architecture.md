@@ -173,31 +173,32 @@ Upstream DNS:
 | Service | Port | Interface |
 |---------|------|-----------|
 | Pi-hole DNS | 53 | LAN-facing |
-| Pi-hole Web | 80 | LAN-facing |
+| Pi-hole Web | 8053 | LAN-facing |
 | Unbound | 5353 | localhost only |
 
 ## Configuration Checklist
 
 ### Mobile Kit (Beryl AX)
-- [ ] Configure AdGuard Home on Beryl AX
-- [ ] Set upstream: 1.1.1.1, 9.9.9.9
-- [ ] Beryl AX is DHCP server and DNS (192.168.8.1)
+- [x] Configure AdGuard Home on Beryl AX
+- [x] Set upstream: 1.1.1.1, 9.9.9.9
+- [x] Beryl AX is DHCP server and DNS (192.168.8.1)
 
 ### Fixed Homelab
-- [ ] Configure Unbound on OPNsense (port 5353)
-- [ ] Install Pi-hole in Docker Host
-- [ ] Set Pi-hole upstream: 192.168.0.1#5353
-- [ ] Configure OPNsense DHCP to give Pi-hole IP as DNS
-- [ ] Add local DNS records
+- [x] Configure Unbound on OPNsense (port 5353)
+- [x] Install Pi-hole in Docker Host (v6.3, port 53 DNS, port 8053 web)
+- [x] Set Pi-hole upstream: 192.168.0.1#5353
+- [x] Configure OPNsense DHCP to give Pi-hole IP as DNS
+- [x] Add local DNS records (23 `dns.hosts` entries in pihole.toml)
 
 ### VPS
-- [ ] Install Pi-hole
-- [ ] Set upstream: 1.1.1.1, 9.9.9.9
-- [ ] Configure Docker to use 127.0.0.1 as DNS
+- [x] Install Pi-hole
+- [x] Set upstream: 1.1.1.1, 9.9.9.9
+- [x] Configure Docker to use 127.0.0.1 as DNS
 
 ### Headscale
-- [ ] Configure dns_config with Tailscale IPs
-- [ ] Enable MagicDNS
+- [x] Configure dns_config with Tailscale IPs
+- [x] Enable MagicDNS
+- [x] Configure extra_records (20 A records for *.cronova.dev → Tailscale IPs)
 
 ## Security Considerations
 

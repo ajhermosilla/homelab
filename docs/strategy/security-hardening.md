@@ -59,11 +59,20 @@ sudo ufw status verbose
 
 ### Fixed Homelab Firewall (OPNsense)
 
-All traffic filtered through OPNsense VM:
+All traffic filtered through OPNsense VM (gateway since 2026-02-21):
 - WAN: Block all inbound (no port forwards)
 - LAN: Allow outbound, block inter-VLAN
-- IoT VLAN: No internet, only Frigate access
+- IoT VLAN (10): Configured, rules pending
+- Guest VLAN (20): Configured, rules pending
 - Access via Tailscale only
+
+### Authelia Forward Auth — Deployed
+
+Authelia (Okẽ) provides SSO + TOTP 2FA for services behind Caddy on Docker VM:
+- **Protected:** Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx)
+- **Own auth (not protected):** Jara (HA), Taguato (Frigate), Vaultwarden, Vera (Immich), Forgejo
+- **Notifier:** Filesystem (writes codes to `/data/notification.txt`), not SMTP
+- **2FA:** TOTP via Authy app
 
 ---
 
@@ -78,16 +87,17 @@ All traffic filtered through OPNsense VM:
 
 ### Service 2FA Matrix
 
-| Service | 2FA Method | Priority |
-|---------|------------|----------|
-| Vaultwarden | TOTP or YubiKey | Critical |
-| Headscale | OIDC + 2FA | Critical |
-| Proxmox | TOTP or YubiKey | Critical |
-| Home Assistant | TOTP | High |
-| OPNsense | TOTP | High |
-| Start9 | TOTP | High |
-| Jellyfin | None (internal only) | Low |
-| *arr stack | None (internal only) | Low |
+| Service | 2FA Method | Priority | Status |
+|---------|------------|----------|--------|
+| Vaultwarden | TOTP or YubiKey | Critical | Available |
+| Authelia (Okẽ) | TOTP via Authy | Critical | Active (protects 6 services) |
+| Headscale | OIDC + 2FA | Critical | Pending (CLI-only for now) |
+| Proxmox | TOTP or YubiKey | Critical | Available |
+| Home Assistant | TOTP | High | Available |
+| OPNsense | TOTP | High | Pending |
+| Start9 | TOTP | High | Pending |
+| Jellyfin | None (behind Authelia) | Low | Protected via forward auth |
+| *arr stack | None (internal only) | Low | — |
 
 ### Vaultwarden 2FA Setup
 
@@ -436,20 +446,21 @@ docker compose up -d
 curl -d "VPS containers updated" https://notify.cronova.dev/cronova-info
 ```
 
-### Watchtower (Automated)
+### Watchtower (Automated) — Deployed
 
 ```yaml
-# Optional: auto-update containers
+# Deployed on Docker VM (maintenance stack)
 watchtower:
-  image: containrrr/watchtower
+  image: nicholas-fedor/watchtower:1.14.2  # Maintained fork (containrrr abandoned/Docker 29+ incompatible)
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
   environment:
     - WATCHTOWER_CLEANUP=true
     - WATCHTOWER_SCHEDULE=0 0 4 * * 0  # Sundays 4 AM
-    - WATCHTOWER_NOTIFICATIONS=shoutrrr
-    - WATCHTOWER_NOTIFICATION_URL=ntfy://notify.cronova.dev/cronova-info
+    - WATCHTOWER_LABEL_ENABLE=true       # Opt-in via container labels
 ```
+
+**Excluded from auto-update** (manual only): Vaultwarden, Frigate, Headscale.
 
 ---
 
