@@ -16,7 +16,7 @@
 | Coolify PaaS | **tajy** | lapacho tree | `tajy.cronova.dev` |
 | Homepage | **mbyja** | star | `mbyja.cronova.dev` |
 | Dozzle | **ysyry** | river, stream | `ysyry.cronova.dev` |
-| Stirling-PDF | **kuatia** | paper, document | `kuatia.cronova.dev` |
+| BentoPDF | **kuatia** | paper, document | `kuatia.cronova.dev` |
 | Authelia | **okẽ** | door | `auth.cronova.dev` |
 | VictoriaMetrics + Grafana | **papa** | to count, measure | `papa.cronova.dev` |
 | Immich | **vera** | shine, flash | `vera.cronova.dev` |
@@ -32,7 +32,7 @@
 |---------|-------------|---------------|---------|-----|
 | Homepage | **mbyja** | mm-BUH-zhah | star | Guiding light, sees everything from above |
 | Dozzle | **ysyry** | uh-suh-RUH | river, stream | Logs flowing like water |
-| Stirling-PDF | **kuatia** | kwa-TEE-ah | paper, document | Literally what it handles |
+| BentoPDF | **kuatia** | kwa-TEE-ah | paper, document | Literally what it handles |
 | Authelia | **okẽ** | oh-KÉ | door | Guards the entrance to all services |
 | CrowdSec | **itá** | ee-TÁ | stone, rock | Solid, unbreakable defense |
 | VictoriaMetrics + Grafana | **papa** | pa-PÁ | to count, measure | Counting and measuring metrics |
@@ -69,7 +69,7 @@
 | `notify.cronova.dev` | ntfy | VPS |
 | `mbyja.cronova.dev` | Homepage | Docker VM |
 | `ysyry.cronova.dev` | Dozzle | Docker VM |
-| `kuatia.cronova.dev` | Stirling-PDF | Docker VM |
+| `kuatia.cronova.dev` | BentoPDF | Docker VM |
 | `okẽ.cronova.dev` | Authelia | Docker VM |
 | `papa.cronova.dev` | VictoriaMetrics + Grafana | Docker VM |
 | `vera.cronova.dev` | Immich | NAS |

@@ -1,12 +1,13 @@
 # Frigate Improvement Plan
 
 **Date**: 2026-03-02
-**Status**: Pending — most items blocked on new 8TB HDD purchase
+**Updated**: 2026-03-10
+**Status**: Phase 1 complete, Phase 2 blocked on 8TB HDD
 **Cameras**: 2x Reolink RLC-520A (PoE), 1x TP-Link Tapo C110 (WiFi)
 
 ## Current State
 
-iGPU passthrough completed (2026-03-02): Intel N150 passed to Docker VM, OpenVINO inference at ~15ms (was 102ms on CPU), VA-API hardware decode working for all 3 detect streams. Indoor camera go2rtc still uses software libx264 for rotation (54% CPU) — VA-API encode unstable on N150.
+iGPU passthrough completed (2026-03-02): Intel N150 passed to Docker VM, OpenVINO inference at ~15ms (was 102ms on CPU), VA-API hardware decode working for all 3 detect streams. Indoor camera go2rtc uses software libx264 for rotation — downscaled from 1080x1920 to 360x640 (2026-03-09), reducing CPU from 54% to ~7%.
 
 Recording storage: `/mnt/purple` (WD Red 8TB) at 100% — `red-recovery` 1.6T + `frigate` 195G + 7.5G free. Retention changes blocked until disk space is available.
 
@@ -14,8 +15,7 @@ Recording storage: `/mnt/purple` (WD Red 8TB) at 100% — `red-recovery` 1.6T + 
 
 The Intel N150 iGPU (24 EUs) is sufficient for the full improvement plan. No additional hardware (Coral TPU) needed.
 
-- **Current load (2fps × 3 cameras)**: 6 detections/sec × 15ms = 9% GPU utilization
-- **After Phase 1 (5fps × 3 cameras)**: 15 detections/sec × 15ms = 23% GPU utilization
+- **Current load (5fps × 3 cameras, post-Phase 1)**: 15 detections/sec × 15ms = 23% GPU utilization
 - **Max capacity**: ~66 detections/sec before saturating
 - VA-API video decode for 3 sub streams (640×480) adds minimal GPU load
 - Recording streams use `-c:v copy` (no GPU)
@@ -24,14 +24,9 @@ A Coral TPU would only be needed if adding 6+ cameras, switching to a heavier mo
 
 ## High Priority
 
-### 1. Increase detection FPS from 2 to 5
+### 1. ~~Increase detection FPS from 2 to 5~~ — DONE (2026-03-02)
 
-Current 2 fps means 500ms between frames. A person walking at normal pace moves ~0.7m between frames, risking missed zone entries and unstable bounding box tracking. Face recognition also gets fewer frames.
-
-With OpenVINO GPU at ~15ms inference, detector capacity is barely used (~6% at 2fps). At 5fps it would be ~15% — still plenty of headroom.
-
-**Change**: Set `fps: 5` globally and per-camera.
-**Blocker**: None — can be applied now.
+Applied `fps: 5` globally and per-camera. OpenVINO GPU at ~15ms handles 15 detections/sec (~23% utilization) with headroom to spare.
 
 ### 2. Add event-based recording retention
 
@@ -56,83 +51,23 @@ record:
 
 **Blocker**: Disk space — longer retention needs more storage. Apply after new 8TB HDD.
 
-### 3. Apply retention option C (immediate disk relief)
+### 3. ~~Apply retention option C (immediate disk relief)~~ — DONE (2026-03-02)
 
-Reduce global retention to 1 day and disable indoor continuous recording. Frees ~125G.
-
-**Change**:
-```yaml
-# Global
-record:
-  retain:
-    days: 1      # was 2
-    mode: motion
-
-# Indoor camera
-record:
-  enabled: true
-  retain:
-    days: 1
-  events:
-    retain:
-      default: 3  # keep event clips longer
-```
-
-**Blocker**: None — should be applied now to prevent `/mnt/purple` from filling completely.
+Applied 1-day global retention and indoor events-only recording.
 
 ## Medium Priority
 
-### 4. Tune motion detection for outdoor cameras
+### 4. ~~Tune motion detection for outdoor cameras~~ — DONE (2026-03-02)
 
-Default `contour_area: 10` is very sensitive for outdoor use. Leaves, shadows, and wind trigger false motion, inflating storage.
+Applied `contour_area: 25` for front_door and back_yard.
 
-**Change**: Add per-camera motion settings:
-```yaml
-cameras:
-  front_door:
-    motion:
-      contour_area: 25
-  back_yard:
-    motion:
-      contour_area: 25
-```
+### 5. ~~Add object filters for car/dog/cat~~ — DONE (2026-03-02)
 
-**Blocker**: None — can be applied now. Tune live via Frigate UI motion debug view.
+Applied min_score/threshold filters for person, car, dog, cat.
 
-### 5. Add object filters for car/dog/cat
+### 6. ~~Indoor camera go2rtc CPU optimization~~ — DONE (2026-03-09)
 
-Only `person` has explicit filters. Cars generate tiny distant detections, animals have higher false positive rates with MobileNet v2.
-
-**Change**:
-```yaml
-objects:
-  filters:
-    person:
-      min_score: 0.5
-      threshold: 0.7
-    car:
-      min_score: 0.5
-      threshold: 0.7
-      min_area: 2000
-    dog:
-      min_score: 0.6
-      threshold: 0.75
-    cat:
-      min_score: 0.6
-      threshold: 0.75
-```
-
-**Blocker**: None — tune thresholds after observing false positive rates in Frigate UI.
-
-### 6. Indoor camera go2rtc CPU optimization
-
-go2rtc software transcode with rotation (`transpose=2`) uses 54% CPU (libx264). VA-API h264_vaapi encode crashes after a few seconds (likely VA-API surface memory limitation on N150 iGPU).
-
-**Options to revisit**:
-- Check if Tapo C110 app supports image rotation (eliminates transcode entirely)
-- Try `-preset ultrafast` instead of `-preset superfast` in go2rtc
-- Reduce Tapo stream resolution to lower encode cost
-- Revisit VA-API encode after Frigate/ffmpeg updates
+Downscaled go2rtc transcode from 1080x1920 to 360x640 (`scale=360:640` in ffmpeg filter chain). CPU dropped from 54% to ~7% (8x reduction). VA-API/QSV cannot do transpose — Intel driver limitation, not a bug. Frigate detection uses 300x300, so 360x640 is more than sufficient.
 
 ## Low Priority
 
@@ -184,17 +119,15 @@ Currently only `person` triggers alerts in the driveway. Adding `car` would noti
 
 ## Execution Plan
 
-**Phase 1 — Now (no disk space needed)**:
-- Item 1: Increase detect FPS to 5
-- Item 3: Reduce retention to 1 day (option C)
-- Item 4: Tune motion contour_area
-- Item 5: Add object filters
+**Phase 1 — COMPLETE (2026-03-02)**:
+- ~~Item 1: Increase detect FPS to 5~~
+- ~~Item 3: Reduce retention to 1 day (option C)~~
+- ~~Item 4: Tune motion contour_area~~
+- ~~Item 5: Add object filters~~
+- ~~Item 6: Indoor camera CPU optimization~~ (2026-03-09)
 
-**Phase 2 — After new 8TB HDD**:
+**Phase 2 — After new 8TB HDD (blocked on purchase)**:
 - Item 2: Event-based retention (14 days alerts, 7 days detections)
 - Item 7: Snapshot retention to 7 days
 - Item 8-10: Zone and alert refinements
-
-**Phase 3 — When time permits**:
-- Item 6: Indoor camera CPU optimization
 - Item 9: Porch zone (needs Frigate UI zone drawing)
