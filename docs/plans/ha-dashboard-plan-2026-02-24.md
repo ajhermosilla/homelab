@@ -30,14 +30,14 @@
 
 ### 4. Family & Presence
 
-- Who's home / away (HA Companion App, pending setup)
+- Who's home / away (HA Companion App — configured 2026-03-08)
 - Welcome home / away mode indicators
 - Indoor camera recording status (on when away, off when home)
 
 ### 5. Media & Entertainment
 
-- LG TV power/volume/source controls (pending pairing at home)
-- Apple TV controls (pending pairing at home)
+- LG TV power/volume/source controls (paired 2026-03-09 via webOS integration)
+- Apple TV controls (paired 2026-03-08 via apple_tv integration)
 
 ---
 
@@ -77,21 +77,21 @@ Useful for monitoring the Docker VM itself.
 
 ## Phased Build
 
-| Phase | Requires | Sections Available |
-|-------|----------|--------------------|
-| **Now** | Nothing extra | Infrastructure status, camera summary, Frigate stats |
-| **After Companion App** | Phone setup | Family presence, away mode |
-| **After Phase 1 kit** | ESP32 + BME280 | Server room temperature, water leak |
-| **After Phase 3 kit** | SONOFF S31 | Power monitoring, energy dashboard |
-| **After TV pairing** | Physical access | Media controls |
+| Phase | Requires | Sections Available | Status |
+|-------|----------|--------------------|--------|
+| **Now** | Nothing extra | Infrastructure status, camera summary, Frigate stats | Ready |
+| **After Companion App** | Phone setup | Family presence, away mode | Ready (Companion App configured) |
+| **After Phase 1 kit** | ESP32 + BME280 | Server room temperature, water leak | Pending hardware |
+| **After Phase 3 kit** | SONOFF S31 | Power monitoring, energy dashboard | Pending hardware |
+| **After TV pairing** | Physical access | Media controls | Ready (LG TV + Apple TV paired) |
 
 ---
 
 ## Prerequisites
 
 - [ ] Install HACS frontend cards (mushroom, mini-graph-card, auto-entities)
-- [ ] Add System Monitor integration via browser
-- [ ] Set up Companion App on phones (presence tracking)
+- [x] Add System Monitor integration via browser
+- [x] Set up Companion App on phones (presence tracking)
 - [ ] Deploy ESP32 sensors (Phase 1 kit from AliExpress)
 - [ ] Flash and deploy SONOFF S31 plugs (Phase 3 kit)
-- [ ] Pair LG TV and Apple TV integrations (at home)
+- [x] Pair LG TV and Apple TV integrations (at home)

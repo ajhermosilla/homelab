@@ -1,7 +1,10 @@
 # Homelab Expansion Ideas — Service & Project Recommendations
 
 **Date:** 2026-02-24
-**Context:** Proxmox host (N150, 9GB Docker VM), NAS (i3-3220T, 8GB), VPS (Vultr), OPNsense firewall, 18 active services. Research from r/homelab, r/selfhosted, ServeTheHome, TechnoTim, Jeff Geerling.
+**Updated:** 2026-03-10
+**Context:** Proxmox host (N150, 9GB Docker VM), NAS (i3-3220T, 8GB), VPS (Vultr), OPNsense firewall. Originally 18 services, now 41+ active. Research from r/homelab, r/selfhosted, ServeTheHome, TechnoTim, Jeff Geerling.
+
+**Deployment status:** 7 of 9 recommended services deployed. Remaining: CrowdSec (OPNsense), n8n.
 
 ---
 
@@ -34,45 +37,29 @@ Plus 4 backup sidecars (headscale-backup, vaultwarden-backup, homeassistant-back
 
 ## Tier 1 — Quick Wins (High Value, Easy Effort)
 
-### Homepage Dashboard
+### Homepage Dashboard — DEPLOYED
 
-- **What:** Single pane of glass for all services with live status widgets, Docker auto-discovery, and API integrations
-- **Why:** 18+ services across 3 hosts — no single place to see them all. Auto-discovers Docker containers via labels, pulls live stats from Pi-hole, Frigate, HA, Jellyfin
-- **Resources:** ~30MB RAM, single container
-- **Where:** Docker VM
-- **Time:** 30 minutes
-- **Links:** [GitHub](https://github.com/gethomepage/homepage), [TechnoTim Guide](https://technotim.com/posts/homepage-dashboard/)
+- **What:** Single pane of glass for all services with live status widgets, Docker auto-discovery
+- **Where:** Docker VM (Mbyja, `mbyja.cronova.dev`, behind Authelia)
 
-### Dozzle (Docker Log Viewer)
+### Dozzle (Docker Log Viewer) — DEPLOYED
 
-- **What:** Real-time Docker log streaming across all hosts from one web UI. Supports SQL queries via in-browser DuckDB and ntfy alerts
-- **Why:** Replaces `ssh + docker logs` for debugging. Connects to Docker VM, NAS, and VPS from a single instance
-- **Resources:** ~15MB RAM, stateless (no database, no log storage)
-- **Where:** Docker VM (connect NAS and VPS as remote agents)
-- **Time:** 15 minutes
-- **Links:** [Dozzle](https://dozzle.dev/), [GitHub](https://github.com/amir20/dozzle)
+- **What:** Real-time Docker log streaming across all hosts from one web UI
+- **Where:** Docker VM (Ysyry, `ysyry.cronova.dev`, behind Authelia)
 
-### Stirling-PDF (PDF Toolkit)
+### BentoPDF (PDF Toolkit) — DEPLOYED (replaced Stirling-PDF)
 
-- **What:** Self-hosted PDF manipulation (merge, split, convert, compress, OCR, sign, watermark) with web UI and REST API
-- **Why:** Replaces sketchy online PDF tools that harvest data. API enables automation workflows
-- **Resources:** ~100MB RAM
-- **Where:** Docker VM
-- **Time:** 15 minutes
-- **Links:** [Blog](https://akashrajpurohit.com/blog/selfhost-stirling-pdf-for-pdf-manipulation/)
+- **What:** Client-side WASM PDF manipulation (merge, split, convert). Replaced Stirling-PDF (Java/Spring Boot, 85% idle CPU, ~500MB RAM) with BentoPDF (0% CPU, ~4MB RAM)
+- **Where:** Docker VM (Kuatia, `kuatia.cronova.dev`, behind Authelia)
 
 ---
 
 ## Tier 2 — Evening Projects (High Value, Medium Effort)
 
-### Authelia (Single Sign-On + 2FA)
+### Authelia (Single Sign-On + 2FA) — DEPLOYED
 
-- **What:** Authentication server that adds SSO and 2FA in front of all Caddy-proxied services. TOTP, WebAuthn/FIDO2, Duo push
-- **Why:** Centralizes authentication through Caddy's `forward_auth`. One login protects Frigate, Jellyfin, Forgejo, Pi-hole. Single container with file/SQLite config (unlike Authentik which needs PostgreSQL + Redis + workers)
-- **Resources:** ~30MB RAM
-- **Where:** Docker VM alongside Caddy
-- **Time:** 2-3 hours
-- **Links:** [GitHub](https://github.com/authelia/authelia), [Setup Guide](https://akashrajpurohit.com/blog/setup-authelia-for-sso-authentication/)
+- **What:** Authentication server with TOTP 2FA via Caddy `forward_auth`
+- **Where:** Docker VM (Okẽ, `auth.cronova.dev`). Protects: Yrasema, Ysyry, Kuatia, Mbyja, Papa, Aranduka. TOTP via Authy, filesystem notifier.
 
 ### CrowdSec on OPNsense (Collaborative IPS)
 
@@ -83,36 +70,24 @@ Plus 4 backup sidecars (headscale-backup, vaultwarden-backup, homeassistant-back
 - **Time:** 1 hour
 - **Links:** [CrowdSec Docs](https://docs.crowdsec.net/docs/getting_started/install_crowdsec_opnsense/), [HomeNetworkGuy](https://homenetworkguy.com/how-to/install-and-configure-crowdsec-on-opnsense/)
 
-### VictoriaMetrics + Grafana (Metrics & Dashboards)
+### VictoriaMetrics + Grafana (Metrics & Dashboards) — DEPLOYED
 
-- **What:** Lightweight Prometheus alternative (3-4x less RAM) + Grafana visualization. Historical metrics dashboards for all hosts
-- **Why:** Glances and Uptime Kuma give real-time data but no history. VictoriaMetrics scrapes existing endpoints and provides capacity planning, alerting, and trend analysis
-- **Resources:** VictoriaMetrics ~50MB + Grafana ~100MB + node-exporter ~10MB/host
-- **Where:** Docker VM
-- **Time:** 2-3 hours
-- **Links:** [VictoriaMetrics](https://victoriametrics.com/), [MangoHost Guide](https://mangohost.net/blog/self-hosted-monitoring-with-victoriametrics-grafana-a-lightweight-alternative/)
+- **What:** Lightweight Prometheus alternative + Grafana visualization
+- **Where:** Docker VM (Papa, `papa.cronova.dev`, behind Authelia). Scrapes Docker VM + NAS + HA. 90-day retention.
 
 ---
 
 ## Tier 3 — Weekend Projects (High Value, More Effort)
 
-### Immich (Self-Hosted Google Photos)
+### Immich (Self-Hosted Google Photos) — DEPLOYED
 
-- **What:** Full Google Photos replacement with mobile apps, automatic backup, ML face recognition, smart search, albums, sharing, map view. Stable v2.0 since October 2025
-- **Why:** Biggest privacy win if using Google/iCloud Photos. Mobile app handles background uploads. ML runs locally (CLIP model). 8TB WD Red on NAS is perfect
-- **Resources:** ~500MB-1GB RAM (needs PostgreSQL)
-- **Where:** NAS (photos on 8TB WD Red)
-- **Time:** 3-4 hours
-- **Links:** [Immich](https://immich.app/), [XDA Migration Guide](https://www.xda-developers.com/google-photos-vs-immich-3628122/)
+- **What:** Full Google Photos replacement with mobile apps, ML face recognition, smart search
+- **Where:** Docker VM (Vera, `vera.cronova.dev`, own auth). 4 containers: server, ML, Valkey, PostgreSQL.
 
-### Paperless-ngx (Document Management)
+### Paperless-ngx (Document Management) — DEPLOYED
 
-- **What:** Scans, OCRs, tags, and indexes documents. Consume folder watches for new files, ML auto-tagging, full-text search
-- **Why:** Scan with phone → drop in Syncthing folder → auto-processed. Combined with Stirling-PDF for preprocessing, complete document pipeline
-- **Resources:** ~300-500MB RAM (needs PostgreSQL + Redis)
-- **Where:** Docker VM or NAS
-- **Time:** 3-4 hours
-- **Links:** [Paperless-ngx Docs](https://docs.paperless-ngx.com/setup/), [TechnoTim + Local AI](https://technotim.com/posts/paperless-ngx-local-ai/)
+- **What:** Document scanning, OCR, tagging, full-text search
+- **Where:** Docker VM (Aranduka, `aranduka.cronova.dev`, behind Authelia). 3 containers: server, PostgreSQL, Redis.
 
 ### n8n (Workflow Automation)
 
@@ -191,16 +166,16 @@ Frigate detects person → ntfy notification with action buttons: "View Camera,"
 
 ### Docker VM (9GB total, ~5GB used)
 
-| Service | RAM |
-|---------|-----|
-| Homepage | 30MB |
-| Dozzle | 15MB |
-| Stirling-PDF | 100MB |
-| Authelia | 30MB |
-| VictoriaMetrics + Grafana | 150MB |
-| Paperless-ngx | 400MB |
-| n8n | 200MB |
-| **Total** | **~925MB** |
+| Service | RAM | Status |
+|---------|-----|--------|
+| Homepage | 30MB | Deployed |
+| Dozzle | 15MB | Deployed |
+| BentoPDF | ~4MB | Deployed (replaced Stirling-PDF) |
+| Authelia | 30MB | Deployed |
+| VictoriaMetrics + Grafana | 150MB | Deployed |
+| Paperless-ngx | 400MB | Deployed |
+| n8n | 200MB | Pending |
+| **Total deployed** | **~629MB** | |
 
 ### NAS (8GB total, ~3GB used)
 
@@ -215,17 +190,17 @@ Both well within capacity.
 
 ## Recommended Deployment Order
 
-| # | Service | Where | RAM | Time | Priority |
-|---|---------|-------|-----|------|----------|
-| 1 | Homepage | Docker VM | 30MB | 30 min | Do first |
-| 2 | Dozzle | Docker VM | 15MB | 15 min | Do first |
-| 3 | CrowdSec | OPNsense | 100MB | 1 hour | Security |
-| 4 | Stirling-PDF | Docker VM | 100MB | 15 min | Utility |
-| 5 | Authelia | Docker VM | 30MB | 2-3 hours | Security |
-| 6 | VictoriaMetrics + Grafana | Docker VM | 150MB | 2-3 hours | Observability |
-| 7 | Immich | NAS | 750MB | 3-4 hours | Privacy |
-| 8 | Paperless-ngx | Docker VM | 400MB | 3-4 hours | Productivity |
-| 9 | n8n | Docker VM | 200MB | 2-3 hours | Automation |
+| # | Service | Where | Status |
+|---|---------|-------|--------|
+| 1 | Homepage (Mbyja) | Docker VM | Deployed |
+| 2 | Dozzle (Ysyry) | Docker VM | Deployed |
+| 3 | CrowdSec | OPNsense | **Pending** |
+| 4 | BentoPDF (Kuatia) | Docker VM | Deployed (replaced Stirling-PDF) |
+| 5 | Authelia (Okẽ) | Docker VM | Deployed |
+| 6 | VictoriaMetrics + Grafana (Papa) | Docker VM | Deployed |
+| 7 | Immich (Vera) | Docker VM | Deployed |
+| 8 | Paperless-ngx (Aranduka) | Docker VM | Deployed |
+| 9 | n8n (Pytyvõ) | Docker VM | **Pending** |
 
 ---
 
