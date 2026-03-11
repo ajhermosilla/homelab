@@ -80,6 +80,84 @@ services:
       - victoriametrics
 
   # =========================================================================
+  # vmalert - Alerting Rule Evaluator
+  # https://docs.victoriametrics.com/vmalert/
+  # =========================================================================
+  vmalert:
+    image: victoriametrics/vmalert:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: vmalert
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=monitoring"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    volumes:
+      - ./alerts.yml:/etc/vmalert/alerts.yml:ro
+    command:
+      - "--datasource.url=http://victoriametrics:8428"
+      - "--notifier.url=http://alertmanager:9093"
+      - "--remoteWrite.url=http://victoriametrics:8428"
+      - "--remoteRead.url=http://victoriametrics:8428"
+      - "--rule=/etc/vmalert/alerts.yml"
+      - "--evaluationInterval=30s"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - monitoring-net
+    depends_on:
+      - victoriametrics
+      - alertmanager
+
+  # =========================================================================
+  # Alertmanager - Alert Routing & Deduplication
+  # https://prometheus.io/docs/alerting/latest/alertmanager/
+  # =========================================================================
+  alertmanager:
+    image: prom/alertmanager:latest
+    env_file:
+      - ../../../shared/common.env
+    container_name: alertmanager
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=monitoring"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.25'
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./ntfy-token:/etc/alertmanager/ntfy-token:ro
+      - alertmanager-data:/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+      - "--web.external-url=http://alertmanager:9093"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - monitoring-net
+
+  # =========================================================================
   # cAdvisor - Container Metrics Exporter
   # https://github.com/google/cadvisor
   # =========================================================================
@@ -164,6 +242,8 @@ volumes:
     name: vm-data
   vmagent-data:
     name: vmagent-data
+  alertmanager-data:
+    name: alertmanager-data
   grafana-data:
     name: grafana-data
 
@@ -194,7 +274,11 @@ networks:
 # 4. Create .env:
 #    GRAFANA_ADMIN_PASSWORD=<secure-password>
 #
-# 5. Start monitoring:
+# 5. Create ntfy-token file for Alertmanager:
+#    echo -n "tk_<your-ntfy-token>" > ntfy-token
+#    Generate token: docker exec ntfy ntfy token add augusto
+#
+# 6. Start monitoring:
 #    docker compose up -d
 #
 # =============================================================================
