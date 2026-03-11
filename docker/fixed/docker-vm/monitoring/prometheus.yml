@@ -33,6 +33,15 @@ scrape_configs:
           instance: victoriametrics
 
   # =========================================================================
+  # vmagent - Self-monitoring
+  # =========================================================================
+  - job_name: vmagent
+    static_configs:
+      - targets: ['vmagent:8429']
+        labels:
+          instance: vmagent
+
+  # =========================================================================
   # cAdvisor - Docker Container Metrics
   # =========================================================================
   - job_name: cadvisor
