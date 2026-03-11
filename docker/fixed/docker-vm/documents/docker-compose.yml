@@ -137,6 +137,61 @@ services:
     networks:
       - documents-net
 
+  # =========================================================================
+  # Paperless-ngx Backup Sidecar
+  # Daily encrypted backups to NAS via restic
+  # Backs up data (config, search index) and media (original documents)
+  # =========================================================================
+  paperless-backup:
+    image: restic/restic:0.16.4
+    env_file:
+      - ../../../shared/common.env
+    container_name: paperless-backup
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=backup"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    init: true  # Proper signal handling for cron daemon
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "0 3 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+        crond -f -l 2
+    volumes:
+      - paperless-data:/data/data:ro
+      - paperless-media:/data/media:ro
+      - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/restic-backup.sh:/backup.sh:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/paperless}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      BACKUP_PATH: /data
+      BACKUP_TAG: paperless
+      BACKUP_EXCLUDE: "*.log,*.pyc,classification_model.pickle"
+      KEEP_DAILY: "7"
+      KEEP_WEEKLY: "4"
+      KEEP_MONTHLY: "12"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - documents-net
+    depends_on:
+      - paperless-ngx
+
 volumes:
   paperless-data:
     name: paperless-data
@@ -186,7 +241,7 @@ networks:
 # RAM CONSIDERATIONS
 # =============================================================================
 #
-# Resource limits: 896M total (512M server + 256M postgres + 128M redis)
+# Resource limits: 1024M total (512M server + 256M postgres + 128M redis + 128M backup)
 # Actual usage: ~500-600M typical
 #
 # Gotenberg and Tika are intentionally skipped to save ~768M RAM.
