@@ -21,8 +21,12 @@ How the homelab is monitored, alerted, and observed.
 
 ```
 node_exporter (Docker VM :9100) ──┐
-node_exporter (NAS :9100) ────────┼──► vmagent ──► VictoriaMetrics ──► Grafana
-Home Assistant (/api/prometheus) ──┘    (30s scrape)    (90d retention)    (papa.cronova.dev)
+node_exporter (NAS :9100) ────────┤
+VictoriaMetrics (:8428) ──────────┤
+vmagent (:8429) ──────────────────┼──► vmagent ──► VictoriaMetrics ──► Grafana
+Grafana (:3000) ──────────────────┤    (30s scrape)    (90d retention)    (papa.cronova.dev)
+cAdvisor (:8080) ─────────────────┤
+Home Assistant (/api/prometheus) ──┘
 ```
 
 **Config:** `docker/fixed/docker-vm/monitoring/prometheus.yml`
@@ -33,6 +37,10 @@ Home Assistant (/api/prometheus) ──┘    (30s scrape)    (90d retention)   
 |-----|--------|--------|
 | node-docker-vm | `host.docker.internal:9100` | instance: docker-vm |
 | node-nas | `100.82.77.97:9100` | instance: nas |
+| victoriametrics | `victoriametrics:8428` | instance: victoriametrics |
+| vmagent | `vmagent:8429` | instance: vmagent |
+| grafana | `grafana:3000` | instance: grafana |
+| cadvisor | `cadvisor:8080` | instance: docker-vm |
 | home-assistant | `host.docker.internal:8123/api/prometheus` | instance: home-assistant |
 
 ### VictoriaMetrics
@@ -49,6 +57,17 @@ Home Assistant (/api/prometheus) ──┘    (30s scrape)    (90d retention)   
 - Port: 3000 (localhost only, behind Caddy + Authelia)
 - URL: `https://papa.cronova.dev`
 - Plugin: `victoriametrics-metrics-datasource`
+- Dashboards provisioned via `grafana/provisioning/dashboards/json/`
+
+### Grafana Dashboards
+
+| Dashboard | Grafana ID | Source | What it shows |
+|-----------|-----------|--------|---------------|
+| Node Exporter Full | 1860 | node-docker-vm, node-nas | Host CPU, RAM, disk, network |
+| VictoriaMetrics Single | 10229 | victoriametrics | TSDB health, ingestion rate, storage |
+| cAdvisor Docker | 19792 | cadvisor | Per-container CPU, memory, network |
+| vmagent | 12683 | vmagent | Scrape stats, target health, remote write |
+| Grafana Internals | 3590 | grafana | API response times, sessions, memory |
 
 ---
 
