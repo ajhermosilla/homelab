@@ -194,7 +194,7 @@ main() {
     log "Phase 7: Starting auth stack"
     compose_up "$AUTH_STACK" || true
 
-    # Phase 8: Tools (Dozzle, Stirling-PDF, Homepage)
+    # Phase 8: Tools (Dozzle, BentoPDF, Homepage)
     log "Phase 8: Starting tools stack"
     compose_up "$TOOLS_STACK" || true
 
@@ -202,7 +202,7 @@ main() {
     log "Phase 9: Starting documents stack"
     compose_up "$DOCUMENTS_STACK" || true
 
-    # Phase 10: Monitoring (VictoriaMetrics, vmagent, Grafana)
+    # Phase 10: Monitoring (VictoriaMetrics, vmagent, vmalert, Alertmanager, cAdvisor, Grafana)
     log "Phase 10: Starting monitoring stack"
     compose_up "$MONITORING_STACK" || true
 
