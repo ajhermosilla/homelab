@@ -39,9 +39,9 @@ services:
       # Don't restart containers, just pull new images
       # Set to false to enable full auto-update
       WATCHTOWER_MONITOR_ONLY: ${WATCHTOWER_MONITOR_ONLY:-false}
-      # Notification settings (optional)
-      WATCHTOWER_NOTIFICATIONS: ${WATCHTOWER_NOTIFICATIONS:-}
-      WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL:-}
+      # Notifications via ntfy (requires NTFY_USER and NTFY_PASS in .env)
+      WATCHTOWER_NOTIFICATIONS: "shoutrrr"
+      WATCHTOWER_NOTIFICATION_URL: "ntfy://${NTFY_USER}:${NTFY_PASS}@notify.cronova.dev/cronova-info"
       # Rolling restarts (one at a time)
       WATCHTOWER_ROLLING_RESTART: "false"
       # Timeout for stopping containers
@@ -111,9 +111,9 @@ services:
 #      labels:
 #        - "com.centurylinklabs.watchtower.enable=true"
 #
-# 2. Optional: Create .env for notifications:
-#    WATCHTOWER_NOTIFICATIONS=shoutrrr
-#    WATCHTOWER_NOTIFICATION_URL=ntfy://notify.cronova.dev/cronova-updates
+# 2. Create .env with ntfy credentials:
+#    NTFY_USER=augusto
+#    NTFY_PASS=your-ntfy-password
 #
 # 3. Start Watchtower:
 #    docker compose up -d
