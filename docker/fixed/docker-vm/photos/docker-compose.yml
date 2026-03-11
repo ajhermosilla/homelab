@@ -15,6 +15,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
@@ -64,6 +66,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
@@ -96,6 +100,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
@@ -103,6 +109,7 @@ services:
       resources:
         limits:
           memory: 128M
+          cpus: '0.25'
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 30s
@@ -127,6 +134,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
@@ -135,6 +144,7 @@ services:
       resources:
         limits:
           memory: 512M
+          cpus: '1'
     volumes:
       - immich-db-data:/var/lib/postgresql/data
     environment:
