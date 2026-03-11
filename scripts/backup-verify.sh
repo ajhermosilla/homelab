@@ -3,6 +3,16 @@
 # Run on: First Sunday of each month
 # Usage: ./backup-verify.sh [--full]
 #
+# Tests (8 suites):
+#   1. Restic repository health
+#   2. Snapshot freshness (Headscale, VW, HA, Paperless, Immich)
+#   3. Headscale restore
+#   4. Vaultwarden restore
+#   5. Home Assistant restore
+#   6. Paperless-ngx restore
+#   7. Immich DB restore (pg_dump integrity)
+#   8. Offsite backup (Google Drive)
+#
 # Options:
 #   --full    Run full quarterly restore drill (in test directory)
 
@@ -128,6 +138,36 @@ test_snapshots() {
         fi
     else
         log_warn "No Home Assistant snapshot found (may be expected if not deployed)"
+    fi
+
+    # Check Paperless-ngx (should be within 25 hours)
+    local pl_snapshot=$(restic snapshots --tag paperless --json 2>/dev/null | jq -r '.[-1].time // empty')
+    if [[ -n "$pl_snapshot" ]]; then
+        local pl_time=$(date -d "$pl_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${pl_snapshot%%.*}" +%s 2>/dev/null)
+        local pl_age=$(( (now - pl_time) / 3600 ))
+        if [[ $pl_age -le 25 ]]; then
+            log_info "Paperless-ngx snapshot: ${pl_age}h ago (OK)"
+        else
+            log_warn "Paperless-ngx snapshot: ${pl_age}h ago (expected <25h)"
+            ((errors++))
+        fi
+    else
+        log_warn "No Paperless-ngx snapshot found (may be expected if not deployed)"
+    fi
+
+    # Check Immich DB (should be within 25 hours)
+    local im_snapshot=$(restic snapshots --tag immich-db --json 2>/dev/null | jq -r '.[-1].time // empty')
+    if [[ -n "$im_snapshot" ]]; then
+        local im_time=$(date -d "$im_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${im_snapshot%%.*}" +%s 2>/dev/null)
+        local im_age=$(( (now - im_time) / 3600 ))
+        if [[ $im_age -le 25 ]]; then
+            log_info "Immich DB snapshot: ${im_age}h ago (OK)"
+        else
+            log_warn "Immich DB snapshot: ${im_age}h ago (expected <25h)"
+            ((errors++))
+        fi
+    else
+        log_warn "No Immich DB snapshot found (may be expected if not deployed)"
     fi
 
     if [[ $errors -eq 0 ]]; then
@@ -275,7 +315,110 @@ test_homeassistant_restore() {
     return 0
 }
 
-# Test 6: Offsite Backup Verification
+# Test 6: Paperless-ngx Restore
+test_paperless_restore() {
+    log_test "Paperless-ngx Restore"
+
+    export RESTIC_REPOSITORY
+    export RESTIC_PASSWORD_FILE
+
+    # Check if Paperless backups exist
+    local pl_count=$(restic snapshots --tag paperless --json 2>/dev/null | jq length)
+    if [[ "$pl_count" == "0" || -z "$pl_count" ]]; then
+        log_warn "No Paperless-ngx backups found (skipping)"
+        return 0
+    fi
+
+    mkdir -p "$RESTORE_DIR/paperless"
+
+    if ! restic restore latest --target "$RESTORE_DIR/paperless" --tag paperless 2>/dev/null; then
+        log_error "Failed to restore Paperless-ngx backup"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    local data_path="$RESTORE_DIR/paperless/data/data"
+    local media_path="$RESTORE_DIR/paperless/data/media"
+
+    # Check data directory exists
+    if [[ -d "$data_path" ]]; then
+        log_info "data directory exists"
+    else
+        log_error "data directory missing!"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    # Check media directory exists (contains the actual documents)
+    if [[ -d "$media_path" ]]; then
+        local doc_count=$(find "$media_path" -type f 2>/dev/null | wc -l)
+        log_info "media directory exists ($doc_count files)"
+    else
+        log_error "media directory missing!"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "Paperless-ngx restore test passed"
+    ((TESTS_PASSED++))
+    return 0
+}
+
+# Test 7: Immich Database Restore
+test_immich_restore() {
+    log_test "Immich Database Restore"
+
+    export RESTIC_REPOSITORY
+    export RESTIC_PASSWORD_FILE
+
+    # Check if Immich backups exist
+    local im_count=$(restic snapshots --tag immich-db --json 2>/dev/null | jq length)
+    if [[ "$im_count" == "0" || -z "$im_count" ]]; then
+        log_warn "No Immich DB backups found (skipping)"
+        return 0
+    fi
+
+    mkdir -p "$RESTORE_DIR/immich"
+
+    if ! restic restore latest --target "$RESTORE_DIR/immich" --tag immich-db 2>/dev/null; then
+        log_error "Failed to restore Immich DB backup"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    local dump_path="$RESTORE_DIR/immich/backup/immich-db.sql.gz"
+
+    # Check dump file exists and is not empty
+    if [[ -f "$dump_path" && -s "$dump_path" ]]; then
+        local dump_size=$(du -h "$dump_path" | cut -f1)
+        log_info "pg_dump exists ($dump_size)"
+
+        # Verify it's a valid gzip file containing SQL
+        if gunzip -t "$dump_path" 2>/dev/null; then
+            log_info "gzip integrity OK"
+            # Check for PostgreSQL header in dump
+            if gunzip -c "$dump_path" 2>/dev/null | head -5 | command grep -q "PostgreSQL"; then
+                log_info "Valid PostgreSQL dump confirmed"
+            else
+                log_warn "Could not verify PostgreSQL header (may still be valid)"
+            fi
+        else
+            log_error "gzip integrity check failed!"
+            ((TESTS_FAILED++))
+            return 1
+        fi
+    else
+        log_error "pg_dump file missing or empty!"
+        ((TESTS_FAILED++))
+        return 1
+    fi
+
+    log_info "Immich DB restore test passed"
+    ((TESTS_PASSED++))
+    return 0
+}
+
+# Test 8: Offsite Backup Verification
 test_offsite_backup() {
     log_test "Offsite Backup (Google Drive)"
 
@@ -360,6 +503,8 @@ main() {
     test_headscale_restore || true
     test_vaultwarden_restore || true
     test_homeassistant_restore || true
+    test_paperless_restore || true
+    test_immich_restore || true
     test_offsite_backup || true
 
     # Generate report

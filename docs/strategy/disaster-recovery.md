@@ -462,7 +462,7 @@ rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 
 | Script | Purpose | Location |
 |--------|---------|----------|
-| `scripts/backup-verify.sh` | Monthly backup audit (6 test suites) | Docker VM |
+| `scripts/backup-verify.sh` | Monthly backup audit (8 test suites) | Docker VM |
 | `scripts/backup-verify.sh --full` | Quarterly full restore drill | Docker VM |
 | `scripts/backup-notify.sh` | ntfy notifications for backup events | Docker VM |
 
