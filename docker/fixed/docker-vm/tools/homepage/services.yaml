@@ -60,6 +60,12 @@
         description: Indexers
         server: local
         container: prowlarr
+    - qBittorrent:
+        icon: qbittorrent
+        href: "#"
+        description: Torrent Client
+        server: local
+        container: qbittorrent
 
 - Monitoring:
     - Grafana:
@@ -68,6 +74,12 @@
         description: Metrics & Dashboards
         server: local
         container: grafana
+    - VictoriaMetrics:
+        icon: victoriametrics
+        href: "#"
+        description: Time-Series Database
+        server: local
+        container: victoriametrics
     - Uptime Kuma:
         icon: uptime-kuma
         href: https://status.cronova.dev
@@ -79,13 +91,21 @@
         server: local
         container: dozzle
 
+- Photos:
+    - Immich:
+        icon: immich
+        href: https://vera.cronova.dev
+        description: Photo Management
+        server: local
+        container: immich-server
+
 - Tools:
-    - Stirling-PDF:
+    - BentoPDF:
         icon: stirling-pdf
         href: https://kuatia.cronova.dev
         description: PDF Tools
         server: local
-        container: stirling-pdf
+        container: bentopdf
     - Paperless-ngx:
         icon: paperless-ngx
         href: https://aranduka.cronova.dev
@@ -116,3 +136,7 @@
         icon: opnsense
         href: "#"
         description: Firewall & Router
+    - Coolify:
+        icon: coolify
+        href: https://tajy.cronova.dev
+        description: PaaS (NAS)
