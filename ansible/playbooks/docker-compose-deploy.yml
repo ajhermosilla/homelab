@@ -33,13 +33,20 @@
     docker_vm_stacks:
       - networking/pihole
       - networking/caddy
-      - media
       - automation
       - security
+      - auth
+      - tools
+      - documents
+      - monitoring
+      - photos
+      - media
       - maintenance
     storage_stacks:
-      - storage
       - backup
+      - git
+      - storage
+      - monitoring
 
   tasks:
     # =========================================================================
@@ -118,9 +125,9 @@
     # =========================================================================
     # NFS Mount Verification (for media/security stacks)
     # =========================================================================
-    - name: Check if deploying media or security stack
+    - name: Check if deploying NFS-dependent stacks
       set_fact:
-        deploying_nfs_dependent: "{{ ('media' in deploy_stacks | default([])) or ('security' in deploy_stacks | default([])) }}"
+        deploying_nfs_dependent: "{{ ('media' in deploy_stacks | default([])) or ('security' in deploy_stacks | default([])) or ('photos' in deploy_stacks | default([])) }}"
       when: stack_base_path is defined and "'docker_vm' in group_names"
 
     - name: Verify NFS mount points exist
@@ -128,8 +135,10 @@
         path: "{{ item }}"
       register: nfs_mounts
       loop:
-        - /mnt/nas/media
         - /mnt/nas/frigate
+        - /mnt/nas/media
+        - /mnt/nas/downloads
+        - /mnt/nas/photos
       when: deploying_nfs_dependent | default(false)
 
     - name: Warn if NFS mounts missing
@@ -141,12 +150,16 @@
           {% endfor %}
 
           Ensure NFS is mounted before starting services:
-            sudo mount -t nfs {{ nas_ip }}:/srv/media /mnt/nas/media
             sudo mount -t nfs {{ nas_ip }}:/srv/frigate /mnt/nas/frigate
+            sudo mount -t nfs {{ nas_ip }}:/srv/media /mnt/nas/media
+            sudo mount -t nfs {{ nas_ip }}:/srv/downloads /mnt/nas/downloads
+            sudo mount -t nfs {{ nas_ip }}:/srv/photos /mnt/nas/photos
 
           Or add to /etc/fstab for persistent mounts:
-            {{ nas_ip }}:/srv/media    /mnt/nas/media    nfs  defaults,_netdev,nofail  0  0
-            {{ nas_ip }}:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
+            {{ nas_ip }}:/srv/frigate    /mnt/nas/frigate    nfs  defaults,_netdev,nofail  0  0
+            {{ nas_ip }}:/srv/media      /mnt/nas/media      nfs  defaults,_netdev,nofail  0  0
+            {{ nas_ip }}:/srv/downloads  /mnt/nas/downloads  nfs  defaults,_netdev,nofail  0  0
+            {{ nas_ip }}:/srv/photos     /mnt/nas/photos     nfs  defaults,_netdev,nofail  0  0
       when:
         - deploying_nfs_dependent | default(false)
         - nfs_mounts.results | selectattr('stat.exists', 'undefined') | list | length > 0 or
