@@ -72,6 +72,7 @@ Home Assistant (/api/prometheus) ──┘                   (30s eval)    (grou
 | cAdvisor Docker | 19792 | cadvisor | Per-container CPU, memory, network |
 | vmagent | 12683 | vmagent | Scrape stats, target health, remote write |
 | Grafana Internals | 3590 | grafana | API response times, sessions, memory |
+| Homelab Overview | — (custom) | all targets | Host health, containers, network, monitoring health |
 
 ---
 
