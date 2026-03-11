@@ -153,7 +153,7 @@ tailscale up --login-server=https://hs.cronova.dev
 
 ### Scenario 2: Docker VM Failure
 
-**Impact:** All Docker VM services (20+ containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
+**Impact:** All Docker VM services (33 containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
 
 **Recovery:**
 
@@ -205,6 +205,24 @@ docker stop homeassistant
 docker run --rm -v homeassistant-config:/config -v /tmp/ha-restore:/restore alpine \
     sh -c "rm -rf /config/* && cp -a /restore/config/* /config/"
 docker start homeassistant
+
+# 10. Restore Paperless-ngx data + media volumes
+export RESTIC_REPOSITORY="rest:http://augusto:PASS@192.168.0.12:8000/augusto/paperless"
+restic restore latest --target /tmp/paperless-restore --tag paperless
+docker stop paperless-ngx
+docker run --rm \
+    -v paperless-data:/data -v paperless-media:/media \
+    -v /tmp/paperless-restore:/restore alpine \
+    sh -c "rm -rf /data/* /media/* && cp -a /restore/data/data/* /data/ && cp -a /restore/data/media/* /media/"
+docker start paperless-ngx
+
+# 11. Restore Immich database from pg_dump
+export RESTIC_REPOSITORY="rest:http://augusto:PASS@192.168.0.12:8000/augusto/immich"
+restic restore latest --target /tmp/immich-restore --tag immich-db
+docker exec -i immich-db psql -U immich -d postgres -c "DROP DATABASE IF EXISTS immich;"
+docker exec -i immich-db psql -U immich -d postgres -c "CREATE DATABASE immich;"
+gunzip -c /tmp/immich-restore/backup/immich-db.sql.gz | \
+    docker exec -i immich-db psql -U immich -d immich
 ```
 
 ### Scenario 3: NAS Failure
@@ -312,7 +330,85 @@ curl -s https://jara.cronova.dev | head -5
 rm -rf /tmp/ha-restore
 ```
 
-### Scenario 6: Complete Site Failure (Power/Fire/Theft)
+### Scenario 6: Paperless-ngx Corruption
+
+**Impact:** Document management — scanned documents, OCR data, tags
+
+**Recovery:**
+
+```bash
+ssh docker-vm
+
+# 1. Stop Paperless stack
+cd /opt/homelab/repo/docker/fixed/docker-vm/documents
+docker compose stop paperless-ngx
+
+# 2. Restore from Restic (data + media volumes)
+export RESTIC_REPOSITORY="rest:http://augusto:<PASS>@192.168.0.12:8000/augusto/paperless"
+export RESTIC_PASSWORD="<password>"
+
+restic snapshots --tag paperless
+restic restore latest --target /tmp/paperless-restore --tag paperless
+
+# 3. Replace volume contents
+docker run --rm \
+    -v paperless-data:/data \
+    -v paperless-media:/media \
+    -v /tmp/paperless-restore:/restore alpine \
+    sh -c "rm -rf /data/* /media/* && cp -a /restore/data/data/* /data/ && cp -a /restore/data/media/* /media/"
+
+# 4. If PostgreSQL is also corrupted, recreate from scratch
+# Paperless will re-index documents from media on startup
+docker compose down
+docker volume rm paperless-db-data
+docker compose up -d
+
+# 5. Verify
+curl -s https://aranduka.cronova.dev | head -5
+rm -rf /tmp/paperless-restore
+```
+
+**Note:** Documents are the critical data (in `paperless-media`). The PostgreSQL database and search index can be rebuilt from the documents by Paperless-ngx on startup.
+
+### Scenario 7: Immich Database Corruption
+
+**Impact:** Photo metadata, albums, face recognition data, user settings. Photos themselves are safe on NAS.
+
+**Recovery:**
+
+```bash
+ssh docker-vm
+
+# 1. Stop Immich
+cd /opt/homelab/repo/docker/fixed/docker-vm/photos
+docker compose stop immich-server immich-machine-learning
+
+# 2. Restore pg_dump from Restic
+export RESTIC_REPOSITORY="rest:http://augusto:<PASS>@192.168.0.12:8000/augusto/immich"
+export RESTIC_PASSWORD="<password>"
+
+restic snapshots --tag immich-db
+restic restore latest --target /tmp/immich-restore --tag immich-db
+
+# 3. Drop and recreate the database
+docker exec -i immich-db psql -U immich -d postgres -c "DROP DATABASE IF EXISTS immich;"
+docker exec -i immich-db psql -U immich -d postgres -c "CREATE DATABASE immich;"
+
+# 4. Restore the dump
+gunzip -c /tmp/immich-restore/backup/immich-db.sql.gz | \
+    docker exec -i immich-db psql -U immich -d immich
+
+# 5. Restart Immich
+docker compose start immich-server immich-machine-learning
+
+# 6. Verify
+curl -s https://vera.cronova.dev | head -5
+rm -rf /tmp/immich-restore
+```
+
+**Note:** Photos are stored on NAS (`/mnt/nas/photos`) and in the `immich-upload` volume. Only metadata/albums/face data is in PostgreSQL. If the database is unrecoverable, Immich can re-scan the upload library (Settings → Libraries → Scan) but albums and face assignments will be lost.
+
+### Scenario 8: Complete Site Failure (Power/Fire/Theft)
 
 **What survives:** VPS keeps running (Headscale, Uptime Kuma, ntfy, Caddy)
 
@@ -321,7 +417,7 @@ rm -rf /tmp/ha-restore
 1. VPS services continue operating — mesh network and external monitoring intact
 2. Once power/access restored, boot Proxmox (auto-boot on AC power loss)
 3. OPNsense VM starts first (start order 1), then Docker VM (start order 2, 30s delay)
-4. Docker boot orchestrator runs automatically — starts all 13 phases
+4. Docker boot orchestrator runs automatically — starts all 14 phases
 5. NAS boots from USB — all containers recreated from compose files
 6. If hardware destroyed: rebuild from Forgejo repo + Restic backups on NAS
 
@@ -349,7 +445,7 @@ restic -r /tmp/restic-restore/augusto/vaultwarden restore latest --target /tmp/v
 rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 ```
 
-### Scenario 7: Restic Password Lost
+### Scenario 9: Restic Password Lost
 
 **All backups become unrecoverable.** Restic encryption is AES-256 — no backdoor.
 
@@ -376,7 +472,7 @@ rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 |------|-----------|-----------|
 | Repository health check | Weekly (auto, Sundays) | Built into `restic-backup.sh` |
 | Snapshot freshness | Monthly (1st Sunday) | `backup-verify.sh` |
-| Test restore (Headscale, Vaultwarden, HA) | Monthly (1st Sunday) | `backup-verify.sh` |
+| Test restore (Headscale, VW, HA, Paperless, Immich) | Monthly (1st Sunday) | `backup-verify.sh` |
 | Full restore drill | Quarterly | `backup-verify.sh --full` |
 
 See `docs/guides/backup-test-procedure.md` for detailed test procedures.
