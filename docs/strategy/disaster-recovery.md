@@ -46,6 +46,7 @@ All backups use **Restic** with a centralized REST server on the NAS. Each backe
 [Vaultwarden Sidecar]──┐
 [HA Sidecar]────────────┤
 [Paperless Sidecar]─────┼──► Restic REST Server (NAS :8000) ──► /mnt/purple/backup/restic/
+[Immich DB Sidecar]─────┤
 [Coolify Sidecar]───────┘
                               ▲
 [Headscale Sidecar]──► Local backup on VPS (separate — hourly tar.gz)
@@ -72,6 +73,7 @@ All times in PYT (America/Asuncion).
 | Vaultwarden | vaultwarden-backup | 2:00 AM daily | `/augusto/vaultwarden` | vaultwarden-data volume |
 | Home Assistant | homeassistant-backup | 2:30 AM daily | `/augusto/homeassistant` | homeassistant-config volume |
 | Paperless-ngx | paperless-backup | 3:00 AM daily | `/augusto/paperless` | data + media volumes (documents) |
+| Immich | immich-backup | 3:15 AM daily | `/augusto/immich` | PostgreSQL dump (metadata, albums, face data) |
 | Coolify | coolify-backup | 3:30 AM daily | `/augusto/coolify` | PostgreSQL dumps + SSH keys |
 
 **Home Assistant exclusions:** `*.log`, `*.db-shm`, `*.db-wal`, `home-assistant_v2.db`
@@ -81,7 +83,7 @@ All times in PYT (America/Asuncion).
 
 | Target | Location | Contents | Status |
 |--------|----------|----------|--------|
-| Restic REST (NAS) | `/mnt/purple/backup/restic/` | Vaultwarden, HA, Paperless, Coolify | Active (WD Purple 2TB, **97% full**) |
+| Restic REST (NAS) | `/mnt/purple/backup/restic/` | Vaultwarden, HA, Paperless, Immich, Coolify | Active (WD Purple 2TB, **97% full**) |
 | VPS local | `/backup/` in headscale-backup container | Headscale SQLite + config | Active (hourly) |
 | Google Drive (encrypted) | `gdrive-crypt:homelab/` | Restic repos + Headscale backups | Active (4:30 AM daily, rclone crypt) |
 
