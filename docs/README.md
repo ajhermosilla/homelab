@@ -10,7 +10,7 @@ Core infrastructure documentation — what runs where, hardware specs, network t
 |----------|-------------|
 | [services.md](architecture/services.md) | Definitive service inventory (40+ services, ports, dependencies, Guarani names) |
 | [hardware.md](architecture/hardware.md) | Device specs, Tailscale IPs, power budget, storage strategy |
-| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (29 containers), NAS (12 containers), OPNsense |
+| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (31 containers), NAS (12 containers), OPNsense |
 | [mobile-homelab.md](architecture/mobile-homelab.md) | Portable kit (MacBook + Beryl AX + phone) |
 | [vps-architecture.md](architecture/vps-architecture.md) | VPS infrastructure (Headscale, Caddy, monitoring) |
 | [network-topology.md](architecture/network-topology.md) | Network diagrams and connectivity |

@@ -131,6 +131,8 @@ Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage
 | Papa | **Grafana** | 3000 | papa.cronova.dev/grafana | grafana/grafana |
 | Papa | **vmagent** | 8429 | — | victoriametrics/vmagent |
 | Papa | **cAdvisor** | 8080 | — | gcr.io/cadvisor/cadvisor |
+| Papa | **vmalert** | 8880 | — | victoriametrics/vmalert |
+| Papa | **Alertmanager** | 9093 | — | prom/alertmanager |
 
 #### Photos
 
