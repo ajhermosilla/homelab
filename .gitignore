@@ -6,6 +6,7 @@
 secrets/
 secrets.yaml
 htpasswd
+ntfy-token
 env-backup/
 
 # Editor

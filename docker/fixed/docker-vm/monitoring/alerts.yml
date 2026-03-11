@@ -1,0 +1,127 @@
+# vmalert Rules — Homelab Alerting
+# Evaluated against VictoriaMetrics every 30s
+# Notifications routed via Alertmanager → ntfy
+
+groups:
+  # =========================================================================
+  # Host Alerts (node_exporter)
+  # =========================================================================
+  - name: host
+    interval: 30s
+    rules:
+      - alert: HighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value | printf \"%.1f\" }}% for 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value | printf \"%.1f\" }}%."
+
+      - alert: DiskSpaceLow
+        expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space low on {{ $labels.instance }}"
+          description: "{{ $labels.mountpoint }} is {{ $value | printf \"%.1f\" }}% full."
+
+      - alert: DiskSpaceCritical
+        expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk space critical on {{ $labels.instance }}"
+          description: "{{ $labels.mountpoint }} is {{ $value | printf \"%.1f\" }}% full. Immediate action needed."
+
+      - alert: HostDown
+        expr: up{job=~"node-.*"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host {{ $labels.instance }} is down"
+          description: "node_exporter on {{ $labels.instance }} has been unreachable for 2 minutes."
+
+  # =========================================================================
+  # Container Alerts (cAdvisor)
+  # =========================================================================
+  - name: containers
+    interval: 30s
+    rules:
+      - alert: ContainerHighCpu
+        expr: sum by (name) (rate(container_cpu_usage_seconds_total{name!=""}[5m])) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} high CPU"
+          description: "{{ $labels.name }} using {{ $value | printf \"%.1f\" }}% CPU for 10 minutes."
+
+      - alert: ContainerHighMemory
+        expr: container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} near memory limit"
+          description: "{{ $labels.name }} at {{ $value | printf \"%.1f\" }}% of memory limit."
+
+      - alert: ContainerRestarting
+        expr: increase(container_start_time_seconds{name!=""}[15m]) > 3
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} restarting"
+          description: "{{ $labels.name }} has restarted {{ $value | printf \"%.0f\" }} times in 15 minutes."
+
+  # =========================================================================
+  # Scrape Target Alerts (vmagent)
+  # =========================================================================
+  - name: scrape
+    interval: 30s
+    rules:
+      - alert: ScrapeTargetDown
+        expr: up == 0
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Scrape target {{ $labels.job }} is down"
+          description: "{{ $labels.job }} ({{ $labels.instance }}) has been unreachable for 3 minutes."
+
+  # =========================================================================
+  # VictoriaMetrics Health
+  # =========================================================================
+  - name: victoriametrics
+    interval: 60s
+    rules:
+      - alert: VmHighIngestionRate
+        expr: rate(vm_rows_inserted_total[5m]) > 50000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "VictoriaMetrics ingestion spike"
+          description: "Ingesting {{ $value | printf \"%.0f\" }} rows/sec — unusual for this homelab."
+
+      - alert: VmStorageSpaceRunningOut
+        expr: vm_free_disk_space_bytes / vm_data_size_bytes < 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "VictoriaMetrics storage running low"
+          description: "Free disk space is less than current data size. Consider increasing retention or disk."

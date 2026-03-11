@@ -1,0 +1,40 @@
+# Alertmanager Configuration
+# Routes alerts from vmalert to ntfy topics by severity
+
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: ntfy-warning
+  group_by: ['alertname', 'instance']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - match:
+        severity: critical
+      receiver: ntfy-critical
+      repeat_interval: 1h
+    - match:
+        severity: warning
+      receiver: ntfy-warning
+      repeat_interval: 4h
+
+receivers:
+  - name: ntfy-critical
+    webhook_configs:
+      - url: 'https://notify.cronova.dev/cronova-critical'
+        send_resolved: true
+        http_config:
+          authorization:
+            type: Bearer
+            credentials_file: /etc/alertmanager/ntfy-token
+
+  - name: ntfy-warning
+    webhook_configs:
+      - url: 'https://notify.cronova.dev/cronova-warning'
+        send_resolved: true
+        http_config:
+          authorization:
+            type: Bearer
+            credentials_file: /etc/alertmanager/ntfy-token
