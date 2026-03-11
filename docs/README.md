@@ -10,7 +10,7 @@ Core infrastructure documentation — what runs where, hardware specs, network t
 |----------|-------------|
 | [services.md](architecture/services.md) | Definitive service inventory (40+ services, ports, dependencies, Guarani names) |
 | [hardware.md](architecture/hardware.md) | Device specs, Tailscale IPs, power budget, storage strategy |
-| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (28 containers), NAS (12 containers), OPNsense |
+| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (29 containers), NAS (12 containers), OPNsense |
 | [mobile-homelab.md](architecture/mobile-homelab.md) | Portable kit (MacBook + Beryl AX + phone) |
 | [vps-architecture.md](architecture/vps-architecture.md) | VPS infrastructure (Headscale, Caddy, monitoring) |
 | [network-topology.md](architecture/network-topology.md) | Network diagrams and connectivity |
@@ -85,6 +85,7 @@ Future plans and proposals — what's next.
 | [forgejo-github-mirror-2026-03-02.md](plans/forgejo-github-mirror-2026-03-02.md) | Forgejo → GitHub mirror setup |
 | [ha-dashboard-plan-2026-02-24.md](plans/ha-dashboard-plan-2026-02-24.md) | Home Assistant dashboard design |
 | [ha-monitoring-plan-2026-02-24.md](plans/ha-monitoring-plan-2026-02-24.md) | HA monitoring integrations |
+| [crowdsec-opnsense-2026-03-11.md](plans/crowdsec-opnsense-2026-03-11.md) | CrowdSec IPS on OPNsense setup plan |
 | [homelab-expansion-ideas-2026-02-24.md](plans/homelab-expansion-ideas-2026-02-24.md) | Service expansion roadmap |
 | [self-hosted-paas-research-2026-02-25.md](plans/self-hosted-paas-research-2026-02-25.md) | PaaS comparison (Coolify chosen) |
 | [nas-deployment-plan.md](plans/nas-deployment-plan.md) | NAS initial deployment plan |

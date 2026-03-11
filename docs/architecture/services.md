@@ -66,7 +66,7 @@
 | **Uptime Kuma** | 3001 | External monitoring (WebSocket API) | louislam/uptime-kuma:1.23.17 |
 | **ntfy** | 80 | Push notifications | binwiederhier/ntfy |
 
-### Docker VM — 20+ containers, 24/7
+### Docker VM — 29 containers, 24/7
 
 #### Networking
 
@@ -130,6 +130,7 @@ Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage
 | Papa | **VictoriaMetrics** | 8428 | papa.cronova.dev | victoriametrics/victoria-metrics |
 | Papa | **Grafana** | 3000 | papa.cronova.dev/grafana | grafana/grafana |
 | Papa | **vmagent** | 8429 | — | victoriametrics/vmagent |
+| Papa | **cAdvisor** | 8080 | — | gcr.io/cadvisor/cadvisor |
 
 #### Photos
 
