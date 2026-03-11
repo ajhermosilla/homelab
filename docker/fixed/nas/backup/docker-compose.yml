@@ -81,6 +81,10 @@ services:
     image: rclone/rclone:latest
     container_name: offsite-sync
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     init: true
     entrypoint: /bin/sh
     command:
