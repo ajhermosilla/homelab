@@ -23,10 +23,12 @@ How the homelab is monitored, alerted, and observed.
 node_exporter (Docker VM :9100) ──┐
 node_exporter (NAS :9100) ────────┤
 VictoriaMetrics (:8428) ──────────┤
-vmagent (:8429) ──────────────────┼──► vmagent ──► VictoriaMetrics ──► Grafana
-Grafana (:3000) ──────────────────┤    (30s scrape)    (90d retention)    (papa.cronova.dev)
-cAdvisor (:8080) ─────────────────┤
-Home Assistant (/api/prometheus) ──┘
+vmagent (:8429) ──────────────────┤
+Grafana (:3000) ──────────────────┼──► vmagent ──► VictoriaMetrics ──► Grafana
+vmalert (:8880) ──────────────────┤    (30s scrape)    (90d retention)    (papa.cronova.dev)
+Alertmanager (:9093) ─────────────┤                         │
+cAdvisor (:8080) ─────────────────┤                    vmalert ──► Alertmanager ──► ntfy
+Home Assistant (/api/prometheus) ──┘                   (30s eval)    (group/dedup)    (push)
 ```
 
 **Config:** `docker/fixed/docker-vm/monitoring/prometheus.yml`
@@ -41,6 +43,8 @@ Home Assistant (/api/prometheus) ──┘
 | vmagent | `vmagent:8429` | instance: vmagent |
 | grafana | `grafana:3000` | instance: grafana |
 | cadvisor | `cadvisor:8080` | instance: docker-vm |
+| vmalert | `vmalert:8880` | instance: vmalert |
+| alertmanager | `alertmanager:9093` | instance: alertmanager |
 | home-assistant | `host.docker.internal:8123/api/prometheus` | instance: home-assistant |
 
 ### VictoriaMetrics
