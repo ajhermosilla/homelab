@@ -165,6 +165,62 @@ services:
     networks:
       - photos-net
 
+  # =========================================================================
+  # Immich Database Backup Sidecar
+  # Daily pg_dump + restic backup to NAS
+  # Photos are on NAS already — this backs up metadata, albums, face data
+  # =========================================================================
+  immich-backup:
+    image: postgres:17-alpine
+    env_file:
+      - ../../../shared/common.env
+    container_name: immich-backup
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=backup"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+    init: true
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache restic >/dev/null 2>&1
+        echo "15 3 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+        crond -f -l 2
+    volumes:
+      - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/immich-db-backup.sh:/backup.sh:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      PGHOST: immich-db
+      PGUSER: ${DB_USERNAME:-immich}
+      PGPASSWORD: ${DB_PASSWORD}
+      PGDATABASE: ${DB_DATABASE_NAME:-immich}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/immich}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      KEEP_DAILY: "7"
+      KEEP_WEEKLY: "4"
+      KEEP_MONTHLY: "12"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - photos-net
+    depends_on:
+      immich-db:
+        condition: service_healthy
+
 volumes:
   immich-upload:
     name: immich-upload
@@ -218,11 +274,12 @@ networks:
 # RAM CONSIDERATIONS
 # =============================================================================
 #
-# Immich adds ~4.5GB in resource limits:
+# Immich adds ~4.9GB in resource limits:
 #   - immich-server: 2G
 #   - immich-ml: 2G
 #   - immich-db: 512M
 #   - immich-valkey: 128M
+#   - immich-backup: 256M
 #
 # Actual usage is typically much lower (Docker overcommits).
 # Monitor with `docker stats` after deployment.
