@@ -51,6 +51,24 @@ scrape_configs:
           instance: grafana
 
   # =========================================================================
+  # vmalert - Alert Evaluator
+  # =========================================================================
+  - job_name: vmalert
+    static_configs:
+      - targets: ['vmalert:8880']
+        labels:
+          instance: vmalert
+
+  # =========================================================================
+  # Alertmanager
+  # =========================================================================
+  - job_name: alertmanager
+    static_configs:
+      - targets: ['alertmanager:9093']
+        labels:
+          instance: alertmanager
+
+  # =========================================================================
   # cAdvisor - Docker Container Metrics
   # =========================================================================
   - job_name: cadvisor
