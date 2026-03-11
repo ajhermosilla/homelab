@@ -1,6 +1,6 @@
 # Services
 
-40+ services across 3 environments. Guarani names are primary identifiers.
+50+ services across 3 environments. Guarani names are primary identifiers.
 
 ## Service Matrix
 
@@ -33,10 +33,17 @@
 | 25 | Vera | Immich Valkey | Photos | Docker VM | Active |
 | 26 | Vera | Immich DB | Photos | Docker VM | Active |
 | 27 | Aranduka | Paperless-ngx | Documents | Docker VM | Active |
-| 28 | — | Sonarr | Media | Docker VM | Planned |
-| 29 | — | Radarr | Media | Docker VM | Planned |
-| 30 | — | Prowlarr | Media | Docker VM | Planned |
-| 31 | — | qBittorrent | Media | Docker VM | Planned |
+| 28 | — | Sonarr | Media | Docker VM | Active |
+| 29 | — | Radarr | Media | Docker VM | Active |
+| 30 | — | Prowlarr | Media | Docker VM | Active |
+| 31 | — | qBittorrent | Media | Docker VM | Active |
+| 32 | — | paperless-db | Documents | Docker VM | Active |
+| 33 | — | paperless-redis | Documents | Docker VM | Active |
+| 34 | — | paperless-backup | Backup | Docker VM | Active |
+| 35 | — | immich-backup | Backup | Docker VM | Active |
+| 36 | Papa | vmalert | Monitoring | Docker VM | Active |
+| 37 | Papa | Alertmanager | Monitoring | Docker VM | Active |
+| 38 | Papa | cAdvisor | Monitoring | Docker VM | Active |
 | 32 | — | Samba | Storage | NAS | Active |
 | 33 | — | Syncthing | Storage | NAS | Active |
 | 34 | — | Restic REST | Backup | NAS | Active |
@@ -52,7 +59,7 @@
 | 44 | Tajy | coolify-backup | PaaS | NAS | Active |
 | 45 | — | OpenClaw | AI | RPi 5 | Pending |
 
-**Active:** 41 | **Planned:** 4 | **Pending:** 1
+**Active:** 52 | **Pending:** 1
 
 ## By Environment
 
@@ -66,7 +73,7 @@
 | **Uptime Kuma** | 3001 | External monitoring (WebSocket API) | louislam/uptime-kuma:1.23.17 |
 | **ntfy** | 80 | Push notifications | binwiederhier/ntfy |
 
-### Docker VM — 29 containers, 24/7
+### Docker VM — 33 containers, 24/7
 
 #### Networking
 
@@ -110,10 +117,10 @@ Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
 | Yrasema | **Jellyfin** | 8096 | yrasema.cronova.dev | jellyfin/jellyfin |
-| — | **Sonarr** | 8989 | — | Planned |
-| — | **Radarr** | 7878 | — | Planned |
-| — | **Prowlarr** | 9696 | — | Planned |
-| — | **qBittorrent** | 8081, 6881 | — | Planned |
+| — | **Sonarr** | 8989 | — | lscr.io/linuxserver/sonarr |
+| — | **Radarr** | 7878 | — | lscr.io/linuxserver/radarr |
+| — | **Prowlarr** | 9696 | — | lscr.io/linuxserver/prowlarr |
+| — | **qBittorrent** | 8081, 6881 | — | lscr.io/linuxserver/qbittorrent |
 
 #### Tools
 
@@ -157,7 +164,7 @@ Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage
 
 Watchtower uses the maintained fork (nicholas-fedor) — the original containrrr image is abandoned and incompatible with Docker 29+.
 
-### NAS — 11 containers, 24/7
+### NAS — 12 containers, 24/7
 
 | Guarani | Service | Port(s) | Purpose | Image |
 |---------|---------|---------|---------|-------|
@@ -397,8 +404,8 @@ docker/
 ├── vps/
 │   ├── networking/                 # Headscale, Caddy
 │   ├── monitoring/                 # Uptime Kuma, ntfy
-│   ├── scraping/                   # changedetection (planned)
-│   └── backup/                     # Restic REST (planned)
+│   ├── scraping/                   # changedetection
+│   └── backup/                     # Restic REST
 └── shared/
 ```
 
@@ -410,13 +417,14 @@ docker/
 | Surveillance | Frigate (Taguato) | 1 |
 | Automation | Home Assistant (Jara), Mosquitto | 2 |
 | Auth | Authelia (Okẽ), Vaultwarden | 2 |
-| Media | Jellyfin (Yrasema) | 1 |
+| Media | Jellyfin (Yrasema), Sonarr, Radarr, Prowlarr, qBittorrent | 5 |
 | Photos | Immich (Vera) — 4 containers | 4 |
-| Documents | Paperless-ngx (Aranduka) | 1 |
+| Documents | Paperless-ngx (Aranduka), paperless-db, paperless-redis | 3 |
 | Tools | Dozzle (Ysyry), BentoPDF (Kuatia), Homepage (Mbyja) | 3 |
-| Monitoring | VictoriaMetrics + Grafana + vmagent (Papa), Uptime Kuma, ntfy, Glances, Watchtower | 7 |
+| Monitoring | VictoriaMetrics + Grafana + vmagent + vmalert + Alertmanager + cAdvisor (Papa), Uptime Kuma, ntfy, Glances | 10 |
 | Storage | Samba, Syncthing, NFS | 3 |
-| Backup | Restic REST, headscale-backup, vaultwarden-backup, homeassistant-backup, coolify-backup | 5 |
+| Backup | Restic REST, headscale-backup, vaultwarden-backup, homeassistant-backup, paperless-backup, immich-backup, coolify-backup, offsite-sync | 8 |
+| Maintenance | Watchtower | 1 |
 | Git | Forgejo | 1 |
 | PaaS | Coolify (Tajy) — 7 containers | 7 |
 | AI | OpenClaw (pending) | 1 |
