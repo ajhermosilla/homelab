@@ -115,7 +115,7 @@ All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured
 | Docker | 101 | 2 | 9GB | 100GB | 2 (delay: 30) |
 
 - **OPNsense** (VM 100) — Gateway/firewall since 2026-02-21, LAN 192.168.0.1/24
-- **Docker** (VM 101) — 28 containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, monitoring, tools, media
+- **Docker** (VM 101) — 29 containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, monitoring (VM+cAdvisor+Grafana), tools, media
 
 **Network bridges:** nic0/vmbr0 = ISP modem (ARRIS bridge mode), nic1/vmbr1 = MokerLink switch. OPNsense has both NICs; Docker VM has vmbr1 only.
 
