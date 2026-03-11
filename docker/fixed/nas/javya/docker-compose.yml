@@ -8,7 +8,20 @@ services:
   db:
     image: postgres:16-alpine
     container_name: javya-db
-    restart: always
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=apps"
+      - "com.cronova.backup=true"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-javya}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
@@ -20,13 +33,30 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: javya-backend
-    restart: always
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=apps"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-javya}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-javya}
       DEBUG: "false"
@@ -42,6 +72,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       default:
       coolify:
@@ -55,7 +90,19 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL:-}
     container_name: javya-frontend
-    restart: always
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=apps"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
     depends_on:
       - backend
     healthcheck:
@@ -63,6 +110,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       default:
       coolify:
