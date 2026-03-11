@@ -43,6 +43,8 @@ services:
       DNSSEC: "true"
       FTLCONF_dns_listeningMode: all
       QUERY_LOGGING: "true"
+    cap_drop:
+      - ALL
     cap_add:
       - NET_ADMIN
     logging:
