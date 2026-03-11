@@ -42,6 +42,15 @@ scrape_configs:
           instance: vmagent
 
   # =========================================================================
+  # Grafana - Self-monitoring
+  # =========================================================================
+  - job_name: grafana
+    static_configs:
+      - targets: ['grafana:3000']
+        labels:
+          instance: grafana
+
+  # =========================================================================
   # cAdvisor - Docker Container Metrics
   # =========================================================================
   - job_name: cadvisor
