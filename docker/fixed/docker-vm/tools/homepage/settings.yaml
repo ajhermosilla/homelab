@@ -17,13 +17,16 @@ layout:
     columns: 2
   Media:
     style: row
-    columns: 4
+    columns: 5
+  Photos:
+    style: row
+    columns: 1
   Monitoring:
     style: row
-    columns: 3
+    columns: 4
   Tools:
     style: row
-    columns: 3
+    columns: 4
   Infrastructure:
     style: row
-    columns: 3
+    columns: 4
