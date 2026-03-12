@@ -243,6 +243,11 @@ papa.cronova.dev {
 #   - Jellyfin: http://192.168.0.10:8096
 #   - Frigate: https://taguato.cronova.dev (port 5000 localhost-only)
 #
+# Intentionally NOT proxied:
+#   - qBittorrent (127.0.0.1:8081): History of CVEs (path traversal, RCE via
+#     default creds, crypto mining exploits). Access via SSH tunnel or Tailscale:
+#     ssh -L 8081:localhost:8081 docker-vm
+#
 # Docker Network:
 #   Caddy uses caddy-net to reach services bound to 127.0.0.1 (by container name).
 #   Services on 0.0.0.0 (HA, Vaultwarden, Jellyfin, *arr) use host.docker.internal.
