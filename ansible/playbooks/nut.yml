@@ -1,0 +1,365 @@
+# NUT (Network UPS Tools) — graceful shutdown on power loss
+# Usage: ansible-playbook -i inventory.yml playbooks/nut.yml --ask-become-pass
+#
+# Topology:
+#   Forza NT-1012U UPS → USB → NAS (NUT server)
+#   NAS → network → Proxmox (NUT client)
+#
+# Prerequisites:
+#   - UPS connected to NAS via USB
+#   - NUT passwords set in inventory or passed via -e:
+#     -e "nut_admin_pass=xxx nut_monitor_pass=xxx nut_slave_pass=xxx"
+#   - NAS sudo requires password (use --ask-become-pass)
+#
+# After running:
+#   1. Verify UPS detection: ssh nas "upsc forza@localhost"
+#   2. Verify client: ssh proxmox "upsc forza@192.168.0.12"
+#   3. Test notifications: ssh nas "NOTIFYTYPE=ONBATT /usr/local/bin/nut-notify.sh"
+#
+# See docs/guides/nut-config.md for manual setup and troubleshooting.
+
+# =============================================================================
+# Play 1: NAS — NUT Server (master)
+# =============================================================================
+---
+- name: "[NUT] Configure NAS as NUT server"
+  hosts: nas
+  become: true
+
+  vars:
+    nut_ups_name: forza
+    nut_ups_driver: blazer_usb
+    nut_ups_desc: "Forza NT-1012U 1000VA"
+    nut_listen_port: 3493
+    nas_lan_ip: "{{ nas_lan_ip | default('192.168.0.12') }}"
+    ntfy_url: "https://notify.cronova.dev/cronova-critical"
+    # Pass via -e or add to inventory/vault
+    nut_admin_pass: "{{ nut_admin_pass | default('changeme-admin') }}"
+    nut_monitor_pass: "{{ nut_monitor_pass | default('changeme-monitor') }}"
+    nut_slave_pass: "{{ nut_slave_pass | default('changeme-slave') }}"
+
+  tasks:
+    # =========================================================================
+    # Install
+    # =========================================================================
+    - name: Install NUT packages
+      apt:
+        name:
+          - nut
+          - nut-server
+          - nut-client
+        state: present
+        update_cache: yes
+
+    # =========================================================================
+    # UPS Detection
+    # =========================================================================
+    - name: Check if UPS is connected via USB
+      shell: lsusb | grep -i ups || lsusb | grep "0001:0000"
+      register: ups_usb
+      changed_when: false
+      ignore_errors: true
+
+    - name: Display UPS detection result
+      debug:
+        msg: "{{ 'UPS detected: ' + ups_usb.stdout if ups_usb.rc == 0 else 'WARNING: UPS not detected on USB. Check cable and run: sudo nut-scanner -U' }}"
+
+    - name: Add nut user to dialout group (USB permissions)
+      user:
+        name: nut
+        groups: dialout
+        append: yes
+
+    # =========================================================================
+    # Configuration Files
+    # =========================================================================
+    - name: Configure UPS driver (ups.conf)
+      copy:
+        dest: /etc/nut/ups.conf
+        owner: root
+        group: nut
+        mode: '0640'
+        content: |
+          [{{ nut_ups_name }}]
+              driver = {{ nut_ups_driver }}
+              port = auto
+              desc = "{{ nut_ups_desc }}"
+              vendorid = 0001
+              productid = 0000
+              default.battery.voltage.high = 26.0
+              default.battery.voltage.low = 20.8
+      notify: Restart NUT server
+
+    - name: Configure NUT mode as netserver (nut.conf)
+      copy:
+        dest: /etc/nut/nut.conf
+        owner: root
+        group: nut
+        mode: '0644'
+        content: |
+          MODE=netserver
+      notify: Restart NUT server
+
+    - name: Configure network access (upsd.conf)
+      copy:
+        dest: /etc/nut/upsd.conf
+        owner: root
+        group: nut
+        mode: '0640'
+        content: |
+          LISTEN 0.0.0.0 {{ nut_listen_port }}
+          LISTEN :: {{ nut_listen_port }}
+      notify: Restart NUT server
+
+    - name: Configure NUT users (upsd.users)
+      copy:
+        dest: /etc/nut/upsd.users
+        owner: root
+        group: nut
+        mode: '0640'
+        content: |
+          [admin]
+              password = {{ nut_admin_pass }}
+              actions = SET
+              instcmds = ALL
+
+          [upsmon]
+              password = {{ nut_monitor_pass }}
+              upsmon master
+
+          [upsmon_slave]
+              password = {{ nut_slave_pass }}
+              upsmon slave
+      notify: Restart NUT server
+
+    - name: Configure UPS monitor - master (upsmon.conf)
+      copy:
+        dest: /etc/nut/upsmon.conf
+        owner: root
+        group: nut
+        mode: '0640'
+        content: |
+          MONITOR {{ nut_ups_name }}@localhost 1 upsmon {{ nut_monitor_pass }} master
+          MINSUPPLIES 1
+          SHUTDOWNCMD "/sbin/shutdown -h +0"
+          POLLFREQ 5
+          POLLFREQALERT 5
+          HOSTSYNC 15
+          DEADTIME 15
+          POWERDOWNFLAG /etc/killpower
+
+          # Notifications via ntfy
+          NOTIFYCMD /usr/local/bin/nut-notify.sh
+          NOTIFYFLAG ONLINE     SYSLOG+WALL+EXEC
+          NOTIFYFLAG ONBATT     SYSLOG+WALL+EXEC
+          NOTIFYFLAG LOWBATT    SYSLOG+WALL+EXEC
+          NOTIFYFLAG FSD        SYSLOG+WALL+EXEC
+          NOTIFYFLAG SHUTDOWN   SYSLOG+WALL+EXEC
+      notify: Restart NUT client
+
+    # =========================================================================
+    # Notification Script
+    # =========================================================================
+    - name: Deploy ntfy notification script
+      copy:
+        dest: /usr/local/bin/nut-notify.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          # NUT notification script — sends UPS events to ntfy
+
+          NTFY_URL="{{ ntfy_url }}"
+
+          case $NOTIFYTYPE in
+              ONLINE)
+                  MSG="UPS is back on line power"
+                  ;;
+              ONBATT)
+                  MSG="UPS is on battery — check power"
+                  ;;
+              LOWBATT)
+                  MSG="UPS battery is LOW — shutdown imminent"
+                  ;;
+              FSD)
+                  MSG="UPS forced shutdown in progress"
+                  ;;
+              SHUTDOWN)
+                  MSG="System is shutting down"
+                  ;;
+              *)
+                  MSG="UPS event: $NOTIFYTYPE"
+                  ;;
+          esac
+
+          # Send to ntfy (critical priority for power events)
+          curl -s -d "$MSG" -H "Priority: urgent" "$NTFY_URL" 2>/dev/null
+
+          # Log locally
+          logger -t nut-notify "$MSG"
+
+    # =========================================================================
+    # Firewall
+    # =========================================================================
+    - name: Allow NUT port through UFW
+      ufw:
+        rule: allow
+        port: "{{ nut_listen_port }}"
+        proto: tcp
+        comment: "NUT UPS monitor"
+      tags: firewall
+
+    # =========================================================================
+    # Enable Services
+    # =========================================================================
+    - name: Enable and start NUT server
+      service:
+        name: nut-server
+        state: started
+        enabled: yes
+
+    - name: Enable and start NUT client (local monitor)
+      service:
+        name: nut-client
+        state: started
+        enabled: yes
+
+    # =========================================================================
+    # Verify
+    # =========================================================================
+    - name: Query UPS status
+      command: upsc {{ nut_ups_name }}@localhost
+      register: ups_status
+      changed_when: false
+      ignore_errors: true
+
+    - name: Display UPS status
+      debug:
+        msg: "{{ ups_status.stdout_lines[:10] if ups_status.rc == 0 else 'UPS query failed — check driver with: sudo upsdrvctl start' }}"
+
+  handlers:
+    - name: Restart NUT server
+      service:
+        name: nut-server
+        state: restarted
+
+    - name: Restart NUT client
+      service:
+        name: nut-client
+        state: restarted
+
+# =============================================================================
+# Play 2: Proxmox — NUT Client (slave)
+# =============================================================================
+- name: "[NUT] Configure Proxmox as NUT client"
+  hosts: oga
+  become: true
+
+  vars:
+    nut_ups_name: forza
+    nas_lan_ip: "{{ nas_lan_ip | default('192.168.0.12') }}"
+    nut_slave_pass: "{{ nut_slave_pass | default('changeme-slave') }}"
+
+  tasks:
+    # =========================================================================
+    # Install
+    # =========================================================================
+    - name: Install NUT client
+      apt:
+        name: nut-client
+        state: present
+        update_cache: yes
+
+    # =========================================================================
+    # Configuration
+    # =========================================================================
+    - name: Configure NUT mode as netclient (nut.conf)
+      copy:
+        dest: /etc/nut/nut.conf
+        owner: root
+        group: nut
+        mode: '0644'
+        content: |
+          MODE=netclient
+      notify: Restart NUT client
+
+    - name: Configure UPS monitor - slave (upsmon.conf)
+      copy:
+        dest: /etc/nut/upsmon.conf
+        owner: root
+        group: nut
+        mode: '0640'
+        content: |
+          MONITOR {{ nut_ups_name }}@{{ nas_lan_ip }} 1 upsmon_slave {{ nut_slave_pass }} slave
+          MINSUPPLIES 1
+          SHUTDOWNCMD "/sbin/shutdown -h +0"
+          POLLFREQ 5
+          POLLFREQALERT 5
+          DEADTIME 25
+
+          NOTIFYFLAG ONLINE     SYSLOG+WALL
+          NOTIFYFLAG ONBATT     SYSLOG+WALL
+          NOTIFYFLAG LOWBATT    SYSLOG+WALL
+          NOTIFYFLAG FSD        SYSLOG+WALL
+          NOTIFYFLAG SHUTDOWN   SYSLOG+WALL
+      notify: Restart NUT client
+
+    # =========================================================================
+    # Enable Service
+    # =========================================================================
+    - name: Enable and start NUT client
+      service:
+        name: nut-client
+        state: started
+        enabled: yes
+
+    # =========================================================================
+    # Verify
+    # =========================================================================
+    - name: Query UPS via network
+      command: upsc {{ nut_ups_name }}@{{ nas_lan_ip }}
+      register: ups_remote
+      changed_when: false
+      ignore_errors: true
+
+    - name: Display remote UPS status
+      debug:
+        msg: "{{ ups_remote.stdout_lines[:5] if ups_remote.rc == 0 else 'Cannot reach NUT server — check NAS is running and UFW allows port 3493' }}"
+
+    - name: Display next steps
+      debug:
+        msg: |
+          NUT client configured on Proxmox.
+
+          Verify: upsc {{ nut_ups_name }}@{{ nas_lan_ip }}
+
+          On power loss, this host will gracefully shut down when
+          NAS (master) signals FSD (forced shutdown).
+
+  handlers:
+    - name: Restart NUT client
+      service:
+        name: nut-client
+        state: restarted
+
+# =============================================================================
+# NOTES
+# =============================================================================
+#
+# UPS Driver Troubleshooting:
+#   If blazer_usb doesn't work, try nutdrv_qx:
+#     ansible-playbook -i inventory.yml playbooks/nut.yml \
+#       -e "nut_ups_driver=nutdrv_qx" --ask-become-pass
+#
+# Test shutdown sequence (CAREFUL — will actually shut down!):
+#   ssh nas "sudo upsmon -c fsd"
+#
+# Test notifications only:
+#   ssh nas "NOTIFYTYPE=ONBATT /usr/local/bin/nut-notify.sh"
+#
+# Add Uptime Kuma monitor:
+#   TCP check: 192.168.0.12:3493
+#
+# Future: Prometheus metrics via nut_exporter
+#   See docs/guides/nut-config.md for details
+#
+# =============================================================================
