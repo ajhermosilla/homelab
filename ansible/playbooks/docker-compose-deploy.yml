@@ -12,7 +12,7 @@
 
   vars:
     homelab_base: /opt/homelab
-    homelab_repo: "https://github.com/ajhermosilla/homelab.git"
+    homelab_repo: "https://git.cronova.dev/augusto/homelab.git"
     compose_action: "up"  # up, down, restart, pull
     nas_ip: "192.168.0.12"  # NAS IP for NFS mounts
     # Stack base paths per environment

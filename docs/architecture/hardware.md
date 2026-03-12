@@ -64,7 +64,7 @@ Always-on infrastructure at home.
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
 | AOOSTAR Mini PC (Oga) | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
-| NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian 13 (11 containers) | Active |
+| NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian 13 (19 containers) | Active |
 | Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | OpenClaw (AI assistant) | Pending (PSU in transit) |
 | Raspberry Pi 4 | 4GB RAM, 1TB external SSD | Start9 (Bitcoin node) | Pending setup |
 
@@ -159,14 +159,16 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 | Boot USB | Generic Flash Disk 3.7GB | EFI (512M FAT32) + /boot (3.1G ext4) — must stay plugged in |
 | OS | Debian 13 (Trixie) | Docker data-root at /data/docker (SSD) |
 
-**NAS Containers (11 active):**
+**NAS Containers (19 active):**
 - Samba (network shares) — justinpatchett/samba
 - Syncthing 2.0.14 (file sync)
 - Restic REST 0.14.0 (backup target, data at /mnt/purple/backup/restic/)
+- Offsite Sync (rclone crypt to Google Drive)
 - Forgejo 11 (git server, data at /srv/forgejo)
 - Glances (system monitoring)
-- NFS (kernel, exports Purple 2TB for Frigate on Docker VM)
 - Coolify + 6 sub-containers (PaaS, data at /data/coolify/)
+- Katupyry (3 containers: app, db, redis — personal finance tool)
+- Javya (3 containers: app, db, redis — worship planning tool)
 
 **Boot:** USB UEFI → GRUB → kernel/initramfs → SSD LVM root. USB only read during first 2s of boot.
 
@@ -231,7 +233,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
      |          |          |           |           |           |
 [Docker VM] [NAS]    [RPi 5]    [WiFi AP]   [PoE Switch]  [Proxmox mgmt]
  VM 101    .0.12    .0.20      AX50          .0.237
- .0.10     11 cnt   pending                       |
+ .0.10     19 cnt   pending                       |
  20+ cnt                              +-----------+-----------+
                                       |           |           |
                                  [front_door] [back_yard]  [indoor]
@@ -245,7 +247,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 | Device | Running Containers | Key Services |
 |--------|-------------------|--------------|
 | Docker VM | 33 | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (BentoPDF), Papa (VictoriaMetrics+Grafana+vmagent+vmalert+Alertmanager+cAdvisor), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower, media (*arr stack), backup sidecars |
-| NAS | 12 | Forgejo, Tajy (Coolify + 6 sub-containers), Samba, Syncthing, Restic REST, Offsite Sync, Glances |
+| NAS | 19 | Forgejo, Tajy (Coolify + 6 sub-containers), Samba, Syncthing, Restic REST, Offsite Sync, Glances, Katupyry (3), Javya (3) |
 | RPi 5 | — | OpenClaw (pending PSU) |
 | RPi 4 | — | Bitcoin Core, LND, Electrum Server (Start9) |
 
