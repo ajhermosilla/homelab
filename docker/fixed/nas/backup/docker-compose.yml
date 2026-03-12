@@ -78,7 +78,7 @@ services:
   #    ssh nas "cat /root/.ssh/offsite-key.pub" | ssh vps "cat >> ~/.ssh/authorized_keys"
   #
   offsite-sync:
-    image: rclone/rclone:latest
+    image: rclone/rclone:1.73.2
     container_name: offsite-sync
     restart: unless-stopped
     security_opt:
@@ -93,6 +93,11 @@ services:
         apk add --no-cache openssh-client rsync curl
         echo "30 4 * * * /sync.sh >> /proc/1/fd/1 2>&1" | crontab -
         crond -f -l 2
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep crond || exit 1"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=backup"

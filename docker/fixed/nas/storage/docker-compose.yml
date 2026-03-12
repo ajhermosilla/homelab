@@ -8,8 +8,8 @@ services:
   # https://www.samba.org/
   # =========================================================================
   samba:
-    # Maintained fork of dperson/samba (https://github.com/jlaptechnologies/samba)
-    image: justinpatchett/samba
+    # https://github.com/dockur/samba — actively maintained, versioned tags
+    image: dockurr/samba:4.23.5
     env_file:
       - ../../../shared/common.env
     container_name: samba
@@ -31,30 +31,21 @@ services:
           memory: 512M
           cpus: '1'
     ports:
-      - "139:139"
       - "445:445"
     volumes:
       - ${MEDIA_PATH:-/srv/media}:/media
       - ${DATA_PATH:-/srv/data}:/data
       - ${DOWNLOADS_PATH:-/srv/downloads}:/downloads
       - ${BACKUP_PATH:-/srv/backup}:/backup
+      - ./smb.conf:/etc/samba/smb.conf
     environment:
       TZ: ${TZ:-America/Asuncion}
-      USERID: ${PUID:-1000}
-      GROUPID: ${PGID:-1000}
-    # ⚠️  SECURITY: Password visible in `docker inspect`. This is a limitation of
-    # the samba image CLI. Mitigations:
-    #   1. Use a strong, unique password in .env
-    #   2. Restrict container access (only trusted users can run docker commands)
-    command: >
-      -u "${SAMBA_USER:-augusto};${SAMBA_PASSWORD:?SAMBA_PASSWORD required in .env}"
-      -s "media;/media;yes;no;no;augusto"
-      -s "data;/data;yes;no;no;augusto"
-      -s "downloads;/downloads;yes;no;no;augusto"
-      -s "backup;/backup;yes;no;no;augusto"
-      -p
+      USER: ${SAMBA_USER:-augusto}
+      PASS: ${SAMBA_PASSWORD:?SAMBA_PASSWORD required in .env}
+      UID: ${PUID:-1000}
+      GID: ${PGID:-1000}
     healthcheck:
-      test: ["CMD", "smbclient", "-L", "localhost", "-U", "%"]
+      test: ["CMD-SHELL", "smbclient -L localhost -U % -N 2>&1 | grep -q media"]
       interval: 60s
       timeout: 10s
       retries: 3
