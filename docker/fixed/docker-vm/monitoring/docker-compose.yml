@@ -8,7 +8,7 @@ services:
   # https://victoriametrics.com/
   # =========================================================================
   victoriametrics:
-    image: victoriametrics/victoria-metrics:latest
+    image: victoriametrics/victoria-metrics:v1.137.0
     env_file:
       - ../../../shared/common.env
     container_name: victoriametrics
@@ -47,7 +47,7 @@ services:
   # https://docs.victoriametrics.com/vmagent/
   # =========================================================================
   vmagent:
-    image: victoriametrics/vmagent:latest
+    image: victoriametrics/vmagent:v1.137.0
     env_file:
       - ../../../shared/common.env
     container_name: vmagent
@@ -88,7 +88,7 @@ services:
   # https://docs.victoriametrics.com/vmalert/
   # =========================================================================
   vmalert:
-    image: victoriametrics/vmalert:latest
+    image: victoriametrics/vmalert:v1.137.0
     env_file:
       - ../../../shared/common.env
     container_name: vmalert
@@ -131,7 +131,7 @@ services:
   # https://prometheus.io/docs/alerting/latest/alertmanager/
   # =========================================================================
   alertmanager:
-    image: prom/alertmanager:latest
+    image: prom/alertmanager:v0.31.1
     env_file:
       - ../../../shared/common.env
     container_name: alertmanager
@@ -210,7 +210,7 @@ services:
   # https://grafana.com/
   # =========================================================================
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:12.4.0
     env_file:
       - ../../../shared/common.env
     container_name: grafana

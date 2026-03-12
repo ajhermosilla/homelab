@@ -8,7 +8,7 @@ services:
   # https://www.authelia.com/
   # =========================================================================
   authelia:
-    image: authelia/authelia:latest
+    image: authelia/authelia:4.39.15
     env_file:
       - ../../../shared/common.env
     container_name: authelia
