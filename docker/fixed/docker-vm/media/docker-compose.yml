@@ -91,7 +91,7 @@ services:
           memory: 1G
           cpus: '1'
     ports:
-      - "8989:8989"
+      - "127.0.0.1:8989:8989"
     volumes:
       - sonarr-config:/config
       - ${MEDIA_PATH:-/mnt/nas/media}:/media
@@ -141,7 +141,7 @@ services:
           memory: 1G
           cpus: '1'
     ports:
-      - "7878:7878"
+      - "127.0.0.1:7878:7878"
     volumes:
       - radarr-config:/config
       - ${MEDIA_PATH:-/mnt/nas/media}:/media
@@ -191,7 +191,7 @@ services:
           memory: 512M
           cpus: '0.5'
     ports:
-      - "9696:9696"
+      - "127.0.0.1:9696:9696"
     volumes:
       - prowlarr-config:/config
     environment:
@@ -235,7 +235,7 @@ services:
           memory: 2G
           cpus: '2'
     ports:
-      - "8081:8080"       # Web UI (8081 to avoid conflicts)
+      - "127.0.0.1:8081:8080"  # Web UI (localhost only, via Caddy)
       - "6881:6881/tcp"   # Torrent
       - "6881:6881/udp"   # Torrent
     volumes:
