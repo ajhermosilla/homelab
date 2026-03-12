@@ -38,7 +38,7 @@ services:
           memory: 256M
           cpus: '0.5'
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Must be 0.0.0.0 — Docker VM backup sidecars push here
     volumes:
       - ${BACKUP_DATA:-/srv/backup/restic}:/data
       - ./htpasswd:/data/.htpasswd:ro

@@ -33,7 +33,7 @@ services:
           memory: 256M
           cpus: '0.5'
     ports:
-      - "61208:61208"
+      - "61208:61208"  # Must be 0.0.0.0 — HA on Docker VM queries via LAN/Tailscale
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:

@@ -34,7 +34,7 @@ services:
           memory: 256M
           cpus: '0.5'
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     volumes:
       - uptime-kuma-data:/app/data
     environment:
@@ -79,7 +79,7 @@ services:
     command:
       - serve
     ports:
-      - "8080:80"  # Behind Caddy at notify.cronova.dev
+      - "127.0.0.1:8080:80"  # Behind Caddy at notify.cronova.dev
     volumes:
       - ntfy-cache:/var/cache/ntfy
       - ntfy-config:/etc/ntfy
