@@ -49,6 +49,7 @@ services:
     networks:
       - headscale-net
       - monitoring-net
+      - adguard-net
 
 volumes:
   caddy-data:
@@ -60,6 +61,8 @@ networks:
   headscale-net:
     external: true
   monitoring-net:
+    external: true
+  adguard-net:
     external: true
 
 # =============================================================================

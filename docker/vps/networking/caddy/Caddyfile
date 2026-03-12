@@ -45,6 +45,11 @@ notify.cronova.dev {
     reverse_proxy ntfy:80
 }
 
+# AdGuard Home - DNS ad-blocking (yvaga = sky in Guarani)
+yvaga.cronova.dev {
+    reverse_proxy adguard:3000
+}
+
 # changedetection.io - Website monitoring
 # watch.cronova.dev {
 #     reverse_proxy changedetection:5000

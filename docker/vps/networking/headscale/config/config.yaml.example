@@ -67,10 +67,13 @@ dns:
   base_domain: hs.net
 
   # Nameservers for Tailscale clients
+  # Primary: AdGuard Home on VPS (ad-blocking + Unbound recursive resolver)
+  # Fallback: Cloudflare (if VPS is unreachable, no ad-blocking)
+  # VPS must have --accept-dns=false to avoid recursive loop (see incident doc)
   nameservers:
     global:
-      - 1.1.1.1      # Cloudflare (public fallback)
-      - 9.9.9.9      # Quad9 (public fallback)
+      - 100.77.172.46  # VPS AdGuard Home (yvaga) — private, ad-blocked
+      - 1.1.1.1        # Cloudflare (fallback only)
     # NOTE: Do NOT add split DNS pointing to 100.100.100.100 (MagicDNS).
     # It creates a recursive loop on the VPS (headscale node) because
     # MagicDNS forwards to itself. See: docs/journal/incident-2026-03-12-dns-loop.md
