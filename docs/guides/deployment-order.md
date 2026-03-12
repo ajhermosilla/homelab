@@ -2,6 +2,34 @@
 
 Service deployment order and dependency graph for the homelab infrastructure.
 
+## Boot Orchestrator (Docker VM)
+
+On reboot, the Docker VM uses a systemd service to start stacks in correct order:
+
+- **Service**: `docker-boot-orchestrator.service` (runs after `docker.service`)
+- **Script**: `/opt/homelab/repo/scripts/docker-boot-orchestrator.sh`
+- **Ansible file**: `ansible/files/docker-boot-orchestrator.service`
+
+The orchestrator:
+1. Waits for Docker daemon (60s timeout)
+2. Waits for NFS mount at `/mnt/nas/frigate` (300s timeout, non-fatal)
+3. Stops all containers for clean state
+4. Starts stacks in phases 4–13 (see below)
+
+Safe to re-run manually: `sudo systemctl restart docker-boot-orchestrator`
+
+## Docker Network Dependencies
+
+Stacks communicate via external Docker networks. The **creating stack must start first**.
+
+| Network | Created By | Consumed By |
+|---------|-----------|-------------|
+| `caddy-net` | networking/caddy | auth, tools, documents, monitoring (grafana), photos (immich) |
+| `mqtt-net` | automation | security (frigate) |
+| `monitoring-net` | monitoring | _(internal only)_ |
+
+If a consuming stack starts before the creating stack, it will fail with a network-not-found error.
+
 ## Dependency Graph
 
 ```
@@ -85,104 +113,96 @@ Service deployment order and dependency graph for the homelab infrastructure.
 
 ## Deployment Commands by Phase
 
+> **Note**: Use SSH aliases (`vps`, `docker-vm`, `nas`) from `~/.ssh/config`.
+
 ### Phase 1: VPS Foundation
 
 ```bash
-# SSH to VPS
-ssh linuxuser@vps.cronova.dev
+ssh vps
 
-# 1. Headscale (FIRST - enables mesh for everything else)
-cd /opt/homelab/repo/docker/vps/networking/headscale
-docker compose up -d
+# 1. Headscale (FIRST — enables mesh for everything else)
+cd /opt/homelab/repo/docker/vps/networking/headscale && docker compose up -d
 # Create user and auth key for other devices
 
 # 2. Caddy (TLS termination)
-cd /opt/homelab/repo/docker/vps/networking/caddy
-docker compose up -d
+cd /opt/homelab/repo/docker/vps/networking/caddy && docker compose up -d
 
 # 3. Pi-hole (backup DNS)
-cd /opt/homelab/repo/docker/vps/networking/pihole
-docker compose up -d
+cd /opt/homelab/repo/docker/vps/networking/pihole && docker compose up -d
 
 # 4. DERP Relay
-cd /opt/homelab/repo/docker/vps/networking/derp
-docker compose up -d
+cd /opt/homelab/repo/docker/vps/networking/derp && docker compose up -d
 
 # 5. Monitoring (Uptime Kuma + ntfy)
-cd /opt/homelab/repo/docker/vps/monitoring
-docker compose up -d
+cd /opt/homelab/repo/docker/vps/monitoring && docker compose up -d
 
-# 6. Backup server
-cd /opt/homelab/repo/docker/vps/backup
-docker compose up -d
+# 6. Scraping
+cd /opt/homelab/repo/docker/vps/scraping && docker compose up -d
+
+# 7. Backup
+cd /opt/homelab/repo/docker/vps/backup && docker compose up -d
 ```
 
-### Phase 2: Fixed Homelab - Networking
+### Phase 2: NAS Services
 
 ```bash
-# SSH to Docker VM (join Tailscale first)
-ssh user@100.68.63.168
+ssh nas
 
-# 1. Pi-hole (local DNS)
-cd /opt/homelab/repo/docker/fixed/docker-vm/networking/pihole
-docker compose up -d
+# 1. Backup (Restic REST server — needed by Docker VM backup sidecars)
+cd /opt/homelab/repo/docker/fixed/nas/backup && docker compose up -d
 
-# 2. Caddy (local reverse proxy)
-cd /opt/homelab/repo/docker/fixed/docker-vm/networking/caddy
-docker compose up -d
+# 2. Git (Forgejo)
+cd /opt/homelab/repo/docker/fixed/nas/git && docker compose up -d
+
+# 3. Storage (Samba + Syncthing)
+cd /opt/homelab/repo/docker/fixed/nas/storage && docker compose up -d
+
+# 4. Monitoring (Glances)
+cd /opt/homelab/repo/docker/fixed/nas/monitoring && docker compose up -d
+
+# 5. PaaS (Coolify — separate start command)
+cd /data/coolify/source && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
-### Phase 3: Fixed Homelab - Core Services
+### Phase 3: Docker VM (boot orchestrator handles this on reboot)
+
+The boot orchestrator runs these in order. For manual deployment:
 
 ```bash
-# 1. Automation (Mosquitto MUST be first)
-cd /opt/homelab/repo/docker/fixed/docker-vm/automation
-docker compose up -d
-# Wait for Mosquitto to be healthy before proceeding
+ssh docker-vm
+BASE=/opt/homelab/repo/docker/fixed/docker-vm
 
-# 2. Security (Vaultwarden)
-cd /opt/homelab/repo/docker/fixed/docker-vm/security
-docker compose up -d vaultwarden vaultwarden-backup
-# Note: Frigate requires NFS, deploy later
-```
+# Phase 4:  Networking — creates caddy-net (required by most stacks)
+cd $BASE/networking/pihole && docker compose up -d
+cd $BASE/networking/caddy && docker compose up -d
 
-### Phase 4: NAS & Storage
+# Phase 5:  Automation — creates mqtt-net (required by security/frigate)
+cd $BASE/automation && docker compose up -d
+# Wait for mosquitto to be healthy before proceeding
 
-```bash
-# SSH to NAS
-ssh user@100.82.77.97
+# Phase 6:  Security — frigate joins mqtt-net, needs NFS
+cd $BASE/security && docker compose up -d
 
-# 1. Storage (Samba + Syncthing)
-cd /opt/homelab/repo/docker/fixed/nas/storage
-docker compose up -d
+# Phase 7:  Auth (Authelia — forward auth for protected services)
+cd $BASE/auth && docker compose up -d
 
-# 2. Backup (Restic REST server)
-cd /opt/homelab/repo/docker/fixed/nas/backup
-docker compose up -d
-```
+# Phase 8:  Tools (Dozzle, BentoPDF, Homepage)
+cd $BASE/tools && docker compose up -d
 
-### Phase 5: Media & Security (NFS-dependent)
+# Phase 9:  Documents (Paperless-ngx)
+cd $BASE/documents && docker compose up -d
 
-```bash
-# Back on Docker VM - verify NFS mounts first
-mount | grep nfs
-# Should show /mnt/nas/media and /mnt/nas/frigate
+# Phase 10: Monitoring (VictoriaMetrics, vmagent, vmalert, Alertmanager, cAdvisor, Grafana)
+cd $BASE/monitoring && docker compose up -d
 
-# 1. Frigate (now that NFS is ready)
-cd /opt/homelab/repo/docker/fixed/docker-vm/security
-docker compose up -d frigate
+# Phase 11: Photos (Immich)
+cd $BASE/photos && docker compose up -d
 
-# 2. Media stack
-cd /opt/homelab/repo/docker/fixed/docker-vm/media
-docker compose up -d
-```
+# Phase 12: Media (Jellyfin, Sonarr, Radarr, Prowlarr, qBittorrent — NFS-dependent)
+cd $BASE/media && docker compose up -d
 
-### Phase 6: Maintenance
-
-```bash
-# Deploy LAST - will auto-update labeled containers
-cd /opt/homelab/repo/docker/fixed/docker-vm/maintenance
-docker compose up -d
+# Phase 13: Maintenance (Watchtower — always last)
+cd $BASE/maintenance && docker compose up -d
 ```
 
 ## Using Ansible
@@ -201,20 +221,25 @@ ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker_
 
 ## Service Dependencies
 
-| Service | Depends On | Notes |
-|---------|------------|-------|
-| **Headscale** | None | Deploy first, enables mesh |
-| **Caddy (VPS)** | Headscale | TLS for hs.cronova.dev |
-| **Pi-hole** | None | Can run standalone |
-| **DERP** | Headscale | Relay for NAT traversal |
-| **Uptime Kuma** | ntfy (optional) | For notifications |
-| **Mosquitto** | None | MQTT broker |
-| **Home Assistant** | Mosquitto | For MQTT integration |
-| **Frigate** | Mosquitto, NFS | Events via MQTT, recordings on NFS |
-| **Vaultwarden** | None | Can run standalone |
-| **Jellyfin** | NFS | Media files on NAS |
-| **Sonarr/Radarr** | Prowlarr, qBittorrent | Indexers and downloads |
-| **Watchtower** | All others | Updates labeled containers |
+| Service | Depends On | Network | Notes |
+|---------|------------|---------|-------|
+| **Headscale** | None | headscale-net | Deploy first, enables mesh |
+| **Caddy (VPS)** | Headscale | headscale-net, monitoring-net | TLS for hs.cronova.dev |
+| **Pi-hole** | None | — | Can run standalone |
+| **DERP** | Headscale | derp-net | Relay for NAT traversal |
+| **Uptime Kuma** | ntfy (optional) | monitoring-net | For notifications |
+| **Caddy (Docker VM)** | None | **creates caddy-net** | Must start before auth/tools/docs/monitoring/photos |
+| **Mosquitto** | None | **creates mqtt-net** | Must start before Frigate |
+| **Home Assistant** | Mosquitto (healthy) | automation-net, mqtt-net | MQTT integration |
+| **Frigate** | Mosquitto, NFS | security-net, mqtt-net | Events via MQTT, recordings on NFS |
+| **Authelia** | Caddy | caddy-net | Forward auth for protected services |
+| **Vaultwarden** | None | security-net | Can run standalone |
+| **Grafana** | VictoriaMetrics (healthy) | monitoring-net, caddy-net | Dashboards |
+| **Immich** | Caddy | photos-net, caddy-net | Photo management |
+| **Paperless-ngx** | Caddy | documents-net, caddy-net | Document management |
+| **Jellyfin** | NFS | media-net | Media files on NAS |
+| **Sonarr/Radarr** | Prowlarr, qBittorrent | media-net | Indexers and downloads |
+| **Watchtower** | All others | — | Updates labeled containers, deploy last |
 
 ## Critical Path
 
@@ -268,33 +293,71 @@ If everything goes down, restart in this order:
 
 ## Stack Interdependencies
 
-### Automation Stack
-- **Mosquitto** → standalone, no dependencies
+### Networking Stack (creates caddy-net)
+- **Pi-hole** → standalone, host network
+- **Caddy** → creates `caddy-net` external network
+
+### Automation Stack (creates mqtt-net)
+- **Mosquitto** → standalone, creates `mqtt-net`
 - **Home Assistant** → requires healthy Mosquitto
 - **homeassistant-backup** → requires Home Assistant
 
-### Security Stack
+### Security Stack (joins mqtt-net)
 - **Vaultwarden** → standalone
-- **Frigate** → requires Mosquitto (automation stack) + NFS mount
+- **Frigate** → requires Mosquitto (automation stack) + NFS mount + mqtt-net
 - **vaultwarden-backup** → requires Vaultwarden
 
-### Media Stack
+### Auth Stack (joins caddy-net)
+- **Authelia** → requires caddy-net (forward auth via Caddy)
+
+### Tools Stack (joins caddy-net)
+- **Dozzle** → requires caddy-net + Docker socket
+- **BentoPDF** → requires caddy-net
+- **Homepage** → requires caddy-net + Docker socket
+
+### Documents Stack (joins caddy-net)
+- **Paperless-ngx** → requires healthy paperless-db + paperless-redis + caddy-net
+- **paperless-db** → standalone (PostgreSQL)
+- **paperless-redis** → standalone
+- **paperless-backup** → requires Paperless-ngx
+
+### Monitoring Stack
+- **VictoriaMetrics** → standalone (TSDB)
+- **vmagent** → requires healthy VictoriaMetrics
+- **Alertmanager** → standalone (needs ntfy-token file)
+- **vmalert** → requires healthy VictoriaMetrics + healthy Alertmanager
+- **cAdvisor** → standalone
+- **Grafana** → requires healthy VictoriaMetrics + caddy-net
+
+### Photos Stack (joins caddy-net)
+- **immich-db** → standalone (PostgreSQL + VectorChord)
+- **immich-valkey** → standalone (Redis-compatible)
+- **immich-server** → requires healthy immich-db + immich-valkey + caddy-net
+- **immich-ml** → standalone
+- **immich-backup** → requires healthy immich-db
+
+### Media Stack (NFS-dependent)
 - **Prowlarr** → standalone (indexer manager)
 - **Sonarr** → requires Prowlarr
 - **Radarr** → requires Prowlarr
 - **qBittorrent** → standalone
 - **Jellyfin** → requires NFS mount for media
 
+### Maintenance Stack
+- **Watchtower** → deploy last, requires Docker socket
+
 ## Pre-Deployment Checklist
 
 Before deploying any stack:
 
 - [ ] Tailscale/Headscale mesh is operational
-- [ ] Target host is accessible via Tailscale
-- [ ] NFS mounts are configured (for media/security)
-- [ ] `.env` files are created from examples
-- [ ] Secrets are generated (admin tokens, passwords)
-- [ ] Required networks exist or will be created
+- [ ] Target host is accessible via SSH aliases (`vps`, `docker-vm`, `nas`)
+- [ ] NFS mounts configured on Docker VM (`/mnt/nas/frigate`, `/mnt/nas/media`, `/mnt/nas/downloads`)
+- [ ] `.env` files created from `.env.example` for each stack
+- [ ] Secrets generated (admin tokens, passwords — stored in KeePassXC)
+- [ ] `ntfy-token` file created on Docker VM for Alertmanager
+- [ ] Maintenance stack `.env` has `NTFY_USER` and `NTFY_PASS` for Watchtower notifications
+- [ ] Boot orchestrator enabled: `sudo systemctl enable docker-boot-orchestrator`
 
 ## References
 
