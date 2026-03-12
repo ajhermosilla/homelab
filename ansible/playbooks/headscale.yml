@@ -13,7 +13,7 @@
     headscale_compose_dir: /opt/homelab/headscale
     headscale_domain: "hs.cronova.dev"
     headscale_user: "augusto"
-    headscale_version: "0.27.0"
+    headscale_version: "0.28.0"
     headscale_base_domain: "hs.net"
 
   tasks:
@@ -162,12 +162,15 @@
               image: headscale/headscale:{{ headscale_version }}
               container_name: headscale
               restart: unless-stopped
+              cap_drop:
+                - ALL
               security_opt:
                 - no-new-privileges:true
               labels:
                 - "com.cronova.environment=vps"
                 - "com.cronova.category=networking"
                 - "com.cronova.critical=true"
+                - "com.cronova.backup=true"
               healthcheck:
                 test: ["CMD", "headscale", "health"]
                 interval: 30s
@@ -197,9 +200,11 @@
                 - headscale-net
 
             headscale-backup:
-              image: alpine:latest
+              image: alpine:3.19
               container_name: headscale-backup
               restart: unless-stopped
+              cap_drop:
+                - ALL
               security_opt:
                 - no-new-privileges:true
               labels:
@@ -210,6 +215,7 @@
                   limits:
                     memory: 128M
                     cpus: '0.25'
+              init: true
               entrypoint: /bin/sh
               command:
                 - -c
