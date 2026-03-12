@@ -44,22 +44,29 @@
 | 36 | Papa | vmalert | Monitoring | Docker VM | Active |
 | 37 | Papa | Alertmanager | Monitoring | Docker VM | Active |
 | 38 | Papa | cAdvisor | Monitoring | Docker VM | Active |
-| 32 | — | Samba | Storage | NAS | Active |
-| 33 | — | Syncthing | Storage | NAS | Active |
-| 34 | — | Restic REST | Backup | NAS | Active |
-| 35 | — | Forgejo | Git | NAS | Active |
-| 36 | — | NFS | Storage | NAS | Active |
-| 37 | — | Glances | Monitoring | NAS | Active |
-| 38 | Tajy | Coolify | PaaS | NAS | Active |
-| 39 | Tajy | coolify-db | PaaS | NAS | Active |
-| 40 | Tajy | coolify-redis | PaaS | NAS | Active |
-| 41 | Tajy | coolify-realtime | PaaS | NAS | Active |
-| 42 | Tajy | coolify-proxy (Traefik) | PaaS | NAS | Active |
-| 43 | Tajy | coolify-sentinel | PaaS | NAS | Active |
-| 44 | Tajy | coolify-backup | PaaS | NAS | Active |
-| 45 | — | OpenClaw | AI | RPi 5 | Pending |
+| 39 | — | Samba | Storage | NAS | Active |
+| 40 | — | Syncthing | Storage | NAS | Active |
+| 41 | — | Restic REST | Backup | NAS | Active |
+| 42 | — | Offsite Sync | Backup | NAS | Active |
+| 43 | — | Forgejo | Git | NAS | Active |
+| 44 | — | NFS | Storage | NAS | Active |
+| 45 | — | Glances | Monitoring | NAS | Active |
+| 46 | Tajy | Coolify | PaaS | NAS | Active |
+| 47 | Tajy | coolify-db | PaaS | NAS | Active |
+| 48 | Tajy | coolify-redis | PaaS | NAS | Active |
+| 49 | Tajy | coolify-realtime | PaaS | NAS | Active |
+| 50 | Tajy | coolify-proxy (Traefik) | PaaS | NAS | Active |
+| 51 | Tajy | coolify-sentinel | PaaS | NAS | Active |
+| 52 | Tajy | coolify-backup | PaaS | NAS | Active |
+| 53 | — | Katupyry App | Finance | NAS | Active |
+| 54 | — | Katupyry DB | Finance | NAS | Active |
+| 55 | — | Katupyry Redis | Finance | NAS | Active |
+| 56 | Javya | Javya App | Worship | NAS | Active |
+| 57 | Javya | Javya DB | Worship | NAS | Active |
+| 58 | Javya | Javya Redis | Worship | NAS | Active |
+| 59 | — | OpenClaw | AI | RPi 5 | Pending |
 
-**Active:** 52 | **Pending:** 1
+**Active:** 58 | **Pending:** 1
 
 ## By Environment
 
@@ -164,7 +171,7 @@ Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage
 
 Watchtower uses the maintained fork (nicholas-fedor) — the original containrrr image is abandoned and incompatible with Docker 29+.
 
-### NAS — 12 containers, 24/7
+### NAS — 19 containers, 24/7
 
 | Guarani | Service | Port(s) | Purpose | Image |
 |---------|---------|---------|---------|-------|
@@ -181,6 +188,13 @@ Watchtower uses the maintained fork (nicholas-fedor) — the original containrrr
 | Tajy | **coolify-proxy** | 80, 443 | Traefik v3.6, TLS DNS-01 | traefik:v3.6 |
 | Tajy | **coolify-sentinel** | — | Health monitoring | — |
 | Tajy | **coolify-backup** | — | Backup via restic | — |
+| — | **Offsite Sync** | — | rclone crypt to Google Drive | custom script |
+| — | **Katupyry App** | 8001 | Personal finance tool | custom (FastAPI) |
+| — | **Katupyry DB** | — | PostgreSQL for Katupyry | postgres:16 |
+| — | **Katupyry Redis** | — | Redis for Katupyry | redis:7 |
+| Javya | **Javya App** | 8002 | Worship planning tool | custom (FastAPI) |
+| Javya | **Javya DB** | — | PostgreSQL for Javya | postgres:16 |
+| Javya | **Javya Redis** | — | Redis for Javya | redis:7 |
 
 Forgejo web: `https://git.cronova.dev` (via Docker VM Caddy). SSH: `git@git.cronova.dev` (routed directly to NAS:2222 via SSH config).
 

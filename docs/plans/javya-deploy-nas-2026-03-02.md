@@ -1,7 +1,7 @@
 # Deploy Javya to NAS
 
 **Date**: 2026-03-02
-**Status**: Pending
+**Status**: Deployed
 **Domain**: `javya.cronova.dev`
 **Stack**: FastAPI + React 19 + PostgreSQL 16
 **Repo**: Forgejo `augusto/javya` (primary), GitHub `ajhermosilla/javya` (private mirror)
