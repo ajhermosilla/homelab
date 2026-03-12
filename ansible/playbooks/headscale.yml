@@ -106,20 +106,45 @@
         dest: "{{ headscale_compose_dir }}/config/acl.json"
         content: |
           {
+            "tagOwners": {
+              "tag:admin":  ["{{ headscale_user }}"],
+              "tag:server": ["{{ headscale_user }}"],
+              "tag:vps":    ["{{ headscale_user }}"],
+              "tag:mobile": ["{{ headscale_user }}"]
+            },
             "acls": [
               {
                 "action": "accept",
-                "src": ["*"],
+                "src": ["tag:admin"],
                 "dst": ["*:*"]
+              },
+              {
+                "action": "accept",
+                "src": ["tag:server"],
+                "dst": ["tag:server:*", "tag:vps:*"]
+              },
+              {
+                "action": "accept",
+                "src": ["tag:vps"],
+                "dst": ["tag:server:80,443,2283,3000,3001,5000,8080,8096,8123,8428,9090,9100"]
+              },
+              {
+                "action": "accept",
+                "src": ["tag:mobile"],
+                "dst": ["tag:server:80,443,2283,3000,3001,5000,8080,8096,8123", "tag:vps:*"]
+              },
+              {
+                "action": "accept",
+                "src": ["tag:mobile"],
+                "dst": ["autogroup:internet:*"]
               }
             ],
-            "tagOwners": {},
             "autoApprovers": {
               "routes": {
                 "0.0.0.0/0": ["{{ headscale_user }}"],
                 "::/0": ["{{ headscale_user }}"]
               },
-              "exitNode": ["{{ headscale_user }}"]
+              "exitNode": ["tag:vps"]
             }
           }
         mode: '0644'
