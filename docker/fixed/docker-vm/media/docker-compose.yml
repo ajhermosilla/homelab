@@ -235,7 +235,7 @@ services:
           memory: 2G
           cpus: '2'
     ports:
-      - "127.0.0.1:8081:8080"  # Web UI (localhost only, via Caddy)
+      - "127.0.0.1:8081:8080"  # Web UI (localhost only, no reverse proxy — CVE history)
       - "6881:6881/tcp"   # Torrent
       - "6881:6881/udp"   # Torrent
     volumes:
