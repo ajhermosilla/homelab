@@ -57,6 +57,9 @@ services:
       - ../../../shared/common.env
     container_name: vmagent
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -104,6 +107,9 @@ services:
       - ../../../shared/common.env
     container_name: vmalert
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -154,6 +160,9 @@ services:
       - ../../../shared/common.env
     container_name: alertmanager
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -198,6 +207,7 @@ services:
       - ../../../shared/common.env
     container_name: cadvisor
     restart: unless-stopped
+    read_only: true
     security_opt:
       - no-new-privileges:true
     cap_drop:

@@ -13,6 +13,9 @@ services:
       - ../../../shared/common.env
     container_name: dozzle
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -57,6 +60,9 @@ services:
       - ../../../shared/common.env
     container_name: bentopdf
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -97,6 +103,9 @@ services:
       - ../../../shared/common.env
     container_name: homepage
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
     security_opt:
       - no-new-privileges:true
     cap_drop:
