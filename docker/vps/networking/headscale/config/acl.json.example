@@ -1,38 +1,129 @@
 {
-  // Headscale ACL Policy
+  // Headscale ACL Policy — Light-touch, tag-based
   // https://headscale.net/ref/acls/
-  // Copy to acl.json and customize
+  // Copy to acl.json and customize IPs to match your mesh
+  //
+  // Philosophy: single-user homelab, all devices trusted.
+  // Only restriction: limit blast radius if VPS or phone is compromised.
+  // MacBook keeps full admin access to everything.
+  //
+  // Validate before applying:
+  //   docker exec headscale headscale policy check --file /etc/headscale/acl.json
 
-  // Named hosts (optional aliases)
+  // ==========================================================================
+  // Named hosts — update IPs after enrolling devices
+  // ==========================================================================
   "hosts": {
-    "vps": "100.77.172.46",
-    "macbook": "100.86.220.9",
-    "phone": "100.110.253.126"
+    "vps":       "100.77.172.46",
+    "docker-vm": "100.68.63.168",
+    "nas":       "100.82.77.97",
+    "proxmox":   "100.78.12.241",
+    "opnsense":  "100.79.230.235",
+    "rpi4":      "100.64.0.11",
+    "macbook":   "100.86.220.9",
+    "phone":     "100.110.253.126",
+    "beryl-ax":  "100.102.244.131"
   },
 
-  // ACL rules - who can access what
+  // ==========================================================================
+  // Tag owners — who can assign each tag
+  // ==========================================================================
+  "tagOwners": {
+    "tag:admin":  ["augusto"],
+    "tag:server": ["augusto"],
+    "tag:vps":    ["augusto"],
+    "tag:mobile": ["augusto"]
+  },
+
+  // ==========================================================================
+  // Groups (optional convenience aliases)
+  // ==========================================================================
+  "groups": {
+    "group:servers": ["tag:server"],
+    "group:infra":   ["tag:server", "tag:vps"]
+  },
+
+  // ==========================================================================
+  // ACL rules — evaluated top-down, first match wins
+  // ==========================================================================
   "acls": [
-    // Allow all devices to reach all other devices
+    // ----- Admin: full access to everything -----
     {
       "action": "accept",
-      "src": ["*"],
+      "src": ["tag:admin"],
       "dst": ["*:*"]
-    }
-  ]
+    },
 
-  // Example: Restrictive rules (uncomment to use)
-  // "acls": [
-  //   // Allow macbook to reach everything
-  //   {
-  //     "action": "accept",
-  //     "src": ["macbook"],
-  //     "dst": ["*:*"]
-  //   },
-  //   // Allow phone to reach only vps (exit node)
-  //   {
-  //     "action": "accept",
-  //     "src": ["phone"],
-  //     "dst": ["vps:*"]
-  //   }
-  // ]
+    // ----- Servers: talk to each other freely -----
+    // Docker VM ↔ NAS (NFS, backups, scraping), Proxmox ↔ VMs, etc.
+    {
+      "action": "accept",
+      "src": ["tag:server"],
+      "dst": ["tag:server:*", "tag:vps:*"]
+    },
+
+    // ----- VPS: reach servers for scraping and health checks -----
+    // Uptime Kuma probes, backup pushes, but NOT full SSH everywhere
+    {
+      "action": "accept",
+      "src": ["tag:vps"],
+      "dst": [
+        "tag:server:80,443,2283,3000,3001,5000,8080,8096,8123,8428,9090,9100"
+      ]
+    },
+    // VPS can reach NAS for backup sync
+    {
+      "action": "accept",
+      "src": ["tag:vps"],
+      "dst": ["nas:8000"]
+    },
+
+    // ----- Mobile: services + exit node, no SSH -----
+    // Phone and Beryl AX can browse services and use VPS as exit node
+    {
+      "action": "accept",
+      "src": ["tag:mobile"],
+      "dst": [
+        "tag:server:80,443,2283,3000,3001,5000,8080,8096,8123",
+        "tag:vps:*"
+      ]
+    },
+
+    // ----- Mobile: internet via exit node -----
+    {
+      "action": "accept",
+      "src": ["tag:mobile"],
+      "dst": ["autogroup:internet:*"]
+    }
+  ],
+
+  // ==========================================================================
+  // Auto-approvers — exit node and subnet routes
+  // ==========================================================================
+  "autoApprovers": {
+    "routes": {
+      "0.0.0.0/0": ["augusto"],
+      "::/0": ["augusto"]
+    },
+    "exitNode": ["tag:vps"]
+  }
+
+  // ==========================================================================
+  // Tag assignment cheat sheet (run on headscale after enrolling):
+  //
+  //   docker exec headscale headscale nodes tag -i <node-id> -t tag:admin
+  //   docker exec headscale headscale nodes tag -i <node-id> -t tag:server
+  //   docker exec headscale headscale nodes tag -i <node-id> -t tag:vps
+  //   docker exec headscale headscale nodes tag -i <node-id> -t tag:mobile
+  //
+  // List nodes:
+  //   docker exec headscale headscale nodes list
+  //
+  // ==========================================================================
+  // When to revisit this policy:
+  //
+  // 1. Adding a new user (friend/family) — create tag:user with limited dst
+  // 2. Adding IoT devices — create tag:iot with minimal access
+  // 3. Enabling Tailscale SSH — add explicit SSH rules per tag
+  // ==========================================================================
 }
