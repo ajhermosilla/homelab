@@ -40,6 +40,12 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE_NAME: ${DB_DATABASE_NAME:-immich}
       REDIS_HOSTNAME: immich-valkey
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2283/api/server/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -79,6 +85,12 @@ services:
           cpus: '2'
     volumes:
       - immich-ml-cache:/cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
     environment:
       MACHINE_LEARNING_WORKERS: 1
     logging:
