@@ -91,6 +91,11 @@ services:
         VITE_API_URL: ${VITE_API_URL:-}
     container_name: javya-frontend
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
+      - /var/cache/nginx:size=64M
+      - /run:size=8M
     security_opt:
       - no-new-privileges:true
     cap_drop:

@@ -8,7 +8,7 @@ services:
   # https://github.com/nicolargo/glances
   # =========================================================================
   glances:
-    image: nicolargo/glances:latest-full
+    image: nicolargo/glances:4.5.1-full
     env_file:
       - ../../../shared/common.env
     container_name: glances
