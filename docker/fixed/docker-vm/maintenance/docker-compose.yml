@@ -21,6 +21,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=maintenance"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "/watchtower", "--health-check"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:

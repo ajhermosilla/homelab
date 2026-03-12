@@ -9,6 +9,8 @@ services:
       - ../../../shared/common.env
     container_name: headscale
     restart: unless-stopped
+    cap_drop:
+      - ALL
     security_opt:
       - no-new-privileges:true
     labels:
@@ -52,6 +54,8 @@ services:
       - ../../../shared/common.env
     container_name: headscale-backup
     restart: unless-stopped
+    cap_drop:
+      - ALL
     security_opt:
       - no-new-privileges:true
     labels:
