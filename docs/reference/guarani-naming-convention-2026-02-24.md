@@ -21,6 +21,7 @@
 | VictoriaMetrics + Grafana | **papa** | to count, measure | `papa.cronova.dev` |
 | Immich | **vera** | shine, flash | `vera.cronova.dev` |
 | Paperless-ngx | **aranduka** | book, library | `aranduka.cronova.dev` |
+| AdGuard Home + Unbound | **yvága** | sky | `yvaga.cronova.dev` |
 
 ---
 
@@ -44,7 +45,6 @@
 
 | Service | Alternative | Meaning | Notes |
 |---------|-----------|---------|-------|
-| Homepage | yvága | sky | Overview from the heavens |
 | Homepage | arakuaa | wisdom | Knows the state of everything |
 | Dozzle | ñe'ẽ | word, voice | Reading the words of containers |
 | Authelia | ñangareko | guardian, caretaker | Longer but more descriptive |
@@ -67,6 +67,7 @@
 | `git.cronova.dev` | Forgejo | NAS |
 | `status.cronova.dev` | Uptime Kuma | VPS |
 | `notify.cronova.dev` | ntfy | VPS |
+| `yvaga.cronova.dev` | AdGuard Home + Unbound | VPS |
 | `mbyja.cronova.dev` | Homepage | Docker VM |
 | `ysyry.cronova.dev` | Dozzle | Docker VM |
 | `kuatia.cronova.dev` | BentoPDF | Docker VM |

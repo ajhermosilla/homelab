@@ -1,0 +1,168 @@
+# AdGuard Home + Unbound — Private recursive DNS with ad-blocking
+# VPS - Vultr (yvaga — sky in Guarani)
+# https://adguard.com/adguard-home.html
+# https://unbound.docs.nlnetlabs.nl/
+
+services:
+  # =========================================================================
+  # AdGuard Home — DNS ad-blocking and filtering
+  # =========================================================================
+  adguard:
+    image: adguard/adguardhome:v0.107.73
+    env_file:
+      - ../../../shared/common.env
+    container_name: adguard
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=networking"
+      - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=false"
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE  # Bind to port 53
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.5'
+    ports:
+      # DNS — localhost + Tailscale IP only (never public)
+      - "127.0.0.1:53:53/tcp"
+      - "127.0.0.1:53:53/udp"
+      - "${TAILSCALE_IP:?TAILSCALE_IP required}:53:53/tcp"
+      - "${TAILSCALE_IP:?TAILSCALE_IP required}:53:53/udp"
+    volumes:
+      - adguard-work:/opt/adguardhome/work
+      - adguard-conf:/opt/adguardhome/conf
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+    depends_on:
+      unbound:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - adguard-net
+
+  # =========================================================================
+  # Unbound — Recursive DNS resolver (no third-party upstream)
+  # https://github.com/madnuttah/unbound-docker
+  # =========================================================================
+  unbound:
+    image: madnuttah/unbound:1.24.2-1
+    env_file:
+      - ../../../shared/common.env
+    container_name: unbound
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.cronova.environment=vps"
+      - "com.cronova.category=networking"
+      - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=false"
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["/usr/local/unbound/sbin/healthcheck.sh"]
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.25'
+    volumes:
+      - ./unbound.conf:/usr/local/unbound/conf.d/custom.conf:ro
+    environment:
+      - TZ=${TZ:-America/Asuncion}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - adguard-net
+
+volumes:
+  adguard-work:
+    name: adguard-work
+  adguard-conf:
+    name: adguard-conf
+
+networks:
+  adguard-net:
+    name: adguard-net
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+#
+# 1. Create .env file:
+#    cp .env.example .env
+#    # Edit TAILSCALE_IP to match VPS Tailscale IP
+#
+# 2. Start services:
+#    docker compose up -d
+#
+# 3. Complete AdGuard initial setup wizard:
+#    Browse to https://yvaga.cronova.dev (after Caddy is configured)
+#    - Set admin password
+#    - Set upstream DNS: unbound:5053
+#    - Set bootstrap DNS: 1.1.1.1
+#    - Disable cache (Unbound handles caching)
+#    - Disable DNSSEC (Unbound handles validation)
+#
+# 4. Recommended blocklists (keep under 6 to stay within 128M RAM):
+#    - AdGuard DNS filter (default, included)
+#    - OISD (small) — https://small.oisd.nl
+#    - Steven Black's hosts — https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+#
+# 5. Update headscale global nameservers:
+#    Set primary to VPS Tailscale IP (100.77.172.46)
+#    Set fallback to 1.1.1.1
+#    Restart headscale container
+#
+# 6. Disable MagicDNS on VPS (avoid recursive loop):
+#    sudo tailscale set --accept-dns=false
+#    echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
+#
+# =============================================================================
+# ARCHITECTURE
+# =============================================================================
+#
+#   Phone (exit node) ──┐
+#                       ├→ MagicDNS → AdGuard (100.77.172.46:53)
+#   Home nodes ─────────┘               ↓
+#                              Unbound (:5053)
+#   VPS processes → AdGuard (127.0.0.1:53)  ↓
+#                               Root servers → Authoritative NS
+#
+#   Privacy: No third party sees DNS queries.
+#   Ad-blocking: All Tailscale nodes get filtering.
+#   Fallback: If VPS is down, nodes use 1.1.1.1 (headscale config).
+#
+# =============================================================================
+# WHY WATCHTOWER IS DISABLED
+# =============================================================================
+#
+# DNS is critical infrastructure. Auto-updates risk breaking resolution for
+# all Tailscale nodes. Update manually after testing:
+#   docker compose pull && docker compose up -d
+#
+# =============================================================================
