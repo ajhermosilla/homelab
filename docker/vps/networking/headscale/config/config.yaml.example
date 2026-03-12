@@ -71,11 +71,9 @@ dns:
     global:
       - 1.1.1.1      # Cloudflare (public fallback)
       - 9.9.9.9      # Quad9 (public fallback)
-
-  # Override DNS for specific domains (route to Pi-hole when available)
-  # restricted_nameservers:
-  #   cronova.dev:
-  #     - 100.68.63.168  # Fixed homelab Pi-hole
+    split:
+      cronova.dev:
+        - 100.100.100.100  # MagicDNS (serves extra_records)
 
   # Extra DNS records (optional)
   extra_records:
