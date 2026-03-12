@@ -71,12 +71,12 @@ dns:
     global:
       - 1.1.1.1      # Cloudflare (public fallback)
       - 9.9.9.9      # Quad9 (public fallback)
-    split:
-      cronova.dev:
-        - 100.100.100.100  # MagicDNS (serves extra_records)
+    # NOTE: Do NOT add split DNS pointing to 100.100.100.100 (MagicDNS).
+    # It creates a recursive loop on the VPS (headscale node) because
+    # MagicDNS forwards to itself. See: docs/journal/incident-2026-03-12-dns-loop.md
 
   # Extra DNS records for *.cronova.dev → Tailscale IPs
-  # These are served by MagicDNS (100.100.100.100) via split DNS above
+  # These are served by MagicDNS directly (checked before forwarding to global nameservers)
   extra_records:
     # Docker VM services (100.68.63.168)
     - name: "vault.cronova.dev"
