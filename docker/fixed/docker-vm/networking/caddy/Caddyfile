@@ -92,10 +92,10 @@ jara.cronova.dev {
 
 # Jellyfin - Media Server (Yrasema)
 # Access: https://yrasema.cronova.dev
+# Own auth — no Authelia (clients can't handle forward auth/TOTP)
 yrasema.cronova.dev {
 	import internal_tls
 	import security_headers
-	import authelia
 	reverse_proxy host.docker.internal:8096
 }
 
@@ -228,13 +228,13 @@ papa.cronova.dev {
 #                     git, auth, ysyry, kuatia, mbyja, aranduka, papa, vera
 #
 # Authelia-protected services:
-#   yrasema (Jellyfin), japysaka (Sonarr), taanga (Radarr), aoao (Prowlarr),
+#   japysaka (Sonarr), taanga (Radarr), aoao (Prowlarr),
 #   ysyry (Dozzle), kuatia (BentoPDF), mbyja (Homepage), aranduka (Paperless),
 #   papa (Grafana)
 #
 # Services with their own auth (NOT protected by Authelia):
 #   jara (Home Assistant), taguato (Frigate), vault (Vaultwarden),
-#   vera (Immich), git (Forgejo)
+#   vera (Immich), git (Forgejo), yrasema (Jellyfin)
 #
 # Direct Access (no reverse proxy needed):
 #   - Pi-hole: http://192.168.0.10:80/admin
