@@ -51,6 +51,7 @@ Design decisions and policies — why things are done a certain way.
 | [disaster-recovery.md](strategy/disaster-recovery.md) | Restic backup procedures, recovery scenarios, verification schedule |
 | [secrets-management.md](strategy/secrets-management.md) | Credential handling (.env, SOPS, age) |
 | [security-hardening.md](strategy/security-hardening.md) | 2FA, firewall rules, SSH hardening, fail2ban |
+| [storage-strategy.md](strategy/storage-strategy.md) | Drive layout, backup topology, data protection, capacity planning |
 | [domain-research.md](strategy/domain-research.md) | Domain comparison (archived — see domain-strategy) |
 
 ## Reference
