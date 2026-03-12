@@ -8,7 +8,7 @@
 
   vars:
     monitoring_compose_dir: /opt/homelab/monitoring
-    homelab_repo: "https://github.com/ajhermosilla/homelab.git"
+    homelab_repo: "{{ homelab_repo | default('https://git.cronova.dev/augusto/homelab.git') }}"
     homelab_base: /opt/homelab
 
   tasks:

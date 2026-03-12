@@ -47,7 +47,7 @@
           # Auto-HTTPS for all domains
 
           {
-              email augusto@cronova.dev
+              email {{ admin_email | default('augusto@cronova.dev') }}
           }
 
           {% for domain in caddy_domains %}

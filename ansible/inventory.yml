@@ -7,6 +7,9 @@ all:
     ansible_python_interpreter: /usr/bin/python3
     # Use Tailscale IPs for remote access
     use_tailscale: true
+    # Shared settings used across playbooks
+    admin_email: augusto@cronova.dev
+    homelab_repo: "https://git.cronova.dev/augusto/homelab.git"
 
   children:
     # ==========================================================================
@@ -75,6 +78,8 @@ all:
         environment_type: fixed
         timezone: America/Asuncion
         local_network: 192.168.0.0/24
+        nas_lan_ip: 192.168.0.12
+        docker_vm_lan_ip: 192.168.0.10
 
     # ==========================================================================
     # Mobile Kit
