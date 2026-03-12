@@ -9,6 +9,8 @@ services:
       - ../../../shared/common.env
     container_name: pihole
     restart: unless-stopped
+    cap_drop:
+      - ALL
     security_opt:
       - no-new-privileges:true
     labels:

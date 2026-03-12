@@ -21,6 +21,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=monitoring"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8428/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -60,6 +65,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=monitoring"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8429/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -81,7 +91,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      - victoriametrics
+      victoriametrics:
+        condition: service_healthy
 
   # =========================================================================
   # vmalert - Alerting Rule Evaluator
@@ -101,6 +112,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=monitoring"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8880/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -123,8 +139,10 @@ services:
     networks:
       - monitoring-net
     depends_on:
-      - victoriametrics
-      - alertmanager
+      victoriametrics:
+        condition: service_healthy
+      alertmanager:
+        condition: service_healthy
 
   # =========================================================================
   # Alertmanager - Alert Routing & Deduplication
@@ -144,6 +162,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=monitoring"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -183,6 +206,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=monitoring"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -223,6 +251,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=monitoring"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -247,7 +280,8 @@ services:
       - monitoring-net
       - caddy-net
     depends_on:
-      - victoriametrics
+      victoriametrics:
+        condition: service_healthy
 
 volumes:
   vm-data:
