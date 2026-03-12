@@ -8,7 +8,7 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
 |-----------|----------|------|------------|
 | Oga (Proxmox) | AOOSTAR Mini PC, Intel N150, 12GB RAM | Hypervisor: OPNsense VM + Docker VM | — |
 | Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 33 containers | 33 |
-| NAS | i3-3220T, 8GB DDR3, Mini-ITX | Storage, git, PaaS: 5 stacks + Coolify | 12 |
+| NAS | i3-3220T, 8GB DDR3, Mini-ITX | Storage, git, PaaS: 5 stacks + Coolify | 19 |
 | OPNsense (100) | 2 vCPU, 2GB RAM, 20GB disk | Gateway, DHCP, VLANs, Tailscale | — |
 
 *Full hardware specs: [hardware.md](hardware.md)*
@@ -32,7 +32,7 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
    |          |        |          |          |          |
 [Docker VM] [NAS]   [RPi 5]   [WiFi AP]  [PoE SW]  [Proxmox mgmt]
   .0.10     .0.12   .0.20     AX50                   .0.237
-  33 cnt    12 cnt  pending                              |
+  33 cnt    19 cnt  pending                              |
                                              +-----------+-----------+
                                              |           |           |
                                         [front_door] [back_yard]  [indoor]
@@ -158,15 +158,17 @@ Rescue USB: SystemRescue 12.03 on Lexar 128GB USB.
 | HDD | WD Purple | 2TB | `/mnt/purple` | Frigate recordings, Restic backups | Active (97% full) |
 | HDD | WD Red Plus | 8TB | — | Media, backups | Partition recovery pending |
 
-### Containers (12 total)
+### Containers (19 total)
 
 | Stack | Containers | Compose Path |
 |-------|-----------|-------------|
-| **backup** | restic-rest | `docker/fixed/nas/backup/` |
+| **backup** | restic-rest, offsite-sync | `docker/fixed/nas/backup/` |
 | **git** | forgejo | `docker/fixed/nas/git/` |
 | **storage** | samba, syncthing | `docker/fixed/nas/storage/` |
 | **monitoring** | glances | `docker/fixed/nas/monitoring/` |
 | **paas** | coolify, coolify-db, coolify-redis, coolify-realtime, coolify-proxy, coolify-sentinel, coolify-backup | `/data/coolify/source/` + `docker/fixed/nas/paas/` |
+| **katupyry** | katupyry-app, katupyry-db, katupyry-redis | `~/deploy/katupyry/` |
+| **javya** | javya-app, javya-db, javya-redis | `~/deploy/javya/` |
 
 **Key services:**
 - **Forgejo** — Git server at `git.cronova.dev`, data at `/srv/forgejo`, SSH on port 2222

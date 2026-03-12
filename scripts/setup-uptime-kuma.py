@@ -174,7 +174,7 @@ MONITORS = [
     {
         "type": MonitorType.HTTP,
         "name": "Forgejo",
-        "url": "http://100.82.77.97:3000",
+        "url": "https://git.cronova.dev",
         "interval": 60,
         "maxretries": 3,
         "notification_tier": "warning",
