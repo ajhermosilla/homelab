@@ -39,8 +39,6 @@ Aliases simplify rule management. Create these before writing rules.
 | Name | Type | Content | Description |
 |------|------|---------|-------------|
 | `RFC1918` | Network(s) | `10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16` | All private networks |
-| `Cameras` | Host(s) | `192.168.10.101, 192.168.10.102, 192.168.10.103` | IoT cameras |
-| `Frigate_Host` | Host(s) | `192.168.0.10` | Docker VM (Frigate) |
 | `PiHole_DNS` | Host(s) | `192.168.0.10` | Docker VM (Pi-hole) |
 
 **Note:** OPNsense may already have a built-in RFC1918 alias — check before creating.
@@ -74,10 +72,13 @@ Rules are evaluated **top to bottom, first match wins**. Order matters.
 | # | Action | Protocol | Source | Dest | Port | Description |
 |---|--------|----------|--------|------|------|-------------|
 | 1 | Pass | TCP/UDP | IOT net | PiHole_DNS | 53 | Allow DNS to Pi-hole |
-| 2 | Pass | UDP | IOT net | PiHole_DNS | 123 | Allow NTP |
-| 3 | Pass | TCP | Cameras | Frigate_Host | 5000 | Cameras → Frigate RTSP |
-| 4 | Block | any | IOT net | RFC1918 | any | Block all private networks |
-| 5 | Block | any | IOT net | any | any | Block internet (default deny) |
+| 2 | Pass | UDP | IOT net | IOT address | 123 | Allow NTP from OPNsense gateway |
+| 3 | Block | any | IOT net | RFC1918 | any | Block all private networks |
+| 4 | Block | any | IOT net | any | any | Block internet (default deny) |
+
+**Why no "Cameras → Frigate" rule?** Frigate (on Docker VM/LAN) *pulls* RTSP streams from cameras — it initiates the connection. LAN has "allow all", so Frigate → Camera traffic is permitted. Return traffic (camera responses) is handled by OPNsense's stateful firewall. Cameras never need to initiate connections to Frigate.
+
+**NTP (rule 2):** Points to `IOT address` (192.168.10.1 — OPNsense on the IOT interface) so cameras can sync time. OPNsense forwards NTP upstream. Using the gateway avoids opening a path to the LAN subnet.
 
 ### How to create each rule:
 
@@ -90,8 +91,8 @@ For each rule:
 - **TCP/IP Version**: IPv4
 - **Protocol**: as specified
 - **Source**: Select alias or "IOT net"
-- **Destination**: Select alias or "any"
-- **Destination port range**: as specified (53, 123, 5000, or "any")
+- **Destination**: Select alias, "IOT address", or "any"
+- **Destination port range**: as specified (53, 123, or "any")
 - **Description**: as specified
 - **Log**: Enable on Block rules (helps debugging)
 
@@ -102,10 +103,11 @@ For each rule:
 ```
 Expected behavior:
 ✓ IoT device → Pi-hole DNS (53)     = PASS
-✓ Camera → Frigate (5000)            = PASS
+✓ IoT device → OPNsense NTP (123)   = PASS
+✓ Frigate → Camera RTSP (554)       = PASS (initiated from LAN, stateful return)
 ✗ IoT device → internet              = BLOCKED
 ✗ IoT device → NAS                   = BLOCKED
-✗ IoT device → Docker VM (other)     = BLOCKED
+✗ IoT device → Docker VM             = BLOCKED
 ✗ Camera → camera                    = BLOCKED (no IoT→IoT rule)
 ```
 
@@ -182,30 +184,32 @@ This means cameras **already receive VLAN 10 at Layer 2**. They just need VLAN 1
 
 ### 5d. Update Frigate config
 
-After cameras move to 192.168.10.x, update Frigate:
+After cameras move to 192.168.10.x, update the go2rtc stream URLs in `frigate.yml`:
 
 ```bash
-ssh docker-vm
-# Edit Frigate config
-nano /opt/homelab/repo/docker/fixed/docker-vm/security/frigate/config.yml
+# Edit locally in repo, then deploy
+# File: docker/fixed/docker-vm/security/frigate.yml
 ```
 
-Change camera IPs:
+Change camera IPs in the `go2rtc.streams` section:
 ```yaml
-cameras:
-  front_door:
-    ffmpeg:
-      inputs:
-        - path: rtsp://user:pass@192.168.10.101:554/...   # was 192.168.0.110
-  back_yard:
-    ffmpeg:
-      inputs:
-        - path: rtsp://user:pass@192.168.10.102:554/...   # was 192.168.0.111
-  indoor:
-    # Leave as-is if Tapo stays on Management VLAN
+go2rtc:
+  streams:
+    front_door_sub:
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@192.168.10.101:554/..."  # was .0.110
+    front_door_main:
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@192.168.10.101:554/..."  # was .0.110
+    back_yard_sub:
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.10.102:554/..."   # was .0.111
+    back_yard_main:
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.10.102:554/..."   # was .0.111
+    indoor:
+      # Leave as-is — Tapo stays on Management VLAN (WiFi, no IoT SSID)
 ```
 
-Restart Frigate: `docker restart frigate`
+**Note:** Camera IPs only appear in `go2rtc.streams`, not in the `cameras:` section (cameras reference go2rtc via `127.0.0.1:8554`).
+
+Deploy: `ssh docker-vm "cd /opt/homelab/repo/docker/fixed/docker-vm/security && docker compose restart frigate"`
 
 ### 5e. Verify camera feeds
 
@@ -228,8 +232,12 @@ curl https://jara.cronova.dev  # HA
 ### From IoT VLAN (camera perspective):
 Check OPNsense Firewall → Live Log, filter by IOT interface:
 - DNS queries to 192.168.0.10:53 → PASS ✓
-- RTSP to 192.168.0.10:5000 → PASS ✓
-- Anything else → BLOCK ✓
+- NTP to 192.168.10.1:123 → PASS ✓
+- Any other outbound → BLOCK ✓
+
+### From LAN → IoT (Frigate pulling cameras):
+- Frigate RTSP pull from 192.168.10.101:554 → PASS ✓ (LAN allows all, stateful return)
+- Check Frigate UI: all camera feeds reconnect after IP change
 
 ### From Guest VLAN:
 Connect a phone to Guest WiFi (if configured) or test later:
@@ -250,7 +258,8 @@ Connect a phone to Guest WiFi (if configured) or test later:
 ## Rollback
 
 If something breaks:
-1. **Cameras offline**: Check Firewall → Rules → IOT — ensure rule 3 (Cameras → Frigate) exists and is above the Block rules
-2. **Guest WiFi broken**: Check GUEST rules — DNS (rule 1) must be above RFC1918 block (rule 2)
-3. **Nuclear option**: Firewall → Rules → IOT/GUEST → delete all rules → Apply. Returns to default deny (safe but cameras offline)
-4. **Restore config**: System → Configuration → Backups → restore pre-rules XML
+1. **Cameras offline in Frigate**: Frigate pulls RTSP from cameras — check LAN "allow all" rule still exists. If cameras moved to IoT VLAN, verify Frigate config has new IPs (192.168.10.x). Check OPNsense Live Log for blocked traffic.
+2. **Cameras can't resolve DNS**: Check IOT rule 1 (DNS to Pi-hole) is above the RFC1918 block rule
+3. **Guest WiFi broken**: Check GUEST rules — DNS (rule 1) must be above RFC1918 block (rule 2)
+4. **Nuclear option**: Firewall → Rules → IOT/GUEST → delete all rules → Apply. Returns to default deny (safe but cameras lose DNS/NTP)
+5. **Restore config**: System → Configuration → Backups → restore pre-rules XML
