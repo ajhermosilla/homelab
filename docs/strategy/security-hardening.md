@@ -460,7 +460,14 @@ watchtower:
     - WATCHTOWER_LABEL_ENABLE=true       # Opt-in via container labels
 ```
 
-**Excluded from auto-update** (manual only): Vaultwarden, Frigate, Headscale.
+**Update strategy** (opt-in via `com.centurylinklabs.watchtower.enable=true` label):
+
+| Category | Services | Strategy |
+|----------|----------|----------|
+| **Pinned (manual bump)** | victoriametrics, vmagent, vmalert, alertmanager, grafana, authelia, paperless-ngx | Version pinned in compose — Watchtower label present but no-op |
+| **Excluded (no label)** | vaultwarden, frigate, homeassistant, immich-db, immich-valkey, paperless-db, paperless-redis | No Watchtower label — manual only |
+| **Excluded (label=false)** | caddy (Docker VM) | Explicitly disabled — custom build with Cloudflare plugin |
+| **Auto-updated** | dozzle, bentopdf, homepage, cadvisor, glances, sonarr, radarr, prowlarr, qbittorrent, jellyfin, mosquitto, pihole, immich-server, immich-ml + backup sidecars | Low-risk or stateless — Watchtower updates on schedule |
 
 ---
 
