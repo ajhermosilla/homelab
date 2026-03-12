@@ -11,7 +11,7 @@
 
   vars:
     maintenance_compose_dir: /opt/homelab/maintenance
-    homelab_repo: "https://github.com/ajhermosilla/homelab.git"
+    homelab_repo: "{{ homelab_repo | default('https://git.cronova.dev/augusto/homelab.git') }}"
     homelab_base: /opt/homelab
     # Watchtower settings
     watchtower_schedule: "0 0 4 * * 0"  # 4 AM every Sunday
