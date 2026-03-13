@@ -28,8 +28,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
-          cpus: '1'
+          memory: 256M
+          cpus: '0.5'
     ports:
       - "127.0.0.1:5000:5000"
     volumes:
@@ -68,8 +68,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2G
-          cpus: '2'
+          memory: 512M
+          cpus: '1'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
@@ -80,7 +80,7 @@ services:
       - SCREEN_WIDTH=1920
       - SCREEN_HEIGHT=1080
       - SCREEN_DEPTH=24
-      - MAX_CONCURRENT_CHROME_PROCESSES=4
+      - MAX_CONCURRENT_CHROME_PROCESSES=2
     logging:
       driver: "json-file"
       options:
