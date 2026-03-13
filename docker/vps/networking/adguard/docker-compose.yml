@@ -24,6 +24,8 @@ services:
       - ALL
     cap_add:
       - NET_BIND_SERVICE  # Bind to port 53
+      - CHOWN             # Own volume files
+      - DAC_OVERRIDE      # Write to volume dirs
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/"]
       interval: 30s
@@ -76,8 +78,11 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
     cap_drop:
       - ALL
+    cap_add:
+      - SETGID  # Required by su-exec for user switching
+      - SETUID  # Required by su-exec for user switching
     healthcheck:
-      test: ["/usr/local/unbound/sbin/healthcheck.sh"]
+      test: ["CMD-SHELL", "drill -p 5335 cloudflare.com @127.0.0.1 || exit 1"]
       interval: 60s
       timeout: 30s
       retries: 5
@@ -123,7 +128,7 @@ networks:
 # 3. Complete AdGuard initial setup wizard:
 #    Browse to https://yvaga.cronova.dev (after Caddy is configured)
 #    - Set admin password
-#    - Set upstream DNS: unbound:5053
+#    - Set upstream DNS: unbound:5335
 #    - Set bootstrap DNS: 1.1.1.1
 #    - Disable cache (Unbound handles caching)
 #    - Disable DNSSEC (Unbound handles validation)
@@ -149,7 +154,7 @@ networks:
 #   Phone (exit node) ──┐
 #                       ├→ MagicDNS → AdGuard (100.77.172.46:53)
 #   Home nodes ─────────┘               ↓
-#                              Unbound (:5053)
+#                              Unbound (:5335)
 #   VPS processes → AdGuard (127.0.0.1:53)  ↓
 #                               Root servers → Authoritative NS
 #
