@@ -118,6 +118,7 @@ For domains without an `extra_record` (e.g., `notify.cronova.dev` when queried f
 - [x] Restart headscale + tailscaled on VPS
 - [x] Verify extra_records still resolve correctly
 - [x] Verify ntfy working from phone
-- [ ] Sync headscale config to repo (Ansible playbook or committed config)
-- [ ] Add Uptime Kuma DNS resolution monitor for `*.cronova.dev` from VPS
+- [x] Sync headscale config to repo (`96461e0`)
+- [x] Add Uptime Kuma DNS resolution monitor — "DNS - cronova.dev (VPS)", queries 100.100.100.100 for notify.cronova.dev A record, 60s interval, Warning (ntfy) notification
 - [ ] Consider adding a fallback resolver to VPS `/etc/resolv.conf` via systemd-resolved (so DNS survives MagicDNS failures)
+- [ ] Add backup notification channel (email/Telegram) for when ntfy itself is unreachable
