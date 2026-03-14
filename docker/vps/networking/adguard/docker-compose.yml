@@ -102,7 +102,8 @@ services:
         max-size: "10m"
         max-file: "3"
     networks:
-      - adguard-net
+      adguard-net:
+        ipv4_address: 172.20.0.10
 
 volumes:
   adguard-work:
@@ -113,6 +114,9 @@ volumes:
 networks:
   adguard-net:
     name: adguard-net
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 
 # =============================================================================
 # SETUP INSTRUCTIONS
@@ -128,10 +132,12 @@ networks:
 # 3. Complete AdGuard initial setup wizard:
 #    Browse to https://yvaga.cronova.dev (after Caddy is configured)
 #    - Set admin password
-#    - Set upstream DNS: unbound:5335
+#    - Set upstream DNS: 172.20.0.10:5335 (Unbound static IP on adguard-net)
 #    - Set bootstrap DNS: 1.1.1.1
 #    - Disable cache (Unbound handles caching)
 #    - Disable DNSSEC (Unbound handles validation)
+#    NOTE: Use Unbound's static IP, not hostname — AdGuard can't resolve
+#    Docker hostnames since it IS the DNS resolver (circular dependency).
 #
 # 4. Recommended blocklists (keep under 6 to stay within 128M RAM):
 #    - AdGuard DNS filter (default, included)
