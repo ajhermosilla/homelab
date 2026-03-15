@@ -17,6 +17,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
@@ -31,7 +36,7 @@ services:
       resources:
         limits:
           memory: 4G
-          cpus: '4'
+          cpus: '2'
     ports:
       - "8096:8096"
     volumes:
@@ -50,8 +55,8 @@ services:
       # Intel QuickSync for hardware transcoding (N150)
       - /dev/dri:/dev/dri
     group_add:
-      - "render"
-      - "video"
+      - "992"    # render (GID varies by host)
+      - "44"     # video
     logging:
       driver: "json-file"
       options:
@@ -75,6 +80,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
@@ -125,6 +135,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
@@ -175,6 +190,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
@@ -220,6 +240,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
