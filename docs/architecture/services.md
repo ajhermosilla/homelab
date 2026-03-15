@@ -11,7 +11,14 @@
 | 3 | — | headscale-backup | Backup | VPS | Active |
 | 4 | — | Uptime Kuma | Monitoring | VPS | Active |
 | 5 | — | ntfy | Notifications | VPS | Active |
-| 6 | — | Pi-hole | DNS | Docker VM | Active |
+| 6 | Yvága | AdGuard Home | DNS | VPS | Active |
+| 7 | Yvága | Unbound | DNS | VPS | Active |
+| 8 | — | DERP Relay | Networking | VPS | Active |
+| 9 | — | Pi-hole (VPS) | DNS | VPS | Active |
+| 10 | — | changedetection | Scraping | VPS | Active |
+| 11 | — | Playwright | Scraping | VPS | Active |
+| 12 | — | Restic REST (VPS) | Backup | VPS | Active |
+| 13 | — | Pi-hole | DNS | Docker VM | Active |
 | 7 | — | Caddy (Docker VM) | Networking | Docker VM | Active |
 | 8 | — | Watchtower | Maintenance | Docker VM | Active |
 | 9 | — | Vaultwarden | Security | Docker VM | Active |
@@ -66,19 +73,26 @@
 | 58 | Javya | Javya Redis | Worship | NAS | Active |
 | 59 | — | OpenClaw | AI | RPi 5 | Pending |
 
-**Active:** 58 | **Pending:** 1
+**Active:** 65 | **Pending:** 1
 
 ## By Environment
 
-### VPS (Vultr) — 5 containers, 24/7
+### VPS (Vultr) — 11 containers, 24/7
 
 | Service | Port(s) | Purpose | Image |
 |---------|---------|---------|-------|
-| **Headscale** | 443, 3478 | Tailscale coordination (PRIMARY) | headscale |
-| **Caddy** | 80, 443 | Reverse proxy, auto-TLS | caddy:2-alpine |
+| **Headscale** | 443, 3478 | Tailscale coordination (PRIMARY) | headscale/headscale:0.28.0 |
+| **Caddy** | 80, 443 | Reverse proxy, auto-TLS | caddy:2.8.4-alpine |
 | **headscale-backup** | — | Headscale DB backups | custom script |
-| **Uptime Kuma** | 3001 | External monitoring (WebSocket API) | louislam/uptime-kuma:1.23.17 |
-| **ntfy** | 80 | Push notifications | binwiederhier/ntfy |
+| **Uptime Kuma** | 3001 | External monitoring (WebSocket API) | louislam/uptime-kuma:1.23 |
+| **ntfy** | 8080 | Push notifications | binwiederhier/ntfy:v2 |
+| **AdGuard Home** (Yvága) | 53, 3000 | DNS ad-blocking + filtering | adguard/adguardhome:v0.107.73 |
+| **Unbound** (Yvága) | 5335 | Recursive DNS resolver (no third-party) | madnuttah/unbound:1.24.2-1 |
+| **DERP Relay** | 443, 3478 | Tailscale relay for NAT traversal | fredliang/derper:1.0 |
+| **Pi-hole** (VPS) | 53 | DNS (legacy, secondary to AdGuard) | pihole/pihole:2026.02.0 |
+| **changedetection** | 5000 | Web page change monitoring | ghcr.io/dgtlmoon/changedetection.io:latest |
+| **Playwright** | — | Browser engine for changedetection | dgtlmoon/sockpuppetbrowser:latest |
+| **Restic REST** (VPS) | 8000 | Headscale backup target | restic/rest-server:0.14.0 |
 
 ### Docker VM — 33 containers, 24/7
 
@@ -315,10 +329,15 @@ Coolify (Tajy)               ← PaaS on NAS
 
 **VPS (deploy first):**
 1. Headscale → mesh network
-2. Caddy → reverse proxy
-3. headscale-backup → DB backups
-4. Uptime Kuma → monitoring
-5. ntfy → notifications
+2. AdGuard + Unbound (Yvága) → recursive DNS
+3. Caddy → reverse proxy
+4. DERP → Tailscale relay
+5. headscale-backup → DB backups
+6. Pi-hole (VPS) → DNS (secondary)
+7. Uptime Kuma → monitoring
+8. ntfy → notifications
+9. changedetection + Playwright → web scraping
+10. Restic REST (VPS) → backup target
 
 **NAS:**
 1. NFS → storage for Frigate
