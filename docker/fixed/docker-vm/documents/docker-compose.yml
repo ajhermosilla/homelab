@@ -17,6 +17,12 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID      # s6-overlay init
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=documents"
@@ -81,6 +87,12 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN       # Entrypoint chowns data dir
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID      # Privilege dropping to postgres user
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=documents"
@@ -122,6 +134,9 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - SETGID  # Entrypoint switches to redis user
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=documents"

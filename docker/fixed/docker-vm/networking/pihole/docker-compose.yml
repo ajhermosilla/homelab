@@ -46,7 +46,12 @@ services:
     cap_drop:
       - ALL
     cap_add:
+      - CHOWN
       - NET_ADMIN
+      - NET_RAW
+      - SETFCAP     # Pi-hole FTL capabilities
+      - SETGID
+      - SETUID
     logging:
       driver: "json-file"
       options:
