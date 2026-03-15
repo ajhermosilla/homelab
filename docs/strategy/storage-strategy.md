@@ -172,7 +172,7 @@ offsite-sync (NAS container, 4:30 AM)
 | HA config | ~200MB | Hard to recreate | 3 | Docker VM, Restic, GDrive |
 | Paperless documents | Variable | Yes (scanned docs) | 3 | Docker VM, Restic, GDrive |
 | Immich metadata | ~500MB | Yes (tags, albums) | 3 | Docker VM, Restic, GDrive |
-| Forgejo repos | Variable | Yes (git history) | 2 | NAS, local clones |
+| Forgejo repos | Variable | Yes (git history) | 3 | NAS, local clones, GitHub mirror |
 | Frigate recordings | ~158GB | No (7-day retention) | 1 | NAS Purple only |
 | Music collection | 346GB | No (re-downloadable) | 1 | Purple recovery (pending 8TB) |
 | Old laptop backups | 473GB | Mostly no | 1 | Purple recovery (pending 8TB) |
@@ -181,7 +181,7 @@ offsite-sync (NAS container, 4:30 AM)
 
 | Gap | Risk | Mitigation |
 |-----|------|------------|
-| Forgejo has no offsite mirror | Single point of failure for git | GitHub mirror planned (not deployed) |
+| ~~Forgejo has no offsite mirror~~ | ~~Single point of failure for git~~ | **Resolved** — GitHub push mirror active (sync on commit + 8h interval) |
 | Frigate recordings = 1 copy | Loss if Purple fails | Acceptable — recordings are ephemeral |
 | Family media pending 8TB recovery | Currently only on 98%-full Purple | Execute recovery plan ASAP |
 | Encryption keys only in Vaultwarden | Lose Vaultwarden = lose offsite | Paper backup recommended |
