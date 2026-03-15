@@ -8,7 +8,7 @@ services:
   # https://dozzle.dev/
   # =========================================================================
   dozzle:
-    image: amir20/dozzle:latest
+    image: amir20/dozzle:v10.1.1
     env_file:
       - ../../../shared/common.env
     container_name: dozzle
@@ -55,7 +55,7 @@ services:
   # Replaces Stirling-PDF (Java/Spring Boot had 85% idle CPU, ~500MB RAM).
   # =========================================================================
   bentopdf:
-    image: ghcr.io/alam00000/bentopdf:latest
+    image: ghcr.io/alam00000/bentopdf:v2.5.0
     env_file:
       - ../../../shared/common.env
     container_name: bentopdf
@@ -95,7 +95,7 @@ services:
   # https://gethomepage.dev/
   # =========================================================================
   homepage:
-    image: ghcr.io/gethomepage/homepage:latest
+    image: ghcr.io/gethomepage/homepage:v1.11.0
     env_file:
       - ../../../shared/common.env
     container_name: homepage
