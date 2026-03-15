@@ -86,7 +86,7 @@ services:
     volumes:
       - immich-ml-cache:/cache
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3003/ping"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3003/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -114,6 +114,9 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - SETGID
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
@@ -148,6 +151,12 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
