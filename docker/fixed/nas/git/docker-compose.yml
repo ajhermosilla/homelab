@@ -23,6 +23,7 @@ services:
       - FOWNER
       - SETGID
       - SETUID
+      - SYS_CHROOT   # SSH daemon preauth chroot
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=git"
