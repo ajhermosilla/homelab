@@ -1,6 +1,7 @@
 # Intel N150 iGPU Passthrough via SR-IOV for Frigate
 
 **Date:** 2026-02-25
+**Status:** Completed (2026-03-02) — iGPU passthrough active, OpenVINO ~15ms, VA-API decode
 **Estimated time:** 45-60 minutes (including BIOS access, reboots, troubleshooting)
 **Downtime:** ~10-15 minutes (Proxmox reboot + VM stop/start)
 **Rollback time:** ~5 minutes (revert VM machine type, remove hostpci0)
