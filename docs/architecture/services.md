@@ -48,6 +48,8 @@
 | 33 | — | paperless-redis | Documents | Docker VM | Active |
 | 34 | — | paperless-backup | Backup | Docker VM | Active |
 | 35 | — | immich-backup | Backup | Docker VM | Active |
+| 36 | — | caddy-backup | Backup | Docker VM | Active |
+| 37 | — | pihole-backup | Backup | Docker VM | Active |
 | 36 | Papa | vmalert | Monitoring | Docker VM | Active |
 | 37 | Papa | Alertmanager | Monitoring | Docker VM | Active |
 | 38 | Papa | cAdvisor | Monitoring | Docker VM | Active |
@@ -73,7 +75,7 @@
 | 58 | Javya | Javya Redis | Worship | NAS | Active |
 | 59 | — | OpenClaw | AI | RPi 5 | Pending |
 
-**Active:** 65 | **Pending:** 1
+**Active:** 67 | **Pending:** 1
 
 ## By Environment
 
@@ -85,7 +87,7 @@
 | **Caddy** | 80, 443 | Reverse proxy, auto-TLS | caddy:2.8.4-alpine |
 | **headscale-backup** | — | Headscale DB backups | custom script |
 | **Uptime Kuma** | 3001 | External monitoring (WebSocket API) | louislam/uptime-kuma:1.23 |
-| **ntfy** | 8080 | Push notifications | binwiederhier/ntfy:v2 |
+| **ntfy** | 8080 | Push notifications | binwiederhier/ntfy:v2.19.1 |
 | **AdGuard Home** (Yvága) | 53, 3000 | DNS ad-blocking + filtering | adguard/adguardhome:v0.107.73 |
 | **Unbound** (Yvága) | 5335 | Recursive DNS resolver (no third-party) | madnuttah/unbound:1.24.2-1 |
 | **DERP Relay** | 443, 3478 | Tailscale relay for NAT traversal | fredliang/derper:1.0 |
@@ -94,7 +96,7 @@
 | **Playwright** | — | Browser engine for changedetection | dgtlmoon/sockpuppetbrowser:latest |
 | **Restic REST** (VPS) | 8000 | Headscale backup target | restic/rest-server:0.14.0 |
 
-### Docker VM — 33 containers, 24/7
+### Docker VM — 35 containers, 24/7
 
 #### Networking
 
@@ -166,8 +168,8 @@ Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-| Vera | **Immich Server** | 2283 | vera.cronova.dev | ghcr.io/immich-app/immich-server |
-| Vera | **Immich ML** | — | — | ghcr.io/immich-app/immich-machine-learning |
+| Vera | **Immich Server** | 2283 | vera.cronova.dev | ghcr.io/immich-app/immich-server:v2.5.6 |
+| Vera | **Immich ML** | — | — | ghcr.io/immich-app/immich-machine-learning:v2.5.6 |
 | Vera | **Immich Valkey** | — | — | valkey/valkey |
 | Vera | **Immich DB** | — | — | tensorchord/pgvecto-rs |
 
@@ -192,7 +194,7 @@ Watchtower uses the maintained fork (nicholas-fedor) — the original containrrr
 | — | **Samba** | 445 | Network file shares | justinpatchett/samba |
 | — | **Syncthing** | 8384, 22000 | Peer-to-peer file sync | syncthing/syncthing:2.0.14 |
 | — | **Restic REST** | 8000 | Backup target | restic/rest-server:0.14.0 |
-| — | **Forgejo** | 3000, 2222 | Git server (SSH + web) | codeberg.org/forgejo/forgejo:11 |
+| — | **Forgejo** | 3000, 2222 | Git server (SSH + web) | codeberg.org/forgejo/forgejo:11.0 |
 | — | **NFS** | 2049 | Exports Purple 2TB for Frigate | kernel (not containerized) |
 | — | **Glances** | 61208 | System monitoring | nicolargo/glances |
 | Tajy | **Coolify** | 8888 | PaaS platform | ghcr.io/coollabsio/coolify |
@@ -456,7 +458,7 @@ docker/
 | Tools | Dozzle (Ysyry), BentoPDF (Kuatia), Homepage (Mbyja) | 3 |
 | Monitoring | VictoriaMetrics + Grafana + vmagent + vmalert + Alertmanager + cAdvisor (Papa), Uptime Kuma, ntfy, Glances | 10 |
 | Storage | Samba, Syncthing, NFS | 3 |
-| Backup | Restic REST, headscale-backup, vaultwarden-backup, homeassistant-backup, paperless-backup, immich-backup, coolify-backup, offsite-sync | 8 |
+| Backup | Restic REST, headscale-backup, vaultwarden-backup, caddy-backup, pihole-backup, homeassistant-backup, paperless-backup, immich-backup, coolify-backup, offsite-sync | 10 |
 | Maintenance | Watchtower | 1 |
 | Git | Forgejo | 1 |
 | PaaS | Coolify (Tajy) — 7 containers | 7 |

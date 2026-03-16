@@ -115,7 +115,9 @@ Docker VM fstab entries use `defaults,_netdev,nofail` to handle NAS unavailabili
 |------|---------|-----------|-------------|------------------|
 | Hourly | Headscale | headscale-backup | Local tar.gz (VPS) | SQLite DB, noise key, config |
 | 2:00 AM | Vaultwarden | vaultwarden-backup | `/augusto/vaultwarden` | vaultwarden-data volume |
+| 2:15 AM | Caddy | caddy-backup | `/augusto/caddy` | TLS certificates, ACME state |
 | 2:30 AM | Home Assistant | homeassistant-backup | `/augusto/homeassistant` | homeassistant-config volume |
+| 2:45 AM | Pi-hole | pihole-backup | `/augusto/pihole` | DNS config, blocklists, local DNS entries |
 | 3:00 AM | Paperless-ngx | paperless-backup | `/augusto/paperless` | Data + media volumes |
 | 3:15 AM | Immich | immich-backup | `/augusto/immich` | PostgreSQL pg_dump (metadata only) |
 | 3:30 AM | Coolify | coolify-backup | `/augusto/coolify` | PostgreSQL dumps + SSH keys |
