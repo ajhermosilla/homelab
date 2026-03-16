@@ -1,0 +1,136 @@
+site_name: Homelab — Augusto Hermosilla
+site_description: Infrastructure-as-code for a self-hosted homelab
+site_author: Augusto Hermosilla
+site_url: https://ajhermosilla.github.io/homelab/
+
+repo_url: https://github.com/ajhermosilla/homelab
+repo_name: ajhermosilla/homelab
+
+docs_dir: docs
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: custom
+    accent: custom
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.mark
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+nav:
+  - Home: README.md
+  - Architecture:
+      - Fixed Homelab: architecture/fixed-homelab.md
+      - VPS Architecture: architecture/vps-architecture.md
+      - Mobile Homelab: architecture/mobile-homelab.md
+      - Network Topology: architecture/network-topology.md
+      - Hardware: architecture/hardware.md
+      - Services: architecture/services.md
+      - Architecture Review: architecture/architecture-review.md
+  - Guides:
+      - Setup Runbook: guides/setup-runbook.md
+      - Deployment Order: guides/deployment-order.md
+      - Proxmox Setup: guides/proxmox-setup.md
+      - OPNsense Setup: guides/opnsense-setup.md
+      - NAS Guide: guides/nas-guide.md
+      - NAS App Deployment: guides/nas-app-deployment.md
+      - NFS Setup: guides/nfs-setup.md
+      - Caddy Config: guides/caddy-config.md
+      - VLAN Design: guides/vlan-design.md
+      - NUT Config: guides/nut-config.md
+      - Mobile Kit: guides/mobile-homelab-kit.md
+      - Uptime Kuma Setup: guides/uptime-kuma-setup-2026-01-19.md
+      - Backup Test Procedure: guides/backup-test-procedure.md
+  - Strategy:
+      - DNS Architecture: strategy/dns-architecture.md
+      - Certificate Strategy: strategy/certificate-strategy.md
+      - Security Hardening: strategy/security-hardening.md
+      - Monitoring Strategy: strategy/monitoring-strategy.md
+      - Storage Strategy: strategy/storage-strategy.md
+      - Disaster Recovery: strategy/disaster-recovery.md
+      - Secrets Management: strategy/secrets-management.md
+      - Domain Strategy: strategy/domain-strategy.md
+      - Domain Research: strategy/domain-research.md
+  - Plans:
+      - CrowdSec on OPNsense: plans/crowdsec-opnsense-2026-03-11.md
+      - VLAN Hardening: plans/vlan-hardening-execution-2026-03-11.md
+      - Hetzner Migration: plans/hetzner-migration-2026-03-13.md
+      - 8TB Recovery: plans/8tb-recovery-plan-2026-03-12.md
+      - Frigate Improvements: plans/frigate-improvement-plan-2026-03-02.md
+      - iGPU Passthrough: plans/igpu-passthrough-plan-2026-02-25.md
+      - HA Dashboard: plans/ha-dashboard-plan-2026-02-24.md
+      - HA Monitoring: plans/ha-monitoring-plan-2026-02-24.md
+      - RPi 5 Deployment: plans/rpi5-deployment-plan.md
+      - NAS Deployment: plans/nas-deployment-plan.md
+      - Self-Hosted PaaS: plans/self-hosted-paas-research-2026-02-25.md
+      - Forgejo–GitHub Mirror: plans/forgejo-github-mirror-2026-03-02.md
+      - Javya on NAS: plans/javya-deploy-nas-2026-03-02.md
+      - Uptime Kuma Monitors: plans/uptime-kuma-monitors-2026-03-02.md
+      - WAN Watchdog: plans/wan-watchdog-2026-02-23.md
+      - Homelab Expansion: plans/homelab-expansion-ideas-2026-02-24.md
+  - Reference:
+      - Guarani Naming: reference/guarani-naming-convention-2026-02-24.md
+      - Home Devices: reference/home-devices.md
+      - HA Devices Guide: reference/ha-devices-guide-2026-02-24.md
+      - Tailscale Primer: reference/tailscale-primer.md
+      - Beryl AX Setup: reference/beryl-ax-setup-2026-01-19.md
+      - Beryl AX Persistence: reference/beryl-ax-tailscale-persistence.md
+      - Branding: reference/branding.md
+      - Homelab Evaluation: reference/homelab-evaluation.md
+      - Family Emergency Internet: reference/family-emergency-internet.md
+      - 3D Printed Cases: reference/3d-printed-cases-research.md
+      - RPi 5 Case Research: reference/rpi5-case-research.md
+      - Keychron Quickstart: reference/keychron-k2c3-quickstart.md
+  - Journal:
+      - Community Assessment: journal/community-assessment-2026-03-16.md
+      - Documentation Review: journal/documentation-review-2026-02-26.md
+      - Improvement Report: journal/improvement-report-2026-02-22.md
+      - OPNsense Cutover: journal/opnsense-cutover-execution-2026-02-21.md
+      - OPNsense Gateway: journal/opnsense-gateway-cutover-2026-02-08.md
+      - Post-Cutover Verification: journal/post-cutover-verification-2026-02-21.md
+      - Pre-NAS Audit: journal/pre-nas-audit-2026-02-21.md
+      - 8TB Recovery Log: journal/red-8tb-recovery-2026-02-22.md
+      - Frigate/HA Optimization: journal/frigate-ha-optimization-2026-02-24.md
+  - Incidents:
+      - DNS Loop (2026-03-12): journal/incident-2026-03-12-dns-loop.md
+      - Uptime Kuma Monitors (2026-03-13): journal/incident-2026-03-13-uptime-kuma-monitors.md
+      - Vaultwarden 502 (2026-03-16): journal/incident-2026-03-16-vaultwarden-502.md
+      - Frigate Crash (2026-03-05): guides/incident-2026-03-05-frigate-crash.md
+      - ISP Outage (2026-03-05): guides/incident-2026-03-05-isp-outage.md
