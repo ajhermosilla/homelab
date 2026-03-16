@@ -79,7 +79,7 @@ auth.cronova.dev {
 vault.cronova.dev {
 	import internal_tls
 	import security_headers
-	reverse_proxy host.docker.internal:8843
+	reverse_proxy vaultwarden:80
 }
 
 # Home Assistant - Automation (Jara)

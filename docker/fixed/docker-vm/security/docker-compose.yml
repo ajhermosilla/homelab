@@ -55,6 +55,7 @@ services:
         max-file: "3"
     networks:
       - security-net
+      - caddy-net
 
   # =========================================================================
   # Frigate - NVR with AI Object Detection
@@ -192,6 +193,8 @@ networks:
     name: security-net
   mqtt-net:
     external: true  # Created by automation stack
+  caddy-net:
+    external: true  # Created by networking/caddy stack
 
 # =============================================================================
 # STARTUP ORDER
