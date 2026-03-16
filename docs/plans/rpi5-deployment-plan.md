@@ -318,6 +318,6 @@ If something goes wrong:
 
 - [hardware.md](../architecture/hardware.md) - Full hardware specs
 - [mobile-homelab.md](../architecture/mobile-homelab.md) - Mobile kit (RPi 5 migration history)
-- [ansible/playbooks/openclaw.yml](../../ansible/playbooks/openclaw.yml) - OpenClaw Ansible playbook
+- `ansible/playbooks/openclaw.yml` - OpenClaw Ansible playbook
 - [Raspberry Pi 5 Specs](https://www.raspberrypi.com/products/raspberry-pi-5/)
 - [OpenClaw Docs](https://docs.openclaw.ai/)
