@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homelab Overview — cronova.dev</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-alt: #1c2333;
+    --bg-code: #0d1117;
+    --border: #30363d;
+    --border-subtle: #21262d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent-cyan: #00d4aa;
+    --accent-teal: #39d2c0;
+    --accent-blue: #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-orange: #d29922;
+    --accent-red: #f85149;
+    --accent-green: #3fb950;
+    --accent-pink: #f778ba;
+    --accent-warm: #da7756;
+    --gradient-hero: linear-gradient(135deg, #0d1117 0%, #0f1923 30%, #111d2b 60%, #0d1117 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--gradient-hero);
+    border-bottom: 1px solid var(--border);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 500px 250px at 25% 60%, rgba(0, 212, 170, 0.08), transparent),
+      radial-gradient(ellipse 500px 250px at 75% 40%, rgba(188, 140, 255, 0.07), transparent),
+      radial-gradient(ellipse 400px 200px at 50% 90%, rgba(88, 166, 255, 0.05), transparent);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+  .hero .subtitle {
+    color: var(--text);
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+  .hero .tagline {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .accent-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 1.5rem;
+    height: 4px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .accent-bar .seg-cyan { background: var(--accent-cyan); flex: 1; }
+  .accent-bar .seg-blue { background: var(--accent-blue); flex: 1; }
+  .accent-bar .seg-purple { background: var(--accent-purple); flex: 1; }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    line-height: 1.2;
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Container ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ── Section Headers ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 3rem 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-header:first-child {
+    margin-top: 0;
+  }
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-header .badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg-card-alt);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .card:hover {
+    border-color: var(--accent-teal);
+  }
+  .card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+  .card-meta span {
+    color: var(--text-muted);
+  }
+  .card-meta .label {
+    color: var(--text-dim);
+    min-width: 65px;
+    display: inline-block;
+  }
+
+  .card-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: var(--bg-card-alt);
+    color: var(--accent-cyan);
+    border: 1px solid var(--border-subtle);
+    margin-top: 0.5rem;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+  }
+  .toc a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.2rem 0;
+    transition: color 0.2s;
+  }
+  .toc a:hover {
+    color: var(--accent-cyan);
+  }
+  .toc-num {
+    color: var(--text-dim);
+    margin-right: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* ── Pre / ASCII ── */
+  pre.diagram {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    margin: 1rem 0;
+  }
+
+  /* ── Tables ── */
+  .table-wrapper {
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  thead th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text);
+  }
+  tbody tr:hover {
+    background: var(--bg-card);
+  }
+
+  /* ── Details ── */
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 0.75rem 0;
+    transition: border-color 0.2s;
+  }
+  details:hover {
+    border-color: var(--accent-teal);
+  }
+  details[open] {
+    border-color: var(--accent-blue);
+  }
+  summary {
+    cursor: pointer;
+    padding: 0.75rem 1.25rem;
+    color: var(--accent-blue);
+    font-weight: 600;
+    font-size: 0.92rem;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: '+';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: var(--bg-card-alt);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+  }
+  details[open] > summary::before {
+    content: '-';
+    background: var(--accent-blue);
+    color: var(--bg);
+  }
+  .details-body {
+    padding: 0 1.25rem 1rem;
+  }
+
+  /* ── Category Header ── */
+  .cat-header {
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  /* ── Checklist ── */
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .checklist li::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: var(--accent-green);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  /* ── Service Tags ── */
+  .service-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .service-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--bg-code);
+    border: 1px solid var(--border-subtle);
+    color: var(--text);
+  }
+  .service-tag .host-badge {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    padding: 1px 5px;
+    background: var(--bg-card-alt);
+    border-radius: 3px;
+  }
+  .service-tag .guarani {
+    color: var(--accent-warm);
+    font-style: italic;
+    font-size: 0.75rem;
+  }
+
+  /* ── Tech Grid ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .tech-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+  }
+  .tech-card h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent-cyan);
+    margin-bottom: 0.5rem;
+  }
+  .tech-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .tech-card li {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Paragraph ── */
+  p.desc {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    margin: 0.75rem 0;
+    max-width: 800px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    margin-top: 3rem;
+  }
+  .footer a {
+    color: var(--accent-blue);
+    text-decoration: none;
+  }
+  .footer .domain {
+    color: var(--accent-cyan);
+    font-weight: 600;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .hero { padding: 2.5rem 1.25rem 2rem; }
+    .hero h1 { font-size: 2.2rem; }
+    .stats-row { gap: 1.5rem; }
+    .stat-number { font-size: 1.4rem; }
+    .toc { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    .container { padding: 1.25rem 1rem; }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+    pre.diagram { font-size: 0.68rem; padding: 1rem; }
+  }
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 1.8rem; }
+    .stats-row { gap: 1rem; }
+    .tech-grid { grid-template-columns: 1fr; }
+    pre.diagram { font-size: 0.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<header class="hero">
+  <h1>Homelab</h1>
+  <p class="subtitle">Infrastructure-as-code for a self-hosted homelab</p>
+  <p class="tagline">Proxmox, Docker, OPNsense, Tailscale -- managed via Ansible and Docker Compose</p>
+  <div class="accent-bar">
+    <div class="seg-cyan"></div>
+    <div class="seg-blue"></div>
+    <div class="seg-purple"></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-number">4</div>
+      <div class="stat-label">Hosts</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">67</div>
+      <div class="stat-label">Services</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">35</div>
+      <div class="stat-label">Containers (VM)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">8</div>
+      <div class="stat-label">Backup Repos</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ════════════════════ TOC ════════════════════ -->
+<div class="section-header">
+  <h2>Contents</h2>
+</div>
+<nav class="toc">
+  <a href="#architecture"><span class="toc-num">01</span>Architecture Overview</a>
+  <a href="#services"><span class="toc-num">02</span>Services (67)</a>
+  <a href="#network"><span class="toc-num">03</span>Network Architecture</a>
+  <a href="#security"><span class="toc-num">04</span>Security Hardening</a>
+  <a href="#backup"><span class="toc-num">05</span>Backup Strategy</a>
+  <a href="#monitoring"><span class="toc-num">06</span>Monitoring Pipeline</a>
+  <a href="#naming"><span class="toc-num">07</span>Naming Convention</a>
+  <a href="#techstack"><span class="toc-num">08</span>Tech Stack</a>
+</nav>
+
+<!-- ════════════════════ 1. ARCHITECTURE ════════════════════ -->
+<div class="section-header" id="architecture">
+  <h2>Architecture Overview</h2>
+</div>
+
+<pre class="diagram">
+                          Internet
+                             |
+                       +-----------+
+                       |    VPS    |   Headscale, Caddy, DNS
+                       |  (Vultr) |   1 vCPU / 1GB / 32GB
+                       +-----+-----+
+                             |
+                        Tailscale Mesh (WireGuard)
+               +-------------+-------------+
+               |             |             |
+        +------+------+  +--+---+  +------+------+
+        |  Proxmox    |  | NAS  |  | OPNsense    |
+        |   (Oga)     |  |      |  | Gateway     |
+        | N150 / 12GB |  | 8GB  |  | VM 100      |
+        +------+------+  +------+  +-------------+
+               |
+        +------+------+
+        |  Docker VM  |
+        |  VM 101     |
+        |  9GB / 35ct |
+        +-------------+
+</pre>
+
+<p class="desc">
+  Every service runs as a Docker container across three physical locations: a local
+  Proxmox hypervisor, a NAS for storage and Git, and a VPS for the Tailscale control
+  plane and external DNS. OPNsense provides firewall, DHCP, and VLAN segmentation.
+  All nodes communicate over a Headscale-managed WireGuard mesh, with no ports exposed
+  to the public internet except the Headscale control server.
+</p>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>Proxmox <span style="color:var(--accent-warm);font-style:italic;font-size:0.85rem">(Oga)</span></h3>
+    <p>Hypervisor running two VMs: Docker VM and OPNsense gateway.</p>
+    <div class="card-meta">
+      <span><span class="label">CPU</span> Intel N150 (4C/4T)</span>
+      <span><span class="label">RAM</span> 12 GB DDR5</span>
+      <span><span class="label">Storage</span> 512 GB NVMe SSD</span>
+      <span><span class="label">Role</span> Hypervisor</span>
+    </div>
+    <span class="card-tag">2 VMs</span>
+  </div>
+
+  <div class="card">
+    <h3>Docker VM</h3>
+    <p>Primary workload host. 11 Docker Compose stacks with 35 containers.</p>
+    <div class="card-meta">
+      <span><span class="label">CPU</span> 4 vCPU</span>
+      <span><span class="label">RAM</span> 9 GB</span>
+      <span><span class="label">Storage</span> 100 GB</span>
+      <span><span class="label">Role</span> Application host</span>
+    </div>
+    <span class="card-tag">35 containers</span>
+  </div>
+
+  <div class="card">
+    <h3>NAS</h3>
+    <p>Storage, Git server (Forgejo), Coolify PaaS, and application deployments.</p>
+    <div class="card-meta">
+      <span><span class="label">CPU</span> i3-3220T (2C/4T)</span>
+      <span><span class="label">RAM</span> 8 GB DDR3</span>
+      <span><span class="label">Storage</span> 240GB + 2TB + 8TB</span>
+      <span><span class="label">Role</span> Storage / Git / PaaS</span>
+    </div>
+    <span class="card-tag">19 containers</span>
+  </div>
+
+  <div class="card">
+    <h3>VPS <span style="color:var(--text-dim);font-size:0.85rem">(Vultr)</span></h3>
+    <p>Headscale control plane, external DNS, uptime monitoring, push notifications.</p>
+    <div class="card-meta">
+      <span><span class="label">CPU</span> 1 vCPU</span>
+      <span><span class="label">RAM</span> 1 GB</span>
+      <span><span class="label">Storage</span> 32 GB NVMe</span>
+      <span><span class="label">Role</span> Control plane / DNS</span>
+    </div>
+    <span class="card-tag">11 containers</span>
+  </div>
+</div>
+
+<!-- ════════════════════ 2. SERVICES ════════════════════ -->
+<div class="section-header" id="services">
+  <h2>Services</h2>
+  <span class="badge">67 active</span>
+</div>
+
+<p class="desc">
+  Services are organized into Docker Compose stacks and named using the Guarani naming
+  convention. Each category below can be expanded to see individual services, their
+  Guarani name (if assigned), and which host they run on.
+</p>
+
+<!-- Networking -->
+<details>
+  <summary>Networking <span class="badge">4</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">Headscale <span class="host-badge">VPS</span></span>
+      <span class="service-tag">Caddy <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Caddy <span class="host-badge">VPS</span></span>
+      <span class="service-tag">DERP <span class="host-badge">VPS</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- DNS -->
+<details>
+  <summary>DNS <span class="badge">4</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">Pi-hole <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag"><span class="guarani">Yvaga</span> AdGuard Home <span class="host-badge">VPS</span></span>
+      <span class="service-tag"><span class="guarani">Yvaga</span> Unbound <span class="host-badge">VPS</span></span>
+      <span class="service-tag">Pi-hole <span class="host-badge">VPS</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Surveillance -->
+<details>
+  <summary>Surveillance <span class="badge">1</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Taguato</span> Frigate NVR <span class="host-badge">Docker VM</span></span>
+    </div>
+    <p class="desc" style="margin-top:0.75rem">3 cameras (2 outdoor, 1 indoor). iGPU passthrough with OpenVINO detection (~15ms) and VA-API hardware decoding.</p>
+  </div>
+</details>
+
+<!-- Automation -->
+<details>
+  <summary>Automation <span class="badge">3</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Jara</span> Home Assistant <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Mosquitto (MQTT) <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">HA Backup Sidecar <span class="host-badge">Docker VM</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Auth -->
+<details>
+  <summary>Auth <span class="badge">2</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Oke</span> Authelia <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Vaultwarden <span class="host-badge">Docker VM</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Media -->
+<details>
+  <summary>Media <span class="badge">5</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Yrasema</span> Jellyfin <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Sonarr <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Radarr <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Prowlarr <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">qBittorrent <span class="host-badge">Docker VM</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Photos -->
+<details>
+  <summary>Photos <span class="badge">5</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Vera</span> Immich Server <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Immich ML <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Immich Valkey <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Immich DB <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Immich Backup <span class="host-badge">Docker VM</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Documents -->
+<details>
+  <summary>Documents <span class="badge">4</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Aranduka</span> Paperless-ngx <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Paperless DB <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Paperless Redis <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Paperless Backup <span class="host-badge">Docker VM</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Tools -->
+<details>
+  <summary>Tools <span class="badge">3</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Ysyry</span> Dozzle <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag"><span class="guarani">Kuatia</span> BentoPDF <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag"><span class="guarani">Mbyja</span> Homepage <span class="host-badge">Docker VM</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Monitoring -->
+<details>
+  <summary>Monitoring <span class="badge">10</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Papa</span> VictoriaMetrics <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag"><span class="guarani">Papa</span> Grafana <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">vmagent <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">vmalert <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Alertmanager <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">cAdvisor <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">Uptime Kuma <span class="host-badge">VPS</span></span>
+      <span class="service-tag">ntfy <span class="host-badge">VPS</span></span>
+      <span class="service-tag">Glances <span class="host-badge">NAS</span></span>
+      <span class="service-tag"><span class="guarani">Aoao</span> Changedetection <span class="host-badge">VPS</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Storage -->
+<details>
+  <summary>Storage <span class="badge">3</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">Samba <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Syncthing <span class="host-badge">NAS</span></span>
+      <span class="service-tag">NFS <span class="host-badge">NAS</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Backup -->
+<details>
+  <summary>Backup <span class="badge">10</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">Restic REST Server <span class="host-badge">NAS</span></span>
+      <span class="service-tag">headscale-backup <span class="host-badge">VPS</span></span>
+      <span class="service-tag">vaultwarden-backup <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">caddy-backup <span class="host-badge">VPS</span></span>
+      <span class="service-tag">pihole-backup <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">homeassistant-backup <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">paperless-backup <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">immich-backup <span class="host-badge">Docker VM</span></span>
+      <span class="service-tag">coolify-backup <span class="host-badge">NAS</span></span>
+      <span class="service-tag">offsite-sync <span class="host-badge">NAS</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Maintenance -->
+<details>
+  <summary>Maintenance <span class="badge">1</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">Watchtower <span class="host-badge">Docker VM</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Git -->
+<details>
+  <summary>Git <span class="badge">1</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">Forgejo <span class="host-badge">NAS</span></span>
+    </div>
+    <p class="desc" style="margin-top:0.75rem">Self-hosted Git server at git.cronova.dev with GitHub mirroring.</p>
+  </div>
+</details>
+
+<!-- PaaS -->
+<details>
+  <summary>PaaS <span class="badge">7</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Tajy</span> Coolify <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Coolify Proxy <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Coolify Worker <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Coolify DB <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Coolify Redis <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Coolify Realtime <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Coolify Scheduler <span class="host-badge">NAS</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- Apps -->
+<details>
+  <summary>Apps <span class="badge">6</span></summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag"><span class="guarani">Katupyry</span> App <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Katupyry DB <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Katupyry Redis <span class="host-badge">NAS</span></span>
+      <span class="service-tag"><span class="guarani">Javya</span> App <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Javya DB <span class="host-badge">NAS</span></span>
+      <span class="service-tag">Javya Frontend <span class="host-badge">NAS</span></span>
+    </div>
+  </div>
+</details>
+
+<!-- ════════════════════ 3. NETWORK ════════════════════ -->
+<div class="section-header" id="network">
+  <h2>Network Architecture</h2>
+</div>
+
+<p class="desc">
+  All DNS resolution stays private. Home devices query Pi-hole, which forwards
+  to Unbound on OPNsense for recursive resolution against root servers. The VPS
+  uses a separate AdGuard + Unbound stack. Tailscale MagicDNS serves
+  <code>*.cronova.dev</code> records to all mesh nodes via Headscale extra_records.
+</p>
+
+<pre class="diagram">
+  DNS Resolution Flow
+  ====================
+
+  Home Network                          VPS (yvaga stack)
+  ────────────                          ──────────────────
+  Devices                               VPS Services
+     |                                      |
+  Pi-hole (Docker VM)                   AdGuard Home
+     |                                      |
+  Unbound (OPNsense)                    Unbound
+     |                                      |
+  Root Servers                          Root Servers
+
+
+  Tailscale Mesh (Headscale)
+  ══════════════════════════
+  *.cronova.dev  -->  extra_records (20 A records)
+                      served by MagicDNS to all 8 nodes
+</pre>
+
+<pre class="diagram">
+  VLAN Topology
+  =============
+
+  LAN        10.x.x.0/24     Default network
+  IOT        VLAN 10          IoT devices (cameras, sensors)
+  GUEST      VLAN 20          Guest WiFi
+
+  Gateway: OPNsense (VM 100)
+  Status:  VLANs configured, firewall rules pending
+</pre>
+
+<details>
+  <summary>Headscale Mesh Nodes (8 connected)</summary>
+  <div class="details-body">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Node</th><th>Type</th><th>Tailscale IP</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VPS</td><td>Cloud</td><td>100.x.x.46</td></tr>
+          <tr><td>Proxmox</td><td>Hypervisor</td><td>100.x.x.241</td></tr>
+          <tr><td>Docker VM</td><td>VM</td><td>100.x.x.168</td></tr>
+          <tr><td>OPNsense</td><td>Gateway</td><td>100.x.x.235</td></tr>
+          <tr><td>NAS</td><td>Storage</td><td>100.x.x.97</td></tr>
+          <tr><td>MacBook Air</td><td>Laptop</td><td>100.x.x.x</td></tr>
+          <tr><td>iPhone</td><td>Mobile</td><td>100.x.x.x</td></tr>
+          <tr><td>iPad</td><td>Tablet</td><td>100.x.x.x</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+
+<!-- ════════════════════ 4. SECURITY ════════════════════ -->
+<div class="section-header" id="security">
+  <h2>Security Hardening</h2>
+</div>
+
+<ul class="checklist">
+  <li>All containers: <code>cap_drop: [ALL]</code> with explicit <code>cap_add</code> for required capabilities</li>
+  <li>All containers: <code>security_opt: [no-new-privileges:true]</code></li>
+  <li>Stateless containers run with <code>read_only: true</code> rootfs</li>
+  <li>Authelia SSO with TOTP 2FA protecting 8 services</li>
+  <li>UFW with INPUT DROP policy on Docker VM</li>
+  <li>VPS exposes only the Headscale control port publicly</li>
+  <li>OPNsense gateway with VLAN segmentation (IOT, GUEST)</li>
+  <li>Private DNS: recursive resolution via Unbound (no third-party resolvers)</li>
+  <li>HSTS headers (<code>max-age=31536000</code>) on all Caddy-proxied services</li>
+  <li>All 23 Docker Compose stacks have <code>.env.example</code> files (secrets gitignored)</li>
+</ul>
+
+<details>
+  <summary>Authelia Protection Matrix</summary>
+  <div class="details-body">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Service</th><th>Guarani Name</th><th>Auth</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Homepage</td><td>Mbyja</td><td>Authelia SSO</td></tr>
+          <tr><td>Grafana</td><td>Papa</td><td>Authelia SSO</td></tr>
+          <tr><td>Dozzle</td><td>Ysyry</td><td>Authelia SSO</td></tr>
+          <tr><td>BentoPDF</td><td>Kuatia</td><td>Authelia SSO</td></tr>
+          <tr><td>Paperless-ngx</td><td>Aranduka</td><td>Authelia SSO</td></tr>
+          <tr><td>Changedetection</td><td>Aoao</td><td>Authelia SSO</td></tr>
+          <tr><td style="color:var(--text-dim)">Home Assistant</td><td style="color:var(--text-dim)">Jara</td><td style="color:var(--text-dim)">Own auth</td></tr>
+          <tr><td style="color:var(--text-dim)">Frigate</td><td style="color:var(--text-dim)">Taguato</td><td style="color:var(--text-dim)">Own auth</td></tr>
+          <tr><td style="color:var(--text-dim)">Vaultwarden</td><td style="color:var(--text-dim)">Vault</td><td style="color:var(--text-dim)">Own auth</td></tr>
+          <tr><td style="color:var(--text-dim)">Immich</td><td style="color:var(--text-dim)">Vera</td><td style="color:var(--text-dim)">Own auth</td></tr>
+          <tr><td style="color:var(--text-dim)">Forgejo</td><td style="color:var(--text-dim)">Git</td><td style="color:var(--text-dim)">Own auth</td></tr>
+          <tr><td style="color:var(--text-dim)">Jellyfin</td><td style="color:var(--text-dim)">Yrasema</td><td style="color:var(--text-dim)">Own auth</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+
+<!-- ════════════════════ 5. BACKUP ════════════════════ -->
+<div class="section-header" id="backup">
+  <h2>Backup Strategy</h2>
+</div>
+
+<pre class="diagram">
+  3-2-1 Backup Rule
+  ==================
+
+  Copy 1 (Live)        Copy 2 (On-site)       Copy 3 (Off-site)
+  ──────────────       ────────────────        ─────────────────
+  Docker VM            NAS                     Google Drive
+  (application data)   (Restic REST server)    (rclone crypt)
+                       Nightly snapshots       Encrypted sync
+                       at /mnt/purple/backup   at 04:30 PYT
+
+  Encryption: AES-256 at rest (Restic) + rclone crypt layer
+  Recovery requires: rclone password + salt + RESTIC_PASSWORD
+</pre>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr><th>Sidecar</th><th>Source</th><th>Schedule (PYT)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>vaultwarden-backup</td><td>Vaultwarden</td><td>02:00</td></tr>
+      <tr><td>homeassistant-backup</td><td>Home Assistant</td><td>02:30</td></tr>
+      <tr><td>paperless-backup</td><td>Paperless-ngx</td><td>03:00</td></tr>
+      <tr><td>immich-backup</td><td>Immich</td><td>03:15</td></tr>
+      <tr><td>coolify-backup</td><td>Coolify</td><td>03:30</td></tr>
+      <tr><td>headscale-backup</td><td>Headscale</td><td>03:00</td></tr>
+      <tr><td>caddy-backup</td><td>Caddy (VPS)</td><td>03:00</td></tr>
+      <tr><td>offsite-sync</td><td>All repos</td><td>04:30</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<details>
+  <summary>Retention Policy</summary>
+  <div class="details-body">
+    <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="card" style="text-align:center">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan)">7</div>
+        <p>Daily snapshots</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--accent-blue)">4</div>
+        <p>Weekly snapshots</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--accent-purple)">12</div>
+        <p>Monthly snapshots</p>
+      </div>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>Recovery Time Objectives</summary>
+  <div class="details-body">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th>RTO</th><th>Method</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Single container failure</td><td>&lt; 5 min</td><td>Docker Compose restart</td></tr>
+          <tr><td>Docker VM rebuild</td><td>&lt; 1 hour</td><td>Ansible playbook + Restic restore</td></tr>
+          <tr><td>NAS disk failure</td><td>&lt; 2 hours</td><td>Replace disk + restore from backup</td></tr>
+          <tr><td>Full site rebuild</td><td>&lt; 4 hours</td><td>Proxmox reinstall + Ansible + Restic</td></tr>
+          <tr><td>VPS replacement</td><td>&lt; 30 min</td><td>Cloud-init + Ansible + Restic</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+
+<!-- ════════════════════ 6. MONITORING ════════════════════ -->
+<div class="section-header" id="monitoring">
+  <h2>Monitoring Pipeline</h2>
+</div>
+
+<pre class="diagram">
+  Metrics Pipeline (Papa Stack)
+  ═════════════════════════════
+
+  +---------+    scrape     +------------------+    query    +---------+
+  | vmagent | ------------> | VictoriaMetrics  | <--------- | Grafana |
+  | 9 tgts  |    30s int    | 90-day retention |            | 6 dash  |
+  +---------+               +------------------+            +---------+
+                                    |
+                              +----------+
+                              |  vmalert |    11 rules / 30s eval
+                              +----+-----+
+                                   |
+                            +--------------+
+                            | Alertmanager |
+                            +------+-------+
+                                   |
+                              +--------+
+                              |  ntfy  |    Push notifications
+                              +--------+    3 priority tiers
+</pre>
+
+<details>
+  <summary>Scrape Targets (9)</summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">node-docker-vm</span>
+      <span class="service-tag">node-nas</span>
+      <span class="service-tag">victoriametrics</span>
+      <span class="service-tag">vmagent</span>
+      <span class="service-tag">grafana</span>
+      <span class="service-tag">cadvisor</span>
+      <span class="service-tag">vmalert</span>
+      <span class="service-tag">alertmanager</span>
+      <span class="service-tag">home-assistant</span>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>Alert Rules (11)</summary>
+  <div class="details-body">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Rule</th><th>Severity</th><th>Condition</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>HighCpu</td><td style="color:var(--accent-orange)">warning</td><td>CPU &gt; threshold for 5m</td></tr>
+          <tr><td>HighMemory</td><td style="color:var(--accent-orange)">warning</td><td>Memory &gt; threshold for 5m</td></tr>
+          <tr><td>DiskSpaceLow</td><td style="color:var(--accent-orange)">warning</td><td>Disk usage &gt; 80%</td></tr>
+          <tr><td>DiskSpaceCritical</td><td style="color:var(--accent-red)">critical</td><td>Disk usage &gt; 90%</td></tr>
+          <tr><td>HostDown</td><td style="color:var(--accent-red)">critical</td><td>Node unreachable for 2m</td></tr>
+          <tr><td>ContainerHighCpu</td><td style="color:var(--accent-orange)">warning</td><td>Container CPU spike</td></tr>
+          <tr><td>ContainerHighMemory</td><td style="color:var(--accent-orange)">warning</td><td>Container memory spike</td></tr>
+          <tr><td>ContainerRestarting</td><td style="color:var(--accent-red)">critical</td><td>Restart loop detected</td></tr>
+          <tr><td>ScrapeTargetDown</td><td style="color:var(--accent-orange)">warning</td><td>Target unreachable</td></tr>
+          <tr><td>VmIngestionSpike</td><td style="color:var(--accent-orange)">warning</td><td>Ingestion rate spike</td></tr>
+          <tr><td>VmStorageLow</td><td style="color:var(--accent-orange)">warning</td><td>TSDB storage &gt; threshold</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>Grafana Dashboards (6)</summary>
+  <div class="details-body">
+    <div class="service-grid">
+      <span class="service-tag">Node Exporter Full</span>
+      <span class="service-tag">VictoriaMetrics Single</span>
+      <span class="service-tag">cAdvisor Docker</span>
+      <span class="service-tag">vmagent</span>
+      <span class="service-tag">Grafana Internals</span>
+      <span class="service-tag">Homelab Overview</span>
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>ntfy Priority Tiers</summary>
+  <div class="details-body">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Topic</th><th>Priority</th><th>Use Case</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>cronova-critical</td><td style="color:var(--accent-red)">Urgent</td><td>Host down, disk critical, restart loops</td></tr>
+          <tr><td>cronova-warning</td><td style="color:var(--accent-orange)">High</td><td>High CPU/memory, disk warning, scrape failures</td></tr>
+          <tr><td>cronova-info</td><td style="color:var(--accent-blue)">Default</td><td>Watchtower updates, general info</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+
+<!-- ════════════════════ 7. NAMING ════════════════════ -->
+<div class="section-header" id="naming">
+  <h2>Naming Convention</h2>
+</div>
+
+<p class="desc">
+  Services are named in Guarani, the indigenous language of Paraguay. Each name
+  reflects the function of the service it represents, drawing from nature, daily
+  life, and cultural concepts.
+</p>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr><th>Guarani Name</th><th>Meaning</th><th>Service</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="color:var(--accent-warm)">Oga</td><td>House</td><td>Proxmox hypervisor</td></tr>
+      <tr><td style="color:var(--accent-warm)">Jara</td><td>Owner, lord</td><td>Home Assistant</td></tr>
+      <tr><td style="color:var(--accent-warm)">Taguato</td><td>Hawk</td><td>Frigate NVR</td></tr>
+      <tr><td style="color:var(--accent-warm)">Yrasema</td><td>Sound of water</td><td>Jellyfin</td></tr>
+      <tr><td style="color:var(--accent-warm)">Mbyja</td><td>Firefly</td><td>Homepage dashboard</td></tr>
+      <tr><td style="color:var(--accent-warm)">Ysyry</td><td>Stream, creek</td><td>Dozzle (log viewer)</td></tr>
+      <tr><td style="color:var(--accent-warm)">Kuatia</td><td>Paper, document</td><td>BentoPDF</td></tr>
+      <tr><td style="color:var(--accent-warm)">Oke</td><td>Door</td><td>Authelia</td></tr>
+      <tr><td style="color:var(--accent-warm)">Papa</td><td>To count, enumerate</td><td>Monitoring stack</td></tr>
+      <tr><td style="color:var(--accent-warm)">Vera</td><td>To shine, glow</td><td>Immich (photos)</td></tr>
+      <tr><td style="color:var(--accent-warm)">Tajy</td><td>Lapacho tree</td><td>Coolify PaaS</td></tr>
+      <tr><td style="color:var(--accent-warm)">Aranduka</td><td>Library, book collection</td><td>Paperless-ngx</td></tr>
+      <tr><td style="color:var(--accent-warm)">Yvaga</td><td>Sky, heaven</td><td>AdGuard + Unbound (DNS)</td></tr>
+      <tr><td style="color:var(--accent-warm)">Katupyry</td><td>Skill, ability</td><td>Personal finance app</td></tr>
+      <tr><td style="color:var(--accent-warm)">Javya</td><td>Praise, worship</td><td>Worship planning tool</td></tr>
+      <tr><td style="color:var(--accent-warm)">Aoao</td><td>To watch, observe</td><td>Changedetection</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════════ 8. TECH STACK ════════════════════ -->
+<div class="section-header" id="techstack">
+  <h2>Tech Stack</h2>
+</div>
+
+<div class="tech-grid">
+  <div class="tech-card">
+    <h4>Infrastructure</h4>
+    <ul>
+      <li>Proxmox VE</li>
+      <li>Docker / Compose</li>
+      <li>OPNsense</li>
+      <li>Tailscale / Headscale</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>IaC / Automation</h4>
+    <ul>
+      <li>Ansible</li>
+      <li>Docker Compose</li>
+      <li>Cloud-init</li>
+      <li>Watchtower</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>DNS</h4>
+    <ul>
+      <li>Pi-hole v6</li>
+      <li>AdGuard Home</li>
+      <li>Unbound</li>
+      <li>MagicDNS</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>Monitoring</h4>
+    <ul>
+      <li>VictoriaMetrics</li>
+      <li>Grafana</li>
+      <li>Uptime Kuma</li>
+      <li>ntfy</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>Security</h4>
+    <ul>
+      <li>Authelia (SSO + 2FA)</li>
+      <li>Vaultwarden</li>
+      <li>UFW / OPNsense FW</li>
+      <li>CrowdSec (planned)</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>Backup</h4>
+    <ul>
+      <li>Restic</li>
+      <li>rclone (crypt)</li>
+      <li>Google Drive</li>
+      <li>Cron sidecars</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>Reverse Proxy</h4>
+    <ul>
+      <li>Caddy (Docker VM)</li>
+      <li>Caddy (VPS)</li>
+      <li>Auto HTTPS / ACME</li>
+      <li>HSTS enforcement</li>
+    </ul>
+  </div>
+  <div class="tech-card">
+    <h4>Git / CI</h4>
+    <ul>
+      <li>Forgejo (self-hosted)</li>
+      <li>GitHub (mirror)</li>
+      <li>Coolify (PaaS)</li>
+      <li>GPG-signed commits</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /.container -->
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer class="footer">
+  <p>Built and maintained by Augusto Hermosilla</p>
+  <p><span class="domain">cronova.dev</span></p>
+  <p style="margin-top:0.5rem">Last updated: 2026-03-16</p>
+</footer>
+
+</body>
+</html>
