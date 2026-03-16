@@ -120,6 +120,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
+      - "com.centurylinklabs.watchtower.enable=false"
     deploy:
       resources:
         limits:
@@ -161,6 +162,7 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=photos"
       - "com.cronova.backup=true"
+      - "com.centurylinklabs.watchtower.enable=false"
     deploy:
       resources:
         limits:

@@ -97,6 +97,7 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=documents"
       - "com.cronova.backup=true"
+      - "com.centurylinklabs.watchtower.enable=false"
     deploy:
       resources:
         limits:
@@ -140,6 +141,7 @@ services:
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=documents"
+      - "com.centurylinklabs.watchtower.enable=false"
     deploy:
       resources:
         limits:

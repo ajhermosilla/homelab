@@ -24,6 +24,7 @@
     # Available stacks per host type:
     vps_stacks:
       - networking/headscale
+      - networking/adguard
       - networking/caddy
       - networking/derp
       - networking/pihole
@@ -47,6 +48,10 @@
       - git
       - storage
       - monitoring
+      # Excluded NAS stacks (intentional):
+      # - paas (Coolify) — self-managed, starts via /data/coolify/source/docker-compose.yml
+      # - javya — deployed from ~/deploy/javya/ (separate compose, not repo path)
+      # - katupyry — deployed via Coolify PaaS, not direct compose
 
   tasks:
     # =========================================================================

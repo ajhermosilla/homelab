@@ -60,6 +60,59 @@ services:
     networks:
       - pihole-net
 
+  # =========================================================================
+  # Pi-hole Backup Sidecar
+  # Daily encrypted backups to NAS via restic
+  # Backs up pihole config (DNS rules, blocklists, local DNS entries)
+  # Schedule: 2:45 AM PYT (between HA 2:30 and Paperless 3:00)
+  # =========================================================================
+  pihole-backup:
+    image: restic/restic:0.16.4
+    env_file:
+      - ../../../../shared/common.env
+    container_name: pihole-backup
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      - "com.cronova.environment=fixed"
+      - "com.cronova.category=backup"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    init: true
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "45 2 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+        crond -f -l 2
+    volumes:
+      - pihole-config:/data/pihole:ro
+      - pihole-dnsmasq:/data/dnsmasq:ro
+      - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/restic-backup.sh:/backup.sh:ro
+    environment:
+      TZ: ${TZ:-America/Asuncion}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/pihole}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      BACKUP_PATH: /data
+      BACKUP_TAG: pihole
+      KEEP_DAILY: "7"
+      KEEP_WEEKLY: "4"
+      KEEP_MONTHLY: "12"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - pihole-net
+
 volumes:
   pihole-config:
     name: pihole-config
