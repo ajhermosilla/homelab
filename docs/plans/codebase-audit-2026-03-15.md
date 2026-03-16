@@ -23,7 +23,7 @@ LinuxServer.io removed the old pinned tags (sonarr:4.0, radarr:5.0) from Docker 
 Their `latest` tag tracks the current stable release and is managed responsibly.
 Watchtower handles updates. This is the recommended approach for LinuxServer.io images.
 
-### 2. Pi-hole + Caddy configs not backed up
+### ~~2. Pi-hole + Caddy configs not backed up~~ (FIXED 2026-03-16)
 
 Critical infrastructure without backup sidecars:
 - **Pi-hole**: `/etc/pihole` config (DNS rules, blocklists, 23 local DNS entries)
@@ -31,7 +31,7 @@ Critical infrastructure without backup sidecars:
 
 Both are recoverable but tedious to recreate manually.
 
-### 3. Missing Watchtower labels
+### ~~3. Missing Watchtower labels~~ (FIXED 2026-03-16)
 
 ~13 services lack explicit `com.centurylinklabs.watchtower.enable` label.
 Without it, Watchtower's default behavior applies (update everything).
@@ -67,12 +67,12 @@ Plans that are done but not moved to journal/reference:
 - `frigate-improvement-plan-2026-03-02.md` — Phase 1 complete (iGPU + OpenVINO)
 - `forgejo-github-mirror-2026-03-02.md` — Push mirror active
 
-### 8. docker-boot-orchestrator.sh — verify stack paths
+### ~~8. docker-boot-orchestrator.sh — verify stack paths~~ (VERIFIED 2026-03-16 — all 11 paths OK)
 
 Script references stack paths that may not match actual directory structure.
 Needs verification against current compose file locations on Docker VM.
 
-### 9. docker-compose-deploy.yml — missing NAS stacks
+### ~~9. docker-compose-deploy.yml — missing NAS stacks~~ (FIXED 2026-03-16)
 
 Ansible playbook `docker-compose-deploy.yml` lists NAS stacks but is missing:
 - Coolify (tajy) — may be intentional (Coolify manages itself)
