@@ -154,4 +154,4 @@ Samsung A13 (USB-C) → USB-C to USB-A Dongle → Beryl AX (USB-A port)
 ---
 
 ## Related Documentation
-- [3D Printed Cases Research](./3d-printed-cases-research.md)
+- [3D Printed Cases Research](../reference/3d-printed-cases-research.md)
