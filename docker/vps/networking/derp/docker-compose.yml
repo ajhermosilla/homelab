@@ -11,6 +11,8 @@ services:
     restart: unless-stopped
     cap_drop:
       - ALL
+    cap_add:
+      - NET_BIND_SERVICE  # Bind to ports 3478/udp and 8443
     security_opt:
       - no-new-privileges:true
     labels:
@@ -41,7 +43,7 @@ services:
       - DERP_STUN=true
       - DERP_STUN_PORT=3478
       - DERP_HTTP_PORT=-1
-      - DERP_VERIFY_CLIENTS=false
+      - DERP_VERIFY_CLIENTS=${DERP_VERIFY_CLIENTS:-false}
     volumes:
       - derp-certs:/certs
     logging:

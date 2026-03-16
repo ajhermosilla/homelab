@@ -5,7 +5,7 @@
 #
 # Tests (8 suites):
 #   1. Restic repository health
-#   2. Snapshot freshness (Headscale, VW, HA, Paperless, Immich)
+#   2. Snapshot freshness (Headscale, VW, HA, Paperless, Immich, Caddy, Pi-hole)
 #   3. Headscale restore
 #   4. Vaultwarden restore
 #   5. Home Assistant restore
@@ -168,6 +168,36 @@ test_snapshots() {
         fi
     else
         log_warn "No Immich DB snapshot found (may be expected if not deployed)"
+    fi
+
+    # Check Caddy (should be within 25 hours)
+    local caddy_snapshot=$(restic snapshots --tag caddy --json 2>/dev/null | jq -r '.[-1].time // empty')
+    if [[ -n "$caddy_snapshot" ]]; then
+        local caddy_time=$(date -d "$caddy_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${caddy_snapshot%%.*}" +%s 2>/dev/null)
+        local caddy_age=$(( (now - caddy_time) / 3600 ))
+        if [[ $caddy_age -le 25 ]]; then
+            log_info "Caddy snapshot: ${caddy_age}h ago (OK)"
+        else
+            log_warn "Caddy snapshot: ${caddy_age}h ago (expected <25h)"
+            ((errors++))
+        fi
+    else
+        log_warn "No Caddy snapshot found (may be expected if not deployed)"
+    fi
+
+    # Check Pi-hole (should be within 25 hours)
+    local pihole_snapshot=$(restic snapshots --tag pihole --json 2>/dev/null | jq -r '.[-1].time // empty')
+    if [[ -n "$pihole_snapshot" ]]; then
+        local pihole_time=$(date -d "$pihole_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${pihole_snapshot%%.*}" +%s 2>/dev/null)
+        local pihole_age=$(( (now - pihole_time) / 3600 ))
+        if [[ $pihole_age -le 25 ]]; then
+            log_info "Pi-hole snapshot: ${pihole_age}h ago (OK)"
+        else
+            log_warn "Pi-hole snapshot: ${pihole_age}h ago (expected <25h)"
+            ((errors++))
+        fi
+    else
+        log_warn "No Pi-hole snapshot found (may be expected if not deployed)"
     fi
 
     if [[ $errors -eq 0 ]]; then
