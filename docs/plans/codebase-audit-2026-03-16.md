@@ -58,34 +58,34 @@
 
 ## Medium Priority
 
-### 8. Prometheus HA token placeholder
+### 8. Prometheus HA token placeholder — needs user action
 
 - **File**: `docker/fixed/docker-vm/monitoring/prometheus.yml`
 - **Issue**: `<HA_LONG_LIVED_TOKEN>` placeholder not replaced — HA metrics not scraped
 - **Fix**: Generate HA long-lived token, add to .env, reference in prometheus.yml
 
-### 9. Sonarr/Radarr/Prowlarr backup label misleading
+### ~~9. Sonarr/Radarr/Prowlarr backup label misleading~~ (FIXED 2026-03-16)
 
 - **File**: `docker/fixed/docker-vm/media/docker-compose.yml`
 - **Issue**: `com.cronova.backup=true` label but no backup sidecars
 - **Fix**: Either remove labels or add backup sidecars (configs are re-downloadable, low priority)
 
-### 10. ntfy uses `v2` tag — major only
+### ~~10. ntfy uses `v2` tag — major only~~ (FIXED 2026-03-16 → v2.19.1)
 
 - **File**: `docker/vps/monitoring/docker-compose.yml` line 55
 - **Fix**: Pin to specific minor version
 
-### 11. Forgejo uses `11` tag — major only
+### ~~11. Forgejo uses `11` tag — major only~~ (FIXED 2026-03-16 → 11.0)
 
 - **File**: `docker/fixed/nas/git/docker-compose.yml` line 11
 - **Fix**: Pin to specific minor version (e.g., `11.0`)
 
-### 12. HOMELAB_ROOT missing from .env.example
+### ~~12. HOMELAB_ROOT missing from .env.example~~ (FIXED 2026-03-16)
 
 - **Files**: `docker/fixed/nas/backup/.env.example`, `docker/fixed/nas/paas/.env.example`
 - **Fix**: Add `HOMELAB_ROOT=/opt/homelab/repo` to both
 
-### 13. restic-backup.sh uses grep for JSON parsing
+### ~~13. restic-backup.sh uses grep for JSON parsing~~ (FIXED 2026-03-16 → jq)
 
 - **File**: `docker/shared/backup/restic-backup.sh` line 69
 - **Issue**: `grep -o '"short_id":"[^"]*"'` — fragile if restic output format changes
