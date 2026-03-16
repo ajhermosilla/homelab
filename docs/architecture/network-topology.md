@@ -2,6 +2,69 @@
 
 Complete infrastructure diagram: physical, logical, and overlay networks.
 
+## Interactive Diagram
+
+```mermaid
+graph TB
+    subgraph Internet
+        ISP[ISP / Vultr Cloud]
+    end
+
+    subgraph VPS["VPS (Vultr) — 100.77.172.46"]
+        hs[Headscale]
+        derp[DERP Relay]
+        vps_caddy[Caddy]
+        vps_pihole[AdGuard + Unbound — yvága]
+        vps_mon[Uptime Kuma / ntfy / changedetection]
+    end
+
+    subgraph Proxmox["Proxmox (oga) — 192.168.0.237"]
+        opnsense[OPNsense — Firewall/Router]
+        subgraph DockerVM["Docker VM — 100.68.63.168"]
+            caddy[Caddy]
+            pihole[Pi-hole]
+            authelia[Authelia]
+            ha[Home Assistant — jara]
+            mosquitto[Mosquitto]
+            frigate[Frigate — taguato]
+            vault[Vaultwarden — vault]
+            media["Jellyfin / *arr — yrasema"]
+            monitoring["VictoriaMetrics / Grafana — papa"]
+            paperless[Paperless-ngx — kuatia]
+            immich[Immich — mbyja]
+            tools[Homepage / Dozzle / BentoPDF]
+        end
+    end
+
+    subgraph NAS["NAS — 100.82.77.97"]
+        samba[Samba]
+        syncthing[Syncthing]
+        forgejo[Forgejo — git]
+        restic[Restic REST]
+        coolify[Coolify — tajy]
+        nas_apps[Katupyry / Javya]
+    end
+
+    ISP --> VPS
+    ISP --> opnsense
+    opnsense -->|LAN| DockerVM
+
+    hs <-.->|Tailscale Mesh| DockerVM
+    hs <-.->|Tailscale Mesh| NAS
+
+    DockerVM -->|NFS /mnt/nas| NAS
+    DockerVM -->|Restic Backup| restic
+
+    ha <-->|MQTT| mosquitto
+    frigate -->|MQTT| mosquitto
+
+    style VPS fill:#161b22,stroke:#00d4aa,color:#c9d1d9
+    style Proxmox fill:#161b22,stroke:#58a6ff,color:#c9d1d9
+    style DockerVM fill:#0d1117,stroke:#58a6ff,color:#c9d1d9
+    style NAS fill:#161b22,stroke:#00d4aa,color:#c9d1d9
+    style Internet fill:#0d1117,stroke:#484f58,color:#c9d1d9
+```
+
 ## High-Level Architecture
 
 ```
