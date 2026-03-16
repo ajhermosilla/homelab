@@ -7,7 +7,7 @@
 
 ## High Priority
 
-### 1. Image pinning — 4 services using `latest` tags
+### ~~1. Image pinning — 4 services using `latest` tags~~ (FIXED 2026-03-15)
 
 Services without pinned versions:
 
@@ -40,25 +40,25 @@ Services that should explicitly opt out: critical infrastructure (DNS, Caddy, He
 Affected: forgejo, glances, syncthing, javya services, VPS caddy, derp, pihole,
 uptime-kuma, ntfy, changedetection, playwright.
 
-### 4. services.md missing VPS services
+### ~~4. services.md missing VPS services~~ (FIXED 2026-03-15)
 
 `docs/architecture/services.md` doesn't document:
 - AdGuard + Unbound (yvága stack) — deployed and active
 - Scraping stack (changedetection + playwright) — deployed and active
 - VPS backup stack (restic-rest) — deployed and active
 
-### 5. dns-architecture.md outdated
+### ~~5. dns-architecture.md outdated~~ (FIXED 2026-03-16)
 
 Doesn't document the yvága pipeline (AdGuard → Unbound → root servers).
 Still references "Pi-hole on VPS" as the primary VPS DNS, but AdGuard is now
 the actual DNS resolver on VPS with Pi-hole as a secondary/legacy entry.
 
-### 6. deployment-order.md missing DERP commands
+### ~~6. deployment-order.md missing yvága + DERP commands~~ (FIXED 2026-03-16)
 
 DERP relay appears in the dependency diagram but deployment commands section
 skips it entirely. Should add DERP deployment step after Pi-hole (VPS).
 
-### 7. Completed plans still in `/docs/plans/`
+### ~~7. Completed plans still in `/docs/plans/`~~ (FIXED 2026-03-16)
 
 Plans that are done but not moved to journal/reference:
 - `igpu-passthrough-plan-2026-02-25.md` — iGPU passthrough completed 2026-03-02

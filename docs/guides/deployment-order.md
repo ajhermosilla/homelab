@@ -124,22 +124,25 @@ ssh vps
 cd /opt/homelab/repo/docker/vps/networking/headscale && docker compose up -d
 # Create user and auth key for other devices
 
-# 2. Caddy (TLS termination)
+# 2. AdGuard + Unbound (yvága — recursive DNS, must start before Caddy)
+cd /opt/homelab/repo/docker/vps/networking/adguard && docker compose up -d
+
+# 3. Caddy (TLS termination)
 cd /opt/homelab/repo/docker/vps/networking/caddy && docker compose up -d
 
-# 3. Pi-hole (backup DNS)
+# 4. Pi-hole (legacy/secondary DNS)
 cd /opt/homelab/repo/docker/vps/networking/pihole && docker compose up -d
 
-# 4. DERP Relay
+# 5. DERP Relay
 cd /opt/homelab/repo/docker/vps/networking/derp && docker compose up -d
 
-# 5. Monitoring (Uptime Kuma + ntfy)
+# 6. Monitoring (Uptime Kuma + ntfy)
 cd /opt/homelab/repo/docker/vps/monitoring && docker compose up -d
 
-# 6. Scraping
+# 7. Scraping
 cd /opt/homelab/repo/docker/vps/scraping && docker compose up -d
 
-# 7. Backup
+# 8. Backup
 cd /opt/homelab/repo/docker/vps/backup && docker compose up -d
 ```
 
