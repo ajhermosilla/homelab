@@ -52,7 +52,7 @@ services:
   # https://ntfy.sh/
   # =========================================================================
   ntfy:
-    image: binwiederhier/ntfy:v2
+    image: binwiederhier/ntfy:v2.19.1
     env_file:
       - ../../shared/common.env
     container_name: ntfy
