@@ -1,5 +1,7 @@
 # NAS Deployment Plan
 
+**Status:** Completed — NAS fully deployed with 19 containers across 6 stacks
+
 Step-by-step guide to deploy the DIY NAS (Mini-ITX build from 2013).
 
 ## Hardware Summary
