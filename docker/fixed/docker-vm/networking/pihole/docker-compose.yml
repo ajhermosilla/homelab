@@ -76,6 +76,8 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - DAC_OVERRIDE  # Read root-owned Pi-hole config files
     labels:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=backup"
