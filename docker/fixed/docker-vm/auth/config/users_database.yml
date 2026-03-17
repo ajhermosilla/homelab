@@ -19,7 +19,7 @@ users:
 
   andre:
     displayname: Andre
-    email: andre@hermosilla.me
+    email: user@example.com
     groups:
       - homelab
     # REPLACE: generate with `authelia crypto hash generate argon2`

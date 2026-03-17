@@ -56,15 +56,15 @@ face_recognition:
 go2rtc:
   streams:
     front_door_sub:
-      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@192.168.0.110:554/h264Preview_01_sub"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@<CAMERA_FRONT_IP>:554/h264Preview_01_sub"
     front_door_main:
-      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@192.168.0.110:554/h264Preview_01_main"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_FRONT_PASS}@<CAMERA_FRONT_IP>:554/h264Preview_01_main"
     back_yard_sub:
-      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.0.111:554/h264Preview_01_sub"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@<CAMERA_BACK_IP>:554/h264Preview_01_sub"
     back_yard_main:
-      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@192.168.0.111:554/h264Preview_01_main"
+      - "rtsp://{FRIGATE_REOLINK_USER}:{FRIGATE_BACK_PASS}@<CAMERA_BACK_IP>:554/h264Preview_01_main"
     indoor:
-      - "ffmpeg:rtsp://{FRIGATE_TAPO_USER}:{FRIGATE_TAPO_PASS}@192.168.0.101:554/stream1#raw=-vf transpose=2,scale=360:640#video=h264"
+      - "ffmpeg:rtsp://{FRIGATE_TAPO_USER}:{FRIGATE_TAPO_PASS}@<CAMERA_INDOOR_IP>:554/stream1#raw=-vf transpose=2,scale=360:640#video=h264"
 
 # Global recording settings
 record:
@@ -163,14 +163,14 @@ cameras:
         - car
     zones:
       driveway:
-        coordinates: 0.446,0.989,0.55,0.576,0.991,0.529,0.99,0.994
+        coordinates: <REDACTED>  # see frigate-zones-real.local
         objects:
           - person
           - car
         inertia: 3
         loitering_time: 4
       street:
-        coordinates: 0.511,0.563,0.992,0.509,0.995,0.341,0.434,0.404,0.513,0.566
+        coordinates: <REDACTED>  # see frigate-zones-real.local
         objects:
           - person
           - car
@@ -220,7 +220,7 @@ cameras:
         - cat
     zones:
       terraza:
-        coordinates: 0.159,0.954,0.093,0.832,0.175,0.547,0.633,0.524,0.723,0.626,0.711,0.872
+        coordinates: <REDACTED>  # see frigate-zones-real.local
         objects:
           - person
           - dog
@@ -228,7 +228,7 @@ cameras:
         inertia: 3
         loitering_time: 4
       street:
-        coordinates: 0.489,0.509,0.426,0.348,0.492,0.328,0.729,0.501
+        coordinates: <REDACTED>  # see frigate-zones-real.local
         objects:
           - person
         inertia: 3
@@ -285,9 +285,9 @@ cameras:
 #    (See .env.example for template)
 #
 # 2. Camera IPs:
-#    - 192.168.0.110 - Front door (Reolink)
-#    - 192.168.0.111 - Back yard (Reolink)
-#    - 192.168.0.101 - Indoor (Tapo)
+#    - <CAMERA_FRONT_IP> - Front door (Reolink)
+#    - <CAMERA_BACK_IP> - Back yard (Reolink)
+#    - <CAMERA_INDOOR_IP> - Indoor (Tapo)
 #
 # 3. Enable RTSP on cameras:
 #    - Reolink: Device Settings → Network → Advanced → Port Settings
