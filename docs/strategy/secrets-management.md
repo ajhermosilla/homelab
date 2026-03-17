@@ -1,5 +1,7 @@
 # Secrets Management
 
+> **Current state**: Secrets are managed via `.env` files (gitignored), backed up with `backup-env.sh`, master copies in KeePassXC. SOPS/age described below is planned for future use.
+
 How to handle sensitive data across the homelab without compromising security.
 
 ## Principles

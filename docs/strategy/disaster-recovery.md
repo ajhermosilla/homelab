@@ -35,7 +35,7 @@ http://augusto:<PASS>@192.168.0.12:8000/augusto/<service>
 
 - Docker VM: `/opt/homelab/repo/docker/fixed/docker-vm/`
 - NAS: `/opt/homelab/repo/docker/fixed/nas/`
-- VPS: `/opt/homelab/headscale/`, `/opt/homelab/caddy/`
+- VPS: `/opt/homelab/repo/docker/vps/`
 
 ---
 
@@ -139,15 +139,15 @@ git clone git@github.com:ajhermosilla/homelab.git /opt/homelab
 # 5. Restore Headscale from backup
 # If NAS accessible, copy backups from NAS:
 scp augusto@nas:/backup/headscale/*.tar.gz /tmp/
-tar -xzf /tmp/headscale_latest.tar.gz -C /opt/homelab/headscale/config/
+tar -xzf /tmp/headscale_latest.tar.gz -C /opt/homelab/repo/docker/vps/networking/headscale/config/
 
 # 6. Create .env files from .env.example templates
-cd /opt/homelab/headscale && cp .env.example .env
+cd /opt/homelab/repo/docker/vps/networking/headscale && cp .env.example .env
 # Edit .env with secrets from Vaultwarden
 
 # 7. Start services
-cd /opt/homelab/headscale && docker compose up -d
-cd /opt/homelab/caddy && docker compose up -d
+cd /opt/homelab/repo/docker/vps/networking/headscale && docker compose up -d
+cd /opt/homelab/repo/docker/vps/networking/caddy && docker compose up -d
 
 # 8. Update DNS — point hs.cronova.dev, notify.cronova.dev to NEW_IP (Cloudflare)
 
@@ -160,7 +160,7 @@ tailscale up --login-server=https://hs.cronova.dev
 
 ### Scenario 2: Docker VM Failure
 
-**Impact:** All Docker VM services (33 containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
+**Impact:** All Docker VM services (35 containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
 
 #### Recovery
 

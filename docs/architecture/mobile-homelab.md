@@ -1,5 +1,7 @@
 # Mobile Homelab Architecture
 
+> **Note**: RPi 5 has been migrated to the fixed homelab. The mobile kit is now MacBook + Beryl AX + phones.
+
 Portable infrastructure for dev, self-hosting, and travel.
 
 **Key principle:** Mobile kit operates on-demand (7AM-7PM or travel). Headscale runs on VPS for 24/7 mesh availability. Mobile kit can be off without breaking the mesh.
@@ -16,7 +18,7 @@ Portable infrastructure for dev, self-hosting, and travel.
 #### Why on-demand?
 
 - Paraguay heat: reduce active equipment
-- Energy savings: RPi 5 + Beryl AX off when not needed
+- Energy savings: Beryl AX off when not needed
 - Fire safety: fewer devices running 24/7
 - Mesh still works: Headscale on VPS handles coordination
 
@@ -28,7 +30,6 @@ Portable infrastructure for dev, self-hosting, and travel.
 | Beryl AX (GL-MT3000) | Network gateway, DHCP, Tailscale | USB-C | Configured |
 | Samsung A13 | Dedicated tethering (Claro prepaid) | USB-C (always plugged) | Ready |
 | MacBook Air M1 | Workstation, Docker dev | Battery | Active |
-| Raspberry Pi 5 (8GB) | Pi-hole DNS (mobile) | USB-C PSU | Pending PSU |
 | Samsung A16 (mombeu) | Personal phone, Tailscale client | Battery | Active |
 
 ### Phone Roles
@@ -78,12 +79,10 @@ Portable infrastructure for dev, self-hosting, and travel.
                  |
          [Beryl AX Router]
           192.168.8.1
-           /         \
-          /           \
-   [MacBook Air]    [RPi 5]
-   192.168.8.10    192.168.8.5
-         \           /
-          \         /
+                |
+          [MacBook Air]
+          192.168.8.10
+                |
         [Tailscale Mesh]
           100.x.x.x
               |
@@ -104,16 +103,6 @@ Portable infrastructure for dev, self-hosting, and travel.
 
 *AdGuard Home is built into GL.iNet firmware - lightweight (~30MB), perfect for router.*
 
-### Raspberry Pi 5 (On-Demand / Tinkering)
-
-| Service | Port | Purpose |
-|---------|------|---------|
-
-| Pi-hole | 53, 80 | DNS ad-blocking (secondary) |
-| Tailscale | - | Mesh client |
-
-*RPi 5 is a tinkering device - can be reassigned to other projects. Beryl AX AdGuard provides DNS when RPi 5 is busy/off.*
-
 ### MacBook Air M1 (Workstation)
 
 | Service | Port | Purpose |
@@ -121,22 +110,19 @@ Portable infrastructure for dev, self-hosting, and travel.
 
 | Docker workloads | Various | Dev containers |
 
-### DNS Strategy (Dual-DNS)
+### DNS Strategy
 
 ```json
 [Devices] → [Beryl AX AdGuard Home] → [Upstream DNS]
-                    ↓ (fallback)
-            [RPi 5 Pi-hole] → [Upstream DNS]
 ```
 
 | Scenario | Primary DNS | Fallback |
 |----------|-------------|----------|
 
-| Normal operation | Beryl AX (AdGuard) | RPi 5 (Pi-hole) |
-| RPi 5 tinkering/off | Beryl AX (AdGuard) | Public DNS |
-| Beryl AX issues | RPi 5 (Pi-hole) | Public DNS |
+| Normal operation | Beryl AX (AdGuard) | Public DNS |
+| Beryl AX issues | Public DNS | — |
 
-*Both provide ad-blocking. Redundancy without complexity.*
+*Beryl AX AdGuard Home is the sole DNS ad-blocker for the mobile kit.*
 
 ## IP Addressing
 
@@ -146,7 +132,6 @@ Portable infrastructure for dev, self-hosting, and travel.
 |--------|----|----|
 
 | Beryl AX | 192.168.8.1 | - |
-| RPi 5 | 192.168.8.5 | Yes |
 | MacBook Air | 192.168.8.10 | Yes |
 
 ### Tailscale Network (Headscale Mesh)
@@ -158,7 +143,6 @@ Portable infrastructure for dev, self-hosting, and travel.
 | MacBook Air | 100.86.220.9 | augustos-macbook-air | Workstation |
 | Samsung A16 | 100.110.253.126 | mombeu | Personal phone |
 | Beryl AX | (assigned) | beryl-ax | Travel router |
-| RPi 5 | (pending) | rpi5 | Pi-hole (when deployed) |
 
 *Headscale on VPS assigns and coordinates all IPs. Run `tailscale status` to see current mesh.*
 
@@ -167,7 +151,7 @@ Portable infrastructure for dev, self-hosting, and travel.
 ### Traveling (Primary Use Case)
 
 ```json
-[Hotel Wifi/Tethering] → [Beryl AX] → [RPi 5 + MacBook]
+[Hotel Wifi/Tethering] → [Beryl AX] → [MacBook]
                                            ↓
                                     [Tailscale Mesh]
                                            ↓
@@ -176,22 +160,21 @@ Portable infrastructure for dev, self-hosting, and travel.
                                   [Home devices: connected]
 ```
 
-- Mobile kit provides local DNS (Pi-hole)
-- MacBook ↔ RPi 5 works locally
+- Mobile kit provides local DNS (AdGuard on Beryl AX)
 - Tailscale mesh connects to home via VPS
 
 ### At Home
 
 ```json
-[Home Router] → [Beryl AX optional] → [RPi 5 + MacBook]
+[Home Router] → [Beryl AX optional] → [MacBook]
                          ↓
                  [All devices on Tailscale]
                          ↓
                    [VPS coordinates]
 ```
 
-- RPi 5 optional at home (Fixed homelab Pi-hole available)
 - MacBook connects directly to home network or via Tailscale
+- Beryl AX optional at home (Fixed homelab Pi-hole available)
 
 ### Mobile Kit Off
 
@@ -205,7 +188,7 @@ Portable infrastructure for dev, self-hosting, and travel.
   [Home devices: connected]
 ```
 
-- RPi 5 and Beryl AX powered off
+- Beryl AX powered off
 - Mesh still works (VPS handles coordination)
 - MacBook connects via home network + Tailscale
 
@@ -218,12 +201,6 @@ Portable infrastructure for dev, self-hosting, and travel.
 | 2 | Join Beryl AX to Tailscale mesh | Done |
 | 3 | Test USB tethering | Done |
 | 4 | Test repeater mode | Done |
-| 5 | Wait for RPi 5 PSU | In transit |
-| 6 | Flash RPi OS, install Docker | Pending |
-| 7 | Deploy Pi-hole on RPi 5 | Pending |
-| 8 | Configure Beryl AX DHCP (use RPi 5 DNS) | Pending |
-| 9 | Join RPi 5 to Headscale (VPS) | Pending |
-| 10 | Test on-demand operation | Pending |
 
 ## RPi 5 (Moved to Fixed Homelab)
 
@@ -234,13 +211,12 @@ RPi 5 has been migrated from the mobile kit to the fixed homelab, running OpenCl
 | Source | Destination | Method | Frequency |
 |--------|-------------|--------|-----------|
 
-| Pi-hole config | Git repo | Teleporter export | On change |
+| Beryl AX config | Manual export | On change | — |
 
 *Headscale backup handled by VPS (see `docker/vps/networking/headscale/backup.sh`).*
 
 ## Security Considerations
 
-- Pi-hole web password in `.env` (set via `pihole -a -p`)
 - Beryl AX admin password: change from default
 - Enable Beryl AX firewall, disable WAN access to admin
 
@@ -250,12 +226,11 @@ RPi 5 has been migrated from the mobile kit to the fixed homelab, running OpenCl
 
 ```bash
 # Morning: Power on
-# - Plug in RPi 5
 # - Power on Beryl AX
-# - Wait ~2 minutes for boot
+# - Wait ~1 minute for boot
 
 # Evening: Power off
-# - Safe to unplug (Pi-hole is stateless)
+# - Safe to unplug
 # - Mesh continues via VPS
 ```
 
@@ -269,8 +244,6 @@ On extremely hot days, keep mobile kit off entirely:
 
 ## Future Enhancements
 
-- [ ] Tailscale exit node on RPi 5
-- [ ] Syncthing between MacBook and RPi 5
 - [ ] Ansible playbooks for declarative deployment
 
 ## References

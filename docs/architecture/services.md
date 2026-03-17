@@ -139,7 +139,7 @@ HA integrations: System Monitor (Docker VM), Proxmox VE (HACS), Glances (NAS), M
 
 | Okẽ | **Authelia** | 9091 | auth.cronova.dev | authelia/authelia |
 
-Protects: Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx). NOT protecting (own auth): Jara, Taguato, Vault, Vera, Forgejo. TOTP 2FA via Authy, filesystem notifier (not SMTP).
+Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx). NOT protecting (own auth): Jara, Taguato, Vault, Vera, Forgejo, Yrasema (Jellyfin — excluded because mobile/TV clients can't handle redirects). TOTP 2FA via Authy, filesystem notifier (not SMTP).
 
 #### Media
 
@@ -309,7 +309,7 @@ All HTTPS services go through Caddy on Docker VM (DNS-01 TLS via Cloudflare). Pi
 | Vera (Immich) | vera.cronova.dev | No | Own auth |
 | Forgejo | git.cronova.dev | No | Own auth |
 | Tajy (Coolify) | tajy.cronova.dev | No | Own auth |
-| Yrasema (Jellyfin) | yrasema.cronova.dev | Yes | Forward auth |
+| Yrasema (Jellyfin) | yrasema.cronova.dev | No | Own auth (mobile/TV clients can't handle redirects) |
 | Mbyja (Homepage) | mbyja.cronova.dev | Yes | Forward auth |
 | Ysyry (Dozzle) | ysyry.cronova.dev | Yes | Forward auth |
 | Kuatia (BentoPDF) | kuatia.cronova.dev | Yes | Forward auth |
