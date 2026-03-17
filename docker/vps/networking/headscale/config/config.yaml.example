@@ -43,7 +43,7 @@ derp:
     region_id: 999
     region_code: "cronova"
     region_name: "Cronova VPS"
-    stun_listen_addr: 0.0.0.0:3478
+    stun_listen_addr: ""  # Disabled — DERP relay owns 3478/udp
     private_key_path: /var/lib/headscale/derp_server_private.key
 
   # Use Tailscale's public DERP servers as fallback
