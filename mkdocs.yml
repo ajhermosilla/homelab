@@ -1,7 +1,7 @@
 site_name: Homelab — Augusto Hermosilla
 site_description: Infrastructure-as-code for a self-hosted homelab
 site_author: Augusto Hermosilla
-site_url: https://homelab-docs.pages.dev/
+site_url: https://homelab-docs-cwy.pages.dev/
 
 repo_url: https://github.com/ajhermosilla/homelab
 repo_name: ajhermosilla/homelab
