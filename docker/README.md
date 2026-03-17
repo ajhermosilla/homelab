@@ -13,7 +13,7 @@ docker/
 │   │   ├── automation/      # Home Assistant, Mosquitto
 │   │   ├── security/        # Vaultwarden, Frigate
 │   │   ├── auth/            # Authelia (Okẽ)
-│   │   ├── tools/           # Dozzle, Stirling-PDF, Homepage
+│   │   ├── tools/           # Dozzle, BentoPDF, Homepage
 │   │   ├── monitoring/      # VictoriaMetrics, Grafana
 │   │   ├── photos/          # Immich (Vera)
 │   │   ├── documents/       # Paperless-ngx (Aranduka)
