@@ -9,13 +9,14 @@
 
 | Time | Event |
 |------|-------|
+
 | ~11:45 | Headscale container restarts (cause unknown, possibly Watchtower or OOM) |
 | ~11:45 | Tailscaled on VPS re-fetches DNS config, split DNS loop begins |
 | ~11:45 | DNS request queue floods — all VPS DNS resolution fails |
 | ~11:45–21:30 | Latent failure — undetected because SSH uses IPs, Caddy uses Docker DNS |
 | 21:30 | User reports ntfy not working on phone |
 | 21:35 | Investigation begins — ntfy container healthy, Caddy healthy |
-| 21:38 | `curl https://notify.cronova.dev` from VPS returns 000 — DNS timeout |
+| 21:38 | `curl <https://notify.cronova.dev`> from VPS returns 000 — DNS timeout |
 | 21:40 | VPS `/etc/resolv.conf` points to `100.100.100.100` (MagicDNS) — all queries timeout |
 | 21:42 | tailscaled logs: `dns: tcp query: request queue full` (thousands of dropped queries) |
 | 21:45 | Root cause identified: split DNS `cronova.dev → 100.100.100.100` creates recursive loop |
@@ -45,7 +46,7 @@ This told every Tailscale node: "resolve `*.cronova.dev` by querying `100.100.10
 
 On the **VPS**, MagicDNS received the query, matched the split DNS route for `cronova.dev`, and forwarded it to... `100.100.100.100` — itself. This created an infinite recursive loop:
 
-```
+```text
 query cronova.dev → MagicDNS → split route → 100.100.100.100 → MagicDNS → split route → ...
 ```
 
@@ -88,9 +89,10 @@ dns:
 For domains without an `extra_record` (e.g., `notify.cronova.dev` when queried from a non-VPS node), the query falls through to the global nameservers (`1.1.1.1`), which return the VPS public IP. This is the correct behavior — the phone reaches ntfy via the public IP through Caddy.
 
 **Verification after fix**:
+
 - `dig notify.cronova.dev @100.100.100.100` → `104.207.144.195` (VPS public IP via global DNS)
 - `dig vault.cronova.dev @100.100.100.100` → `100.68.63.168` (Tailscale IP via extra_records)
-- `curl https://notify.cronova.dev/` → 200 OK (from VPS, Mac, and phone)
+- `curl <https://notify.cronova.dev/`> → 200 OK (from VPS, Mac, and phone)
 
 ## Impact
 

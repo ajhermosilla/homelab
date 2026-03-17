@@ -18,6 +18,7 @@ Mini PC tower aesthetic - perfect for a portable server.
 
 | Property | Value |
 |----------|-------|
+
 | Designer | Xavior93 |
 | Platform | Printables |
 | Style | Retro mini PC |
@@ -25,13 +26,14 @@ Mini PC tower aesthetic - perfect for a portable server.
 | Active Cooler | Yes |
 | Difficulty | Medium |
 
-**Why this one:**
+#### Why this one
+
 - Server aesthetic matches Headscale use case
 - "Carry your mesh in your backpack" vibes
 - Functional front panel (power, LEDs)
 - Conversation starter
 
-**Link:** https://www.printables.com/model/848796-raspberry-pi-5-case-retro-tower-desktop
+**Link:** <https://<www.printables.com/model/848796-raspberry-pi-5-case-retro-tower-desktop>
 
 ---
 
@@ -41,6 +43,7 @@ Maximum geek factor with RGB and display.
 
 | Property | Value |
 |----------|-------|
+
 | Designer | Various |
 | Platform | Cults3D / Etsy |
 | Style | Cyberpunk / Neon |
@@ -48,19 +51,21 @@ Maximum geek factor with RGB and display.
 | Active Cooler | Custom cooling |
 | Difficulty | Hard |
 
-**Additional parts needed:**
+#### Additional parts needed
+
 - 50x50x10mm DC fans (x2)
 - M3 nuts and bolts
 - WS2812 RGB LED rings
 - OLED display (optional)
 - Laser-cut acrylic panels
 
-**Why this one:**
+#### Why this one
+
 - OLED could display Headscale stats
 - RGB for status indication
 - Ultimate flex at hackerspaces
 
-**Link:** https://cults3d.com/en/3d-model/gadget/raspberry-pi-case-cyberpunk-edition
+**Link:** <https://cults3d.com/en/3d-model/gadget/raspberry-pi-case-cyberpunk-edition>
 
 ---
 
@@ -70,6 +75,7 @@ Mathematical tribute with functional design.
 
 | Property | Value |
 |----------|-------|
+
 | Designer | Instructables community |
 | Platform | Instructables |
 | Style | Math nerd |
@@ -77,12 +83,13 @@ Mathematical tribute with functional design.
 | Active Cooler | Passive cooling |
 | Difficulty | Medium |
 
-**Why this one:**
+#### Why this one
+
 - Unique conversation piece
 - Celebrates the Pi name
 - Passive cooling (silent operation)
 
-**Link:** https://www.instructables.com/PiCase-the-Ultimate-Pi-Shaped-Raspberry-Pi-Case-3D/
+**Link:** <https://<www.instructables.com/PiCase-the-Ultimate-Pi-Shaped-Raspberry-Pi-Case-3D/>
 
 ---
 
@@ -92,6 +99,7 @@ Clean, proven, just works.
 
 | Property | Value |
 |----------|-------|
+
 | Designer | Stamos |
 | Platform | Printables / Thingiverse |
 | Style | Minimal / Industrial |
@@ -100,15 +108,17 @@ Clean, proven, just works.
 | Difficulty | Easy |
 | Downloads | 54,000+ |
 
-**Why this one:**
+#### Why this one
+
 - Most popular design
 - No additional hardware needed
 - Quick print, reliable fit
 - Dual-color filament for accent vents
 
-**Links:**
-- https://www.printables.com/model/742926-raspberry-pi-5-case
-- https://www.thingiverse.com/thing:6633603
+#### Links
+
+- <https://www.printables.com/model/742926-raspberry-pi-5-case>
+- <https://www.thingiverse.com/thing:6633603>
 
 ---
 
@@ -118,6 +128,7 @@ Server-ready with SSD support.
 
 | Property | Value |
 |----------|-------|
+
 | Designer | mrlinux2u |
 | Platform | Printables |
 | Style | Functional server |
@@ -125,12 +136,13 @@ Server-ready with SSD support.
 | Active Cooler | Yes |
 | Difficulty | Medium |
 
-**Why this one:**
+#### Why this one
+
 - Future-proof (NVMe expansion)
 - Official cooler support
 - Proper server form factor
 
-**Link:** https://www.printables.com/model/644063-raspberry-pi-5-case-designed-for-active-cooler-and
+**Link:** <https://<www.printables.com/model/644063-raspberry-pi-5-case-designed-for-active-cooler-and>
 
 ---
 
@@ -140,6 +152,7 @@ Art Deco meets GPU reference design.
 
 | Property | Value |
 |----------|-------|
+
 | Designer | the printed cow |
 | Platform | Printables |
 | Style | Retro / Art Deco / GPU |
@@ -147,12 +160,13 @@ Art Deco meets GPU reference design.
 | Active Cooler | Yes |
 | Difficulty | Easy |
 
-**Why this one:**
+#### Why this one
+
 - Looks like a mini graphics card
 - No support material needed
 - Clean retro aesthetic
 
-**Link:** https://www.printables.com/model/705427-retro-raspberry-pi-5-case-snap-fit
+**Link:** <https://<www.printables.com/model/705427-retro-raspberry-pi-5-case-snap-fit>
 
 ---
 
@@ -162,6 +176,7 @@ Overkill flex for maximum geek cred.
 
 | Property | Value |
 |----------|-------|
+
 | Designer | Michael Klements |
 | Platform | XDA / Custom |
 | Style | Enthusiast |
@@ -169,19 +184,21 @@ Overkill flex for maximum geek cred.
 | Active Cooler | Water block |
 | Difficulty | Expert |
 
-**Additional parts needed:**
+#### Additional parts needed
+
 - Water cooling block
 - Pump
 - Reservoir
 - Tubing
 - Fittings
 
-**Why this one:**
+#### Why this one
+
 - Ultimate conversation piece
 - Completely unnecessary (that's the point)
 - Peak hobbyist energy
 
-**Link:** https://www.xda-developers.com/3d-printed-raspberry-pi-5-case-water-cooling/
+**Link:** <https://<www.xda-developers.com/3d-printed-raspberry-pi-5-case-water-cooling/>
 
 ---
 
@@ -189,6 +206,7 @@ Overkill flex for maximum geek cred.
 
 | Case | Geek Factor | Difficulty | Cost | Active Cooler | NVMe |
 |------|-------------|------------|------|---------------|------|
+
 | Retro Tower | 9/10 | Medium | Low | Yes | No |
 | Cyberpunk | 10/10 | Hard | Medium | Custom | No |
 | PiCase (π) | 8/10 | Medium | Low | Passive | No |
@@ -201,11 +219,12 @@ Overkill flex for maximum geek cred.
 
 | Platform | URL | Notes |
 |----------|-----|-------|
-| Printables | https://www.printables.com | Best quality, Prusa community |
-| MakerWorld | https://makerworld.com | Bambu Lab, multicolor |
-| Thingiverse | https://www.thingiverse.com | Classic, largest library |
-| Cults3D | https://cults3d.com | Premium designs |
-| Thangs | https://thangs.com | Growing community |
+
+| Printables | <https://www.printables.com> | Best quality, Prusa community |
+| MakerWorld | <https://makerworld.com> | Bambu Lab, multicolor |
+| Thingiverse | <https://www.thingiverse.com> | Classic, largest library |
+| Cults3D | <https://cults3d.com> | Premium designs |
+| Thangs | <https://thangs.com> | Growing community |
 
 ## Printing Tips
 
@@ -213,6 +232,7 @@ Overkill flex for maximum geek cred.
 
 | Material | Use Case |
 |----------|----------|
+
 | **PETG** | Near active cooler (heat resistant) |
 | **PLA** | Decorative parts, low-heat areas |
 | **ABS** | Maximum heat resistance |
@@ -223,6 +243,7 @@ Overkill flex for maximum geek cred.
 
 | Setting | Value |
 |---------|-------|
+
 | Layer height | 0.2mm |
 | Infill | 20-30% |
 | Supports | Check per model |
@@ -234,6 +255,7 @@ Common parts needed across designs:
 
 | Part | Quantity | Notes |
 |------|----------|-------|
+
 | M2.5 x 6mm screws | 4 | Mount Pi to case |
 | M2.5 nuts | 4 | Some designs |
 | M3 screws/nuts | Varies | Fan mounting |

@@ -8,6 +8,7 @@ Core infrastructure documentation — what runs where, hardware specs, network t
 
 | Document | Description |
 |----------|-------------|
+
 | [services.md](architecture/services.md) | Definitive service inventory (40+ services, ports, dependencies, Guarani names) |
 | [hardware.md](architecture/hardware.md) | Device specs, Tailscale IPs, power budget, storage strategy |
 | [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (33 containers), NAS (19 containers), OPNsense |
@@ -22,6 +23,7 @@ Setup and operational guides — how to deploy, configure, and maintain.
 
 | Document | Description |
 |----------|-------------|
+
 | [setup-runbook.md](guides/setup-runbook.md) | Full first-time setup (7 phases) |
 | [deployment-order.md](guides/deployment-order.md) | Service dependencies and startup order |
 | [proxmox-setup.md](guides/proxmox-setup.md) | Proxmox VE installation and VM creation |
@@ -44,6 +46,7 @@ Design decisions and policies — why things are done a certain way.
 
 | Document | Description |
 |----------|-------------|
+
 | [domain-strategy.md](strategy/domain-strategy.md) | cronova.dev DNS and domain plan |
 | [certificate-strategy.md](strategy/certificate-strategy.md) | TLS certificates (DNS-01 Cloudflare) |
 | [dns-architecture.md](strategy/dns-architecture.md) | DNS resolution flow (Pi-hole, AdGuard, Cloudflare) |
@@ -60,6 +63,7 @@ Device guides, naming conventions, research, and reference material.
 
 | Document | Description |
 |----------|-------------|
+
 | [guarani-naming-convention-2026-02-24.md](reference/guarani-naming-convention-2026-02-24.md) | Guarani naming guide for all services |
 | [ha-devices-guide-2026-02-24.md](reference/ha-devices-guide-2026-02-24.md) | Home Assistant device integration guide |
 | [home-devices.md](reference/home-devices.md) | Family device inventory |
@@ -79,6 +83,7 @@ Future plans and proposals — what's next.
 
 | Document | Description |
 |----------|-------------|
+
 | [frigate-improvement-plan-2026-03-02.md](plans/frigate-improvement-plan-2026-03-02.md) | Frigate NVR improvements (Phase 1 done, Phase 2 blocked on 8TB HDD) |
 | [uptime-kuma-monitors-2026-03-02.md](plans/uptime-kuma-monitors-2026-03-02.md) | Uptime Kuma monitor setup (complete — 35 monitors) |
 | [igpu-passthrough-plan-2026-02-25.md](plans/igpu-passthrough-plan-2026-02-25.md) | SR-IOV iGPU passthrough for Frigate (done 2026-03-02) |
@@ -100,6 +105,7 @@ Execution logs, reports, and session notes — what happened.
 
 | Document | Description |
 |----------|-------------|
+
 | [opnsense-gateway-cutover-2026-02-08.md](journal/opnsense-gateway-cutover-2026-02-08.md) | OPNsense cutover plan |
 | [opnsense-cutover-execution-2026-02-21.md](journal/opnsense-cutover-execution-2026-02-21.md) | OPNsense cutover execution log |
 | [post-cutover-verification-2026-02-21.md](journal/post-cutover-verification-2026-02-21.md) | Post-cutover verification |

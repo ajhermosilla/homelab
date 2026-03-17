@@ -6,6 +6,7 @@ Mini PC configuration for running OPNsense router and Docker VM.
 
 | Component | Spec | Notes |
 |-----------|------|-------|
+
 | CPU | Intel N150 | VT-x/VT-d enabled |
 | RAM | 12GB | ~1GB host + 2GB OPNsense + 9GB Docker |
 | Storage | 512GB SSD | VMs + ISO storage |
@@ -33,12 +34,13 @@ Mini PC configuration for running OPNsense router and Docker VM.
 
 | Setting | Value |
 |---------|-------|
+
 | Target Disk | 512GB SSD |
 | Country | Paraguay |
 | Timezone | America/Asuncion |
 | Keyboard | us |
 | Admin Password | (strong password) |
-| Email | augusto@cronova.dev |
+| Email | <augusto@cronova.dev> |
 | Hostname | pve.cronova.local |
 | Management IP | 192.168.0.237/24 |
 | Gateway | 192.168.0.1 (temporary) |
@@ -52,7 +54,7 @@ Mini PC configuration for running OPNsense router and Docker VM.
 
 ### 1. Access Web UI
 
-```
+```yaml
 https://192.168.0.237:8006
 Username: root
 Password: (set during install)
@@ -122,7 +124,7 @@ ip link show
 nano /etc/network/interfaces
 ```
 
-```
+```bash
 auto lo
 iface lo inet loopback
 
@@ -156,6 +158,7 @@ ifreload -a
 
 | Storage | Path | Content |
 |---------|------|---------|
+
 | local | /var/lib/vz | ISO images, CT templates |
 | local-lvm | LVM thin pool | VM disks |
 
@@ -172,48 +175,62 @@ ifreload -a
 
 ### 1. Create VM
 
-**General:**
+#### General
+
 | Setting | Value |
 |---------|-------|
+
 | VM ID | 100 |
 | Name | opnsense |
 
-**OS:**
+#### OS
+
 | Setting | Value |
 |---------|-------|
+
 | ISO | OPNsense-24.x-amd64.iso |
 | Type | Other |
 
-**System:**
+#### System
+
 | Setting | Value |
 |---------|-------|
+
 | Machine | q35 |
 | BIOS | OVMF (UEFI) |
 | Add EFI Disk | Yes |
 | SCSI Controller | VirtIO SCSI |
 
-**Disks:**
+#### Disks
+
 | Setting | Value |
 |---------|-------|
+
 | Bus | SCSI |
 | Size | 20 GB |
 | Storage | local-lvm |
 | Discard | Enabled |
 
-**CPU:**
+#### CPU
+
 | Setting | Value |
 |---------|-------|
+
 | Cores | 2 |
 | Type | host |
 
-**Memory:**
+#### Memory
+
 | Setting | Value |
 |---------|-------|
+
 | Memory | 2048 MB |
 
 **Network:**
+
 | Setting | Value |
 |---------|-------|
+
 | Bridge | vmbr0 |
 | Model | VirtIO |
 
@@ -222,17 +239,21 @@ ifreload -a
 The OPNsense VM needs two bridged NICs — one for WAN (vmbr0) and one for LAN (vmbr1).
 The first NIC (vmbr0) was added during VM creation. Now add the second:
 
-**VM > Hardware > Add > Network Device:**
+#### VM > Hardware > Add > Network Device
+
 | Setting | Value |
 |---------|-------|
+
 | Bridge | vmbr1 |
 | Model | VirtIO |
 
 ### 3. VM Options
 
-**VM > Options:**
+#### VM > Options
+
 | Setting | Value |
 |---------|-------|
+
 | Start at boot | Yes |
 | Start/Shutdown order | 1 |
 | Startup delay | 0 |
@@ -247,58 +268,74 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 ### 1. Create VM
 
-**General:**
+#### General
+
 | Setting | Value |
 |---------|-------|
+
 | VM ID | 101 |
 | Name | docker |
 
-**OS:**
+#### OS
+
 | Setting | Value |
 |---------|-------|
+
 | ISO | debian-13-amd64.iso |
 | Type | Linux |
 | Version | 6.x - 2.6 Kernel |
 
-**System:**
+#### System
+
 | Setting | Value |
 |---------|-------|
+
 | Machine | q35 |
 | BIOS | OVMF (UEFI) |
 | Add EFI Disk | Yes |
 | SCSI Controller | VirtIO SCSI |
 
-**Disks:**
+#### Disks
+
 | Setting | Value |
 |---------|-------|
+
 | Bus | SCSI |
 | Size | 100 GB |
 | Storage | local-lvm |
 | Discard | Enabled |
 
-**CPU:**
+#### CPU
+
 | Setting | Value |
 |---------|-------|
+
 | Cores | 2 |
 | Type | host |
 
-**Memory:**
+#### Memory
+
 | Setting | Value |
 |---------|-------|
+
 | Memory | 9216 MB |
 | Ballooning | Disabled |
 
 **Network:**
+
 | Setting | Value |
 |---------|-------|
+
 | Bridge | vmbr1 |
 | Model | VirtIO |
 
 ### 2. VM Options
 
-**VM > Options:**
+#### VM > Options
+
 | Setting | Value |
 |---------|-------|
+
 | Start at boot | Yes |
 | Start/Shutdown order | 2 |
 | Startup delay | 30 |
@@ -377,9 +414,10 @@ lspci | grep -i vga
 
 ### Pass through to Docker VM
 
-**Method 1: Device Passthrough**
+#### Method 1: Device Passthrough
 
 Edit VM config:
+
 ```bash
 nano /etc/pve/qemu-server/101.conf
 
@@ -387,9 +425,10 @@ nano /etc/pve/qemu-server/101.conf
 args: -device vfio-pci,host=00:02.0
 ```
 
-**Method 2: LXC Container (Alternative)**
+#### Method 2: LXC Container (Alternative)
 
 If using LXC instead of VM:
+
 ```bash
 # Edit container config
 nano /etc/pve/lxc/101.conf
@@ -417,10 +456,11 @@ vainfo
 
 ### Enable VM Backups
 
-**Datacenter > Backup > Add:**
+#### Datacenter > Backup > Add
 
 | Setting | Value |
 |---------|-------|
+
 | Storage | local |
 | Schedule | Daily 03:00 |
 | Selection Mode | Include selected VMs |
@@ -445,15 +485,18 @@ ls /var/lib/vz/dump/
 
 ### Enable Email Alerts
 
-**Datacenter > Options > Email from address:**
-- Set to: `pve@cronova.dev`
+#### Datacenter > Options > Email from address
 
-**User > root > Email:**
-- Set to: `augusto@cronova.dev`
+- Set to: `<pve@cronova.dev>`
+
+#### User > root > Email
+
+- Set to: `<augusto@cronova.dev>`
 
 ### System Metrics
 
 Available in Proxmox web UI:
+
 - CPU usage
 - Memory usage
 - Network I/O
@@ -462,8 +505,9 @@ Available in Proxmox web UI:
 ### Integration with Uptime Kuma
 
 Add Proxmox health check:
+
 - Type: HTTP
-- URL: https://192.168.0.237:8006
+- URL: <https://192.168.0.237:8006>
 - Expected: 200
 
 ---
@@ -505,6 +549,7 @@ Add Proxmox health check:
 
 | VM | vCPU | RAM | Disk | Purpose |
 |----|------|-----|------|---------|
+
 | OPNsense | 2 | 2GB | 20GB | Router/Firewall |
 | Docker | 2 | 9GB | 100GB | All containers |
 | **Total** | 4 | 11GB | 120GB | |

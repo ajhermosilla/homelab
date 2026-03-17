@@ -4,7 +4,7 @@ External monitoring for all homelab services, running on VPS.
 
 ## Access
 
-- **URL:** https://status.cronova.dev
+- **URL:** <https://status.cronova.dev>
 - **Container:** `uptime-kuma` on `monitoring-net`
 - **Data:** Docker volume `uptime-kuma-data`
 
@@ -22,7 +22,8 @@ sudo docker run -d \
 ```
 
 Caddy reverse proxy at `/opt/homelab/caddy/Caddyfile`:
-```
+
+```text
 status.cronova.dev {
     reverse_proxy uptime-kuma:3001
 }
@@ -32,6 +33,7 @@ status.cronova.dev {
 
 | Name | Type | Target | Interval |
 |------|------|--------|----------|
+
 | Headscale | HTTP(s) | `https://hs.cronova.dev/health` | 60s |
 | Uptime Kuma | HTTP(s) | `https://status.cronova.dev` | 60s |
 | Caddy | TCP | `caddy:443` | 60s |
@@ -43,6 +45,7 @@ status.cronova.dev {
 
 | Name | Type | Target |
 |------|------|--------|
+
 | MacBook | Ping | `100.86.220.9` |
 | Phone (mombeu) | Ping | `100.110.253.126` |
 
@@ -50,6 +53,7 @@ status.cronova.dev {
 
 | Name | Type | Target |
 |------|------|--------|
+
 | cronova.dev | HTTP(s) | `https://cronova.dev` |
 | hermosilla.me | HTTP(s) | `https://hermosilla.me` |
 
@@ -57,12 +61,14 @@ status.cronova.dev {
 
 | Name | Type | Query | Server |
 |------|------|-------|--------|
+
 | DNS Check | DNS | `hs.cronova.dev` | `1.1.1.1` |
 
 ### External Dependencies (15m interval)
 
 | Name | Type | Target |
 |------|------|--------|
+
 | GitHub | HTTP(s) | `https://github.com` |
 | Cloudflare | HTTP(s) | `https://1.1.1.1` |
 | Fastmail | HTTP(s) | `https://www.fastmail.com` |
@@ -71,6 +77,7 @@ status.cronova.dev {
 
 | Service | Type | Target |
 |---------|------|--------|
+
 | Pi-hole (RPi 5) | TCP | `100.64.0.1:53` |
 | Vaultwarden | HTTP(s) | `https://vault.cronova.dev/alive` |
 | Home Assistant | HTTP(s) | `http://100.68.63.168:8123` |
@@ -80,6 +87,7 @@ status.cronova.dev {
 
 | Type | Use Case |
 |------|----------|
+
 | HTTP(s) | Web services, APIs, health endpoints |
 | TCP | Port availability (databases, services without HTTP) |
 | Ping | Host reachability (Tailscale nodes, servers) |
@@ -92,6 +100,7 @@ status.cronova.dev {
 ### Container Networking
 
 When monitoring Docker containers from Uptime Kuma:
+
 - Use container name, not `localhost` (e.g., `caddy:443` not `localhost:443`)
 - Containers must be on same Docker network (`monitoring-net`)
 
@@ -102,6 +111,7 @@ HTTPS monitors automatically track certificate expiry. Configure alerts for 14/7
 ### Status Page
 
 Create a public status page at Settings > Status Pages:
+
 - Add monitors to display
 - Get public URL to share
 
@@ -109,7 +119,7 @@ Create a public status page at Settings > Status Pages:
 
 ### Access
 
-- **URL:** https://notify.cronova.dev
+- **URL:** <https://notify.cronova.dev>
 - **Container:** `ntfy` on `monitoring-net`
 - **Data:** Docker volumes `ntfy-cache`, `ntfy-data`
 
@@ -133,7 +143,8 @@ sudo docker run -d \
 ```
 
 Caddy reverse proxy:
-```
+
+```text
 notify.cronova.dev {
     reverse_proxy ntfy:80
 }
@@ -162,7 +173,7 @@ sudo docker exec -e NTFY_PASSWORD='newpassword' ntfy \
 4. Topic: `alerts`
 5. Username: `augusto`
 6. Password: (your password)
-7. Click **Test** then **Save**
+7. Click **Test**then**Save**
 
 ### Phone App Setup
 
@@ -188,6 +199,7 @@ curl -u augusto:PASSWORD \
 
 | Topic | Use Case | Priority |
 |-------|----------|----------|
+
 | `alerts` | Uptime Kuma alerts | high |
 | `backups` | Backup job notifications | default |
 | `info` | General homelab info | low |

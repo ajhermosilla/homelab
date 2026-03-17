@@ -6,6 +6,7 @@ Comprehensive evaluation of the planned homelab stack. Reviewed 2026-01-15.
 
 | Factor | Score | Notes |
 |--------|-------|-------|
+
 | Utility | 9/10 | All bases covered, maybe over-engineered initially |
 | Learning | 10/10 | Exceptional breadth and depth |
 | Privacy | 9.5/10 | Near-perfect sovereignty |
@@ -20,6 +21,7 @@ Comprehensive evaluation of the planned homelab stack. Reviewed 2026-01-15.
 
 | Service | Daily Use Value |
 |---------|-----------------|
+
 | Headscale | Remote access anywhere, no vendor lock-in |
 | Vaultwarden | Password management across all devices |
 | Pi-hole (x3) | Ad-free browsing everywhere |
@@ -54,6 +56,7 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 
 | Domain | Technologies |
 |--------|--------------|
+
 | Virtualization | Proxmox VE, VM management |
 | Networking | OPNsense, VLANs, DNS, mesh networking |
 | Containers | Docker, docker-compose, multi-host |
@@ -85,6 +88,7 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 
 | Aspect | Implementation | Rating |
 |--------|----------------|--------|
+
 | Mesh control | Headscale (self-hosted) | Excellent |
 | DNS | Pi-hole everywhere | Excellent |
 | Passwords | Vaultwarden (local) | Excellent |
@@ -104,7 +108,7 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 - VPS on privacy-focused provider (Njalla, 1984.is) if paranoid
 - Current setup is already excellent for 99% of threat models
 
-**The "carry your mesh in your backpack" philosophy is peak sovereignty.**
+#### The "carry your mesh in your backpack" philosophy is peak sovereignty
 
 ---
 
@@ -114,12 +118,13 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 
 | Item | Cost | Notes |
 |------|------|-------|
+
 | VPS (Vultr) | $6/mo | Helper only, not critical |
 | Google One | $0 extra | Already have AI Pro subscription |
 | cronova.dev | Owned | No additional cost |
 | verava.ai | ~$5/mo | ~$60/yr to purchase |
 | Electricity | ~$5-10/mo | Estimate for ~200W |
-| **Total** | **~$12-16/mo** | |
+| **Total**|**~$12-16/mo** | |
 
 ### Hardware (One-Time, Already Owned)
 
@@ -136,6 +141,7 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 ### Potential Savings
 
 Could eliminate VPS entirely (~$72/yr) if you:
+
 - Run DERP on mobile kit when traveling
 - Use free uptime monitoring (Uptime Robot)
 - Skip changedetection
@@ -150,6 +156,7 @@ Could eliminate VPS entirely (~$72/yr) if you:
 
 | Factor | Geek Points |
 |--------|-------------|
+
 | Headscale on RPi 5 | "Carry your mesh in your backpack" - peak mobile sovereignty |
 | Start9 Bitcoin node | Full node + Lightning on dedicated hardware |
 | Mini-ITX NAS from 2013 | Repurposed hardware, sustainable |
@@ -186,6 +193,7 @@ Prevents overwhelm and lets you learn each layer properly:
 
 | Phase | Services | Focus |
 |-------|----------|-------|
+
 | 1 | Headscale, Pi-hole, Vaultwarden | Core infrastructure |
 | 2 | Jellyfin, *arr stack | Media consumption |
 | 3 | Home Assistant, Frigate, Mosquitto | Automation & security |
@@ -212,4 +220,4 @@ A thoughtfully designed, privacy-respecting, cost-effective homelab with excelle
 
 The architecture prioritizes sovereignty (self-hosted everything), resilience (three-tier redundancy), and practicality (CLI-first, minimal dependencies).
 
-**This is not just a homelab. It's a philosophy.**
+#### This is not just a homelab. It's a philosophy

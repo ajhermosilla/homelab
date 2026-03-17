@@ -10,6 +10,7 @@ Drive layout, backup topology, and data protection across all hosts.
 
 | Device | Model | Size | Mount | Role | Status |
 |--------|-------|------|-------|------|--------|
+
 | sda | Lexar NQ100 SSD | 240GB | `/` (LVM) | OS, Docker data-root (`/data/docker`) | Healthy |
 | sdb | WD Purple (WD23PURZ) | 2TB | `/mnt/purple` | Frigate recordings, Restic repos | **98% full** |
 | sdc | WD Red Plus (WD80EFBX) | 8TB | `/mnt/red8` (planned) | Media, downloads, family data, service data | Recovery pending |
@@ -20,18 +21,21 @@ Drive layout, backup topology, and data protection across all hosts.
 
 | Disk | Size | Role |
 |------|------|------|
+
 | virtio0 | 100GB | Debian OS, Docker volumes, container data |
 
 ### VPS (Vultr)
 
 | Disk | Size | Role |
 |------|------|------|
+
 | NVMe | 32GB | OS, Headscale DB, container data |
 
 ### Spare Drives (at home)
 
 | Drive | Size | Interface | Location |
 |-------|------|-----------|----------|
+
 | WD Red 3TB (#1) | 3TB | SATA | Sabrent USB dock |
 | WD Red 3TB (#2) | 3TB | SATA | Spare |
 | Old drive | 1TB | SATA | Spare |
@@ -43,7 +47,7 @@ Drive layout, backup topology, and data protection across all hosts.
 
 ### NAS Filesystem Layout
 
-```
+```text
 NAS Drives
 ├── sda (240GB SSD) ─── LVM root (/)
 │   ├── /data/docker/          # Docker data-root (images, volumes)
@@ -71,7 +75,7 @@ NAS Drives
 
 Services access data through `/srv/` symlinks, decoupling mount points from service paths:
 
-```
+```text
 /srv/frigate      → /mnt/purple/frigate
 /srv/media        → /mnt/red8/media
 /srv/downloads    → /mnt/red8/downloads
@@ -84,9 +88,10 @@ Services access data through `/srv/` symlinks, decoupling mount points from serv
 
 | NAS Export | Docker VM Mount | Used By | Mode |
 |------------|-----------------|---------|------|
+
 | `/srv/frigate` | `/mnt/nas/frigate` | Frigate NVR | rw |
-| `/srv/media` | `/mnt/nas/media` | Jellyfin, *arr stack | ro |
-| `/srv/downloads` | `/mnt/nas/downloads` | qBittorrent, *arr stack | rw |
+| `/srv/media` | `/mnt/nas/media` | Jellyfin, \*arr stack | ro |
+| `/srv/downloads` | `/mnt/nas/downloads` | qBittorrent, \*arr stack | rw |
 | `/srv/photos` | `/mnt/nas/photos` | Immich (external library) | ro |
 
 Docker VM fstab entries use `defaults,_netdev,nofail` to handle NAS unavailability gracefully.
@@ -97,7 +102,7 @@ Docker VM fstab entries use `defaults,_netdev,nofail` to handle NAS unavailabili
 
 ### 3-2-1 Strategy
 
-```
+```text
 [Docker VM]                    [NAS]                        [Google Drive]
  Live data                      Restic REST                  rclone crypt
  (Docker volumes)               (/mnt/purple/backup/restic)  (gdrive-crypt:homelab/)
@@ -113,6 +118,7 @@ Docker VM fstab entries use `defaults,_netdev,nofail` to handle NAS unavailabili
 
 | Time | Service | Container | Restic Repo | What's Backed Up |
 |------|---------|-----------|-------------|------------------|
+
 | Hourly | Headscale | headscale-backup | Local tar.gz (VPS) | SQLite DB, noise key, config |
 | 2:00 AM | Vaultwarden | vaultwarden-backup | `/augusto/vaultwarden` | vaultwarden-data volume |
 | 2:15 AM | Caddy | caddy-backup | `/augusto/caddy` | TLS certificates, ACME state |
@@ -129,6 +135,7 @@ All Restic sidecars use the same retention:
 
 | Period | Keep |
 |--------|------|
+
 | Daily | 7 |
 | Weekly | 4 |
 | Monthly | 12 |
@@ -151,7 +158,7 @@ All Docker VM sidecars connect to `rest:http://augusto:<pass>@192.168.0.12:8000/
 
 ### Offsite Sync Details
 
-```
+```text
 offsite-sync (NAS container, 4:30 AM)
 ├── 1. rsync Headscale backups from VPS (SSH, last 48h only)
 ├── 2. rclone sync Restic repos → gdrive-crypt:homelab/restic/
@@ -160,7 +167,7 @@ offsite-sync (NAS container, 4:30 AM)
 └── Bandwidth limit: 5 MB/s (RCLONE_BWLIMIT)
 ```
 
-**Encryption:** rclone crypt wraps Google Drive with AES-256. Restore requires **three secrets**: rclone password, rclone salt, and RESTIC_PASSWORD. All stored in Vaultwarden.
+**Encryption:**rclone crypt wraps Google Drive with AES-256. Restore requires**three secrets**: rclone password, rclone salt, and RESTIC_PASSWORD. All stored in Vaultwarden.
 
 ---
 
@@ -168,6 +175,7 @@ offsite-sync (NAS container, 4:30 AM)
 
 | Data | Size | Irreplaceable | Copies | Location(s) |
 |------|------|---------------|--------|-------------|
+
 | Family videos (2010-2013) | 45GB | **Yes** | 2 (pending 3) | Purple recovery, 8TB (planned), SSD (planned), GDrive |
 | Family photos (2006-2014) | 168GB | **Yes** | 2 (pending 3) | Purple recovery, 8TB (planned), SSD (planned), GDrive |
 | Vaultwarden DB | ~50MB | Yes (passwords) | 3 | Docker VM, Restic, GDrive |
@@ -183,6 +191,7 @@ offsite-sync (NAS container, 4:30 AM)
 
 | Gap | Risk | Mitigation |
 |-----|------|------------|
+
 | ~~Forgejo has no offsite mirror~~ | ~~Single point of failure for git~~ | **Resolved** — GitHub push mirror active (sync on commit + 8h interval) |
 | Frigate recordings = 1 copy | Loss if Purple fails | Acceptable — recordings are ephemeral |
 | Family media pending 8TB recovery | Currently only on 98%-full Purple | Execute recovery plan ASAP |
@@ -196,6 +205,7 @@ offsite-sync (NAS container, 4:30 AM)
 
 | Drive | Total | Used | Free | Pressure |
 |-------|-------|------|------|----------|
+
 | NAS SSD (sda) | 240GB | ~60GB | ~180GB | Low |
 | NAS Purple (sdb) | 2TB | 1.7TB | 45GB | **Critical** |
 | NAS Red (sdc) | 8TB | — | — | Recovery pending |
@@ -209,6 +219,7 @@ After 8TB recovery and Purple cleanup:
 
 | Drive | Projected Used | Projected Free | Growth Rate |
 |-------|---------------|----------------|-------------|
+
 | Purple (sdb) | ~170GB | ~1.6TB | ~5GB/week (Frigate) |
 | Red (sdc) | ~1.5TB | ~5.8TB | Slow (media additions) |
 | Backup SSD (sdd) | ~213GB | ~263GB | Static (critical data only) |
@@ -219,6 +230,7 @@ Purple will sustain Frigate for **~6 years** at current recording rates after re
 
 | Trigger | When | Action |
 |---------|------|--------|
+
 | Purple > 80% | ~2028 | Review Frigate retention or add camera exclusions |
 | Red > 70% (5.6TB) | Years away | Consider SnapRAID parity with spare 3TB drives |
 | Restic repos > 500GB | Monitor quarterly | Review retention or move to Red |
@@ -232,6 +244,7 @@ Purple will sustain Frigate for **~6 years** at current recording rates after re
 
 | Scenario | Recovery Source | Procedure | RTO |
 |----------|---------------|-----------|-----|
+
 | Single service (VW, HA, Paperless) | Restic REST on NAS | `restic restore latest` | 15 min |
 | Docker VM failure | Restic REST + compose files | Rebuild VM, restore volumes | 2-4 hours |
 | NAS failure | Google Drive + Forgejo | Rebuild Debian, restore from offsite | 4-8 hours |
@@ -253,6 +266,7 @@ All backup scripts live in `docker/shared/backup/`:
 
 | Script | Used By | Purpose |
 |--------|---------|---------|
+
 | `restic-backup.sh` | VW, HA, Paperless, Coolify sidecars | Generic Restic backup with retention + integrity |
 | `immich-db-backup.sh` | Immich sidecar | pg_dump → compress → Restic |
 | `offsite-sync.sh` | offsite-sync container | rsync VPS + rclone to Google Drive |
@@ -264,6 +278,7 @@ All backup scripts live in `docker/shared/backup/`:
 
 | Frequency | Check | Method |
 |-----------|-------|--------|
+
 | Daily | Backup ran successfully | ntfy notifications (automatic) |
 | Weekly | Restic integrity | `restic check` in backup script (automatic) |
 | Monthly (1st Sunday) | Snapshot freshness | `restic snapshots` — verify recent entries |

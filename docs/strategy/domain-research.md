@@ -17,6 +17,7 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 | Domain | Status | Price | Purpose |
 |--------|--------|-------|---------|
+
 | **nanduti.io** | Available | ~$30/yr | Homelab / Infra |
 | **verava.net** | Available | ~$12/yr | Business / Consulting |
 | mbyja.io | Available | ~$30/yr | Alternative |
@@ -26,6 +27,7 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 | Aspect | verava.net | nanduti.io | mbyja.io | kuarahy.io |
 |--------|------------|------------|----------|------------|
+
 | **Meaning** | Brand name | "Web/Lace" (Guarani) | "Star" (Guarani) | "Sun" (Guarani) |
 | **Pronounceable** | Easy | Medium | Hard | Hard |
 | **Spellable** | Easy | Medium | Hard | Hard |
@@ -41,7 +43,7 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 **Vibe:** Professional, corporate, safe
 
-```
+```text
 + Professional, safe, corporate-friendly
 + Easy for customers to type/remember
 + Cheap (.net ~$12/yr)
@@ -59,7 +61,7 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 **Vibe:** Cultural hacker, poetic geek
 
-```
+```text
 + PERFECT metaphor (ñanduti lace = intricate web = network mesh)
 + Cultural flex (Paraguay heritage)
 + Conversation starter ("What does it mean?")
@@ -78,7 +80,7 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 **Vibe:** Mysterious, short
 
-```
+```text
 + Short, mysterious
 + "Star" = aspiration, navigation
 - Nobody can pronounce it
@@ -94,7 +96,7 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 **Vibe:** Always-on, but forgettable
 
-```
+```text
 + "Sun" = always-on, reliability
 - Too long
 - Unspellable
@@ -111,7 +113,7 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 Ñanduti is traditional Paraguayan lace with intricate web patterns. The word literally means "white web" in Guarani. You're building a digital web/mesh network. Poetry.
 
-```
+```text
 Traditional ñanduti lace = intricate interconnected web
 Your homelab            = intricate interconnected mesh
 ```
@@ -119,6 +121,7 @@ Your homelab            = intricate interconnected mesh
 ### 2. The Story
 
 Every time someone asks "what's nanduti?", you get to explain:
+
 - Guarani indigenous culture
 - Paraguayan heritage
 - Your sovereign infrastructure philosophy
@@ -141,11 +144,13 @@ curl https://api.verava.net/status
 ### 4. The TLD
 
 **.io** = The hacker's TLD
+
 - Says "I build things" without saying it
 - Tech credibility
 - Startup/maker culture
 
 **.net** = The 2005 TLD
+
 - "We couldn't get .com"
 - Corporate fallback
 - Safe but boring
@@ -158,8 +163,9 @@ curl https://api.verava.net/status
 
 | Domain | Use Case | Subdomains |
 |--------|----------|------------|
+
 | **nanduti.io** | Homelab / Personal | headscale.nanduti.io, pihole.nanduti.io, git.nanduti.io |
-| **verava.net** | Business / Customers | www.verava.net, api.verava.net, app.verava.net |
+| **verava.net** | Business / Customers | <www.verava.net>, api.verava.net, app.verava.net |
 
 ### Why Both?
 
@@ -174,6 +180,7 @@ curl https://api.verava.net/status
 
 | Subdomain | Service | Environment |
 |-----------|---------|-------------|
+
 | `hs.nanduti.io` | Headscale | Mobile (RPi 5) |
 | `dns.nanduti.io` | Pi-hole | All |
 | `git.nanduti.io` | Forgejo | Fixed (NAS) |
@@ -194,6 +201,7 @@ curl https://api.verava.net/status
 
 | Domain | Registrable? |
 |--------|--------------|
+
 | ~~ñanduti.io~~ | No (special character ñ) |
 | **nanduti.io** | Yes (ASCII only) |
 
@@ -205,6 +213,7 @@ If you want the ñ, use Paraguay's TLD:
 
 | Domain | Notes |
 |--------|-------|
+
 | ñanduti.com.py | Supports IDN |
 | nanduti.com.py | Also available |
 
@@ -214,7 +223,7 @@ But .com.py lacks the tech credibility of .io.
 
 ## WHOIS Results (2026-01-14)
 
-```
+```text
 nanduti.io  - Domain not found (AVAILABLE)
 verava.net  - No match for domain (AVAILABLE)
 mbyja.io    - Domain not found (AVAILABLE)
@@ -227,6 +236,7 @@ kuarahy.io  - Domain not found (AVAILABLE)
 
 | Domain | Decision | Action |
 |--------|----------|--------|
+
 | **nanduti.io** | BUY | Primary homelab domain |
 | **verava.net** | BUY | Business domain |
 | mbyja.io | Skip | Too hard to spell |
@@ -242,7 +252,8 @@ kuarahy.io  - Domain not found (AVAILABLE)
 
 Ñanduti (Guarani: "white web") is a traditional Paraguayan lace-making technique. The intricate radial patterns resemble spider webs, created by weaving threads around a central point.
 
-**Connection to homelab:**
+#### Connection to homelab
+
 - Radial pattern = mesh network topology
 - Interconnected threads = Tailscale connections
 - Central point = Headscale coordination server
@@ -256,6 +267,7 @@ The metaphor is perfect.
 
 | Registrar | .io Price | .net Price | Notes |
 |-----------|-----------|------------|-------|
+
 | Namecheap | ~$30/yr | ~$12/yr | Good UI, privacy included |
 | Cloudflare | ~$28/yr | ~$10/yr | At-cost pricing, no markup |
 | Porkbun | ~$28/yr | ~$10/yr | Cheap, good reputation |

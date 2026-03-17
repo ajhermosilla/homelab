@@ -19,6 +19,7 @@ The root cause is a **driver version mismatch**: the Frigate container bundles `
 
 | Time | Event |
 |------|-------|
+
 | Mar 2, 10:06 | First `Failed to sync surface` error appears (both cameras) |
 | Mar 2, 09:30 | Indoor camera (Tapo) already unreachable ("No route to host") — separate issue |
 | Mar 2–3 | Continuous crash loop: ffmpeg crashes → watchdog restarts → crashes again (~6/min per camera) |
@@ -36,7 +37,8 @@ The root cause is a **driver version mismatch**: the Frigate container bundles `
 **The Frigate container image (v0.16.4, built 2026-01-28) bundles `intel-media-va-driver-non-free` v24.3.3.** The Intel N150 (Alder Lake-N, device ID `8086:46D4`) requires v25.1+ for reliable VA-API surface sync. Older versions can initialize the GPU but fail intermittently under sustained decode workload.
 
 The error signature:
-```
+
+```json
 [AVHWFramesContext] Failed to sync surface 0xe: 1 (operation failed)
 [hwdownload] Failed to download frame: -5
 [vf#0:0] Error while filtering: Input/output error
@@ -49,6 +51,7 @@ This means the VA-API driver tried to synchronize a decoded video frame from GPU
 ### 2. Dual iGPU Contention (Amplifying Factor)
 
 The configuration uses the N150 iGPU for **both** tasks simultaneously:
+
 - **VA-API** for hardware video decoding (`ffmpeg.hwaccel_args: preset-vaapi`)
 - **OpenVINO GPU** for object detection (`detectors.ov.device: GPU`)
 
@@ -57,11 +60,13 @@ Both compete for the same 24 execution units on the N150. Under sustained load, 
 ### 3. Crash Loop → Resource Exhaustion (Cascade)
 
 Each ffmpeg crash-and-restart cycle:
+
 - Leaves behind "inactive_anon" memory pages that the kernel must reclaim
 - Opens new file descriptors for `/dev/dri/renderD128`, RTSP sockets, IPC pipes
 - Allocates new VA-API surface pools
 
 At 360 restarts/hour over 30 hours (14,893 total), this overwhelmed the container's resources:
+
 - **Memory**: 4GB limit was borderline even without crash loops. OpenVINO GPU mode uses ~500MB–1GB, face recognition adds ~200–400MB, leaving little headroom for ffmpeg churn
 - **VA-API surface pool**: DRM handle pool on the kernel side has limited concurrent open handles
 - **Shared memory**: 256MB SHM was adequate but under pressure
@@ -92,6 +97,7 @@ The Tapo C110 (192.168.0.101) has been returning "No route to host" since at lea
 
 | # | Action | Status |
 |---|--------|--------|
+
 | 1 | Restarted Frigate: `docker compose up -d frigate` | Done |
 | 2 | Verified all 3 cameras reachable (ping) | Done |
 | 3 | Verified VA-API loads (`vainfo` shows iHD 24.3.3) | Done |
@@ -131,7 +137,7 @@ ffmpeg:
 
 ### Fix 3: Add Docker Healthcheck That Catches Exit State (Short Term)
 
-The current healthcheck (`curl -f http://localhost:5000/api/version`) only checks the web UI. A more robust check should also verify ffmpeg processes are running:
+The current healthcheck (`curl -f <http://localhost:5000/api/version`>) only checks the web UI. A more robust check should also verify ffmpeg processes are running:
 
 ```yaml
 healthcheck:
@@ -183,7 +189,7 @@ Add Uptime Kuma "Docker Container" monitor (if supported) or a script-based chec
 
 ## Recommended Fix Order
 
-1. **Fix 1** (memory 4G→6G) + **Fix 2** (VA-API→QSV) — apply together, restart Frigate
+1. **Fix 1**(memory 4G→6G) +**Fix 2** (VA-API→QSV) — apply together, restart Frigate
 2. **Fix 4** (sysctl tuning) — apply on Docker VM host
 3. **Fix 6** (monitoring) — add ntfy alert for container state
 4. **Fix 3** (healthcheck) — update compose file
@@ -195,6 +201,7 @@ Add Uptime Kuma "Docker Container" monitor (if supported) or a script-based chec
 
 | Metric | Value |
 |--------|-------|
+
 | Frigate version | 0.16.4 (image built 2026-01-28) |
 | Container driver | intel-media-va-driver-non-free 24.3.3 |
 | Host driver | intel-media-va-driver 25.2.3 |

@@ -3,6 +3,7 @@
 Caddy configuration for cronova.dev and verava.ai across all environments. Created 2026-01-14.
 
 > **WARNING (2026-03-10):** This doc is a pre-deployment design from January 2026 and does NOT reflect the current Caddyfile. Key differences:
+>
 > - Docker VM Caddy is a **custom build** with `caddy-dns/cloudflare` for DNS-01 TLS (not Let's Encrypt ACME)
 > - **Authelia forward auth** protects 6 services (not shown below)
 > - **BentoPDF** replaced Stirling-PDF (Kuatia)
@@ -12,7 +13,7 @@ Caddy configuration for cronova.dev and verava.ai across all environments. Creat
 
 ## Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              INTERNET                                    │
 └───────────────────────────────────┬─────────────────────────────────────┘
@@ -39,14 +40,15 @@ Caddy configuration for cronova.dev and verava.ai across all environments. Creat
 
 | Subdomain | Destination | Access |
 |-----------|-------------|--------|
-| `www.cronova.dev` | Cloudflare Pages | Public |
+
+| `<www.cronova.dev>` | Cloudflare Pages | Public |
 | `docs.cronova.dev` | Cloudflare Pages | Public |
 | `vault.cronova.dev` | VPS → Fixed Homelab (Tailscale) | Public |
 | `status.cronova.dev` | VPS localhost:3001 | Public |
 | `notify.cronova.dev` | VPS localhost:80 | Public |
 | `api.cronova.dev` | VPS localhost:8080 | Public |
 | `saas.cronova.dev` | VPS localhost:3000 | Public |
-| `www.verava.ai` | VPS static files | Public |
+| `<www.verava.ai>` | VPS static files | Public |
 | `app.verava.ai` | VPS localhost:4000 | Public |
 | `api.verava.ai` | VPS localhost:4001 | Public |
 | `jara.cronova.dev` | Fixed Homelab (Tailscale only) | Private |
@@ -372,6 +374,7 @@ networks:
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
+
 | A | @ | VPS_IP | Yes |
 | CNAME | www | cronova.pages.dev | Yes |
 | CNAME | docs | cronova-docs.pages.dev | Yes |
@@ -391,6 +394,7 @@ networks:
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
+
 | A | @ | VPS_IP | Yes |
 | A | www | VPS_IP | Yes |
 | A | app | VPS_IP | Yes |
@@ -409,7 +413,7 @@ networks:
 
 ### Internal Services (Tailscale)
 
-**Option A: Tailscale HTTPS (Recommended)**
+#### Option A: Tailscale HTTPS (Recommended)
 
 ```bash
 # Enable Tailscale HTTPS
@@ -417,6 +421,7 @@ tailscale cert jara.cronova.dev
 ```
 
 Caddy config for Tailscale certs:
+
 ```caddyfile
 jara.cronova.dev {
     tls /var/lib/tailscale/certs/jara.cronova.dev.crt /var/lib/tailscale/certs/jara.cronova.dev.key
@@ -424,7 +429,7 @@ jara.cronova.dev {
 }
 ```
 
-**Option B: Internal CA**
+#### Option B: Internal CA
 
 Use Caddy's internal CA for Tailscale-only services (simpler but requires trusting CA on devices).
 
@@ -436,6 +441,7 @@ Use Caddy's internal CA for Tailscale-only services (simpler but requires trusti
 
 | Setting | Value |
 |---------|-------|
+
 | SSL/TLS | Full (strict) |
 | Always Use HTTPS | On |
 | Minimum TLS Version | TLS 1.2 |
@@ -446,6 +452,7 @@ Use Caddy's internal CA for Tailscale-only services (simpler but requires trusti
 ### Caddy Security Headers
 
 All responses include:
+
 - `Strict-Transport-Security` (HSTS)
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options` (DENY or SAMEORIGIN)
@@ -478,7 +485,7 @@ api.cronova.dev {
 - [ ] Create web directories: `mkdir -p /var/www/verava /var/www/verava-docs`
 - [ ] Validate config: `caddy validate --config /etc/caddy/Caddyfile`
 - [ ] Reload Caddy: `systemctl reload caddy`
-- [ ] Test SSL: `curl -I https://status.cronova.dev`
+- [ ] Test SSL: `curl -I <https://status.cronova.dev`>
 
 ### Fixed Homelab
 

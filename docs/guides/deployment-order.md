@@ -11,6 +11,7 @@ On reboot, the Docker VM uses a systemd service to start stacks in correct order
 - **Ansible file**: `ansible/files/docker-boot-orchestrator.service`
 
 The orchestrator:
+
 1. Waits for Docker daemon (60s timeout)
 2. Waits for NFS mount at `/mnt/nas/frigate` (300s timeout, non-fatal)
 3. Stops all containers for clean state
@@ -24,6 +25,7 @@ Stacks communicate via external Docker networks. The **creating stack must start
 
 | Network | Created By | Consumed By |
 |---------|-----------|-------------|
+
 | `caddy-net` | networking/caddy | auth, tools, documents, monitoring (grafana), photos (immich) |
 | `mqtt-net` | automation | security (frigate) |
 | `monitoring-net` | monitoring | _(internal only)_ |
@@ -32,7 +34,7 @@ If a consuming stack starts before the creating stack, it will fail with a netwo
 
 ## Dependency Graph
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         DEPLOYMENT ORDER                                     │
 ├─────────────────────────────────────────────────────────────────────────────┤
@@ -226,13 +228,14 @@ ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker_
 
 | Service | Depends On | Network | Notes |
 |---------|------------|---------|-------|
+
 | **Headscale** | None | headscale-net | Deploy first, enables mesh |
 | **Caddy (VPS)** | Headscale | headscale-net, monitoring-net | TLS for hs.cronova.dev |
 | **Pi-hole** | None | — | Can run standalone |
 | **DERP** | Headscale | derp-net | Relay for NAT traversal |
 | **Uptime Kuma** | ntfy (optional) | monitoring-net | For notifications |
-| **Caddy (Docker VM)** | None | **creates caddy-net** | Must start before auth/tools/docs/monitoring/photos |
-| **Mosquitto** | None | **creates mqtt-net** | Must start before Frigate |
+| **Caddy (Docker VM)**| None |**creates caddy-net** | Must start before auth/tools/docs/monitoring/photos |
+| **Mosquitto**| None |**creates mqtt-net** | Must start before Frigate |
 | **Home Assistant** | Mosquitto (healthy) | automation-net, mqtt-net | MQTT integration |
 | **Frigate** | Mosquitto, NFS | security-net, mqtt-net | Events via MQTT, recordings on NFS |
 | **Authelia** | Caddy | caddy-net | Forward auth for protected services |
@@ -248,7 +251,7 @@ ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker_
 
 The minimum services needed for basic functionality:
 
-```
+```text
 Headscale → Tailscale clients → Pi-hole → Vaultwarden
 ```
 
@@ -272,7 +275,7 @@ If everything goes down, restart in this order:
 
 ## Network Dependencies
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    NETWORK TOPOLOGY                              │
 ├─────────────────────────────────────────────────────────────────┤
@@ -297,34 +300,41 @@ If everything goes down, restart in this order:
 ## Stack Interdependencies
 
 ### Networking Stack (creates caddy-net)
+
 - **Pi-hole** → standalone, host network
 - **Caddy** → creates `caddy-net` external network
 
 ### Automation Stack (creates mqtt-net)
+
 - **Mosquitto** → standalone, creates `mqtt-net`
 - **Home Assistant** → requires healthy Mosquitto
 - **homeassistant-backup** → requires Home Assistant
 
 ### Security Stack (joins mqtt-net)
+
 - **Vaultwarden** → standalone
 - **Frigate** → requires Mosquitto (automation stack) + NFS mount + mqtt-net
 - **vaultwarden-backup** → requires Vaultwarden
 
 ### Auth Stack (joins caddy-net)
+
 - **Authelia** → requires caddy-net (forward auth via Caddy)
 
 ### Tools Stack (joins caddy-net)
+
 - **Dozzle** → requires caddy-net + Docker socket
 - **BentoPDF** → requires caddy-net
 - **Homepage** → requires caddy-net + Docker socket
 
 ### Documents Stack (joins caddy-net)
+
 - **Paperless-ngx** → requires healthy paperless-db + paperless-redis + caddy-net
 - **paperless-db** → standalone (PostgreSQL)
 - **paperless-redis** → standalone
 - **paperless-backup** → requires Paperless-ngx
 
 ### Monitoring Stack
+
 - **VictoriaMetrics** → standalone (TSDB)
 - **vmagent** → requires healthy VictoriaMetrics
 - **Alertmanager** → standalone (needs ntfy-token file)
@@ -333,6 +343,7 @@ If everything goes down, restart in this order:
 - **Grafana** → requires healthy VictoriaMetrics + caddy-net
 
 ### Photos Stack (joins caddy-net)
+
 - **immich-db** → standalone (PostgreSQL + VectorChord)
 - **immich-valkey** → standalone (Redis-compatible)
 - **immich-server** → requires healthy immich-db + immich-valkey + caddy-net
@@ -340,6 +351,7 @@ If everything goes down, restart in this order:
 - **immich-backup** → requires healthy immich-db
 
 ### Media Stack (NFS-dependent)
+
 - **Prowlarr** → standalone (indexer manager)
 - **Sonarr** → requires Prowlarr
 - **Radarr** → requires Prowlarr
@@ -347,6 +359,7 @@ If everything goes down, restart in this order:
 - **Jellyfin** → requires NFS mount for media
 
 ### Maintenance Stack
+
 - **Watchtower** → deploy last, requires Docker socket
 
 ## Pre-Deployment Checklist

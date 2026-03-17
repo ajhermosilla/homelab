@@ -18,15 +18,16 @@
 ## Before You Start
 
 1. **Open OPNsense web UI** via SSH tunnel:
+
    ```bash
    ssh -L 8443:192.168.0.1:443 proxmox
    # Browser: https://localhost:8443
    ```
 
-2. **Backup OPNsense config** (System → Configuration → Backups → Download):
+1. **Backup OPNsense config** (System → Configuration → Backups → Download):
    Save as `config-pre-vlan-rules-YYYYMMDD.xml`
 
-3. **Have a rollback plan**: If you lose access, connect directly to MokerLink P8 (Management VLAN) via Ethernet from MacBook. OPNsense LAN is always reachable at 192.168.0.1.
+1. **Have a rollback plan**: If you lose access, connect directly to MokerLink P8 (Management VLAN) via Ethernet from MacBook. OPNsense LAN is always reachable at 192.168.0.1.
 
 ---
 
@@ -34,10 +35,11 @@
 
 Aliases simplify rule management. Create these before writing rules.
 
-**Firewall → Aliases → Add:**
+#### Firewall → Aliases → Add
 
 | Name | Type | Content | Description |
 |------|------|---------|-------------|
+
 | `RFC1918` | Network(s) | `10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16` | All private networks |
 | `PiHole_DNS` | Host(s) | `192.168.0.10` | Docker VM (Pi-hole) |
 
@@ -51,10 +53,11 @@ Aliases simplify rule management. Create these before writing rules.
 
 LAN should already have a default "allow all" rule. Verify:
 
-**Firewall → Rules → LAN:**
+#### Firewall → Rules → LAN
 
 | # | Action | Source | Dest | Port | Protocol | Description |
 |---|--------|--------|------|------|----------|-------------|
+
 | 1 | Pass | LAN net | any | any | any | Default allow all |
 
 This should exist from the initial OPNsense setup. If not, create it.
@@ -65,26 +68,28 @@ This should exist from the initial OPNsense setup. If not, create it.
 
 ## Phase 3: IoT VLAN Rules
 
-**Firewall → Rules → IOT:**
+#### Firewall → Rules → IOT
 
 Rules are evaluated **top to bottom, first match wins**. Order matters.
 
 | # | Action | Protocol | Source | Dest | Port | Description |
 |---|--------|----------|--------|------|------|-------------|
+
 | 1 | Pass | TCP/UDP | IOT net | PiHole_DNS | 53 | Allow DNS to Pi-hole |
 | 2 | Pass | UDP | IOT net | IOT address | 123 | Allow NTP from OPNsense gateway |
 | 3 | Block | any | IOT net | RFC1918 | any | Block all private networks |
 | 4 | Block | any | IOT net | any | any | Block internet (default deny) |
 
-**Why no "Cameras → Frigate" rule?** Frigate (on Docker VM/LAN) *pulls* RTSP streams from cameras — it initiates the connection. LAN has "allow all", so Frigate → Camera traffic is permitted. Return traffic (camera responses) is handled by OPNsense's stateful firewall. Cameras never need to initiate connections to Frigate.
+**Why no "Cameras → Frigate" rule?**Frigate (on Docker VM/LAN)*pulls* RTSP streams from cameras — it initiates the connection. LAN has "allow all", so Frigate → Camera traffic is permitted. Return traffic (camera responses) is handled by OPNsense's stateful firewall. Cameras never need to initiate connections to Frigate.
 
 **NTP (rule 2):** Points to `IOT address` (192.168.10.1 — OPNsense on the IOT interface) so cameras can sync time. OPNsense forwards NTP upstream. Using the gateway avoids opening a path to the LAN subnet.
 
-### How to create each rule:
+### How to create each rule
 
-**Firewall → Rules → IOT → Add (+ icon at top for first position):**
+#### Firewall → Rules → IOT → Add (+ icon at top for first position)
 
 For each rule:
+
 - **Action**: Pass or Block
 - **Interface**: IOT
 - **Direction**: in
@@ -98,9 +103,9 @@ For each rule:
 
 **Click Apply Changes** after adding all rules.
 
-### Verification:
+### Verification
 
-```
+```text
 Expected behavior:
 ✓ IoT device → Pi-hole DNS (53)     = PASS
 ✓ IoT device → OPNsense NTP (123)   = PASS
@@ -115,21 +120,22 @@ Expected behavior:
 
 ## Phase 4: Guest VLAN Rules
 
-**Firewall → Rules → GUEST:**
+#### Firewall → Rules → GUEST
 
 | # | Action | Protocol | Source | Dest | Port | Description |
 |---|--------|----------|--------|------|------|-------------|
+
 | 1 | Pass | TCP/UDP | GUEST net | PiHole_DNS | 53 | Allow DNS to Pi-hole |
 | 2 | Block | any | GUEST net | RFC1918 | any | Block all private networks |
 | 3 | Pass | TCP | GUEST net | any | 80 | Allow HTTP |
 | 4 | Pass | TCP | GUEST net | any | 443 | Allow HTTPS |
 | 5 | Block | any | GUEST net | any | any | Block all else |
 
-**Apply Changes.**
+#### Apply Changes
 
-### Verification:
+### Verification
 
-```
+```text
 Expected behavior:
 ✓ Guest → Pi-hole DNS (53)           = PASS
 ✓ Guest → internet HTTP/HTTPS        = PASS
@@ -148,7 +154,8 @@ Expected behavior:
 ### 5a. Verify physical path
 
 Cameras are connected via:
-```
+
+```text
 Camera → TP-Link PoE Switch → MokerLink P6 (VLAN 10 access) → Proxmox P1 (trunk)
 ```
 
@@ -156,28 +163,33 @@ This means cameras **already receive VLAN 10 at Layer 2**. They just need VLAN 1
 
 ### 5b. Reserve static IPs in OPNsense DHCP
 
-**Services → DHCPv4 → IOT → Static Mappings:**
+#### Services → DHCPv4 → IOT → Static Mappings
 
 | MAC Address | IP | Hostname | Description |
 |-------------|-----|----------|-------------|
+
 | (from cam 1) | 192.168.10.101 | front-door | Reolink front door |
 | (from cam 2) | 192.168.10.102 | back-yard | Reolink back yard |
 
 **Get MAC addresses** from current DHCP leases:
+
 - Services → DHCPv4 → Leases → find 192.168.0.110 and .111
 
 **Tapo C110** (192.168.0.101) is WiFi — it's on VLAN 1 via the TP-Link AP (HomeNet SSID). Moving it to IoT VLAN requires either:
+
 - A separate IoT SSID on the AP (needs OpenWrt or multi-SSID support)
 - Leave it on Management VLAN for now (still accessible to Frigate)
 
 ### 5c. Re-IP Reolink cameras
 
 **Option A: Via Reolink app/web UI** (simplest)
+
 1. Access each camera's web UI (192.168.0.110, .111)
 2. Settings → Network → change IP to 192.168.10.101/.102, gateway 192.168.10.1, DNS 192.168.0.10
 3. Camera reboots on new IP
 
-**Option B: Let DHCP handle it**
+#### Option B: Let DHCP handle it
+
 1. Cameras already connected to PoE switch on VLAN 10
 2. If cameras use DHCP, they'll get 192.168.10.x from OPNsense IOT DHCP
 3. Static mapping ensures they always get .101/.102
@@ -192,6 +204,7 @@ After cameras move to 192.168.10.x, update the go2rtc stream URLs in `frigate.ym
 ```
 
 Change camera IPs in the `go2rtc.streams` section:
+
 ```yaml
 go2rtc:
   streams:
@@ -221,7 +234,8 @@ Deploy: `ssh docker-vm "cd /opt/homelab/repo/docker/fixed/docker-vm/security && 
 
 ## Phase 6: Test Everything
 
-### From Management VLAN (MacBook on LAN):
+### From Management VLAN (MacBook on LAN)
+
 ```bash
 # Should work
 ping 192.168.0.1        # OPNsense
@@ -229,20 +243,25 @@ ping 192.168.0.10       # Docker VM
 curl https://jara.cronova.dev  # HA
 ```
 
-### From IoT VLAN (camera perspective):
+### From IoT VLAN (camera perspective)
+
 Check OPNsense Firewall → Live Log, filter by IOT interface:
+
 - DNS queries to 192.168.0.10:53 → PASS ✓
 - NTP to 192.168.10.1:123 → PASS ✓
 - Any other outbound → BLOCK ✓
 
-### From LAN → IoT (Frigate pulling cameras):
+### From LAN → IoT (Frigate pulling cameras)
+
 - Frigate RTSP pull from 192.168.10.101:554 → PASS ✓ (LAN allows all, stateful return)
 - Check Frigate UI: all camera feeds reconnect after IP change
 
-### From Guest VLAN:
+### From Guest VLAN
+
 Connect a phone to Guest WiFi (if configured) or test later:
+
 - `nslookup google.com` → should resolve (DNS passes) ✓
-- `curl https://google.com` → should work (443 passes) ✓
+- `curl <https://google.com`> → should work (443 passes) ✓
 - `ping 192.168.0.10` → should fail (RFC1918 blocked) ✓
 
 ---
@@ -258,6 +277,7 @@ Connect a phone to Guest WiFi (if configured) or test later:
 ## Rollback
 
 If something breaks:
+
 1. **Cameras offline in Frigate**: Frigate pulls RTSP from cameras — check LAN "allow all" rule still exists. If cameras moved to IoT VLAN, verify Frigate config has new IPs (192.168.10.x). Check OPNsense Live Log for blocked traffic.
 2. **Cameras can't resolve DNS**: Check IOT rule 1 (DNS to Pi-hole) is above the RFC1918 block rule
 3. **Guest WiFi broken**: Check GUEST rules — DNS (rule 1) must be above RFC1918 block (rule 2)

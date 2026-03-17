@@ -8,6 +8,7 @@ Issues identified during codebase review that must be fixed before deployment.
 
 | Priority | Count | Status |
 |----------|-------|--------|
+
 | CRITICAL | 1 | **FIXED** |
 | HIGH | 4 | **FIXED** (already documented) |
 | MEDIUM | 5 | 1 Fixed, 4 Deferred |
@@ -23,7 +24,8 @@ Issues identified during codebase review that must be fixed before deployment.
 
 **Problem:** Camera IPs were configured for VLAN 10 (192.168.10.x) but Day 1 deployment uses main LAN (192.168.1.x).
 
-**Fix Applied:**
+#### Fix Applied
+
 - Changed 192.168.10.101 → 192.168.1.101
 - Changed 192.168.10.102 → 192.168.1.102
 - Changed 192.168.10.103 → 192.168.1.103
@@ -49,6 +51,7 @@ docker network create monitoring-net || true
 **Directory:** `docker/fixed/docker-vm/security/secrets/`
 
 **Status:** README.md already documents how to create secrets:
+
 ```bash
 openssl rand -base64 32 > admin_token.txt
 openssl rand -base64 32 > restic_password.txt
@@ -60,6 +63,7 @@ chmod 600 *.txt
 **Files:** `docker/fixed/docker-vm/automation/mosquitto.conf`, `docker/fixed/docker-vm/automation/README.md`
 
 **Status:** Both files contain detailed setup instructions:
+
 ```bash
 docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/password.txt homeassistant
 docker exec -it mosquitto mosquitto_passwd -b /mosquitto/config/password.txt frigate <password>
@@ -83,6 +87,7 @@ docker compose restart mosquitto
 **File:** `docker/fixed/docker-vm/security/frigate.yml`
 
 **Fix Applied:** Added detailed RTSP URL documentation:
+
 - Reolink RLC-520A: Main and Sub stream paths, default credentials, enable steps
 - TP-Link Tapo C110: Stream path, how to create RTSP account in app
 
@@ -97,6 +102,7 @@ docker compose restart mosquitto
 ### 10. Hardware Acceleration Detection - Deferred
 
 **Status:** Command already in frigate.yml setup notes:
+
 ```bash
 docker exec frigate vainfo
 ```
@@ -106,12 +112,15 @@ docker exec frigate vainfo
 ## LOW Priority Issues - Deferred to Post-Deployment
 
 ### 11. Docker Compose Version Warnings
+
 Non-blocking, just warnings.
 
 ### 12. Missing Health Checks
+
 Many services already have health checks. Can add more post-deployment.
 
 ### 13. Commented Code Cleanup
+
 Will clean up after deployment is stable.
 
 ---
@@ -120,6 +129,7 @@ Will clean up after deployment is stable.
 
 | # | Issue | Status |
 |---|-------|--------|
+
 | 1 | Frigate camera IPs | **FIXED** |
 | 2 | External networks | Already documented |
 | 3 | Secrets files | Already documented |

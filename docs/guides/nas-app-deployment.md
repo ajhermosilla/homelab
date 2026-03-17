@@ -6,13 +6,14 @@ How to deploy FastAPI + React + PostgreSQL apps on the NAS using manual Docker C
 
 The NAS runs Coolify (tajy) as its PaaS, but Coolify v4 beta cannot deploy from a local Forgejo instance (see [Lessons Learned](#lessons-learned)). Instead, apps are deployed as standalone Docker Compose stacks that share Coolify's `coolify` Docker network and Traefik reverse proxy.
 
-**Deployed apps using this pattern:**
+#### Deployed apps using this pattern
+
 - **Katupyry** — Personal finance (FastAPI + React + PostgreSQL)
 - **Javya** — Worship planning (FastAPI + React + PostgreSQL)
 
 ## Architecture
 
-```
+```text
 Internet → Cloudflare DNS → Tailscale (Headscale) → NAS
   → Traefik (Coolify) :443 → coolify Docker network
     → app-frontend:80     (javya.cronova.dev)
@@ -21,6 +22,7 @@ Internet → Cloudflare DNS → Tailscale (Headscale) → NAS
 ```
 
 Key points:
+
 - **No published ports** — containers are only reachable via Traefik through the `coolify` network
 - **TLS termination** — Traefik handles Let's Encrypt certificates (DNS-01 via Cloudflare)
 - **Two routing patterns**: frontend-only (Katupyry) or frontend + API (Javya)
@@ -28,9 +30,10 @@ Key points:
 ## Prerequisites
 
 Before deploying, ensure:
+
 - [ ] App repo exists on Forgejo (`git.cronova.dev`)
 - [ ] App has a `docker-compose.prod.yml` (or similar) and Dockerfiles for backend/frontend
-- [ ] DNS records exist in **Pi-hole** (LAN) and **Headscale extra_records** (Tailscale)
+- [ ] DNS records exist in **Pi-hole**(LAN) and**Headscale extra_records** (Tailscale)
 - [ ] Secrets generated and stored in Vaultwarden
 - [ ] NAS has enough resources (~900MB RAM per app: 512M DB + 256M backend + 128M frontend)
 
@@ -74,6 +77,7 @@ Store all secrets in Vaultwarden immediately.
 Adapt the compose file for the Coolify/Traefik pattern:
 
 **Remove** from all services:
+
 - `ports:` — Traefik routes traffic, no host port publishing needed
 
 **Add** to services that Traefik needs to reach (frontend always, backend if API is exposed externally):
@@ -191,6 +195,7 @@ Add via the web UI at `https://status.cronova.dev` (username: `ajhermosilla`):
 
 | Field | Value |
 |-------|-------|
+
 | Type | HTTP(s) |
 | URL | `https://<app>.cronova.dev` |
 | Interval | 60s |
@@ -202,7 +207,7 @@ Add via the web UI at `https://status.cronova.dev` (username: `ajhermosilla`):
 
 Add compose and Traefik config under `docker/fixed/nas/<app>/`:
 
-```
+```text
 docker/fixed/nas/<app>/
 ├── docker-compose.yml    # Reference copy of production compose
 ├── .env.example          # Template (no secrets)
@@ -228,6 +233,7 @@ docker compose -f docker-compose.prod.yml up -d --force-recreate
 
 | App | URL | API URL | Deploy Path | Traefik Config |
 |-----|-----|---------|-------------|----------------|
+
 | Katupyry | katupyry.cronova.dev | (internal) | ~/deploy/katupyry/ | /data/coolify/proxy/dynamic/katupyry.yaml |
 | Javya | javya.cronova.dev | javya-api.cronova.dev | ~/deploy/javya/ | /data/coolify/proxy/dynamic/javya.yaml |
 
@@ -235,6 +241,7 @@ docker compose -f docker-compose.prod.yml up -d --force-recreate
 
 | Aspect | Katupyry | Javya |
 |--------|----------|-------|
+
 | API routing | Internal only (frontend proxies) | External (`javya-api.cronova.dev`) |
 | Coolify network | Frontend only | Frontend + backend |
 | Container names | Default (compose-generated) | Explicit (`container_name:`) |
@@ -250,7 +257,7 @@ We spent significant time trying to deploy Javya via Coolify's UI. The blockers 
 1. **URL validation** — Rejects `localhost`, IP addresses, and `ssh://` scheme. Only accepts `https://`, `http://`, `git://`, or `git@host:repo` format.
 2. **SSH helper containers** — Coolify clones repos inside helper containers that use Docker's embedded DNS, not the host's `/etc/hosts`. Adding `192.168.0.12 git.cronova.dev` to NAS `/etc/hosts` doesn't help.
 3. **GIT_SSH_COMMAND wrapping** — Even HTTP URLs get wrapped with SSH when a Deploy Key is configured, making HTTP-based workarounds fail too.
-4. **Port mismatch** — Forgejo SSH runs on port 2222, but `git@git.cronova.dev:2222/...` syntax doesn't work as expected in Coolify.
+4. **Port mismatch** — Forgejo SSH runs on port 2222, but `<git@git.cronova.dev>:2222/...` syntax doesn't work as expected in Coolify.
 
 **Conclusion**: Until Coolify v4 supports local/private git servers properly, use manual Docker Compose. The manual approach is actually simpler and more transparent.
 

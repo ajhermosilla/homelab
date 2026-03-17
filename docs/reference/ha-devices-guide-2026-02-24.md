@@ -11,10 +11,11 @@
 
 | Device | Chip | Flashable? | Price (USD) | Notes |
 |--------|------|-----------|-------------|-------|
+
 | **SONOFF MINI R4** | ESP32 | Yes (Tasmota/ESPHome) | ~$10-15 | In-wall relay, decoupled switch. Requires soldering to flash. |
 | **SONOFF MINI R4M** | ESP32-C3 | No (Matter-locked) | ~$12-15 | Matter-certified. Use via Matter integration, don't try to flash. |
 | **SONOFF Basic R4** | ESP32 | Yes (Tasmota/ESPHome) | ~$8-12 | Basic relay, well-documented flashing. |
-| **SONOFF S31** | ESP8266 | Yes (Tasmota/ESPHome) | ~$10-13 | Best flashable plug with energy monitoring. Exposed pin headers. **SAFETY**: GND connected to live AC — use isolated USB-serial adapter. |
+| **SONOFF S31**| ESP8266 | Yes (Tasmota/ESPHome) | ~$10-13 | Best flashable plug with energy monitoring. Exposed pin headers.**SAFETY**: GND connected to live AC — use isolated USB-serial adapter. |
 | **SONOFF S26 R2** | ESP8266 | Yes (Tasmota) | ~$8-10 | Simple plug, no energy monitoring. Multiple regional versions. |
 | **SONOFF TX Ultimate** | ESP32 | Yes (ESPHome) | ~$30-40 | Touch wall switch with LED effects. |
 
@@ -24,6 +25,7 @@
 
 | Device | Type | Price (USD) | Battery Life | Notes |
 |--------|------|-------------|-------------|-------|
+
 | **SNZB-04P** | Door/Window | ~$10-16 | 5+ years (CR2477) | Zigbee 3.0, ZHA/Z2M |
 | **SNZB-03P** | Motion | ~$10-16 | 3 years | Includes ambient light sensor |
 | **SNZB-02D** | Temp/Humidity | ~$10-16 | LCD display, CR2032 | Great for room climate |
@@ -40,6 +42,7 @@ Boards cost $2-4 on AliExpress. ESPHome turns YAML configs into fully integrated
 
 | Board | Price | WiFi | BLE | Thread | Best For |
 |-------|-------|------|-----|--------|----------|
+
 | **ESP32-C3 Super Mini** | ~$2-3 | Yes | 5.0 | No | BLE proxy, sensors, relays |
 | **ESP32-S3 Super Mini** | ~$3-4 | Yes | 5.0 | No | Camera, heavy processing |
 | **ESP32-C6 Super Mini** | ~$3-5 | WiFi 6 | 5.0 | Yes | Future-proof, Thread support |
@@ -49,32 +52,37 @@ Boards cost $2-4 on AliExpress. ESPHome turns YAML configs into fully integrated
 
 ### Top Projects
 
-**Presence Detection (mmWave + ESP32):**
+#### Presence Detection (mmWave + ESP32)
+
 - **LD2410C** sensor (~$3-5) + ESP32-C3 Super Mini = ~$5-8 per room
 - Detects stationary humans (breathing detection), range up to 5m
 - Native ESPHome `ld2410` component
 - vs $167 for commercial Aqara FP2
 
-**BLE Bluetooth Proxy:**
+#### BLE Bluetooth Proxy
+
 - ESP32 with ESPHome Bluetooth Proxy firmware
 - Extends HA's BLE range throughout the house
 - ~$3 per proxy, place 2-4 around the house
 
-**Temperature/Humidity Monitoring:**
+#### Temperature/Humidity Monitoring
+
 - ESP32 + BME280 sensor = ~$5-7 per node
 - Perfect for server room / rack monitoring
 
-**Water Leak Detection:**
+#### Water Leak Detection
+
 - ESP32 + water sensor module = ~$3-5 per detector
 - ESPHome `binary_sensor` with `device_class: moisture`
 
-**Smart Relay / Light Switch:**
+#### Smart Relay / Light Switch
+
 - ESP32 + relay module = ~$4-6
 - Controls any light or appliance
 
 ### Pre-flashed Option: Athom Technology
 
-If you don't want to solder, [Athom](https://www.athom.tech/) sells devices pre-flashed with ESPHome/Tasmota on AliExpress: smart plugs with energy monitoring (~$10-13), relay modules, bulbs. Ready to pair with HA out of the box.
+If you don't want to solder, [Athom](https://<www.athom.tech/)> sells devices pre-flashed with ESPHome/Tasmota on AliExpress: smart plugs with energy monitoring (~$10-13), relay modules, bulbs. Ready to pair with HA out of the box.
 
 ---
 
@@ -82,6 +90,7 @@ If you don't want to solder, [Athom](https://www.athom.tech/) sells devices pre-
 
 | Factor | Zigbee | WiFi (ESPHome) | Matter (Thread) |
 |--------|--------|----------------|-----------------|
+
 | **Cost** | Cheapest sensors | Cheap (ESP-based) | Getting cheaper (IKEA) |
 | **Battery life** | Excellent (years) | Poor (mains only) | Excellent |
 | **Range** | Mesh extends | Router-dependent | Mesh extends |
@@ -91,12 +100,13 @@ If you don't want to solder, [Athom](https://www.athom.tech/) sells devices pre-
 
 ### Recommendation
 
-**Start with Zigbee** for battery-powered sensors + **SONOFF ZBDongle-P** (~$15-20). Use **WiFi/ESPHome** for mains-powered DIY projects. **Matter** worth considering for new purchases (especially IKEA), but don't migrate existing setups.
+**Start with Zigbee**for battery-powered sensors +**SONOFF ZBDongle-P**(~$15-20). Use**WiFi/ESPHome**for mains-powered DIY projects.**Matter** worth considering for new purchases (especially IKEA), but don't migrate existing setups.
 
 ### Zigbee Coordinators
 
 | Coordinator | Chip | Price | Notes |
 |------------|------|-------|-------|
+
 | **SONOFF ZBDongle-P** | CC2652P | ~$15-20 | Most recommended, best Z2M support |
 | **SONOFF ZBDongle-E** | EFR32MG21 | ~$15-20 | Works great with ZHA |
 | **HA Connect ZBT-2** | - | ~$30 | Official, supports Zigbee + Thread |
@@ -110,6 +120,7 @@ For Docker VM HA: **ZBDongle-P** is the budget choice. Plug into Proxmox host, p
 
 | Plug | Protocol | Energy Monitor | Flashable | Price | Notes |
 |------|----------|---------------|-----------|-------|-------|
+
 | **SONOFF S31** | WiFi | Yes | Yes (ESPHome) | ~$10-13 | Best hackable plug. US/Type B. |
 | **Athom Smart Plug V3** | WiFi | Yes (HLW8032) | Pre-flashed ESPHome | ~$10-13 | Plug-and-play, US/EU/BR types |
 | **SONOFF S40** | WiFi | Yes | No (BK chip) | ~$13-16 | Not flashable |
@@ -157,7 +168,7 @@ Hardware: 1x ESP32-C3 per room (~$2-3 each) + USB power. 2-4 proxies covers a ty
 - Best for occupancy automations (lights, HVAC)
 - Can combine with BLE proxy on the same ESP32
 
-**Use both:** Bermuda for tracking *who* is in which room, mmWave for detecting *if anyone* is there.
+**Use both:**Bermuda for tracking*who*is in which room, mmWave for detecting*if anyone* is there.
 
 ---
 
@@ -200,6 +211,7 @@ Hardware: 1x ESP32-C3 per room (~$2-3 each) + USB power. 2-4 proxies covers a ty
 
 | Source | What You'll Find | Notes |
 |--------|-----------------|-------|
+
 | **MercadoLibre PY** | Tuya-based plugs, bulbs, switches | Most common, use LocalTuya |
 | **Ciudad del Este** | SONOFF via [Mobile Zone](https://sonoff.tech/en-us/blogs/news/primer-proyecto-de-domotica-en-paraguay-mobile-zone) (Galeria Jebai) | Official SONOFF distributor |
 | **TiendaMia** | Full Amazon catalog | Handles import/customs, good for SONOFF S31 |
@@ -228,6 +240,7 @@ Hardware: 1x ESP32-C3 per room (~$2-3 each) + USB power. 2-4 proxies covers a ty
 
 | Item | Source | Price | Purpose |
 |------|--------|-------|---------|
+
 | SONOFF ZBDongle-P | AliExpress | ~$15 | Zigbee coordinator |
 | 3x ESP32-C3 Super Mini | AliExpress | ~$6-9 | BLE proxy + sensors |
 | 2x LD2410C mmWave | AliExpress | ~$6-10 | Presence detection |
@@ -237,6 +250,7 @@ Hardware: 1x ESP32-C3 per room (~$2-3 each) + USB power. 2-4 proxies covers a ty
 
 | Item | Source | Price | Purpose |
 |------|--------|-------|---------|
+
 | 2x SONOFF SNZB-04P | AliExpress | ~$20-30 | Door/window sensors |
 | 1x SONOFF SNZB-03P | AliExpress | ~$10-16 | Motion sensor |
 | 1x SONOFF SNZB-02D | AliExpress | ~$10-16 | Temp/humidity LCD |
@@ -246,6 +260,7 @@ Hardware: 1x ESP32-C3 per room (~$2-3 each) + USB power. 2-4 proxies covers a ty
 
 | Item | Source | Price | Purpose |
 |------|--------|-------|---------|
+
 | 2x SONOFF S31 | TiendaMia | ~$20-26 | Energy monitoring |
 | 2x SONOFF MINI R4 | AliExpress | ~$20-30 | In-wall switches |
 

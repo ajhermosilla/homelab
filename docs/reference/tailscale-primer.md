@@ -6,6 +6,7 @@ WireGuard-based mesh VPN. Every device gets a stable IP (100.x.x.x) and can reac
 
 | Plan | Price | Devices | Users |
 |------|-------|---------|-------|
+
 | Personal | Free | 100 | 1 |
 | Personal Plus | $48/yr | 100 | 1 |
 | Enterprise | $$$ | Unlimited | Teams |
@@ -34,6 +35,7 @@ Free tier is generous for personal use.
 
 | Tool | Model | Self-hosted? | Notes |
 |------|-------|--------------|-------|
+
 | **Headscale** | Tailscale-compatible | Yes | Drop-in replacement for Tailscale's coord server |
 | **Netbird** | Mesh VPN | Yes | Similar to Tailscale, fully self-hostable |
 | **Zerotier** | Mesh VPN | Partial | Older, more complex, free tier exists |

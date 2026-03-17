@@ -35,7 +35,7 @@
 
 ## Executive Summary
 
-The self-hosted PaaS landscape in 2026 is mature and competitive. **Coolify** has emerged as the community favorite with 51k+ GitHub stars and the most feature-rich offering, though it carries notable security baggage (11 CVEs disclosed in January 2026). **Dokploy** is the fast-rising challenger with a cleaner UI and Docker Swarm native support. **Dokku** remains the lightweight veteran for CLI-first developers. **Kamal** (from 37signals) is the minimalist's dream but requires more manual infrastructure management.
+The self-hosted PaaS landscape in 2026 is mature and competitive. **Coolify**has emerged as the community favorite with 51k+ GitHub stars and the most feature-rich offering, though it carries notable security baggage (11 CVEs disclosed in January 2026).**Dokploy**is the fast-rising challenger with a cleaner UI and Docker Swarm native support.**Dokku**remains the lightweight veteran for CLI-first developers.**Kamal** (from 37signals) is the minimalist's dream but requires more manual infrastructure management.
 
 For a homelab with 9GB RAM already running multiple services (Frigate, Home Assistant, Pi-hole, Caddy, Vaultwarden, Mosquitto), the key constraint is **available RAM after existing services**. A full PaaS like Coolify or Dokploy will consume 250-400MB at idle before deploying any apps. Dokku uses only ~95MB. The choice depends on whether you value a web UI or prefer CLI workflows.
 
@@ -44,10 +44,12 @@ For a homelab with 9GB RAM already running multiple services (Frigate, Home Assi
 ## Tier Classification
 
 ### Tier 1: Full PaaS (Heroku-like)
+
 Git-push deploy, managed databases, web UI, SSL automation, monitoring, one-click app templates.
 
 | Platform | Maturity | Stars |
 |----------|----------|-------|
+
 | Coolify | High | 51k |
 | Dokploy | Medium | 28k |
 | CapRover | High | 14k |
@@ -56,19 +58,23 @@ Git-push deploy, managed databases, web UI, SSL automation, monitoring, one-clic
 | Cloudron | High | N/A (proprietary, paid) |
 
 ### Tier 2: Deploy Tools
+
 Focused on getting containers to servers. No built-in DB management, minimal UI.
 
 | Platform | Maturity | Stars |
 |----------|----------|-------|
+
 | Kamal | High | 11k+ |
 | Komodo | Medium | 10k |
 | Haloy | Low | New |
 
 ### Tier 3: Docker Management
+
 GUI for managing existing Docker containers. Not a deploy pipeline.
 
 | Platform | Maturity | Stars |
 |----------|----------|-------|
+
 | Portainer | Very High | 32k+ |
 | Dockge | Medium | 22k |
 
@@ -78,6 +84,7 @@ GUI for managing existing Docker containers. Not a deploy pipeline.
 
 | Platform | Type | Min RAM | Idle RAM | Git Deploy | Auto SSL | DB Mgmt | Web UI | GitHub Stars | Best For |
 |----------|------|---------|----------|------------|----------|---------|--------|--------------|----------|
+
 | **Coolify** | Full PaaS | 2 GB | ~380 MB | Yes | Yes | Yes | Yes | 51k | Feature-hungry teams |
 | **Dokploy** | Full PaaS | 2 GB (4 rec.) | ~300 MB | Yes | Yes | Yes | Yes | 28k | Clean UI + Docker Swarm |
 | **CapRover** | Full PaaS | 1 GB | ~210 MB | Yes | Yes | Basic | Yes | 14k | Simple + lightweight PaaS |
@@ -109,12 +116,14 @@ GUI for managing existing Docker containers. Not a deploy pipeline.
 **Latest**: v4.0.0-beta.463 (Feb 2026)
 
 #### Architecture
+
 - **Backend**: PHP (Laravel), Traefik reverse proxy
 - **Database**: PostgreSQL (internal)
 - **Multi-server**: Docker Swarm-based, SSH connections to remote servers
 - **Build**: Nixpacks, Dockerfiles, Docker Compose, Buildpacks
 
 #### Key Features
+
 - Git push deploy from GitHub, GitLab, Bitbucket, Gitea
 - 280+ one-click service templates (Supabase, Plausible, n8n, etc.)
 - Full Docker Compose stack support (unique among PaaS tools)
@@ -126,21 +135,25 @@ GUI for managing existing Docker containers. Not a deploy pipeline.
 - Webhook and API support
 
 #### Resource Requirements
+
 - **Minimum**: 2 vCPU, 2 GB RAM, 30 GB disk
 - **Recommended**: 4 vCPU, 4 GB RAM, 40 GB+ disk
 - **Idle RAM**: ~380 MB
 - **Disk footprint**: ~1.2 GB
 
 #### Supported App Types
+
 Static sites, Node.js, Python, Go, Rust, PHP, Ruby, Java -- anything with a Dockerfile or buildpack. Full Docker Compose stacks.
 
 #### Community
+
 - 51,000+ GitHub stars (largest in category)
 - Very active development (multiple releases per week)
 - Large Discord community
 - Extensive video guides and LLM-optimized documentation
 
 #### Pros
+
 - Most feature-rich option by far
 - Docker Compose support is a killer feature (deploy multi-container stacks)
 - Beautiful, modern web UI
@@ -150,6 +163,7 @@ Static sites, Node.js, Python, Go, Rust, PHP, Ruby, Java -- anything with a Dock
 - Preview deployments for PRs (Vercel-like workflow)
 
 #### Cons
+
 - **SECURITY**: 11 critical CVEs (CVSS up to 10.0) disclosed January 2026, exposing 52,000+ instances to RCE and auth bypass. Patched quickly but reveals code quality concerns.
 - Highest resource consumption among PaaS options (~380 MB idle)
 - Web UI can feel clunky for complex setups
@@ -160,9 +174,11 @@ Static sites, Node.js, Python, Go, Rust, PHP, Ruby, Java -- anything with a Dock
 - Still technically in "beta" (v4.0.0-beta.xxx)
 
 #### Best For
+
 Teams or solo developers who want a Vercel/Heroku-like experience with maximum features and don't mind the resource overhead. Ideal if you want to deploy full-stack apps, manage databases, and run one-click services all from one panel.
 
 #### Community Quotes
+
 - *"Coolify is basically a self-hosted Vercel/Netlify/Heroku that actually works"* -- r/selfhosted
 - *"Docker Compose support is a game-changer -- unlike CapRover and Dokku, Coolify can deploy entire Docker Compose stacks"* -- selfhostable.dev
 - *"For most people in 2026, Coolify is the best choice. It's the most feature-rich, actively developed, and beginner-friendly"* -- community consensus
@@ -180,6 +196,7 @@ Teams or solo developers who want a Vercel/Heroku-like experience with maximum f
 **Latest**: v0.25.0 (2026)
 
 #### Architecture
+
 - **Backend**: TypeScript (Next.js)
 - **Database**: PostgreSQL (internal) + Redis (deployment queue)
 - **Reverse proxy**: Traefik (auto-configured with dynamic routing)
@@ -187,6 +204,7 @@ Teams or solo developers who want a Vercel/Heroku-like experience with maximum f
 - **Build**: Nixpacks, Heroku Buildpacks, Paketo Buildpacks, Dockerfiles
 
 #### Key Features
+
 - Clean, modern UI (widely praised as superior to Coolify's)
 - 350+ one-click templates
 - Native Docker Swarm multi-server clustering (no manual load balancer config)
@@ -197,21 +215,25 @@ Teams or solo developers who want a Vercel/Heroku-like experience with maximum f
 - Traefik file editor for advanced routing
 
 #### Resource Requirements
+
 - **Minimum**: 2 vCPU, 2 GB RAM (4 GB recommended), 30 GB disk
 - **Recommended**: 4 vCPU, 8 GB RAM, 40 GB+ disk
 - **Idle RAM (UI only)**: ~250 MB
 - **Idle RAM (with apps)**: ~300 MB+
 
 #### Supported App Types
+
 Same breadth as Coolify -- any Docker-compatible app, static sites, databases. Multiple build method support.
 
 #### Community
+
 - 28,000+ GitHub stars (growing fast)
 - 200+ contributors
 - 6M+ Docker Hub downloads
 - Active Discord community
 
 #### Pros
+
 - Cleaner, more intuitive UI than Coolify
 - Docker Swarm clustering works out of the box (Traefik auto-discovers services)
 - Strong monitoring built in
@@ -220,6 +242,7 @@ Same breadth as Coolify -- any Docker-compatible app, static sites, databases. M
 - Official MCP server for AI integration (67 tools)
 
 #### Cons
+
 - Licensing is murky -- "Apache 2.0" but with restrictions on commercial use (effectively source-available)
 - Younger project with less battle-testing than Coolify
 - No preview deployments for pull requests
@@ -228,9 +251,11 @@ Same breadth as Coolify -- any Docker-compatible app, static sites, databases. M
 - Smaller one-click template library (though 350+ is still substantial)
 
 #### Best For
+
 Developers who want a PaaS experience with a cleaner interface and value Docker Swarm native support. Good for teams wanting multi-server clustering without manual configuration.
 
 #### Community Quotes
+
 - *"I chose Dokploy for its modern UI, simplicity without sacrificing power, and active development"* -- Medium blog post
 - *"Dokploy shines with its modern, Docker-centric approach, superior monitoring capabilities, and better built-in scaling features"* -- Cherry Servers
 - *"Many users use Dokploy for critical production applications and Coolify for auxiliary services"* -- INTROSERV blog
@@ -248,6 +273,7 @@ Developers who want a PaaS experience with a cleaner interface and value Docker 
 **Originally**: CaptainDuckDuck (since 2017)
 
 #### Architecture
+
 - **Backend**: Node.js
 - **Reverse proxy**: Nginx (auto-configured)
 - **Monitoring**: NetData (built-in)
@@ -255,6 +281,7 @@ Developers who want a PaaS experience with a cleaner interface and value Docker 
 - **Build**: Captain file templates, Dockerfiles (limited Docker Compose support)
 
 #### Key Features
+
 - Web dashboard + CLI tools
 - 50+ one-click app templates
 - Docker Swarm cluster support
@@ -264,20 +291,24 @@ Developers who want a PaaS experience with a cleaner interface and value Docker 
 - NetData monitoring integration
 
 #### Resource Requirements
+
 - **Minimum**: 1 GB RAM
 - **Idle RAM**: ~210 MB
 - **Disk footprint**: ~800 MB
 
 #### Supported App Types
+
 Node.js, Python, PHP, Ruby, Go, Java, .NET, static sites, Docker images.
 
 #### Community
+
 - 14,000 GitHub stars
 - Stable, mature community since 2017
 - Good documentation
 - Active but slower development pace than Coolify/Dokploy
 
 #### Pros
+
 - Lighter resource footprint than Coolify (~210 MB vs ~380 MB)
 - Stable and mature (8 years of development)
 - Good web UI without being heavyweight
@@ -286,6 +317,7 @@ Node.js, Python, PHP, Ruby, Go, Java, .NET, static sites, Docker images.
 - In-place upgrades are trivial
 
 #### Cons
+
 - **No Docker Compose support** (only subselection of Docker Compose parameters)
 - UI feels dated compared to Coolify and Dokploy
 - Less actively developed (slower release cadence)
@@ -294,9 +326,11 @@ Node.js, Python, PHP, Ruby, Go, Java, .NET, static sites, Docker images.
 - Single-container limitation per app (no multi-container stacks)
 
 #### Best For
+
 Users who want a visual PaaS that's lighter than Coolify but more than Dokku. Good for teams managing simple containerized apps where Docker Compose support isn't needed.
 
 #### Community Quotes
+
 - *"I prefer CapRover because it does everything I need and is lighter weight than Coolify and has a GUI (unlike Dokku)"* -- Reddit user
 - *"CapRover works well if you like control and don't mind a bit of server work"* -- r/selfhosted
 - *"CapRover sits nicely between Coolify's feature-richness and Dokku's minimalism"* -- selfhostable.dev
@@ -314,6 +348,7 @@ Users who want a visual PaaS that's lighter than Coolify but more than Dokku. Go
 **Since**: 2013
 
 #### Architecture
+
 - **Backend**: Go (rewritten from original Bash)
 - **Reverse proxy**: Nginx (default), Caddy, or Traefik options
 - **Build**: Heroku Buildpacks, Dockerfiles, Docker images
@@ -321,6 +356,7 @@ Users who want a visual PaaS that's lighter than Coolify but more than Dokku. Go
 - **Plugins**: Extensive plugin ecosystem
 
 #### Key Features
+
 - `git push dokku main` deployment workflow (identical to Heroku)
 - Heroku-compatible buildpacks (no Dockerfile needed for most languages)
 - Plugin ecosystem: PostgreSQL, Redis, MongoDB, MariaDB, Elasticsearch, etc.
@@ -331,20 +367,24 @@ Users who want a visual PaaS that's lighter than Coolify but more than Dokku. Go
 - Cron job scheduling
 
 #### Resource Requirements
+
 - **Minimum**: 1 GB RAM
 - **Idle RAM**: ~95 MB (lowest of all PaaS options)
 - **Disk footprint**: ~300 MB
 
 #### Supported App Types
+
 Any language supported by Heroku buildpacks (Node.js, Python, Ruby, Go, Java, PHP, Scala, Clojure) plus anything with a Dockerfile.
 
 #### Community
+
 - 32,000 GitHub stars
 - 13 years of development (most mature option)
 - Excellent, comprehensive documentation (among best in the space)
 - Rich plugin ecosystem
 
 #### Pros
+
 - **Lowest resource usage** -- only ~95MB idle, ~300MB disk
 - Rock-solid stability from 13 years of development
 - `git push` workflow is simple and elegant
@@ -354,6 +394,7 @@ Any language supported by Heroku buildpacks (Node.js, Python, Ruby, Go, Java, PH
 - Flexible reverse proxy choice (Nginx/Caddy/Traefik)
 
 #### Cons
+
 - **CLI only** -- no web UI whatsoever
 - **Single-server only** -- no multi-server, no clustering
 - No multi-user support or RBAC
@@ -363,9 +404,11 @@ Any language supported by Heroku buildpacks (Node.js, Python, Ruby, Go, Java, PH
 - No Docker Compose support for deployments
 
 #### Best For
+
 Solo developers, side projects, and small production workloads where resource efficiency matters. Perfect for someone running multiple apps on a RAM-constrained VM who prefers CLI workflows.
 
 #### Community Quotes
+
 - *"Dokku is the lightest and cheapest in terms of resource usage"* -- selfhostable.dev
 - *"Dokku is the veteran of this list, first released in 2013. It's a mini Heroku that gives you git-push deployments on a single server"* -- Haloy blog
 - *"Rock solid stability from long development history"* -- comparison review
@@ -382,12 +425,14 @@ Solo developers, side projects, and small production workloads where resource ef
 **License**: Proprietary (free "Developer Edition" available)
 
 #### Architecture
+
 - **Backend**: Proprietary
 - **Build**: Cloud Native Buildpacks
 - **Reverse proxy**: Traefik
 - **Database**: Built-in support for MySQL, PostgreSQL, MongoDB, Redis
 
 #### Key Features
+
 - One-click app templates
 - Automatic Let's Encrypt SSL
 - GitHub/GitLab/Bitbucket CI/CD integration
@@ -395,23 +440,28 @@ Solo developers, side projects, and small production workloads where resource ef
 - Clean, modern UI designed for simplicity
 
 #### Resource Requirements
+
 - **Minimum**: ~1 GB RAM (estimated)
 - **Recommended**: 2 GB+ RAM
 
 #### Supported App Types
+
 Node.js, Ruby, Python, PHP, Go, Java, Docker images, static sites.
 
 #### Community
+
 - Proprietary core -- limited community contributions
 - Growing user base among VPS operators
 
 #### Pros
+
 - Very clean, intuitive UI
 - Good one-click templates
 - Free developer edition
 - Low learning curve
 
 #### Cons
+
 - **Proprietary core** -- not truly open source
 - Limited community contributions and transparency
 - Paid tiers for advanced features
@@ -419,6 +469,7 @@ Node.js, Ruby, Python, PHP, Go, Java, Docker images, static sites.
 - Less flexibility for power users
 
 #### Best For
+
 Non-technical users or beginners who want the simplest possible PaaS experience and don't mind proprietary software.
 
 ---
@@ -427,17 +478,19 @@ Non-technical users or beginners who want the simplest possible PaaS experience 
 
 **One-liner**: A polished, all-in-one server app store with automatic updates, backups, user management, and email -- but it costs money.
 
-**Website**: [cloudron.io](https://www.cloudron.io)
+**Website**: [cloudron.io](https://<www.cloudron.io>)
 **License**: Proprietary (paid)
 **Pricing**: Free (2 apps, 2 users), Hobbyist ($15/mo), Standard ($30/mo), Premium ($90/mo)
 
 #### Architecture
+
 - **Backend**: Proprietary
 - **App model**: Curated app packages (not raw Docker)
 - **Updates**: Fully automated
 - **Backups**: Automated to S3, Google Cloud, etc.
 
 #### Key Features
+
 - App store model -- install apps like WordPress, Nextcloud, GitLab with one click
 - Fully automated updates and security patches
 - Built-in email server
@@ -446,19 +499,23 @@ Non-technical users or beginners who want the simplest possible PaaS experience 
 - DNS management
 
 #### Resource Requirements
+
 - **Minimum**: 2 GB RAM
 - **Idle RAM**: ~500 MB (heaviest of all options)
 
 #### Supported App Types
+
 Only apps that have been packaged for Cloudron. Limited to the curated catalog.
 
 #### Pros
+
 - Most "hands-off" option -- updates, backups, and security are automatic
 - Excellent for non-developers who want to run standard apps
 - Built-in email server is unique
 - User management and SSO built in
 
 #### Cons
+
 - **Not free** -- $15-90/month
 - **Not open source**
 - Only curated apps (can't deploy arbitrary code)
@@ -467,6 +524,7 @@ Only apps that have been packaged for Cloudron. Limited to the curated catalog.
 - Highest idle RAM (~500 MB)
 
 #### Best For
+
 Non-technical users who want to run standard self-hosted apps (Nextcloud, WordPress, email) with zero maintenance. Not suitable as a developer PaaS.
 
 ---
@@ -486,6 +544,7 @@ Non-technical users who want to run standard self-hosted apps (Nextcloud, WordPr
 **Latest**: Kamal 2.x (2025)
 
 #### Architecture
+
 - **Backend**: Ruby gem (CLI tool)
 - **On-server**: Only your app container + kamal-proxy (~10MB binary)
 - **Reverse proxy**: kamal-proxy (custom, built-in, handles SSL via Let's Encrypt)
@@ -494,6 +553,7 @@ Non-technical users who want to run standard self-hosted apps (Nextcloud, WordPr
 - **No daemon**: Nothing runs on server except your app
 
 #### Key Features
+
 - Zero-downtime rolling deploys
 - Automatic SSL via Let's Encrypt (kamal-proxy)
 - Multi-server deployments
@@ -506,20 +566,24 @@ Non-technical users who want to run standard self-hosted apps (Nextcloud, WordPr
 - Bundled with Rails 8 as default deploy method
 
 #### Resource Requirements
+
 - **Minimum**: 2 GB RAM recommended
 - **Server overhead**: ~0 MB (only kamal-proxy, ~10MB binary)
 - **Build**: Local machine or CI server (not on deploy target)
 
 #### Supported App Types
+
 Any Docker container. Originally designed for Rails but works with any language that produces a Docker image (Python, Go, Node.js, etc.). Kamal is framework-agnostic.
 
 #### Community
+
 - 11,000+ GitHub stars
 - Strong Rails/Ruby community adoption
 - Backed by 37signals (runs HEY email, Basecamp production)
 - Growing adoption outside Rails ecosystem
 
 #### Pros
+
 - **Zero server overhead** -- nothing runs except your app + tiny proxy
 - Battle-tested at 37signals scale
 - Clean, simple deployment model
@@ -529,6 +593,7 @@ Any Docker container. Originally designed for Rails but works with any language 
 - MIT license
 
 #### Cons
+
 - **Requires Docker registry** (no registry-free option)
 - **Requires Ruby** installed on local machine (friction for non-Ruby devs)
 - **No web UI** -- entirely CLI-driven via `deploy.yml` config
@@ -539,9 +604,11 @@ Any Docker container. Originally designed for Rails but works with any language 
 - Gap between marketing promise and production reality widens with infrastructure complexity
 
 #### Best For
+
 Developers who want absolute minimal server overhead and are comfortable managing infrastructure manually. Excellent for Rails apps, good for any Docker app if you're comfortable with the CLI workflow.
 
 #### Community Quotes
+
 - *"If you are deploying a new application to a fresh server with no existing infrastructure to work around, Kamal is genuinely excellent"* -- Ivan Turkovic (Feb 2026 review)
 - *"The gap between Kamal's marketing promise and production reality widens substantially once infrastructure complexity increases"* -- honest review
 - *"Trying to layer nginx alongside kamal-proxy is not worth the complexity"* -- production experience report
@@ -558,6 +625,7 @@ Developers who want absolute minimal server overhead and are comfortable managin
 **License**: GPL-3.0 (no feature gating)
 
 #### Architecture
+
 - **Backend**: Rust (Komodo Core -- web server + API + UI)
 - **Agents**: Komodo Periphery (lightweight Rust agent on each server)
 - **Build**: Docker image builds from git repos, auto-versioned
@@ -565,6 +633,7 @@ Developers who want absolute minimal server overhead and are comfortable managin
 - **No built-in reverse proxy** -- must configure externally
 
 #### Key Features
+
 - Unified resource abstraction (servers, deployments, stacks, builds, procedures)
 - Docker container management across multiple servers
 - Docker Compose stack deployments (file in UI or git repo)
@@ -576,20 +645,24 @@ Developers who want absolute minimal server overhead and are comfortable managin
 - Alert system for resource usage
 
 #### Resource Requirements
+
 - **Minimum**: ~1 GB RAM (estimated, Rust is efficient)
 - **Idle RAM**: Low (Rust binary, no interpreted runtime)
 - **Per-server agent**: Lightweight, stateless
 
 #### Supported App Types
+
 Any Docker container or Docker Compose stack.
 
 #### Community
+
 - 10,000 GitHub stars (growing rapidly)
 - 45+ contributors
 - Active development (Feb 2026 releases)
 - Growing homelab adoption
 
 #### Pros
+
 - Rust backend means excellent performance and low resource usage
 - Multi-server management without PaaS overhead
 - GPL-3.0 with no paid tier or feature gating
@@ -599,6 +672,7 @@ Any Docker container or Docker Compose stack.
 - Strong momentum in homelab community
 
 #### Cons
+
 - Steeper learning curve (broad scope)
 - Requires agent on every managed server
 - No built-in HTTPS or reverse proxy (must configure Caddy/Traefik/etc.)
@@ -607,9 +681,11 @@ Any Docker container or Docker Compose stack.
 - No git push deploy (webhook-triggered builds)
 
 #### Best For
+
 Homelabbers managing multiple servers who want a centralized platform for orchestration without the overhead of a full PaaS. Good Portainer replacement with build/deploy capabilities.
 
 #### Community Quotes
+
 - *"Komodo is the newest option for home labbers and arguably might be what they will lean toward in late 2025 going into 2026"* -- Virtualization Howto
 - *"Free, fast, and modern with great management features built in"* -- homelab review
 - *"Komodo takes a broader scope than most tools, treating servers, deployments, stacks, builds, and automation procedures as interconnected resources"* -- Haloy blog
@@ -626,6 +702,7 @@ Homelabbers managing multiple servers who want a centralized platform for orches
 **Status**: Very new (2025-2026)
 
 #### Architecture
+
 - **CLI**: Go binary on local machine
 - **Server**: Lightweight daemon (haloyd) running over HTTPS
 - **Build**: Local Docker build, direct layer upload (no registry)
@@ -633,6 +710,7 @@ Homelabbers managing multiple servers who want a centralized platform for orches
 - **Deploy**: Zero-downtime container swap
 
 #### Key Features
+
 - Direct Docker layer upload (no registry required)
 - Smart layer caching (only upload changed layers)
 - Single YAML configuration
@@ -644,13 +722,16 @@ Homelabbers managing multiple servers who want a centralized platform for orches
 - Designed for AI coding assistant integration
 
 #### Resource Requirements
+
 - **Minimum**: ~512 MB RAM (estimated)
 - **Server overhead**: Lightweight Go daemon
 
 #### Supported App Types
+
 Anything that can be containerized with Docker.
 
 #### Pros
+
 - No Docker registry needed (unique selling point)
 - Minimal configuration (single YAML file)
 - Built-in SSL
@@ -659,6 +740,7 @@ Anything that can be containerized with Docker.
 - AI/LLM-friendly design
 
 #### Cons
+
 - **Newest tool in the space** -- least battle-tested
 - **CLI only** -- no web dashboard
 - Smallest community
@@ -666,6 +748,7 @@ Anything that can be containerized with Docker.
 - Unproven in production at scale
 
 #### Best For
+
 Indie developers and small teams who want the simplest possible Docker deployment without a registry or PaaS overhead.
 
 ---
@@ -678,18 +761,20 @@ Indie developers and small teams who want the simplest possible Docker deploymen
 
 **One-liner**: The most widely-used Docker management GUI, now supporting Docker, Kubernetes, Podman, and Swarm.
 
-**Website**: [portainer.io](https://www.portainer.io)
+**Website**: [portainer.io](https://<www.portainer.io>)
 **GitHub**: [portainer/portainer](https://github.com/portainer/portainer) -- 32k+ stars
 **License**: Zlib (CE free), Business Edition paid
 **Latest**: Actively maintained (2026)
 
 #### Architecture
+
 - **Backend**: Go
 - **Frontend**: Angular
 - **Agent-based**: Portainer Agent for remote Docker hosts
 - **Supports**: Docker, Kubernetes, Podman, Docker Swarm, ACI
 
 #### Key Features
+
 - Visual Docker container management
 - Stack deployment from Docker Compose files
 - Container logs, stats, shell access
@@ -700,15 +785,18 @@ Indie developers and small teams who want the simplest possible Docker deploymen
 - Multi-environment management
 
 #### Resource Requirements
+
 - **Minimum**: ~512 MB RAM
 - **Idle RAM**: ~100 MB
 
 #### What It Is NOT
+
 - Not a PaaS -- no git push deploy, no buildpacks, no SSL management
 - Not a CI/CD tool -- no builds from source
 - A Docker management GUI, not a deployment platform
 
 #### Pros
+
 - Excellent for visualizing and managing existing Docker containers
 - Multi-platform support (Docker, K8s, Podman)
 - Mature and widely adopted
@@ -716,6 +804,7 @@ Indie developers and small teams who want the simplest possible Docker deploymen
 - Stack deployment from compose files
 
 #### Cons
+
 - Not a PaaS -- can't replace Heroku/Vercel workflows
 - CE (free) edition becoming more limited over time (RBAC, SSO moved to paid tier)
 - No build pipeline
@@ -723,6 +812,7 @@ Indie developers and small teams who want the simplest possible Docker deploymen
 - No automatic SSL certificate management
 
 #### Best For
+
 Docker management visualization alongside a CLI-based PaaS like Dokku or Kamal. Complementary tool, not a replacement for PaaS.
 
 ---
@@ -737,6 +827,7 @@ Docker management visualization alongside a CLI-based PaaS like Dokku or Kamal. 
 **Creator**: Louis Lam (Uptime Kuma)
 
 #### Key Features
+
 - Docker Compose stack management via web UI
 - YAML editor with live preview
 - Container logs and terminal access
@@ -745,14 +836,17 @@ Docker management visualization alongside a CLI-based PaaS like Dokku or Kamal. 
 - Works alongside `docker compose` CLI
 
 #### Resource Requirements
+
 - **Minimum**: ~256 MB RAM
 - **Idle RAM**: ~50 MB
 
 #### What It Is NOT
+
 - Not a PaaS -- no git deploy, no builds, no SSL, no databases
 - A compose file manager, not a deployment platform
 
 #### Pros
+
 - Beautiful UI (from Uptime Kuma creator)
 - Compose files stay on disk -- no lock-in
 - Extremely lightweight
@@ -760,11 +854,13 @@ Docker management visualization alongside a CLI-based PaaS like Dokku or Kamal. 
 - Multi-host support
 
 #### Cons
+
 - No build pipeline, no CI/CD, no SSL, no RBAC
 - Only manages existing compose stacks
 - Not a PaaS replacement
 
 #### Best For
+
 Managing existing Docker Compose stacks with a nice UI. Complementary to manual compose-based homelab workflows (like your current setup).
 
 ---
@@ -796,6 +892,7 @@ Managing existing Docker Compose stacks with a nice UI. Complementary to manual 
 ## Resource Footprint Analysis
 
 Given your Docker VM runs these services already:
+
 - Caddy (reverse proxy)
 - Vaultwarden + backup
 - Pi-hole
@@ -810,6 +907,7 @@ Estimated current RAM usage: **4-6 GB** (Frigate is the elephant).
 
 | PaaS | Idle Overhead | Remaining for Apps | Verdict |
 |------|--------------|-------------------|---------|
+
 | Coolify | ~380 MB | ~2.6-4.6 GB | Feasible but tight with Frigate |
 | Dokploy | ~300 MB | ~2.7-4.7 GB | Feasible |
 | CapRover | ~210 MB | ~2.8-4.8 GB | Comfortable |
@@ -824,19 +922,24 @@ Estimated current RAM usage: **4-6 GB** (Frigate is the elephant).
 
 ## Decision Framework for Your Homelab
 
-### If you want a "set it and forget it" PaaS with UI:
-**Coolify** or **Dokploy** -- Pick Coolify for max features, Dokploy for a cleaner UI and native Swarm support.
+### If you want a "set it and forget it" PaaS with UI
 
-### If you want maximum resource efficiency on the same Docker VM:
+**Coolify**or**Dokploy** -- Pick Coolify for max features, Dokploy for a cleaner UI and native Swarm support.
+
+### If you want maximum resource efficiency on the same Docker VM
+
 **Dokku** -- At ~95MB idle, it leaves the most RAM for your existing services. CLI-only but pairs beautifully with your Vim/tmux/CLI-first workflow.
 
-### If you want zero server overhead (deploy from laptop):
+### If you want zero server overhead (deploy from laptop)
+
 **Kamal** -- Nothing runs on the server except your apps. Build locally, push via SSH.
 
-### If you want to manage existing Docker services better:
-**Komodo** or **Dockge** -- Not a PaaS, but Komodo could centralize management of your Docker VM + NAS + VPS from one panel.
+### If you want to manage existing Docker services better
 
-### If you want PaaS on a separate device:
+**Komodo**or**Dockge** -- Not a PaaS, but Komodo could centralize management of your Docker VM + NAS + VPS from one panel.
+
+### If you want PaaS on a separate device
+
 Run Coolify or Dokploy on the NAS or RPi5, deploying apps to the Docker VM as a "remote server." This avoids RAM competition with Frigate.
 
 ---
@@ -861,7 +964,7 @@ For your specific setup (9GB Docker VM, 2 cores, already running Frigate/HA/Pi-h
 
 **Why**: For deploying Javya (FastAPI + Python) specifically, Kamal's zero-overhead approach is compelling. Build locally on your MacBook Air, deploy via SSH. No PaaS daemon consuming RAM on your server. But you'll miss the database management and one-click services of a full PaaS.
 
-### Worth Watching: **Dokploy** and **Komodo**
+### Worth Watching: **Dokploy**and**Komodo**
 
 Dokploy is growing fast and may surpass Coolify in UI quality. Komodo could be your "homelab control plane" for managing Docker across all three servers (Docker VM, NAS, VPS) from one panel.
 
@@ -870,6 +973,7 @@ Dokploy is growing fast and may surpass Coolify in UI quality. Komodo could be y
 ## Sources
 
 ### Comparison Articles
+
 - [Self-Hosted Deployment Tools Compared (Haloy Blog)](https://haloy.dev/blog/self-hosted-deployment-tools-compared)
 - [Coolify vs CapRover vs Dokku (selfhostable.dev)](https://selfhostable.dev/blog/coolify-vs-caprover-vs-dokku/)
 - [Dokploy vs Coolify 2026 (INTROSERV)](https://introserv.com/blog/dokploy-vs-coolify-complete-comparison-of-the-best-self-hosted-paas-platforms-for-vps-and-dedicated-servers-2026/)
@@ -882,6 +986,7 @@ Dokploy is growing fast and may surpass Coolify in UI quality. Komodo could be y
 - [Best Self-Hosted PaaS 2026 (OpenAlternative)](https://openalternative.co/categories/paas-deployment-tools/self-hosted)
 
 ### Official Project Sites
+
 - [Coolify](https://coolify.io) | [GitHub](https://github.com/coollabsio/coolify)
 - [Dokploy](https://dokploy.com) | [GitHub](https://github.com/Dokploy/dokploy)
 - [CapRover](https://caprover.com) | [GitHub](https://github.com/caprover/caprover)
@@ -896,6 +1001,7 @@ Dokploy is growing fast and may surpass Coolify in UI quality. Komodo could be y
 - [Sealos](https://sealos.io) | [GitHub](https://github.com/labring/sealos)
 
 ### Reviews and Real-World Reports
+
 - [Honest Take on Kamal (Ivan Turkovic, Feb 2026)](https://www.ivanturkovic.com/2026/02/06/honest-take-kamal-rails-deployment/)
 - [Kamal: Hot Deployment Tool (Evil Martians)](https://evilmartians.com/chronicles/mrsk-hot-deployment-tool-or-total-game-changer)
 - [Vercel vs Coolify Cost Analysis (Leon Consulting)](https://leonstaff.com/blogs/vercel-vs-coolify-cost-analysis/)
@@ -907,6 +1013,7 @@ Dokploy is growing fast and may surpass Coolify in UI quality. Komodo could be y
 - [2026 Homelab Stack (Elest.io)](https://blog.elest.io/the-2026-homelab-stack-what-self-hosters-are-actually-running-this-year/)
 
 ### Community Discussions
+
 - [Why Coolify over CapRover or Dokku (GitHub Discussion)](https://github.com/coollabsio/coolify/discussions/688)
 - [Dokploy Comparison Table (Official Docs)](https://docs.dokploy.com/docs/core/comparison)
 - [Kamal 2.0 Released (37signals)](https://dev.37signals.com/kamal-2/)

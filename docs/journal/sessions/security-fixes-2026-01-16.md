@@ -6,10 +6,11 @@ Security audit findings and remediation plan.
 
 | Severity | Count | Status |
 |----------|-------|--------|
+
 | Critical | 2 | **2 Done** |
 | High | 8 | **8 Done** |
 | Medium | 12 | **11 Done** |
-| **Total** | **22** | **21 done** |
+| **Total**|**22**|**21 done** |
 
 ---
 
@@ -17,6 +18,7 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
+
 | 1 | Default password `changeme` fallback | `docker/mobile/rpi5/networking/pihole/docker-compose.yml` | [x] |
 | 2 | Placeholder creds `USER:PASS` in frigate config | `docker/fixed/docker-vm/security/frigate.yml` | [x] |
 
@@ -26,6 +28,7 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
+
 | 3 | `privileged: true` on Home Assistant | `docker/fixed/docker-vm/automation/docker-compose.yml` | [x] |
 | 4 | `privileged: true` on Frigate | `docker/fixed/docker-vm/security/docker-compose.yml` | [x] |
 | 5 | No `security_opt: no-new-privileges` | All docker-compose files (14 files) | [x] |
@@ -41,6 +44,7 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
+
 | 11 | CORS wildcard `*` | `docker/vps/networking/caddy/Caddyfile` | [x] |
 | 12 | Samba credentials in command | `docker/fixed/nas/storage/docker-compose.yml` | [x] |
 | 13 | Pi-hole default password (fixed) | `docker/fixed/docker-vm/networking/pihole/docker-compose.yml` | [x] |
@@ -62,12 +66,14 @@ Security audit findings and remediation plan.
 
 **File:** `docker/mobile/rpi5/networking/pihole/docker-compose.yml`
 
-**Current:**
+#### Current
+
 ```yaml
 WEBPASSWORD: ${PIHOLE_PASSWORD:-changeme}
 ```
 
 **Fix:** Remove default, require env var
+
 ```yaml
 WEBPASSWORD: ${PIHOLE_PASSWORD:?PIHOLE_PASSWORD required}
 ```
@@ -78,12 +84,14 @@ WEBPASSWORD: ${PIHOLE_PASSWORD:?PIHOLE_PASSWORD required}
 
 **File:** `docker/fixed/docker-vm/security/frigate.yml`
 
-**Current:**
+#### Current
+
 ```yaml
 - path: rtsp://USER:PASS@192.168.10.101:554/...
 ```
 
 **Fix:** Use environment variable substitution or clear placeholder
+
 ```yaml
 - path: rtsp://${CAM_USER}:${CAM_PASS}@192.168.10.101:554/...
 ```
@@ -92,11 +100,13 @@ WEBPASSWORD: ${PIHOLE_PASSWORD:?PIHOLE_PASSWORD required}
 
 ### High #3-4: Remove Privileged Mode
 
-**Files:**
+#### Files
+
 - `docker/fixed/docker-vm/automation/docker-compose.yml`
 - `docker/fixed/docker-vm/security/docker-compose.yml`
 
 **Fix:** Replace `privileged: true` with specific device access
+
 ```yaml
 # Instead of privileged: true
 devices:
@@ -108,6 +118,7 @@ devices:
 ### High #5: Add security_opt to All Services
 
 **Fix:** Add to every service in all docker-compose files:
+
 ```yaml
 security_opt:
   - no-new-privileges:true
@@ -118,6 +129,7 @@ security_opt:
 ### High #6-7: Add Resource Limits
 
 **Fix:** Add to media stack and changedetection:
+
 ```yaml
 deploy:
   resources:
@@ -130,9 +142,11 @@ deploy:
 
 ### High #8: Pin Image Versions
 
-**Current → Fixed:**
+#### Current → Fixed
+
 | Service | Current | Fixed |
 |---------|---------|-------|
+
 | pihole | `pihole/pihole:latest` | `pihole/pihole:2024.07.0` |
 | headscale | `headscale/headscale:latest` | `headscale/headscale:0.23.0` |
 | vaultwarden | `vaultwarden/server:latest` | `vaultwarden/server:1.32.0` |
@@ -163,13 +177,15 @@ deploy:
 
 **File:** `docker/vps/networking/caddy/Caddyfile`
 
-**Current:**
-```
+#### Current
+
+```text
 Access-Control-Allow-Origin "*"
 ```
 
 **Fix:**
-```
+
+```text
 Access-Control-Allow-Origin "https://cronova.dev"
 ```
 
@@ -178,22 +194,25 @@ Access-Control-Allow-Origin "https://cronova.dev"
 ## Action Plan
 
 ### Phase 1: Critical (Do First)
+
 1. Fix Pi-hole default password
 2. Fix Frigate placeholder credentials
 
 ### Phase 2: High Priority
-3. Remove privileged mode from HA and Frigate
-4. Add security_opt to all services
-5. Add resource limits
-6. Pin image versions
-7. Remove credential comments
-8. Enforce changedetection auth
+
+1. Remove privileged mode from HA and Frigate
+2. Add security_opt to all services
+3. Add resource limits
+4. Pin image versions
+5. Remove credential comments
+6. Enforce changedetection auth
 
 ### Phase 3: Medium Priority
-9. Fix CORS
-10. Fix Samba credentials
-11. Add health checks
-12. Document remaining items
+
+1. Fix CORS
+2. Fix Samba credentials
+3. Add health checks
+4. Document remaining items
 
 ---
 

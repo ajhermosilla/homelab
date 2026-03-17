@@ -16,6 +16,7 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
 
 | Provider | Plan | Specs | Price |
 |----------|------|-------|-------|
+
 | **Vultr** | High Frequency | 1 vCPU, 1GB RAM, 32GB NVMe | $6/mo |
 
 **Location:** USA (for web scraping and low latency)
@@ -26,6 +27,7 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
 
 | Service | Port | Purpose | Status |
 |---------|------|---------|--------|
+
 | Headscale | 8080 | Tailscale coordination server | Active |
 | Caddy | 80, 443 | Reverse proxy, auto-SSL | Active |
 
@@ -33,6 +35,7 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
 
 | Service | Port | Purpose | Status |
 |---------|------|---------|--------|
+
 | Uptime Kuma | 3001 | Status monitoring | Active |
 | ntfy | 80 | Push notifications | Active |
 
@@ -40,13 +43,14 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
 
 | Service | Port | Purpose | Status |
 |---------|------|---------|--------|
+
 | changedetection.io | 5000 | Website change monitoring | Planned |
 | DERP Relay | 3478/udp | Tailscale NAT traversal | Planned |
 | Restic REST Server | 8000 | Encrypted backup target | Planned |
 
 ## Architecture Diagram
 
-```
+```json
                         [Internet]
                             |
                      [Vultr VPS - US]
@@ -72,6 +76,7 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
 
 | Subdomain | Service | Notes |
 |-----------|---------|-------|
+
 | hs.cronova.dev | Headscale | Tailscale coordination |
 | status.cronova.dev | Uptime Kuma | Public status page |
 | notify.cronova.dev | ntfy | Push notifications |
@@ -99,7 +104,7 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
 
 ## Docker Structure
 
-```
+```text
 docker/vps/
 ├── networking/
 │   ├── headscale/
@@ -118,6 +123,7 @@ docker/vps/
 
 | Phase | Task | Status |
 |-------|------|--------|
+
 | 1 | Create Vultr account, deploy VPS | Done |
 | 2 | Basic hardening (SSH keys, firewall) | Done |
 | 3 | Install Docker | Done |
@@ -147,6 +153,7 @@ docker/vps/
 
 | Item | Monthly |
 |------|---------|
+
 | Vultr VPS (1GB) | $6.00 |
 | Domain (cronova.dev) | ~$1.00 |
 | **Total** | ~$7.00 |

@@ -26,6 +26,7 @@ The two-tier strategy (showcase + operational) has a fatal flaw: the showcase ti
 
 | Document | Problem |
 |----------|---------|
+
 | `disaster-recovery.md` | **Wrong procedures.** Uses tar+gz to `/mnt/nas/backups/` — actual system uses Restic REST. SSH usernames wrong (`admin` instead of `linuxuser`/`augusto`). References SnapRAID on a system without it. Stops Vaultwarden hourly for backups (the backup container handles this). Following this during an emergency wastes critical time. |
 | `monitoring-strategy.md` | **Monitors phantom services.** Lists Pi-hole on VPS, changedetection, Restic REST on VPS — none exist. No mention of VictoriaMetrics/Grafana (Papa). Missing monitors for 15+ deployed services. |
 | `setup-runbook.md` | **Deploys a different homelab.** Clones from `github.com` (actual: Forgejo). Deploys Pi-hole/DERP on VPS (not real). Camera IPs in VLAN 10 range (actual: main LAN). Missing phases for 8+ deployed services. |
@@ -37,6 +38,7 @@ This is the #1 mistake the community warns about: impressive-looking docs that a
 
 | Source | Docker VM RAM |
 |--------|--------------|
+
 | README.md | 7GB |
 | hardware.md | 7GB |
 | fixed-homelab.md | 9GB |
@@ -70,6 +72,7 @@ Forgejo runs on the homelab. If the NAS dies, the DR runbook dies with it. Push 
 
 | Document | Accuracy | Structure | Completeness | Readability | Score |
 |----------|----------|-----------|-------------|------------|-------|
+
 | README.md | 7 | 9 | 8 | 9 | **7.5/10** |
 | docs/README.md | 8 | 8 | 7 | 8 | **7/10** |
 | services.md | 6 | 9 | 8 | 8 | **8/10** |
@@ -86,6 +89,7 @@ Forgejo runs on the homelab. If the NAS dies, the DR runbook dies with it. Push 
 
 | Criteria | Community Standard | This Homelab | Grade |
 |----------|-------------------|--------------|-------|
+
 | Repo structure | Organized by host/stack | Excellent | A |
 | IaC (Compose, Ansible) | Code as documentation | Strong | A |
 | README as showcase | Hardware + services + diagram | Good after overhaul | B+ |
@@ -116,11 +120,13 @@ Forgejo runs on the homelab. If the NAS dies, the DR runbook dies with it. Push 
 ## Community Best Practices Reference
 
 ### Gold Standard Homelab Repos
+
 - [khuedoan/homelab](https://github.com/khuedoan/homelab) (~8k stars) — Fully automated, MkDocs site, feature badges
 - [ChristianLempa/homelab](https://github.com/ChristianLempa/homelab) (~2k stars) — Config-focused, per-service directories
 - [h0bbel/homelab](https://github.com/h0bbel/homelab) — Enterprise-style RCAR document, three-tier design model
 
 ### Documentation Tools Used by the Community
+
 - **BookStack** — Most recommended self-hosted wiki (Shelves/Books/Chapters/Pages)
 - **Obsidian** — Local-first, bidirectional linking, massive plugin ecosystem
 - **Plain Markdown in Git** — Zero dependencies, version controlled, survives infra failures
@@ -129,6 +135,7 @@ Forgejo runs on the homelab. If the NAS dies, the DR runbook dies with it. Push 
 - **NetBox** — DCIM/IPAM for network-heavy setups
 
 ### Key Community Rules
+
 1. **Documentation must be accessible when infrastructure is down** — Git on external host, printable DR copy
 2. **Document the WHY, not just the WHAT** — Compose files document the what; notes should explain decisions
 3. **DR runbook is the most important document** — Test it regularly

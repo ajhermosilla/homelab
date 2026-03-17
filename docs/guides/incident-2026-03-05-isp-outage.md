@@ -17,6 +17,7 @@ A 4-hour ISP outage took the entire homelab offline. After the ISP restored serv
 
 | Time | Event |
 |------|-------|
+
 | ~01:00 | ISP outage begins (Tigo) |
 | ~01:00 | All Tailscale tunnels to homelab nodes drop (no internet → no DERP relay) |
 | ~01:00 | Uptime Kuma on VPS detects all homelab monitors as DOWN |
@@ -43,6 +44,7 @@ Tigo Paraguay had a ~4-hour service interruption. The ARRIS modem in bridge mode
 ### 2. No Remote Access During Outage
 
 All homelab nodes connect to the self-hosted Headscale coordinator (`hs.cronova.dev`) on the VPS via the internet. When the ISP goes down:
+
 - Tailscale tunnels on Docker VM, NAS, and Proxmox cannot reach Headscale
 - Existing tunnels expire within minutes
 - The only access path is **physical LAN** — requiring the operator to be on-site and connected to the MokerLink switch
@@ -52,6 +54,7 @@ All homelab nodes connect to the self-hosted Headscale coordinator (`hs.cronova.
 ### 3. Missing `.env` Files (pre-existing)
 
 Five Docker Compose stacks on the Docker VM had no `.env` files:
+
 - `photos/.env` (Immich) — `POSTGRES_PASSWORD` empty → `immich-db` crash loop
 - `documents/.env` (Paperless) — `POSTGRES_PASSWORD` empty → `paperless-db` crash loop
 - `auth/config/secrets/` (Authelia) — missing JWT, session, encryption keys → crash loop
@@ -66,11 +69,12 @@ The `authelia-data` named volume was owned by `root`, but Authelia runs as UID 1
 
 ### 5. Authelia Healthcheck Command Outdated
 
-The Docker Compose healthcheck uses `authelia healthcheck`, which doesn't exist in Authelia v4.39.x. The correct check is `curl -f http://localhost:9091/api/health`. This causes the container to report `unhealthy` despite functioning correctly.
+The Docker Compose healthcheck uses `authelia healthcheck`, which doesn't exist in Authelia v4.39.x. The correct check is `curl -f <http://localhost:9091/api/health`.> This causes the container to report `unhealthy` despite functioning correctly.
 
 ### 6. OPNsense WAN MTU Anomaly
 
 During investigation, OPNsense WAN (`vtnet0`) showed `mtu 576` — far below the standard 1500. This is likely ISP-imposed or a DHCP option from the ARRIS modem. While not blocking connectivity, it causes:
+
 - Packet fragmentation for anything >576 bytes
 - Reduced throughput
 - Potential issues with services that set DF (Don't Fragment) bit
@@ -81,6 +85,7 @@ During investigation, OPNsense WAN (`vtnet0`) showed `mtu 576` — far below the
 
 | # | Action | Status |
 |---|--------|--------|
+
 | 1 | Power-cycled ARRIS modem | Done |
 | 2 | Set static IP on Mac (192.168.0.300) for LAN access | Done |
 | 3 | Verified OPNsense WAN lease and internet via `ping 8.8.8.8` | Done |
@@ -101,6 +106,7 @@ During investigation, OPNsense WAN (`vtnet0`) showed `mtu 576` — far below the
 
 | Service | Credential | Note |
 |---------|-----------|------|
+
 | Authelia | augusto user password | Saved to KeePassXC |
 | Authelia | andre user password | Saved to KeePassXC |
 | Paperless | admin password | Saved to KeePassXC |
@@ -116,12 +122,15 @@ During investigation, OPNsense WAN (`vtnet0`) showed `mtu 576` — far below the
 ### P0 — Immediate (this week)
 
 #### 1. Store All Secrets in Vaultwarden
+
 Every `.env` file and secret must have a corresponding entry in Vaultwarden. Create a "Homelab Secrets" folder with entries for each stack. This is the single source of truth for disaster recovery.
 
 #### 2. Backup `.env` Files via Restic
+
 Add the `.env` files and `auth/config/secrets/` to the Docker VM backup sidecar. These are currently **not backed up anywhere** — losing them means regenerating all credentials and reconfiguring every service.
 
 Recommended: create a backup script that copies all `.env` files to a single directory, then Restic backs up that directory:
+
 ```bash
 # /opt/homelab/scripts/backup-env.sh
 mkdir -p /opt/homelab/repo/env-backup
@@ -133,7 +142,9 @@ cp -r /opt/homelab/repo/docker/fixed/docker-vm/auth/config/secrets/ /opt/homelab
 ```
 
 #### 3. Fix Authelia Healthcheck
+
 Update `auth/docker-compose.yml` healthcheck to (Authelia image has no `curl`, use `wget`):
+
 ```yaml
 healthcheck:
   test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9091/api/health"]
@@ -143,6 +154,7 @@ healthcheck:
 ```
 
 #### 4. Investigate OPNsense WAN MTU 576
+
 From OPNsense web UI: **Interfaces → WAN → MTU** — verify if this is ISP-imposed (DHCP option) or misconfigured. If ISP-imposed, set MSS clamping. If misconfigured, set to 1500.
 
 ### P1 — Short Term (this month)
@@ -152,6 +164,7 @@ From OPNsense web UI: **Interfaces → WAN → MTU** — verify if this is ISP-i
 **Status**: Design complete, hardware pending purchase.
 
 Two-layer failover approach:
+
 - **Layer 1 (automatic)**: TP-Link TL-MR100 LTE router (~$32, Flytec CDE) + prepaid SIM, connected to MokerLink switch as a LAN-side gateway on `192.168.0.3`. OPNsense gateway group routes Tailscale + DNS over LTE during ISP outage. Family doesn't notice
 - **Layer 2 (manual)**: GL.iNet Opal in repeater mode + phone hotspot → `EmergencyWiFi` for streaming. Family activates in <5 minutes, no cable swapping
 
@@ -160,6 +173,7 @@ Two-layer failover approach:
 **Design choice**: LAN-side gateway (MR100 on switch) instead of USB LTE dongle with Proxmox passthrough. Avoids FreeBSD driver issues, USB passthrough complexity, and rack cable mess. Double NAT is irrelevant — Tailscale handles NAT traversal via DERP relays.
 
 **Documentation**:
+
 - Full dual-WAN setup: `docs/guides/opnsense-setup.md` → "Dual-WAN / LTE Failover" section
 - Family runbook: `docs/reference/family-emergency-internet.md` (rewritten for two-layer approach)
 
@@ -169,25 +183,28 @@ Two-layer failover approach:
 
 The ARRIS modem, MokerLink switch, and Proxmox host should survive brief power outages. A small UPS (APC BE425M or similar, ~$40) provides 10-15 minutes of runtime — enough to ride out flickers and allow graceful shutdowns.
 
-**Power budget:**
+#### Power budget
+
 | Device | Watts |
 |--------|-------|
+
 | ARRIS modem | ~10W |
 | MokerLink switch | ~5W |
 | Proxmox (P8H77-I, i3-3220T) | ~35W idle |
 | NAS (if separate) | ~25W idle |
-| **Total** | **~75W** |
+| **Total**|**~75W** |
 
 With a 425VA UPS: ~10 minutes runtime at 75W. Enough for power flickers. For extended outages, configure NUT (already have `nut-config.md`) to gracefully shut down VMs after 5 minutes on battery.
 
 #### 7. OPNsense SSH Key Authentication
 
 Currently OPNsense only accepts password authentication, which makes automated recovery impossible. Add the Mac's SSH public key to OPNsense:
-```
+
+```text
 System → Access → Users → root → Authorized Keys → paste ~/.ssh/id_ed25519.pub
 ```
 
-This enables scripted recovery like `ssh root@192.168.0.1 "configctl interface reconfigure wan"`.
+This enables scripted recovery like `ssh <root@192.168>.0.1 "configctl interface reconfigure wan"`.
 
 ### P2 — Medium Term (next quarter)
 
@@ -223,13 +240,15 @@ ssh augusto@192.168.0.10 "tailscale status | head -5"
 #### 9. Monitoring Gap: No LAN-Side Monitoring
 
 Uptime Kuma runs on the VPS — it monitors via Tailscale, which itself depends on internet. During an ISP outage, **there is zero monitoring of internal services**. Options:
+
 - Run a lightweight monitor on Proxmox or the RPi 5 (when set up) that checks LAN services and sends alerts via LTE failover
 - Home Assistant can monitor services and send notifications via the Companion app (local push, no internet needed)
 
 #### 10. Document the Recovery Runbook
 
 Add a quick-reference card to `docs/guides/`:
-```
+
+```text
 ISP Outage Recovery Checklist:
 1. Connect to LAN (ethernet or home WiFi)
 2. Set static IP if DHCP not working: sudo ifconfig en16 192.168.0.300/24
@@ -245,7 +264,7 @@ ISP Outage Recovery Checklist:
 
 ## Architecture Gap Analysis
 
-```
+```text
 CURRENT STATE:
                     ┌──────────┐
    ISP ────────────►│  ARRIS   │──── SINGLE POINT OF FAILURE
@@ -268,7 +287,6 @@ CURRENT STATE:
       │Proxmox │   │Docker VM│   │  NAS   │
       │  host  │   │ (VM101) │   │        │
       └────────┘   └─────────┘   └────────┘
-
 
 PROPOSED STATE:
                     ┌──────────┐
@@ -303,9 +321,10 @@ PROPOSED STATE:
 
 | Item | Cost | Priority | Impact |
 |------|------|----------|--------|
+
 | USB LTE dongle + prepaid SIM | ~$28 | P1 | Eliminates remote access blackout |
 | Small UPS (APC BE425M or similar) | ~$45 | P1 | Survives power flickers, graceful shutdown |
-| **Total** | **~$73** | | |
+| **Total**|**~$73** | | |
 
 ---
 

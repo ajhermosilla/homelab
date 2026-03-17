@@ -19,7 +19,7 @@
 
 ## Step 1: Connect nic1 to Switch
 
-**Physical:** Plug an Ethernet cable from Proxmox **nic1** (2nd port) into the MokerLink switch.
+**Physical:**Plug an Ethernet cable from Proxmox**nic1** (2nd port) into the MokerLink switch.
 
 Verify from Mac terminal:
 
@@ -48,6 +48,7 @@ ssh augusto@192.168.0.237 "ip -br addr show vmbr0 && ip -br addr show vmbr1"
 ```
 
 Expected:
+
 - `vmbr0` — no IP (manual)
 - `vmbr1` — `192.168.0.237/24`
 
@@ -59,9 +60,9 @@ Expected:
 
 ## Step 3: Swap Cables
 
-**Physical — two cable changes:**
+#### Physical — two cable changes
 
-1. Unplug ISP Ethernet from **TP-Link WAN port** → plug into **Proxmox nic0**
+1. Unplug ISP Ethernet from **TP-Link WAN port**→ plug into**Proxmox nic0**
 2. Unplug the old switch cable from **Proxmox nic0** (no longer needed)
 
 Result: nic0 faces ISP modem, nic1 faces switch.
@@ -75,14 +76,15 @@ Result: nic0 faces ISP modem, nic1 faces switch.
 
 ## Step 4: Verify OPNsense Gets Public IP
 
-Open **Proxmox web UI** → VM 100 (OPNsense) → **Console**.
+Open **Proxmox web UI**→ VM 100 (OPNsense) →**Console**.
 
 In the OPNsense console (or web UI from the console browser):
+
 - Dashboard → Interfaces → WAN → should show a public IP via DHCP
 
 If no public IP: wait 30 seconds, then run in OPNsense console:
 
-```
+```text
 /usr/local/sbin/configctl interface reconfigure wan
 ```
 
@@ -100,7 +102,7 @@ From Mac (still connected to WiFi):
 2. Operation Mode → **Access Point**
 3. Set static IP: **192.168.0.2**
 4. Apply (TP-Link reboots, ~1 minute)
-5. After reboot: move TP-Link cable from **WAN port** to a **LAN port** on the switch
+5. After reboot: move TP-Link cable from **WAN port**to a**LAN port** on the switch
 
 > WiFi will briefly drop and reconnect. Same SSID/password = auto-reconnect.
 
@@ -112,16 +114,18 @@ From Mac (still connected to WiFi):
 
 ## Step 6: Configure OPNsense LAN
 
-From **Proxmox web UI** → VM 100 (OPNsense) → **Console**:
+From **Proxmox web UI**→ VM 100 (OPNsense) →**Console**:
 
-Open OPNsense web UI inside the console (https://192.168.1.1):
+Open OPNsense web UI inside the console (<https://192.168.1.1>):
 
 ### 6a. Change LAN IP
+
 - Interfaces → LAN
 - IPv4: `192.168.0.1/24`
 - Save → Apply
 
 ### 6b. Enable DHCP
+
 - Services → DHCPv4 → LAN
 - Enable: checked
 - Range: `192.168.0.100` – `192.168.0.250`
@@ -130,6 +134,7 @@ Open OPNsense web UI inside the console (https://192.168.1.1):
 - Save
 
 ### 6c. Add Static Mappings
+
 - Docker VM: MAC `BC:24:11:A8:E9:C5` → `192.168.0.10`
 - TP-Link AP: (get MAC from lease list) → `192.168.0.2`
 - Save → Apply
@@ -180,13 +185,15 @@ ssh augusto@192.168.0.10 "ip addr show ens18 | grep inet && ping -c1 8.8.8.8"
 ## Step 8: Verify — The Family Test
 
 ### Internet
+
 - [ ] Reconnect phone WiFi → gets 192.168.0.x IP
 - [ ] Phone can browse the web
 - [ ] **Netflix works on TV** (the real test)
 
 ### Homelab
-- [ ] SSH to Docker VM: `ssh docker-vm` (Tailscale) or `ssh augusto@192.168.0.10`
-- [ ] Pi-hole resolving: `ssh augusto@192.168.0.10 "docker exec pihole dig google.com @127.0.0.1 +short"`
+
+- [ ] SSH to Docker VM: `ssh docker-vm` (Tailscale) or `ssh <augusto@192.168.0.10>`
+- [ ] Pi-hole resolving: `ssh <augusto@192.168.0.10> "docker exec pihole dig google.com @127.0.0.1 +short"`
 - [ ] Vaultwarden accessible
 - [ ] Proxmox web UI: `https://192.168.0.237:8006`
 - [ ] OPNsense web UI: `https://192.168.0.1` (from Mac)
@@ -200,7 +207,7 @@ ssh augusto@192.168.0.10 "ip addr show ens18 | grep inet && ping -c1 8.8.8.8"
 
 ## Rollback (If Anything Goes Wrong)
 
-### Before step 6 (OPNsense LAN still 192.168.1.x):
+### Before step 6 (OPNsense LAN still 192.168.1.x)
 
 ```bash
 # 1. Revert Proxmox config
@@ -210,12 +217,12 @@ ssh augusto@192.168.0.237 "sudo cp /etc/network/interfaces.original /etc/network
 # 3. TP-Link: reboot to restore router mode (if AP mode was applied)
 ```
 
-### After step 6 (OPNsense LAN already at 192.168.0.x):
+### After step 6 (OPNsense LAN already at 192.168.0.x)
 
 1. OPNsense console: Interfaces → LAN → change back to `192.168.1.1/24`, Apply
 2. Docker VM: `ip addr del 192.168.0.10/24 dev ens18; ip addr add 192.168.1.10/24 dev ens18; ip route add default via 192.168.1.1`
 3. Then do the cable/config revert above
 
-### Nuclear option:
+### Nuclear option
 
 Connect Mac to phone tethering, SSH to VPS, figure it out from there.
