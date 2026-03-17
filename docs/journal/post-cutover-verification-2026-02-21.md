@@ -7,7 +7,7 @@
 
 ## Network Topology (Post-Cutover)
 
-```
+```text
 ISP Modem (ARRIS TG2482, bridge mode)
   │
   └── nic0 / vmbr0 ── OPNsense WAN (vtnet0) ── Public IP via DHCP
@@ -27,6 +27,7 @@ Proxmox mgmt: 192.168.0.237 (on vmbr1)
 
 | Setting | Value |
 |---------|-------|
+
 | Server | OPNsense ISC DHCPv4 |
 | Range | 192.168.0.100 – 192.168.0.250 |
 | Gateway | 192.168.0.1 |
@@ -37,6 +38,7 @@ Proxmox mgmt: 192.168.0.237 (on vmbr1)
 
 | Check | Result |
 |-------|--------|
+
 | IP | 192.168.0.105 (DHCP) |
 | Gateway | 192.168.0.1 (OPNsense) |
 | DNS | 192.168.0.10 (Pi-hole, from DHCP) |
@@ -51,6 +53,7 @@ Proxmox mgmt: 192.168.0.237 (on vmbr1)
 
 | Container | Status |
 |-----------|--------|
+
 | caddy | Up (healthy) |
 | vaultwarden | Up (healthy) |
 | pihole | Up (healthy) |
@@ -60,6 +63,7 @@ Proxmox mgmt: 192.168.0.237 (on vmbr1)
 
 | Container | Status |
 |-----------|--------|
+
 | headscale | Running |
 | uptime-kuma | Running |
 | caddy | Running |
@@ -70,6 +74,7 @@ Proxmox mgmt: 192.168.0.237 (on vmbr1)
 
 | Node | Tailscale IP | Status |
 |------|-------------|--------|
+
 | augustos-macbook-air | 100.86.220.9 | Active |
 | oga (Proxmox) | 100.78.12.241 | Active, direct |
 | docker | 100.68.63.168 | Active |
@@ -81,6 +86,7 @@ Proxmox mgmt: 192.168.0.237 (on vmbr1)
 
 | File | Location |
 |------|----------|
+
 | Proxmox network config | `/etc/network/interfaces` + `/etc/network/interfaces.d/vmbr1` |
 | Proxmox config backup | `/etc/network/interfaces.original`, `vmbr1.original` |
 | OPNsense config | `/conf/config.xml` |

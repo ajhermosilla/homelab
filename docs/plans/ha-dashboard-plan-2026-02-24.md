@@ -47,6 +47,7 @@
 
 | Card | Use Case |
 |------|----------|
+
 | `entities` | Infrastructure status rows |
 | `picture-entity` | Camera live feeds |
 | `glance` | Detection counts, sensor readings |
@@ -58,6 +59,7 @@
 
 | Card | Use Case |
 |------|----------|
+
 | **mushroom** | Modern, clean entity cards |
 | **mini-graph-card** | Sparkline graphs for temp/power trends |
 | **auto-entities** | Dynamic card lists (e.g., all sensors above threshold) |
@@ -66,6 +68,7 @@
 ### System Monitor Integration
 
 Built-in HA integration (no install needed). Add via Settings → Integrations → System Monitor. Provides:
+
 - CPU usage, memory usage, disk usage
 - Network throughput (bytes/sec)
 - Last boot time
@@ -79,6 +82,7 @@ Useful for monitoring the Docker VM itself.
 
 | Phase | Requires | Sections Available | Status |
 |-------|----------|--------------------|--------|
+
 | **Now** | Nothing extra | Infrastructure status, camera summary, Frigate stats | Ready |
 | **After Companion App** | Phone setup | Family presence, away mode | Ready (Companion App configured) |
 | **After Phase 1 kit** | ESP32 + BME280 | Server room temperature, water leak | Pending hardware |

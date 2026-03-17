@@ -4,7 +4,7 @@ Network UPS Tools configuration for graceful shutdown on power loss.
 
 ## Overview
 
-```
+```text
 [Forza NT-1012U UPS]
         │
         │ USB
@@ -21,7 +21,8 @@ Network UPS Tools configuration for graceful shutdown on power loss.
 NUT Client   NUT Client
 ```
 
-**Topology:**
+#### Topology
+
 - NAS connects to UPS via USB (master)
 - Mini PC and RPi 4 are network clients
 - All devices gracefully shutdown when battery is low
@@ -210,15 +211,15 @@ When power fails:
 1. **ONBATT** - UPS switches to battery
    - Log event, send notification
 
-2. **LOWBATT** - Battery reaches threshold (~20%)
+1. **LOWBATT** - Battery reaches threshold (~20%)
    - Start shutdown timer (60 seconds)
    - Notify all clients
 
-3. **FSD** (Forced Shutdown) - Master initiates shutdown
+1. **FSD** (Forced Shutdown) - Master initiates shutdown
    - Clients receive FSD and begin shutdown
    - Order: RPi 4 → Mini PC → NAS (master last)
 
-4. **POWEROFF** - NAS sends UPS kill command
+1. **POWEROFF** - NAS sends UPS kill command
    - UPS powers off after delay
 
 ---
@@ -384,6 +385,7 @@ ss -tlnp | grep 3493
 
 | Spec | Value |
 |------|-------|
+
 | Capacity | 1000VA / 500W |
 | Input Voltage | 220V |
 | Battery | 12V 7Ah x2 |

@@ -17,6 +17,7 @@ GitHub becomes **read-only** — any direct changes there get overwritten by the
 
 | Forgejo Repo | GitHub Repo | Visibility |
 |---|---|---|
+
 | `augusto/homelab` | `ajhermosilla/homelab` | Public or private |
 | `augusto/notes` | `ajhermosilla/notes` | **Private** (personal session notes) |
 
@@ -47,6 +48,7 @@ Alternative: Classic token with `repo` scope (simpler, no expiry option).
 ### Via Web UI
 
 For each repo (`homelab`, `notes`):
+
 1. Go to `https://git.cronova.dev/augusto/<repo>/settings`
 2. Navigate to **Mirror Settings** section
 3. Fill in:
@@ -118,7 +120,7 @@ gh repo view ajhermosilla/homelab --json pushedAt --jq '.pushedAt'
 
 Default settings in `app.ini` are fine. Can be set via environment variables in compose:
 
-```
+```text
 FORGEJO__mirror__ENABLED=true
 FORGEJO__mirror__DEFAULT_INTERVAL=8h
 FORGEJO__mirror__MIN_INTERVAL=10m

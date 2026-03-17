@@ -18,7 +18,7 @@ username = "augusto"
 password = "<from-vaultwarden>"
 ```
 
-3. Test connection: `kuma monitor list`
+1. Test connection: `kuma monitor list`
 
 ## Phase 1 — Critical (60s interval, ntfy urgent)
 
@@ -67,6 +67,7 @@ Configure in Uptime Kuma UI (Settings → Notifications) before adding monitors:
 
 | Notification | ntfy Topic | Priority |
 |---|---|---|
+
 | Critical Alerts | `cronova-critical` | urgent (5) |
 | Warning Alerts | `cronova-warning` | high (4) |
 | Info Alerts | `cronova-info` | default (3) |

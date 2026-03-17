@@ -8,15 +8,18 @@ Step-by-step guide to deploy the DIY NAS (Mini-ITX build from 2013).
 
 | Component | Model |
 |-----------|-------|
+
 | Case | Cooler Master Elite 120 Advanced |
 | Motherboard | ASUS P8H77-I (LGA 1155) |
 | CPU | Intel Core i3-3220T (35W TDP) |
 | RAM | Kingston HyperX 8GB DDR3 |
 | PSU | picoPSU-160-XT + 220W brick |
 
-**Drives:**
+#### Drives
+
 | Drive | Size | Purpose | Mount |
 |-------|------|---------|-------|
+
 | Lexar NQ110 SSD | 240GB | Debian OS, Docker | / |
 | WD Purple | 2TB | Frigate recordings (NFS) | /mnt/purple |
 | WD Red Plus | 8TB | Media, data, backups | /mnt/red8 |
@@ -28,6 +31,7 @@ Step-by-step guide to deploy the DIY NAS (Mini-ITX build from 2013).
 Complete these tasks remotely before the deployment day:
 
 ### 1. Generate Tailscale Auth Key
+
 ```bash
 # SSH to VPS
 ssh linuxuser@100.77.172.46
@@ -40,15 +44,18 @@ docker exec headscale headscale preauthkeys create --expiration 1h
 ```
 
 ### 2. Verify OPNsense DHCP Reservation
-- Login to OPNsense via SSH tunnel: `ssh -L 8443:192.168.0.1:443 augusto@100.78.12.241` then `https://localhost:8443`
+
+- Login to OPNsense via SSH tunnel: `ssh -L 8443:192.168.0.1:443 <augusto@100.78.12.241>` then `https://localhost:8443`
 - Services → DHCPv4 → LAN
 - Add reservation: MAC → 192.168.0.12 (get MAC from NAS motherboard sticker)
 
 ### 3. Prepare USB Boot Drive
+
 - Debian 12 netinst ISO already downloaded
 - Flash to USB with: `sudo dd if=debian.iso of=/dev/sdX bs=4M status=progress`
 
 ### 4. Pre-generate Passwords
+
 ```bash
 # Samba password
 openssl rand -base64 24
@@ -64,6 +71,7 @@ Save these securely (Vaultwarden) before going home.
 ## Pre-Deployment Checklist
 
 ### Hardware Ready
+
 - [ ] NAS assembled and tested (powers on)
 - [ ] All 3 drives installed (SSD, Purple, Red)
 - [ ] Ethernet cable to MokerLink switch port 4
@@ -71,11 +79,13 @@ Save these securely (Vaultwarden) before going home.
 - [ ] USB keyboard + monitor for initial setup
 
 ### Network Ready
+
 - [ ] MokerLink port 4 configured as VLAN 1 access
 - [ ] OPNsense DHCP reservation: 192.168.0.12 → NAS MAC
 - [ ] Pi-hole DNS entry: nas.home → 192.168.0.12
 
 ### Software Ready
+
 - [ ] Debian 12 ISO on USB (prepared already)
 - [ ] Tailscale auth key from Headscale
 
@@ -84,14 +94,17 @@ Save these securely (Vaultwarden) before going home.
 ## Phase 1: Debian Installation
 
 ### Boot from USB
+
 1. Connect USB keyboard, monitor, Debian USB
 2. Power on NAS
 3. Press F8 (or DEL) for boot menu
 4. Select USB drive
 
 ### Installation Options
+
 | Setting | Value |
 |---------|-------|
+
 | Language | English |
 | Location | Paraguay |
 | Hostname | nas |
@@ -278,6 +291,7 @@ ansible-playbook -i inventory.yml playbooks/nfs-server.yml -l nas
 ```
 
 The playbook automatically:
+
 - Creates /srv symlinks to drive mounts
 - Configures /etc/exports with correct permissions
 - Opens firewall ports (111, 2049)
@@ -445,6 +459,7 @@ curl http://192.168.0.12:8000/
 
 | Hostname | IP |
 |----------|-----|
+
 | nas.home | 192.168.0.12 |
 | syncthing.home | 192.168.0.12 |
 
@@ -452,6 +467,7 @@ curl http://192.168.0.12:8000/
 
 | Service | Check |
 |---------|-------|
+
 | NAS SSH | TCP 192.168.0.12:22 |
 | Samba | TCP 192.168.0.12:445 |
 | Syncthing | HTTP 192.168.0.12:8384 |
@@ -468,6 +484,7 @@ curl http://192.168.0.12:8000/
 ## Troubleshooting
 
 ### Drive Not Mounting
+
 ```bash
 # Check drive is detected
 lsblk
@@ -482,6 +499,7 @@ sudo mount /dev/sdb1 /mnt/purple
 ```
 
 ### NFS Not Working
+
 ```bash
 # Check service status
 sudo systemctl status nfs-kernel-server
@@ -497,6 +515,7 @@ showmount -e 192.168.0.12
 ```
 
 ### Samba Connection Failed
+
 ```bash
 # Check container logs
 docker logs samba
@@ -509,6 +528,7 @@ ss -tlnp | grep -E '139|445'
 ```
 
 ### Tailscale Won't Connect
+
 ```bash
 # Check status
 tailscale status
@@ -534,6 +554,7 @@ If something goes wrong:
 
 | Phase | Estimate |
 |-------|----------|
+
 | Debian install | 20-30 min |
 | Drive setup | 15-20 min |
 | Docker + Tailscale | 10-15 min |

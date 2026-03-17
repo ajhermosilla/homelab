@@ -6,6 +6,7 @@ Post-security audit improvement opportunities identified after completing 24/24 
 
 | Priority | Count | Effort |
 |----------|-------|--------|
+
 | Quick Wins | 6 | < 1 hour each |
 | Medium | 8 | 1-2 hours each |
 | Lower | 5 | 2+ hours each |
@@ -16,12 +17,13 @@ Post-security audit improvement opportunities identified after completing 24/24 
 
 ### 1. Add Health Checks to Missing Services
 
-**Effort:** 30 min | **Impact:** High
+**Effort:**30 min |**Impact:** High
 
 9 compose files lack healthchecks for automatic restart on silent failures.
 
 | File | Services |
 |------|----------|
+
 | `docker/fixed/nas/storage/docker-compose.yml` | Samba, Syncthing |
 | `docker/fixed/nas/backup/docker-compose.yml` | Restic REST |
 | `docker/vps/backup/docker-compose.yml` | Restic REST |
@@ -33,7 +35,8 @@ Post-security audit improvement opportunities identified after completing 24/24 
 | `docker/fixed/docker-vm/networking/caddy/docker-compose.yml` | Caddy |
 | `docker/vps/networking/caddy/docker-compose.yml` | Caddy |
 
-**Template:**
+#### Template
+
 ```yaml
 healthcheck:
   test: ["CMD", "curl", "-f", "http://localhost:PORT/health"]
@@ -46,19 +49,21 @@ healthcheck:
 
 ### 2. Add Service Dependencies (`depends_on`)
 
-**Effort:** 20 min | **Impact:** High
+**Effort:**20 min |**Impact:** High
 
 Services may start out-of-order, causing initialization failures.
 
 | Service | Depends On |
 |---------|------------|
+
 | Frigate | Mosquitto |
 | Home Assistant | Mosquitto |
 | Jellyfin | NFS mount |
 | Sonarr | Prowlarr |
 | Radarr | Prowlarr |
 
-**Template:**
+#### Template
+
 ```yaml
 depends_on:
   mosquitto:
@@ -69,11 +74,12 @@ depends_on:
 
 ### 3. Add Logging Limits
 
-**Effort:** 15 min | **Impact:** High
+**Effort:**15 min |**Impact:** High
 
 Unbounded container log growth will fill disk. No compose files have logging configuration.
 
-**Template (add to all services):**
+#### Template (add to all services)
+
 ```yaml
 logging:
   driver: "json-file"
@@ -86,11 +92,12 @@ logging:
 
 ### 4. Add Container Labels
 
-**Effort:** 30 min | **Impact:** Medium
+**Effort:**30 min |**Impact:** Medium
 
 No labels in any compose file. Labels enable filtering, organization, and automation.
 
-**Template:**
+#### Template
+
 ```yaml
 labels:
   - "com.cronova.environment=vps"      # vps|fixed|mobile
@@ -103,12 +110,13 @@ labels:
 
 ### 5. Create Per-Service READMEs
 
-**Effort:** 45 min | **Impact:** Medium
+**Effort:**45 min |**Impact:** Medium
 
 8 docker directories lack setup documentation.
 
 | Directory | Missing README |
 |-----------|---------------|
+
 | `docker/fixed/docker-vm/media/` | *arr stack integration, setup |
 | `docker/fixed/docker-vm/automation/` | MQTT setup, HA config |
 | `docker/fixed/docker-vm/security/` | Frigate setup, camera config |
@@ -122,9 +130,10 @@ labels:
 
 ### 6. Document Network Topology
 
-**Effort:** 45 min | **Impact:** Medium
+**Effort:**45 min |**Impact:** Medium
 
 `docker/README.md` discusses network strategy but lacks:
+
 - Visualization of how networks connect between compose files
 - Explicit list of which services talk to which networks
 - Documented ports/interfaces for inter-service communication
@@ -137,13 +146,15 @@ labels:
 
 ### 7. Missing Ansible Playbooks
 
-**Effort:** 1-2 hours | **Impact:** High
+**Effort:**1-2 hours |**Impact:** High
 
 Current playbooks: `common.yml`, `docker.yml`, `tailscale.yml`
 
-**Missing:**
+#### Missing
+
 | Playbook | Purpose |
 |----------|---------|
+
 | `backup.yml` | Deploy restic, configure cronjobs |
 | `monitoring.yml` | Deploy Uptime Kuma, ntfy, configure monitors |
 | `update.yml` | System and container update automation |
@@ -156,11 +167,12 @@ Current playbooks: `common.yml`, `docker.yml`, `tailscale.yml`
 
 ### 8. Service Startup Checklist
 
-**Effort:** 1 hour | **Impact:** High
+**Effort:**1 hour |**Impact:** High
 
 No end-to-end workflow documented for starting services across all 3 environments.
 
-**Missing:**
+#### Missing
+
 - Service startup order across environments
 - Health check commands for each service
 - Verification steps (curl endpoints, port checks)
@@ -172,9 +184,10 @@ No end-to-end workflow documented for starting services across all 3 environment
 
 ### 9. Backup Configuration Gaps
 
-**Effort:** 1 hour | **Impact:** Medium
+**Effort:**1 hour |**Impact:** Medium
 
 `docs/disaster-recovery.md` exists but missing:
+
 - Backup verification cronjob
 - Automated backup scheduling
 - Backup encryption key storage procedure
@@ -184,7 +197,7 @@ No end-to-end workflow documented for starting services across all 3 environment
 
 ### 10. Image Pull Policies
 
-**Effort:** 30 min | **Impact:** Medium
+**Effort:**30 min |**Impact:** Medium
 
 No compose files define `pull_policy`. Stale images persist on restart.
 
@@ -194,7 +207,7 @@ No compose files define `pull_policy`. Stale images persist on restart.
 
 ### 11. Restic Backup Sidecar for Backup Infrastructure
 
-**Effort:** 1 hour | **Impact:** Medium
+**Effort:**1 hour |**Impact:** Medium
 
 Headscale has backup sidecar (good model). Restic REST instances have no automated backup.
 
@@ -202,9 +215,10 @@ Headscale has backup sidecar (good model). Restic REST instances have no automat
 
 ### 12. Service Lifecycle Documentation
 
-**Effort:** 1 hour | **Impact:** Medium
+**Effort:**1 hour |**Impact:** Medium
 
 Missing:
+
 - Blue-green deployment strategy
 - Update verification procedure
 - Zero-downtime update guidance
@@ -214,7 +228,7 @@ Missing:
 
 ### 13. Compose File Version Strategy
 
-**Effort:** 15 min | **Impact:** Low
+**Effort:**15 min |**Impact:** Low
 
 Versions range implicitly. Explicitly define `version: "3.9"` for `depends_on: condition:` support.
 
@@ -222,9 +236,10 @@ Versions range implicitly. Explicitly define `version: "3.9"` for `depends_on: c
 
 ### 14. Incomplete Docker Network Documentation
 
-**Effort:** 1 hour | **Impact:** Medium
+**Effort:**1 hour |**Impact:** Medium
 
 Missing:
+
 - Network isolation strategy (external networks?)
 - Inter-service communication matrix
 
@@ -234,11 +249,12 @@ Missing:
 
 ### 15. Prometheus/Grafana Monitoring Stack
 
-**Effort:** 2+ hours | **Impact:** Medium
+**Effort:**2+ hours |**Impact:** Medium
 
 Currently only Uptime Kuma (endpoint monitoring). Missing metrics collection (CPU, memory, disk, network).
 
-**Benefits:**
+#### Benefits
+
 - Historical performance metrics
 - Capacity planning data
 - Alert thresholds on resource utilization
@@ -247,9 +263,10 @@ Currently only Uptime Kuma (endpoint monitoring). Missing metrics collection (CP
 
 ### 16. Disaster Recovery Testing Automation
 
-**Effort:** 2+ hours | **Impact:** Medium
+**Effort:**2+ hours |**Impact:** Medium
 
 Missing:
+
 - Automated monthly restore test
 - ntfy notification of test results
 - Test environment documentation
@@ -258,9 +275,10 @@ Missing:
 
 ### 17. Service Upgrade Strategy
 
-**Effort:** 2 hours | **Impact:** Low
+**Effort:**2 hours |**Impact:** Low
 
 Document for each service:
+
 - Release notes source
 - Update frequency
 - Test procedure
@@ -272,9 +290,10 @@ Document for each service:
 
 ### 18. Capacity Planning
 
-**Effort:** 2 hours | **Impact:** Low
+**Effort:**2 hours |**Impact:** Low
 
 Missing:
+
 - CPU/memory requirements per service
 - Expected disk usage (Frigate recordings, media)
 - Network bandwidth estimates
@@ -311,6 +330,7 @@ Missing:
 
 | File | Purpose |
 |------|---------|
+
 | `docs/network-topology.md` | Network visualization |
 | `docs/service-startup-guide.md` | Deployment workflow |
 | `docs/service-upgrade-strategy.md` | Update procedures |

@@ -10,15 +10,16 @@
 
 | What you see | Likely cause | What to do |
 |---|---|---|
-| **No internet, Mini PC lights ON** | ISP is down | → **Scenario A** (most common) |
-| **No internet, Mini PC lights OFF** | Proxmox/power issue | → **Scenario B** |
-| **Internet is slow or keeps dropping** | ISP issue | → **Scenario C** |
+
+| **No internet, Mini PC lights ON**| ISP is down | →**Scenario A** (most common) |
+| **No internet, Mini PC lights OFF**| Proxmox/power issue | →**Scenario B** |
+| **Internet is slow or keeps dropping**| ISP issue | →**Scenario C** |
 
 ---
 
 ## Scenario A: No Internet, Mini PC Lights Are ON
 
-**This is the most common case — the ISP (Tigo) is down.**
+#### This is the most common case — the ISP (Tigo) is down
 
 Augusto's remote access works automatically via LTE backup (he gets an alert on his phone). But for **Netflix, YouTube, and video calls**, the family needs to activate the emergency WiFi:
 
@@ -27,7 +28,7 @@ Augusto's remote access works automatically via LTE backup (he gets an alert on 
 1. **Your phone** — turn on WiFi hotspot
 2. **The Opal** — small white router on the shelf near the switch
 
-```
+```text
 ┌───────────────────┐
 │    GL-SFT1200     │  ← Small white box
 │      (Opal)       │     with antennas
@@ -46,22 +47,23 @@ Label: "Emergency Internet"
    - Android: Settings → Connections → Mobile Hotspot → Turn on
    - Hotspot name should be the one pre-configured in the Opal
 
-2. **Plug in the Opal's power cable (USB-C)**
+1. **Plug in the Opal's power cable (USB-C)**
    - That's it — just power. No other cables to connect
    - Wait ~1 minute for it to boot (lights go solid)
 
-3. **Connect your devices to EmergencyWiFi**
+1. **Connect your devices to EmergencyWiFi**
 
    | Network | Password |
    |---------|----------|
+
    | `EmergencyWiFi` (2.4GHz) | *(written on the label)* |
    | `EmergencyWiFi-5G` (faster) | *(same password)* |
 
    **Tip:** Use 5G for streaming — it's faster.
 
-4. **Test it** — open Netflix or YouTube
+1. **Test it** — open Netflix or YouTube
 
-**No cable swapping. No touching the modem or switch. Just power + phone hotspot.**
+#### No cable swapping. No touching the modem or switch. Just power + phone hotspot
 
 ### When ISP Comes Back
 
@@ -74,7 +76,7 @@ Label: "Emergency Internet"
 
 ## Scenario B: No Internet, Mini PC Lights Are OFF
 
-**The Mini PC (Proxmox) has crashed or lost power.**
+#### The Mini PC (Proxmox) has crashed or lost power
 
 This is rarer. The Opal needs to connect directly to the ISP modem:
 
@@ -88,7 +90,7 @@ This is rarer. The Opal needs to connect directly to the ISP modem:
 6. Wait 1-2 minutes
 7. Connect devices to the Opal's WiFi (`EmergencyWiFi` or `EmergencyWiFi-5G`)
 
-```
+```text
 NORMAL (not working):
 [ISP Modem] ──cable──► [Mini PC] ──► [Switch] ──► WiFi
                             ✗ DEAD
@@ -119,6 +121,7 @@ EMERGENCY:
 
 | Service | Status | Notes |
 |---------|--------|-------|
+
 | Netflix | ✓ Works | Uses phone data |
 | YouTube | ✓ Works | Uses phone data |
 | Web browsing | ✓ Works | |
@@ -129,6 +132,7 @@ EMERGENCY:
 
 | Service | Why |
 |---------|-----|
+
 | Ad blocking | Pi-hole runs on Mini PC |
 | Smart home | Home Assistant is on Mini PC |
 | Security cameras | Frigate is on Mini PC |
@@ -145,7 +149,7 @@ You don't need to do anything for this — it's automatic:
 - This keeps Augusto's remote access working (so he can fix things from anywhere)
 - It does NOT provide enough bandwidth for Netflix — that's why the Opal + phone hotspot exists for streaming
 
-```
+```text
 Layer 1 (automatic, invisible):
   ISP down → LTE modem takes over → Augusto has remote access
 
@@ -157,7 +161,7 @@ Layer 2 (manual, family activates):
 
 ## Where Everything Is
 
-```
+```text
                     ┌─────────────────────┐
                     │     ISP Modem       │
                     │  (Tigo — ARRIS)     │
@@ -187,6 +191,7 @@ Layer 2 (manual, family activates):
 
 | Person | Contact | When |
 |--------|---------|------|
+
 | Augusto | [phone/WhatsApp] | Always try first |
 | ISP Support | Tigo: 147 / Personal: *111 | If neighbors also have no internet |
 
@@ -194,9 +199,9 @@ Layer 2 (manual, family activates):
 
 ## Quick Reference Card
 
-**Print this, laminate it, and keep it on the shelf near the Opal.**
+#### Print this, laminate it, and keep it on the shelf near the Opal
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │          🌐 EMERGENCY INTERNET — QUICK STEPS                 │
 ├──────────────────────────────────────────────────────────────┤
@@ -245,9 +250,10 @@ Layer 2 (manual, family activates):
 2. Wait 1-2 minutes for it to boot
 3. Move closer to the Opal
 
-### I made things worse!
+### I made things worse
 
 Don't worry — nothing is permanently broken.
+
 1. Unplug everything you connected
 2. Put cables back where they were
 3. Use mobile data on your phone for now
@@ -259,6 +265,7 @@ Don't worry — nothing is permanently broken.
 
 | Item | Details |
 |------|---------|
+
 | **Emergency Router** | GL-iNet GL-SFT1200 (Opal) |
 | **Color** | White, small box with antennas |
 | **Power** | USB-C (5V/2A) |

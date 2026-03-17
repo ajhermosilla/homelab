@@ -6,6 +6,7 @@ Security configuration to protect against script kiddies, malware, and DoS attac
 
 | Threat | Likelihood | Mitigation |
 |--------|------------|------------|
+
 | Script kiddies | High | Fail2ban, rate limiting, no exposed ports |
 | Malware/botnets | Medium | 2FA, updates, network segmentation |
 | DoS attacks | Medium | Cloudflare, rate limiting, geo-blocking |
@@ -20,7 +21,7 @@ Security configuration to protect against script kiddies, malware, and DoS attac
 
 Only **one service** exposed to internet: Headscale on VPS.
 
-```
+```text
 Internet Access:
 ├── hs.cronova.dev (Headscale) ← Only public endpoint
 │   └── Port 443 (HTTPS)
@@ -60,6 +61,7 @@ sudo ufw status verbose
 ### Fixed Homelab Firewall (OPNsense)
 
 All traffic filtered through OPNsense VM (gateway since 2026-02-21):
+
 - WAN: Block all inbound (no port forwards)
 - LAN: Allow outbound, block inter-VLAN
 - IoT VLAN (10): Configured, rules pending
@@ -69,6 +71,7 @@ All traffic filtered through OPNsense VM (gateway since 2026-02-21):
 ### Authelia Forward Auth — Deployed
 
 Authelia (Okẽ) provides SSO + TOTP 2FA for services behind Caddy on Docker VM:
+
 - **Protected:** Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx)
 - **Own auth (not protected):** Jara (HA), Taguato (Frigate), Vaultwarden, Vera (Immich), Forgejo
 - **Notifier:** Filesystem (writes codes to `/data/notification.txt`), not SMTP
@@ -81,6 +84,7 @@ Authelia (Okẽ) provides SSO + TOTP 2FA for services behind Caddy on Docker VM:
 ### Hardware Key
 
 **YubiKey 5C NFC** available for hardware-based 2FA:
+
 - USB-C + NFC for phone/laptop
 - Supports FIDO2, WebAuthn, TOTP
 - Use for most critical accounts (Vaultwarden master, Cloudflare, GitHub)
@@ -89,6 +93,7 @@ Authelia (Okẽ) provides SSO + TOTP 2FA for services behind Caddy on Docker VM:
 
 | Service | 2FA Method | Priority | Status |
 |---------|------------|----------|--------|
+
 | Vaultwarden | TOTP or YubiKey | Critical | Available |
 | Authelia (Okẽ) | TOTP via Authy | Critical | Active (protects 6 services) |
 | Headscale | OIDC + 2FA | Critical | Pending (CLI-only for now) |
@@ -106,9 +111,10 @@ Authelia (Okẽ) provides SSO + TOTP 2FA for services behind Caddy on Docker VM:
 # Users enable in: Settings → Two-step Login → Authenticator App
 ```
 
-**Enforce 2FA for all users:**
+#### Enforce 2FA for all users
 
 Add to `docker-compose.yml` environment:
+
 ```yaml
 environment:
   - SIGNUPS_ALLOWED=false
@@ -119,7 +125,7 @@ environment:
 
 For web-based admin with 2FA, integrate with an OIDC provider.
 
-**Option 1: Authelia (self-hosted)**
+#### Option 1: Authelia (self-hosted)
 
 ```yaml
 # docker-compose.yml addition
@@ -131,9 +137,10 @@ authelia:
     - TZ=America/Asuncion
 ```
 
-**Option 2: Use pre-auth keys only (simpler)**
+#### Option 2: Use pre-auth keys only (simpler)
 
 No web admin exposed. Manage via CLI:
+
 ```bash
 # All admin via SSH + CLI
 docker exec headscale headscale users list
@@ -161,7 +168,7 @@ pveum user modify root@pam -totp "otpauth://totp/Proxmox:root?secret=XXXX"
 
 1. **System → Access → Servers → Add**
    - Type: Local + Timebased One-time Password
-2. **System → Access → Users → Edit**
+1. **System → Access → Users → Edit**
    - OTP seed: Generate new
 
 ---
@@ -310,6 +317,7 @@ cloudflared:
 ```
 
 Pi-hole configuration:
+
 - Custom upstream DNS: `cloudflared#5053`
 
 ### Alternative: Unbound with DoT
@@ -333,11 +341,13 @@ All public domains use Cloudflare proxy (orange cloud):
 
 | Domain | Proxy | Notes |
 |--------|-------|-------|
+
 | cronova.dev | Yes | Static site |
 | hs.cronova.dev | **No** | Headscale needs direct IP |
 | verava.ai | Yes | When purchased |
 
 **For Headscale:** IP is exposed, but:
+
 - Only serves Tailscale clients
 - Fail2ban protects against abuse
 - Can geo-block if needed
@@ -350,6 +360,7 @@ Ensure WHOIS privacy is enabled:
 2. **Other registrars** - Enable WHOIS privacy/redaction
 
 Verify:
+
 ```bash
 whois cronova.dev | grep -i registrant
 # Should show privacy service, not personal info
@@ -358,12 +369,13 @@ whois cronova.dev | grep -i registrant
 ### Email Privacy
 
 - Don't use personal email in public configs
-- Use domain email: `admin@cronova.dev`
+- Use domain email: `<admin@cronova.dev>`
 - Forward to personal email privately
 
 ### Git Privacy
 
 Check for exposed info:
+
 ```bash
 # Search for emails in repo
 git log --all --format='%ae' | sort -u
@@ -464,6 +476,7 @@ watchtower:
 
 | Category | Services | Strategy |
 |----------|----------|----------|
+
 | **Pinned (manual bump)** | victoriametrics, vmagent, vmalert, alertmanager, grafana, authelia, paperless-ngx | Version pinned in compose — Watchtower label present but no-op |
 | **Excluded (no label)** | vaultwarden, frigate, homeassistant, immich-db, immich-valkey, paperless-db, paperless-redis | No Watchtower label — manual only |
 | **Excluded (label=false)** | caddy (Docker VM) | Explicitly disabled — custom build with Cloudflare plugin |
@@ -479,6 +492,7 @@ Add monitors for security events:
 
 | Monitor | Type | Alert |
 |---------|------|-------|
+
 | VPS SSH | TCP 22 | If down, possible attack |
 | Fail2ban status | Push | On ban events |
 | UFW logs | Push | On blocked connections |
@@ -516,6 +530,7 @@ action = %(action_)s
 ### Encrypted Backups
 
 Restic encrypts by default:
+
 ```bash
 # Repository is AES-256 encrypted
 restic init  # Prompts for password
@@ -530,6 +545,7 @@ restic init  # Prompts for password
 ### Offsite Encryption
 
 rclone crypt adds additional layer:
+
 ```bash
 # Google Drive data is encrypted client-side
 rclone config
@@ -545,9 +561,11 @@ rclone config
 ### If VPS Compromised
 
 1. **Isolate**: Remove from Tailscale
+
    ```bash
    tailscale down
    ```
+
 2. **Revoke**: Invalidate all Headscale auth keys
 3. **Rotate**: Change all passwords/keys
 4. **Rebuild**: Fresh VPS from backup
@@ -628,6 +646,7 @@ cat ~/.ssh/authorized_keys
 
 | Tool | Purpose | Install |
 |------|---------|---------|
+
 | fail2ban | Ban brute forcers | `apt install fail2ban` |
 | ufw | Firewall | `apt install ufw` |
 | rkhunter | Rootkit detection | `apt install rkhunter` |

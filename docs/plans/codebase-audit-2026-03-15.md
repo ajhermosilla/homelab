@@ -13,6 +13,7 @@ Services without pinned versions:
 
 | Service | Image | Host | Notes |
 |---------|-------|------|-------|
+
 | cadvisor | `gcr.io/cadvisor/cadvisor:latest` | Docker VM | Pin to stable release |
 | dozzle | `amir20/dozzle:latest` | Docker VM | Pin to stable release |
 | bentopdf | `ghcr.io/alam00000/bentopdf:latest` | Docker VM | Pin to stable release |
@@ -26,6 +27,7 @@ Watchtower handles updates. This is the recommended approach for LinuxServer.io 
 ### ~~2. Pi-hole + Caddy configs not backed up~~ (FIXED 2026-03-16)
 
 Critical infrastructure without backup sidecars:
+
 - **Pi-hole**: `/etc/pihole` config (DNS rules, blocklists, 23 local DNS entries)
 - **Caddy**: `/data` and `/config` (TLS certificates, ACME state)
 
@@ -43,6 +45,7 @@ uptime-kuma, ntfy, changedetection, playwright.
 ### ~~4. services.md missing VPS services~~ (FIXED 2026-03-15)
 
 `docs/architecture/services.md` doesn't document:
+
 - AdGuard + Unbound (yvága stack) — deployed and active
 - Scraping stack (changedetection + playwright) — deployed and active
 - VPS backup stack (restic-rest) — deployed and active
@@ -61,6 +64,7 @@ skips it entirely. Should add DERP deployment step after Pi-hole (VPS).
 ### ~~7. Completed plans still in `/docs/plans/`~~ (FIXED 2026-03-16)
 
 Plans that are done but not moved to journal/reference:
+
 - `igpu-passthrough-plan-2026-02-25.md` — iGPU passthrough completed 2026-03-02
 - `nas-deployment-plan.md` — NAS fully deployed
 - `javya-deploy-nas-2026-03-02.md` — Javya deployed on NAS
@@ -75,6 +79,7 @@ Needs verification against current compose file locations on Docker VM.
 ### ~~9. docker-compose-deploy.yml — missing NAS stacks~~ (FIXED 2026-03-16)
 
 Ansible playbook `docker-compose-deploy.yml` lists NAS stacks but is missing:
+
 - Coolify (tajy) — may be intentional (Coolify manages itself)
 - Javya — deployed via `~/deploy/javya/`, not from repo path
 - Katupyry — deployed via Coolify
@@ -94,6 +99,7 @@ but should be documented as a deliberate exception.
 ### 11. `read_only: true` underused
 
 Only 5 services use read-only rootfs. Stateless services that could benefit:
+
 - changedetection (VPS)
 - pihole containers
 - cadvisor already has it
@@ -106,6 +112,7 @@ hardcoded in the compose file instead of using `.env` substitution.
 ### 13. Inconsistent healthcheck patterns
 
 Mix of tools across stacks:
+
 - `wget` (BusyBox containers — must use `127.0.0.1`, not `localhost`)
 - `curl` (full distro containers)
 - `nc` (DERP)
@@ -166,6 +173,7 @@ These are solid across the entire codebase:
 Example: `postgres:17-alpine`, `adguard/adguardhome:v0.107.73`
 
 **`latest` tag acceptable** when:
+
 - The image maintainer manages `latest` as a stable release channel (LinuxServer.io)
 - Old version tags are removed from registries (sonarr, radarr, prowlarr)
 - Watchtower is enabled to handle updates automatically

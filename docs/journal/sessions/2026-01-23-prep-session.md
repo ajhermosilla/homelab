@@ -10,10 +10,11 @@
 
 | If done Jan 23 | Jan 24 benefit |
 |----------------|----------------|
+
 | Proxmox installed | Skip Phase 2 (save 45 min) |
 | OPNsense VM created | Skip most of Phase 3 (save 45 min) |
 | NAS drives installed | Phase 6 faster |
-| **Total** | **~1.5 hours saved + less stress** |
+| **Total**|**~1.5 hours saved + less stress** |
 
 ---
 
@@ -31,7 +32,7 @@ Before starting, verify you have:
 
 ## Session Timeline
 
-```
+```text
 START   Task                                    Duration
 ─────────────────────────────────────────────────────────
 0:00    Setup: Connect Mini PC                  5 min
@@ -51,7 +52,7 @@ START   Task                                    Duration
 
 The Mini PC needs network access for Proxmox post-install, but does NOT need to be in the routing path.
 
-```
+```text
 Current setup (keep as-is):
 [ISP Modem] → [AX3000] → [Devices]
                  │
@@ -60,7 +61,7 @@ Current setup (keep as-is):
            [Mini PC] ← Will get IP from AX3000 DHCP
 ```
 
-```
+```json
 [ ] Connect Mini PC NIC2 (LAN port) to switch
     - Do NOT connect NIC1 (WAN port) to anything yet
 [ ] Connect HDMI + keyboard to Mini PC
@@ -77,7 +78,7 @@ Current setup (keep as-is):
 
 ### 2.1 Boot from USB
 
-```
+```json
 [ ] Insert Ventoy USB
 [ ] Boot Mini PC, select USB boot
 [ ] Select Proxmox VE ISO from Ventoy menu
@@ -86,7 +87,7 @@ Current setup (keep as-is):
 
 ### 2.2 Run Installer
 
-```
+```json
 [ ] Click "Install Proxmox VE"
 [ ] Accept license agreement
 [ ] Select target disk: 512GB SSD
@@ -99,7 +100,7 @@ Current setup (keep as-is):
 
 ### 2.3 Admin Password & Email
 
-```
+```json
 [ ] Password: [your chosen password - WRITE IT DOWN]
 [ ] Confirm password
 [ ] Email: augusto@hermosilla.me
@@ -109,7 +110,7 @@ Current setup (keep as-is):
 
 **Important:** Configure for current network (AX3000 as gateway), will adjust later.
 
-```
+```yaml
 Management Interface: Select NIC2 (the one connected to switch)
                       Look for the one that's "UP" or has link
 
@@ -121,7 +122,7 @@ DNS Server: 192.168.1.1         ← AX3000
 
 ### 2.5 Confirm & Install
 
-```
+```json
 [ ] Review summary
 [ ] Click "Install"
 [ ] Wait for installation (~10-15 min)
@@ -135,7 +136,7 @@ DNS Server: 192.168.1.1         ← AX3000
 
 ### 3.1 Verify Proxmox Booted
 
-```
+```json
 [ ] Mini PC shows Proxmox console login screen
 [ ] Note the URL shown: https://192.168.1.5:8006
 ```
@@ -144,7 +145,7 @@ DNS Server: 192.168.1.1         ← AX3000
 
 From your MacBook (or any device on the network):
 
-```
+```json
 [ ] Open browser: https://192.168.1.5:8006
 [ ] Accept self-signed certificate warning
 [ ] Login:
@@ -156,7 +157,7 @@ From your MacBook (or any device on the network):
 
 ### 3.3 Quick Verification
 
-```
+```json
 [ ] Proxmox dashboard loads
 [ ] See "pve" node in left sidebar
 [ ] Summary shows correct RAM/CPU
@@ -170,7 +171,7 @@ From your MacBook (or any device on the network):
 
 ### 4.1 Upload OPNsense ISO
 
-```
+```json
 [ ] Proxmox UI → pve → local (storage) → ISO Images
 [ ] Click "Upload"
 [ ] Select OPNsense ISO from your computer
@@ -222,7 +223,7 @@ After reboot, re-access Proxmox web UI.
 
 ### 4.4 Create VM
 
-```
+```json
 [ ] Proxmox UI → pve → Create VM (top right button)
 
 General:
@@ -264,16 +265,16 @@ Network:
 
 ### 4.5 Add WAN Interface
 
-**Option A: PCI Passthrough (recommended)**
+#### Option A: PCI Passthrough (recommended)
 
-```
+```json
 [ ] Select VM 100 → Hardware → Add → PCI Device
 [ ] Select the NIC for WAN (identified earlier)
 [ ] Check "All Functions" if available
 [ ] Click Add
 ```
 
-**Option B: Second Bridge (simpler, if passthrough fails)**
+#### Option B: Second Bridge (simpler, if passthrough fails)
 
 ```bash
 # SSH to Proxmox, create second bridge for WAN
@@ -295,6 +296,7 @@ After configuration, VM 100 should have:
 
 | Device | Purpose |
 |--------|---------|
+
 | virtio0 | 20GB disk |
 | net0 (vmbr0) | LAN interface |
 | hostpci0 OR net1 (vmbr1) | WAN interface |
@@ -308,7 +310,7 @@ After configuration, VM 100 should have:
 
 ### 5.1 Start VM and Open Console
 
-```
+```json
 [ ] Select VM 100 → Start
 [ ] Click "Console" button (or use noVNC)
 [ ] Watch boot process
@@ -316,7 +318,7 @@ After configuration, VM 100 should have:
 
 ### 5.2 Boot OPNsense Installer
 
-```
+```json
 [ ] Wait for OPNsense to boot to login prompt
 [ ] Login as: installer
 [ ] Password: opnsense
@@ -324,7 +326,7 @@ After configuration, VM 100 should have:
 
 ### 5.3 Run Installation
 
-```
+```json
 [ ] Select "Install (UFS)" - simpler than ZFS for small disk
 [ ] Select target disk (virtio0)
 [ ] Confirm disk wipe
@@ -336,7 +338,7 @@ After configuration, VM 100 should have:
 
 ### 5.4 Remove ISO
 
-```
+```json
 [ ] While VM is rebooting:
     - VM 100 → Hardware → CD/DVD Drive
     - Edit → Do not use any media
@@ -347,7 +349,7 @@ After configuration, VM 100 should have:
 
 After reboot, at OPNsense console:
 
-```
+```json
 [ ] Login as: root / [your password]
 
 Assign interfaces (option 1):
@@ -371,7 +373,7 @@ Set interface IP (option 2):
 
 ### 5.6 Test Web Access
 
-```
+```json
 [ ] From MacBook: https://192.168.1.2
 [ ] Accept certificate warning
 [ ] Login: root / [your password]
@@ -408,7 +410,7 @@ Now you can access Proxmox via Tailscale IP even remotely.
 
 If you have time remaining:
 
-```
+```json
 [ ] Power off NAS (if on)
 [ ] Open case
 [ ] Install SSD (240GB Lexar) - connect to first SATA port
@@ -426,7 +428,7 @@ If you have time remaining:
 
 Before stopping:
 
-```
+```json
 [ ] Proxmox accessible at https://192.168.1.5:8006
 [ ] OPNsense VM created and accessible at https://192.168.1.2
 [ ] OPNsense LAN IP is 192.168.1.2 (not .1)
@@ -444,6 +446,7 @@ After this session:
 
 | Phase | Status | Jan 24 Action |
 |-------|--------|---------------|
+
 | Phase 1 | Ready | Just connect cables |
 | Phase 2 | **DONE** | Skip |
 | Phase 3 | **Mostly DONE** | Only cutover config |
@@ -469,7 +472,7 @@ systemctl restart pveproxy
 
 ### OPNsense VM won't start
 
-```
+```bash
 # Check IOMMU if using passthrough
 dmesg | grep -i iommu
 
@@ -479,7 +482,7 @@ dmesg | grep -i iommu
 
 ### Can't access OPNsense web UI
 
-```
+```bash
 # From OPNsense console, check IP
 Option 7 (ping host) → ping 192.168.1.5
 

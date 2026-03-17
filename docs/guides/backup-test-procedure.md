@@ -10,6 +10,7 @@ All backups use Restic with a centralized REST server on the NAS. See `docs/stra
 
 | Copy | Location | Status |
 |------|----------|--------|
+
 | 1 | Original data (live volumes) | Active |
 | 2 | NAS Restic REST (`/mnt/purple/backup/restic/`) | Active |
 | 3 | Google Drive (rclone crypt) | Not yet configured |
@@ -18,6 +19,7 @@ All backups use Restic with a centralized REST server on the NAS. See `docs/stra
 
 | Service | Container | Schedule | Repository |
 |---------|-----------|----------|------------|
+
 | Headscale | headscale-backup | Hourly (VPS local) | VPS `/backup/` (tar.gz) |
 | Vaultwarden | vaultwarden-backup | 2:00 AM daily | `/augusto/vaultwarden` |
 | Home Assistant | homeassistant-backup | 2:30 AM daily | `/augusto/homeassistant` |
@@ -64,7 +66,8 @@ restic check
 
 **Pass criteria:** "no errors were found"
 
-**If errors found:**
+#### If errors found
+
 ```bash
 # Attempt repair
 restic repair index
@@ -88,7 +91,8 @@ restic snapshots
 # xxxxxxxx  2026-01-14 03:00:00  docker  homeassistant /config
 ```
 
-**Pass criteria:**
+#### Pass criteria
+
 - [ ] Vaultwarden snapshot within last 25 hours (2:00 AM daily)
 - [ ] Home Assistant snapshot within last 25 hours (2:30 AM daily)
 - [ ] Coolify snapshot within last 25 hours (3:30 AM daily)
@@ -122,20 +126,23 @@ ls -la /tmp/restore-test/headscale/
 # - noise_private.key
 ```
 
-**Verify database integrity:**
+#### Verify database integrity
+
 ```bash
 sqlite3 /tmp/restore-test/headscale/db.sqlite "SELECT COUNT(*) FROM nodes;"
 
 # Should return number of registered nodes (e.g., 8)
 ```
 
-**Pass criteria:**
+#### Pass criteria
+
 - [ ] db.sqlite exists and is not empty
 - [ ] SQLite query returns expected node count
 - [ ] noise_private.key exists
 - [ ] Latest backup is less than 2 hours old
 
-**Cleanup:**
+#### Cleanup
+
 ```bash
 rm -rf /tmp/restore-test/headscale
 ```
@@ -168,19 +175,22 @@ ls -la /tmp/restore-test/vaultwarden/data/
 # - sends/ (if any)
 ```
 
-**Verify database:**
+#### Verify database
+
 ```bash
 sqlite3 /tmp/restore-test/vaultwarden/data/db.sqlite3 "SELECT COUNT(*) FROM users;"
 
 # Should return number of users (e.g., 1)
 ```
 
-**Pass criteria:**
+#### Pass criteria
+
 - [ ] db.sqlite3 exists
 - [ ] RSA keys exist
 - [ ] User count matches expected
 
-**Cleanup:**
+#### Cleanup
+
 ```bash
 rm -rf /tmp/restore-test/vaultwarden
 ```
@@ -213,13 +223,15 @@ ls -la /tmp/restore-test/homeassistant/config/
 # Note: home-assistant_v2.db is excluded from backups (*.db-shm, *.db-wal, home-assistant_v2.db)
 ```
 
-**Pass criteria:**
+#### Pass criteria
+
 - [ ] configuration.yaml exists
 - [ ] automations.yaml exists
 - [ ] .storage/ directory exists
 - [ ] custom_components/ directory exists (HACS integrations)
 
-**Cleanup:**
+#### Cleanup
+
 ```bash
 rm -rf /tmp/restore-test/homeassistant
 ```
@@ -233,6 +245,7 @@ rm -rf /tmp/restore-test/homeassistant
 **Status:** Not yet configured. Google Drive offsite via rclone crypt is planned but not active.
 
 When configured:
+
 ```bash
 # List remote files
 rclone ls gdrive-crypt:homelab/ | head -20
@@ -243,7 +256,8 @@ rclone check /srv/backup/critical gdrive-crypt:homelab --one-way
 # Expected: No differences found
 ```
 
-**Pass criteria:**
+#### Pass criteria
+
 - [ ] Files exist on remote
 - [ ] No sync differences
 
@@ -265,7 +279,8 @@ rclone check /srv/backup/critical gdrive-crypt:homelab --one-way
 6. Access Vaultwarden, verify login works
 7. Connect a test Tailscale client
 
-**Pass criteria:**
+#### Pass criteria
+
 - [ ] Services start without errors
 - [ ] Vaultwarden login successful
 - [ ] Tailscale client connects
@@ -335,6 +350,7 @@ Add monitors for backup infrastructure:
 
 | Check | Type | Target |
 |-------|------|--------|
+
 | Restic REST (NAS) | HTTP | `http://100.82.77.97:8000/` (expect 401) |
 
 ---
@@ -343,6 +359,7 @@ Add monitors for backup infrastructure:
 
 | Service | RTO | RPO | Notes |
 |---------|-----|-----|-------|
+
 | Headscale | 30 min | 1 hour | Mesh depends on this |
 | Vaultwarden | 1 hour | 24 hours | Can use cached passwords |
 | Home Assistant | 2 hours | 24 hours | Automations can wait |
@@ -359,6 +376,7 @@ If backup restore fails during actual disaster:
 
 | Issue | Action |
 |-------|--------|
+
 | Restic corruption | Run `restic repair index` + `restic repair snapshots` |
 | Restic REST unreachable | Check NAS, Docker, `/data/docker` filesystem |
 | All local backups lost | Restore from Google Drive (when configured) |
@@ -372,4 +390,5 @@ See `docs/strategy/disaster-recovery.md` for full recovery procedures.
 
 | Date | Change |
 |------|--------|
+
 | 2026-01-16 | Initial document |

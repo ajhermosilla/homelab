@@ -4,7 +4,7 @@ How DNS resolution works across all homelab environments.
 
 ## Overview
 
-```
+```json
 [Client Device]
        |
        v
@@ -25,7 +25,7 @@ How DNS resolution works across all homelab environments.
 
 Mobile kit uses Beryl AX AdGuard Home as the sole DNS ad-blocker:
 
-```
+```json
 [MacBook/Devices]
        |
        | DNS: 192.168.8.1
@@ -39,6 +39,7 @@ Mobile kit uses Beryl AX AdGuard Home as the sole DNS ad-blocker:
 
 | Component | Role | IP |
 |-----------|------|-----|
+
 | Beryl AX | AdGuard Home (DNS), DHCP | 192.168.8.1 |
 | Upstream | Public recursive DNS | 1.1.1.1, 9.9.9.9 |
 
@@ -48,7 +49,7 @@ Mobile kit uses Beryl AX AdGuard Home as the sole DNS ad-blocker:
 
 ### Fixed Homelab
 
-```
+```json
 [Home Devices]
        |
        | DNS: 192.168.0.10 (Docker Host)
@@ -66,26 +67,30 @@ Mobile kit uses Beryl AX AdGuard Home as the sole DNS ad-blocker:
 
 | Component | Role | IP |
 |-----------|------|-----|
+
 | OPNsense | DHCP, points to Pi-hole | 192.168.0.1 |
 | Pi-hole (Docker) | Ad-blocking, DNS server | 192.168.0.10 |
 | Unbound (OPNsense) | Recursive resolver | 192.168.0.1:5353 |
 
-**Why Unbound behind Pi-hole:**
+#### Why Unbound behind Pi-hole
+
 - Pi-hole handles ad-blocking and logging (what you care about)
 - Unbound does recursive resolution (no third-party DNS)
 - Maximum privacy: queries go directly to root servers
 - Unbound on non-standard port (5353) to avoid conflict
 
-**OPNsense Unbound Config:**
-```
+#### OPNsense Unbound Config
+
+```text
 Services → Unbound DNS → General
 - Listen Port: 5353 (not 53, Pi-hole uses that)
 - Enable DNSSEC: Yes
 - DNS Query Forwarding: Disabled (recursive mode)
 ```
 
-**Pi-hole Upstream Config:**
-```
+#### Pi-hole Upstream Config
+
+```text
 Settings → DNS → Upstream DNS Servers
 - Custom: 192.168.0.1#5353
 - Uncheck all public resolvers
@@ -93,7 +98,7 @@ Settings → DNS → Upstream DNS Servers
 
 ### VPS (yvága — AdGuard + Unbound)
 
-```
+```json
 [VPS Services / Tailscale Nodes]
        |
        | DNS: 127.0.0.1 / 100.77.172.46
@@ -111,11 +116,13 @@ Settings → DNS → Upstream DNS Servers
 
 | Component | Role | IP |
 |-----------|------|-----|
+
 | AdGuard Home | Ad-blocking, DNS filtering, internal rewrites | 127.0.0.1:53, 100.77.172.46:53 |
 | Unbound | Recursive resolver (no third-party DNS) | 172.20.0.10:5335 (adguard-net) |
 | Pi-hole (VPS) | Legacy, secondary — may be removed | 127.0.0.1 (not actively used) |
 
-**Architecture notes:**
+#### Architecture notes
+
 - AdGuard upstream uses Unbound's **static IP** (172.20.0.10), not hostname — AdGuard can't resolve Docker hostnames since it IS the DNS resolver (circular dependency)
 - AdGuard cache disabled — Unbound handles caching with `serve-expired`
 - VPS has `accept-dns=false` on Tailscale to prevent recursive loops
@@ -124,7 +131,8 @@ Settings → DNS → Upstream DNS Servers
 - Blocklists (3): AdGuard DNS filter, OISD small, Steven Black hosts
 - Both containers have Watchtower disabled (critical infrastructure)
 
-**Use cases:**
+#### Use cases
+
 - VPS containers use AdGuard for DNS (ad-blocking for scraping)
 - All Tailscale nodes use VPS as fallback nameserver (headscale global DNS config)
 - Full privacy: no third-party DNS provider sees queries
@@ -135,10 +143,12 @@ When on Tailscale mesh, devices can use Pi-hole on Docker VM or VPS:
 
 | DNS Location | Tailscale IP | Use Case |
 |--------------|--------------|----------|
+
 | Pi-hole, Docker VM (home) | 100.68.63.168 | Primary — LAN DNS for all home devices |
 | AdGuard, VPS (yvága) | 100.77.172.46 | Fallback — recursive DNS via Unbound |
 
 **Headscale DNS Config** (on VPS):
+
 ```yaml
 # /etc/headscale/config.yaml
 dns_config:
@@ -153,7 +163,7 @@ dns_config:
 
 Pi-hole can resolve local hostnames:
 
-```
+```bash
 # Pi-hole → Local DNS → DNS Records
 192.168.0.237   oga.home
 192.168.0.20    rpi5.home
@@ -162,7 +172,8 @@ Pi-hole can resolve local hostnames:
 ```
 
 Or use Headscale MagicDNS:
-```
+
+```bash
 oga.tail.net     → 100.78.12.241
 docker.tail.net  → 100.68.63.168
 ```
@@ -171,6 +182,7 @@ docker.tail.net  → 100.68.63.168
 
 | Scenario | Behavior |
 |----------|----------|
+
 | Home Pi-hole down | Home devices fail DNS (fix quickly) |
 | OPNsense Unbound down | Pi-hole falls back to public DNS |
 | VPS AdGuard down | Tailscale nodes fall back to home Pi-hole; VPS containers fail DNS |
@@ -179,7 +191,8 @@ docker.tail.net  → 100.68.63.168
 | VPS down | Home Pi-hole unaffected; Tailscale nodes use home Pi-hole only |
 
 **Home Pi-hole upstream recommendation:** Configure with both Unbound AND one public resolver:
-```
+
+```text
 Upstream DNS:
 - 192.168.0.1#5353 (Unbound, primary)
 - 9.9.9.9 (Quad9, fallback)
@@ -189,6 +202,7 @@ Upstream DNS:
 
 | Service | Port | Interface |
 |---------|------|-----------|
+
 | Pi-hole DNS | 53 | LAN-facing |
 | Pi-hole Web | 8053 | LAN-facing |
 | Unbound | 5353 | localhost only |
@@ -196,11 +210,13 @@ Upstream DNS:
 ## Configuration Checklist
 
 ### Mobile Kit (Beryl AX)
+
 - [x] Configure AdGuard Home on Beryl AX
 - [x] Set upstream: 1.1.1.1, 9.9.9.9
 - [x] Beryl AX is DHCP server and DNS (192.168.8.1)
 
 ### Fixed Homelab
+
 - [x] Configure Unbound on OPNsense (port 5353)
 - [x] Install Pi-hole in Docker Host (v6.3, port 53 DNS, port 8053 web)
 - [x] Set Pi-hole upstream: 192.168.0.1#5353
@@ -208,6 +224,7 @@ Upstream DNS:
 - [x] Add local DNS records (23 `dns.hosts` entries in pihole.toml)
 
 ### VPS (yvága)
+
 - [x] Deploy AdGuard Home + Unbound stack (docker/vps/networking/adguard/)
 - [x] Set AdGuard upstream: 172.20.0.10:5335 (Unbound static IP)
 - [x] Disable AdGuard cache (Unbound handles it)
@@ -218,6 +235,7 @@ Upstream DNS:
 - [x] Add 127.0.0.1 hs.cronova.dev to /etc/hosts + cloud-init template
 
 ### Headscale
+
 - [x] Configure dns_config with Tailscale IPs
 - [x] Enable MagicDNS
 - [x] Configure extra_records (20 A records for *.cronova.dev → Tailscale IPs)
