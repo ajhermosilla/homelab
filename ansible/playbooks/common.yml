@@ -76,6 +76,7 @@
         path: /etc/ssh/sshd_config
         regexp: '^#?PermitRootLogin'
         line: 'PermitRootLogin no'
+      when: ansible_hostname != 'oga'  # Proxmox requires root SSH
       notify: Restart SSH
       tags: ssh
 

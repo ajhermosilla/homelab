@@ -142,7 +142,7 @@ services:
     environment:
       TZ: ${TZ:-America/Asuncion}
       RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/homeassistant}
-      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD:?RESTIC_PASSWORD required in .env}
       BACKUP_PATH: /data
       BACKUP_TAG: homeassistant
       BACKUP_EXCLUDE: "*.log,*.db-shm,*.db-wal,home-assistant_v2.db"
