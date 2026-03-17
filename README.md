@@ -7,7 +7,7 @@ Personal infrastructure as code. Self-hosted services across three environments,
 
 All services are named in **Guarani** (the indigenous language of Paraguay) as a nod to home. English descriptions follow each name.
 
-> 40+ services | 30+ containers | 3 environments | 8 Tailscale nodes
+> 67 services | 65+ containers | 3 environments | 8 Tailscale nodes
 
 ## Architecture
 
@@ -26,7 +26,7 @@ On-demand                 24/7                                24/7
                           │       ├── Yrasema — Jellyfin
                           │       ├── Mbyja — Homepage
                           │       ├── Ysyry — Dozzle
-                          │       ├── Kuatia — Stirling-PDF
+                          │       ├── Kuatia — BentoPDF
                           │       ├── Papa — VictoriaMetrics + Grafana
                           │       ├── Vera — Immich
                           │       ├── Aranduka — Paperless-ngx
@@ -49,9 +49,9 @@ On-demand                 24/7                                24/7
 
 | Environment | Host | Status | Containers |
 |-------------|------|--------|------------|
-| **VPS** | Vultr (1 vCPU, 1GB) | Active | 5 |
-| **Docker VM** | Proxmox VM 101 (9GB RAM) | Active | 20+ |
-| **NAS** | Mini-ITX i3-3220T | Active | 11 |
+| **VPS** | Vultr (1 vCPU, 1GB) | Active | 12 |
+| **Docker VM** | Proxmox VM 101 (9GB RAM) | Active | 35 |
+| **NAS** | Mini-ITX i3-3220T | Active | 19 |
 | **RPi 5** | OpenClaw | Pending (PSU in transit) | - |
 | **Mobile Kit** | MacBook + Beryl AX | Active | - |
 
@@ -69,7 +69,7 @@ On-demand                 24/7                                24/7
 | Yrasema | Jellyfin | yrasema.cronova.dev | Media streaming |
 | Mbyja | Homepage | mbyja.cronova.dev | Dashboard |
 | Ysyry | Dozzle | ysyry.cronova.dev | Container log viewer |
-| Kuatia | Stirling-PDF | kuatia.cronova.dev | PDF tools |
+| Kuatia | BentoPDF | kuatia.cronova.dev | PDF tools |
 | Papa | VictoriaMetrics | papa.cronova.dev | Metrics + Grafana |
 | Vera | Immich | vera.cronova.dev | Photo management |
 | Aranduka | Paperless-ngx | aranduka.cronova.dev | Document management |
@@ -103,7 +103,7 @@ homelab/
 │   │   │   ├── automation/    #   Home Assistant, Mosquitto
 │   │   │   ├── media/         #   Jellyfin, *arr stack
 │   │   │   ├── auth/          #   Authelia (Okẽ)
-│   │   │   ├── tools/         #   Dozzle, Stirling-PDF, Homepage
+│   │   │   ├── tools/         #   Dozzle, BentoPDF, Homepage
 │   │   │   ├── monitoring/    #   VictoriaMetrics, Grafana
 │   │   │   ├── photos/        #   Immich (Vera)
 │   │   │   ├── documents/     #   Paperless-ngx (Aranduka)
