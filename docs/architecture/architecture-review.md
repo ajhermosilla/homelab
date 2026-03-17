@@ -1,5 +1,7 @@
 # Architecture Review
 
+> **ARCHIVED**: Snapshot from 2026-01-14. See [services.md](services.md) for current state.
+
 Comprehensive analysis of homelab architecture with domain coexistence strategy. Reviewed 2026-01-14.
 
 ## Executive Summary

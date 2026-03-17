@@ -8,7 +8,7 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
 |-----------|----------|------|------------|
 
 | Oga (Proxmox) | AOOSTAR Mini PC, Intel N150, 12GB RAM | Hypervisor: OPNsense VM + Docker VM | — |
-| Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 33 containers | 33 |
+| Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 35 containers | 33 |
 | NAS | i3-3220T, 8GB DDR3, Mini-ITX | Storage, git, PaaS: 5 stacks + Coolify | 19 |
 | OPNsense (100) | 2 vCPU, 2GB RAM, 20GB disk | Gateway, DHCP, VLANs, Tailscale | — |
 
@@ -33,7 +33,7 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
    |          |        |          |          |          |
 [Docker VM] [NAS]   [RPi 5]   [WiFi AP]  [PoE SW]  [Proxmox mgmt]
   .0.10     .0.12   .0.20     AX50                   .0.237
-  33 cnt    19 cnt  pending                              |
+  35 cnt    19 cnt  pending                              |
                                              +-----------+-----------+
                                              |           |           |
                                         [front_door] [back_yard]  [indoor]
@@ -84,13 +84,13 @@ Debian 13 (Trixie) | 4 vCPU | 9GB RAM | 100GB disk | vmbr1 (LAN only)
 | **security** | vaultwarden, frigate, vaultwarden-backup | 8843 (VW), 5000/8554/8555 (Frigate) |
 | **auth** | authelia | 9091 |
 | **tools** | dozzle, bentopdf, homepage | 9999, 8080, 3030 |
-| **documents** | paperless-ngx, paperless-db, paperless-redis, paperless-backup | 8000 |
+| **documents** | paperless-ngx, paperless-db, paperless-redis, paperless-backup | 8010 |
 | **monitoring** | victoriametrics, vmagent, vmalert, alertmanager, cadvisor, grafana | 8428, 3000 (localhost only) |
 | **photos** | immich-server, immich-ml, immich-valkey, immich-db, immich-backup | 2283 |
 | **media** | jellyfin, sonarr, radarr, prowlarr, qbittorrent | 8096, 8989, 7878, 9696, 8081 |
 | **maintenance** | watchtower | — |
 
-**Total: 10 stacks, 33 containers**
+**Total: 10 stacks, 35 containers**
 
 ### Boot Orchestrator
 
@@ -131,8 +131,8 @@ Docker VM mounts NAS storage for services that need shared data:
 Custom build: `caddy:2` + `caddy-dns/cloudflare` for DNS-01 TLS challenges.
 
 - All `.cronova.dev` subdomains terminate TLS at Caddy
-- Authelia forward auth protects: Yrasema, Ysyry, Kuatia (BentoPDF), Mbyja, Papa, Aranduka. TOTP 2FA via Authy.
-- Services with own auth (not protected): Jara (HA), Taguato (Frigate), Vaultwarden, Vera (Immich), Forgejo
+- Authelia forward auth protects: Ysyry, Kuatia (BentoPDF), Mbyja, Papa, Aranduka. TOTP 2FA via Authy.
+- Services with own auth (not protected): Jara (HA), Taguato (Frigate), Vaultwarden, Vera (Immich), Forgejo, Yrasema (Jellyfin — mobile/TV clients can't handle redirects)
 
 ---
 
