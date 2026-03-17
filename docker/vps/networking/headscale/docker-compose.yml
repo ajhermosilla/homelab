@@ -29,9 +29,8 @@ services:
           memory: 256M
           cpus: '0.5'
     command: serve
-    ports:
-      # NOTE: Port 8080 NOT exposed publicly - Caddy uses internal Docker network
-      - "3478:3478/udp" # STUN
+    # NOTE: Port 8080 NOT exposed publicly - Caddy uses internal Docker network
+    # STUN port removed - DERP relay owns 3478/udp to avoid bind conflict
     volumes:
       - ./config:/etc/headscale
       - headscale-data:/var/lib/headscale
