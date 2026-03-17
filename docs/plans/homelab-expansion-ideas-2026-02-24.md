@@ -204,6 +204,17 @@ Both well within capacity.
 
 ---
 
+## Hardware Projects
+
+### Raspberry Pi Zero W — PicoClaw
+
+**Status:** Research needed
+**Hardware:** Dormant Raspberry Pi Zero W (found 2026-03-17)
+
+Explore [PicoClaw](https://github.com/anthropics/picoclaw) as a lightweight AI assistant on the Pi Zero W. Research feasibility given the Zero W's limited specs (1GHz single-core, 512MB RAM, WiFi).
+
+---
+
 ## Sources
 
 - [Homepage GitHub](https://github.com/gethomepage/homepage)
