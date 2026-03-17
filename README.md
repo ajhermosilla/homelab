@@ -1,5 +1,8 @@
 # Homelab
 
+[![CI](https://github.com/ajhermosilla/homelab/actions/workflows/ci.yml/badge.svg)](https://github.com/ajhermosilla/homelab/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-docs.cronova.dev-00d4aa)](https://docs.cronova.dev)
+
 Personal infrastructure as code. Self-hosted services across three environments, connected by a Tailscale mesh network over cronova.dev.
 
 All services are named in **Guarani** (the indigenous language of Paraguay) as a nod to home. English descriptions follow each name.
