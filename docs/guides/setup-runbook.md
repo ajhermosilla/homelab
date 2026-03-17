@@ -89,6 +89,7 @@ docker compose logs -f
 ### 1.4 Configure DNS
 
 In Cloudflare, add A record:
+
 - `hs.cronova.dev` → `<vps-ip>`
 
 ### 1.5 Deploy VPS Caddy
@@ -139,9 +140,9 @@ docker compose up -d
 
 ### 1.8 Verify VPS
 
-- [ ] Headscale accessible at https://hs.cronova.dev
-- [ ] Pi-hole admin at http://<vps-ip>:8053
-- [ ] Uptime Kuma at http://<vps-ip>:3001
+- [ ] Headscale accessible at <https://hs.cronova.dev>
+- [ ] Pi-hole admin at <http://<vps-ip>:8053
+- [ ] Uptime Kuma at <http://<vps-ip>:3001
 
 ---
 
@@ -164,7 +165,7 @@ See `docs/guides/proxmox-setup.md` for detailed steps.
 
 1. Boot Mini PC from Proxmox USB
 2. Complete installation wizard
-3. Access web UI at https://192.168.0.237:8006
+3. Access web UI at <https://192.168.0.237:8006>
 4. Enable IOMMU (optional, for future PCI passthrough)
 5. Configure network bridges (vmbr0, vmbr1)
 
@@ -427,6 +428,7 @@ Install Tailscale via Start9 marketplace or manually.
 ### 6.3 Add to Frigate
 
 Edit `frigate.yml` with camera details:
+
 ```yaml
 cameras:
   front_door:
@@ -436,13 +438,14 @@ cameras:
 ```
 
 Restart Frigate:
+
 ```bash
 docker compose restart frigate
 ```
 
 ### 6.4 Verify Recordings
 
-1. Access Frigate at http://192.168.0.10:5000
+1. Access Frigate at <http://192.168.0.10:5000>
 2. Verify cameras show video
 3. Check recordings in /mnt/frigate
 

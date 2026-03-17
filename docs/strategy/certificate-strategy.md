@@ -6,11 +6,12 @@ SSL/TLS certificate management for homelab services.
 
 | Service Type | Method | Provider |
 |--------------|--------|----------|
+
 | Public (VPS) | Let's Encrypt (HTTP-01) | Caddy ACME |
 | Public (Static) | Cloudflare | Edge certificates |
 | Internal (Docker VM) | Let's Encrypt (DNS-01) | Caddy + Cloudflare DNS |
 
-**Decision:** Use **Let's Encrypt via Cloudflare DNS-01** for internal services. No ports open to internet required.
+**Decision:**Use**Let's Encrypt via Cloudflare DNS-01** for internal services. No ports open to internet required.
 
 ---
 
@@ -18,6 +19,7 @@ SSL/TLS certificate management for homelab services.
 
 | Component | Status | Notes |
 |-----------|--------|-------|
+
 | VPS Caddy + Let's Encrypt (HTTP-01) | Deployed | cronova.dev, hs, status, notify |
 | Cloudflare Edge | Deployed | DNS proxied |
 | Docker VM Caddy + Let's Encrypt (DNS-01) | Deployed | home, media, frigate, sonarr, radarr, prowlarr |
@@ -33,6 +35,7 @@ SSL/TLS certificate management for homelab services.
 
 | Factor | DNS-01 (Cloudflare) | Internal CA | Tailscale HTTPS |
 |--------|---------------------|-------------|-----------------|
+
 | Headscale compatible | Yes | Yes | No |
 | Setup complexity | Low | Medium | N/A |
 | Device trust setup | None | Install CA on each device | None |
@@ -47,7 +50,7 @@ SSL/TLS certificate management for homelab services.
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                           INTERNET                                   │
 └────────────────────────────────┬────────────────────────────────────┘
@@ -87,13 +90,15 @@ vault.cronova.dev {
 }
 ```
 
-**How it works:**
+#### How it works
+
 1. Caddy detects HTTPS is needed
 2. Requests certificate from Let's Encrypt
 3. Completes HTTP-01 challenge automatically
 4. Renews 30 days before expiry
 
-**Requirements:**
+#### Requirements
+
 - Port 80/443 open to internet
 - DNS A record pointing to VPS IP
 - Valid email in Caddy global config
@@ -106,7 +111,7 @@ vault.cronova.dev {
 
 Docker VM runs a custom Caddy build with the `caddy-dns/cloudflare` plugin. Caddy proves domain ownership by creating a DNS TXT record via the Cloudflare API, then Let's Encrypt issues the certificate. No public ports required.
 
-```
+```text
 Caddy → Cloudflare API → _acme-challenge TXT record → Let's Encrypt validates → cert issued
 ```
 
@@ -160,12 +165,15 @@ Caddy handles renewal automatically — no cron jobs needed. Certificates renew 
 ### Edge Certificates
 
 Cloudflare provides free edge certificates for:
-- `www.cronova.dev` (Cloudflare Pages)
+
+- `<www.cronova.dev>` (Cloudflare Pages)
 - `docs.cronova.dev` (Cloudflare Pages)
 
-**Settings:**
+#### Settings
+
 | Option | Value |
 |--------|-------|
+
 | SSL/TLS Mode | Full (strict) |
 | Always Use HTTPS | On |
 | Minimum TLS | 1.2 |
@@ -195,10 +203,11 @@ www.verava.ai {
 
 | Domain | Type | Provider | Challenge | Auto-Renew |
 |--------|------|----------|-----------|------------|
+
 | status.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
 | notify.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
 | vault.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
-| www.cronova.dev | Edge | Cloudflare | N/A | Yes |
+| <www.cronova.dev> | Edge | Cloudflare | N/A | Yes |
 | docs.cronova.dev | Edge | Cloudflare | N/A | Yes |
 | jara.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
 | yrasema.cronova.dev | Let's Encrypt | Docker VM Caddy | DNS-01 (CF) | Yes |
@@ -218,6 +227,7 @@ Add certificate expiry monitoring:
 
 | Monitor | Type | Alert Threshold |
 |---------|------|-----------------|
+
 | status.cronova.dev | HTTPS | 14 days |
 | vault.cronova.dev | HTTPS | 14 days |
 | jara.cronova.dev | HTTPS | 14 days |
@@ -281,12 +291,14 @@ openssl x509 -in /etc/ssl/cloudflare/verava.ai.pem -noout -dates
 ## Implementation Checklist
 
 ### VPS (Let's Encrypt)
+
 - [x] Verify ports 80/443 open
 - [x] Configure Caddy with email
 - [x] Deploy Caddyfile
-- [x] Verify auto-cert: `curl -I https://status.cronova.dev`
+- [x] Verify auto-cert: `curl -I <https://status.cronova.dev`>
 
 ### Fixed Homelab (DNS-01 via Cloudflare)
+
 - [x] Custom Caddy build with caddy-dns/cloudflare plugin
 - [x] Cloudflare API Token (Zone/DNS/Edit + Zone/Zone/Read)
 - [x] Pi-hole local DNS entries for *.cronova.dev → 192.168.0.10
@@ -294,6 +306,7 @@ openssl x509 -in /etc/ssl/cloudflare/verava.ai.pem -noout -dates
 - [x] HTTPS working for home, media, frigate, sonarr, radarr, prowlarr
 
 ### Cloudflare
+
 - [x] Set SSL mode to Full (strict)
 - [x] Enable Always Use HTTPS
 - [ ] (Optional) Create origin certificate for VPS

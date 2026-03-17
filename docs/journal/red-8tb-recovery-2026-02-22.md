@@ -6,6 +6,7 @@ WD Red 8TB (WDC WD80EFBX-68AZZN0) GPT partition table destroyed. Drive was used 
 
 | Field | Value |
 |-------|-------|
+
 | Model | WDC WD80EFBX-68AZZN0 |
 | Capacity | 8001 GB / 7452 GiB |
 | Sectors | 15,628,053,168 (512-byte logical) |
@@ -31,7 +32,7 @@ WD Red 8TB (WDC WD80EFBX-68AZZN0) GPT partition table destroyed. Drive was used 
 
 ### Most Likely: Sabrent USB Enclosure Sector Size Translation (HIGH probability)
 
-The WD80EFBX is a **512e drive** (512-byte logical, 4096-byte physical). Sabrent USB enclosures with JMicron controllers are documented to **silently translate drives >2TB to report 4096-byte logical sectors** to the host OS.
+The WD80EFBX is a **512e drive**(512-byte logical, 4096-byte physical). Sabrent USB enclosures with JMicron controllers are documented to**silently translate drives >2TB to report 4096-byte logical sectors** to the host OS.
 
 - GPT partition tables use sector numbers for addresses
 - If the sector size changes from 512 to 4096 (or vice versa), every address is off by 8x
@@ -40,7 +41,8 @@ The WD80EFBX is a **512e drive** (512-byte logical, 4096-byte physical). Sabrent
 
 This exactly matches the symptoms: GPT gone, backup GPT gone, but testdisk found Linux filesystem data.
 
-**Sources:**
+#### Sources
+
 - [Klennet: USB adapters silently change the sector size](https://www.klennet.com/notes/2018-04-14-usb-and-sector-size.aspx) — "Partition tables use physical sector size to compute addresses. Changing the physical sector size invalidates partition tables."
 - [Sabrent Community: EC-DFLT 4096 Bytes sector problem](https://sabrent.com/community/xenforum/topic/88640/ec-dflt-4096-bytes-sector-problem-firmware-update) — JMicron controller "changes the reported size for drives >2TB back to 4096 Bytes." Firmware update available but must be requested from Sabrent support.
 - [Level1Techs: PSA don't change sector size of external USB WD drives](https://forum.level1techs.com/t/psa-dont-change-sector-size-of-external-usb-wd-drives/191317) — "Changing sector sizes will most likely brick your drive."
@@ -68,6 +70,7 @@ Multiple factors from using Parallels and VMware Fusion on the same USB disk:
 
 | Rank | Cause | Probability |
 |------|-------|-------------|
+
 | 1 | Sabrent enclosure sector size translation (512e -> 4096) misaligning GPT writes | **High** |
 | 2 | Multiple VMs (Parallels + VMware Fusion) with unsynchronized disk access | **Moderate-High** |
 | 3 | macOS disk arbitration writing stale/incorrect metadata during VM handoff | **Moderate** |
@@ -86,7 +89,7 @@ Most probable scenario: the Sabrent enclosure's sector size translation caused t
 
 Ran during NAS deployment. Drive connected via SATA as `/dev/sdc`.
 
-```
+```bash
 $ lsblk -f /dev/sdc
 NAME FSTYPE FSVER LABEL UUID FSAVAIL FSUSE% MOUNTPOINTS
 sdc
@@ -99,7 +102,7 @@ $ sudo parted /dev/sdc print
 
 TestDisk 7.2 full disk analysis. Ran for ~12 hours on the 8TB drive.
 
-```
+```text
 Disk /dev/sdc - 8001 GB / 7452 GiB - CHS 972801 255 63
 
 The hard disk (8001 GB / 7452 GiB) seems too small! (< 9831486 TB / 8941685 TiB)
@@ -122,7 +125,7 @@ The following partitions can't be recovered:
 
 ### Step 3: Filesystem Signature Search (2026-02-22)
 
-```
+```bash
 $ sudo file -s /dev/sdc
 /dev/sdc: DOS/MBR boot sector; partition 1 : ID=0xee, start-CHS (0x0,0,1),
 end-CHS (0x3ff,254,63), startsector 1, 1953506645 sectors, extended partition
@@ -142,11 +145,11 @@ $ sudo gdisk -l /dev/sdc
 # Total free space is 15628053101 sectors (7.3 TiB)
 ```
 
-**Key finding:** `file -s -k` found a stale GPT header referencing **1,953,506,646 sectors of 4096 bytes**. But `gdisk` reads the drive as **15,628,053,168 sectors of 512 bytes**. These are the same total capacity (8TB) expressed in different sector sizes. This confirms the **sector size translation** theory — the GPT was written when the enclosure reported 4096-byte sectors.
+**Key finding:**`file -s -k` found a stale GPT header referencing**1,953,506,646 sectors of 4096 bytes**. But `gdisk` reads the drive as **15,628,053,168 sectors of 512 bytes**. These are the same total capacity (8TB) expressed in different sector sizes. This confirms the **sector size translation** theory — the GPT was written when the enclosure reported 4096-byte sectors.
 
 ### Step 4: Superblock Search (2026-02-22)
 
-```
+```bash
 # Primary superblock (byte 1080) — zeros
 $ sudo hexdump -C -s 1080 -n 2 /dev/sdc
 00000438  00 00
@@ -168,12 +171,13 @@ $ sudo grep -boa -P '\x53\xef' /dev/sdc | head -20
 ```
 
 **Analysis:** No ext4 superblock at any standard offset. The scattered `0x53EF` matches are within file data, not superblock copies. This suggests either:
+
 - The ext4 superblock was at a non-standard offset (due to 4096-byte sector addressing during format)
 - The superblock area was overwritten by the corrupted GPT writes
 
 ### Step 5: Sector Size Verification (2026-02-22)
 
-```
+```bash
 $ sudo lsblk -o NAME,PHY-SEC,LOG-SEC /dev/sdc
 NAME PHY-SEC LOG-SEC
 sdc     4096     512
@@ -183,9 +187,9 @@ Confirmed: 512e drive (512 logical / 4096 physical) via SATA. The Sabrent enclos
 
 ### Step 6: GPT Header Discovery (2026-02-22)
 
-Key insight: if the GPT was written with 4096-byte sectors, the GPT header is at **byte 4096** (LBA 1 * 4096), not byte 512 (where `gdisk` looks with 512-byte sectors).
+Key insight: if the GPT was written with 4096-byte sectors, the GPT header is at **byte 4096**(LBA 1* 4096), not byte 512 (where `gdisk` looks with 512-byte sectors).
 
-```
+```bash
 $ sudo hexdump -C -s 4096 -n 128 /dev/sdc
 00001000  45 46 49 20 50 41 52 54  00 00 01 00 5c 00 00 00  |EFI PART....\...|
 ```
@@ -196,7 +200,7 @@ $ sudo hexdump -C -s 4096 -n 128 /dev/sdc
 
 Created a loop device presenting the disk with 4096-byte sectors so tools read the GPT natively:
 
-```
+```bash
 $ sudo losetup --sector-size 4096 -r /dev/loop0 /dev/sdc
 $ sudo gdisk -l /dev/loop0
 GPT fdisk (gdisk) version 1.0.10
@@ -216,11 +220,11 @@ Number  Start (sector)    End (sector)  Size       Code  Name
    1            8191      1953504353   7.3 TiB     8300  primary
 ```
 
-**GPT is fully intact when read with correct sector size!**
+#### GPT is fully intact when read with correct sector size
 
 ### Step 8: Filesystem Recovery — SUCCESS (2026-02-22)
 
-```
+```bash
 $ sudo partprobe /dev/loop0
 $ sudo blkid /dev/loop0p1
 /dev/loop0p1: UUID="d42d005e-d53e-4224-b93d-7a9467e11174" BLOCK_SIZE="4096"
@@ -241,7 +245,7 @@ drwxr-xr-x  15 root    root     4096 Sep 14  2021 storage
 
 ### Step 9: Data Inventory (2026-02-22)
 
-```
+```bash
 $ du -sh /mnt/red8/Data
 5.2T    /mnt/red8/Data
 
@@ -271,6 +275,7 @@ Purple has 1.7TB free, selected ~1.2TB of critical data:
 
 | Directory | Size | Priority |
 |-----------|------|----------|
+
 | etc/ | 7.9M | Critical — old system configs |
 | scanner/ | 40M | Critical — scanned documents |
 | videos/ | 145G | Critical — family memories |

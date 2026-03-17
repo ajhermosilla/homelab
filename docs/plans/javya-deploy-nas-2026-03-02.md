@@ -33,6 +33,7 @@ cp .env.example .env
 ```
 
 Edit `.env` with production values:
+
 ```bash
 # Database
 POSTGRES_USER=javya
@@ -60,6 +61,7 @@ docker compose -f docker-compose.prod.yml ps
 ```
 
 Verify:
+
 ```bash
 # Check containers
 docker ps --filter name=javya --format 'table {{.Names}}\t{{.Status}}'
@@ -74,11 +76,13 @@ docker compose -f docker-compose.prod.yml logs -f
 ## Step 4: DNS (Pi-hole)
 
 Add to Pi-hole custom DNS (same as other `*.cronova.dev` services):
-```
+
+```text
 javya.cronova.dev → 192.168.0.10
 ```
 
 Pi-hole already resolves `*.cronova.dev` to Docker VM Caddy (192.168.0.10) if a wildcard is set. Verify:
+
 ```bash
 ssh docker-vm "dig javya.cronova.dev @127.0.0.1 +short"
 ```
@@ -93,17 +97,18 @@ Add to Caddyfile on Docker VM (`docker/fixed/docker-vm/networking/caddy/Caddyfil
 # Javya - Worship Planning
 # Deployed on NAS, proxied via Docker VM Caddy
 javya.cronova.dev {
-	import internal_tls
-	import security_headers
-	reverse_proxy 100.82.77.97:<PORT> {
-		header_up X-Real-IP {remote_host}
-	}
+    import internal_tls
+    import security_headers
+    reverse_proxy 100.82.77.97:<PORT> {
+        header_up X-Real-IP {remote_host}
+    }
 }
 ```
 
 Note: Replace `<PORT>` with the port exposed by `docker-compose.prod.yml` frontend container.
 
 Then reload Caddy:
+
 ```bash
 ssh docker-vm "cd /opt/homelab/repo/docker/fixed/docker-vm/networking/caddy && docker compose restart caddy"
 ```
@@ -136,12 +141,14 @@ Set up push mirror on Forgejo (same pattern as homelab/notes):
 ## Step 9: Mobile Access (Beryl AX)
 
 Add AdGuard DNS rewrite:
-```
+
+```text
 javya.cronova.dev → 100.82.77.97
 ```
 
 Or if routed through Docker VM Caddy:
-```
+
+```text
 javya.cronova.dev → 100.68.63.168
 ```
 
@@ -175,10 +182,11 @@ Schedule: 3:00 AM PYT (between HA 2:30 AM and Coolify 3:30 AM).
 
 | Container | RAM | CPU |
 |-----------|-----|-----|
+
 | javya-db | 512M | 1.0 |
 | javya-backend | 256M | 0.5 |
 | javya-frontend | 128M | 0.25 |
-| **Total** | **~900M** | **1.75** |
+| **Total**|**~900M**|**1.75** |
 
 NAS (i3-3220T, 8GB RAM) can handle this alongside existing 16 containers.
 
@@ -186,6 +194,7 @@ NAS (i3-3220T, 8GB RAM) can handle this alongside existing 16 containers.
 
 | Aspect | Katupyry | Javya |
 |--------|----------|-------|
+
 | NAS path | `~/deploy/katupyry/` | `~/deploy/javya/` |
 | Domain | `katupyry.cronova.dev` | `javya.cronova.dev` |
 | DB volume | `katupyry_postgres_data` | `javya_postgres_data` |

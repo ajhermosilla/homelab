@@ -4,7 +4,7 @@ Brand identity for cronova.dev and verava.ai. Created 2026-01-14.
 
 ## The Two Brands
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                      AUGUSTO HERMOSILLA                          │
 │                                                                  │
@@ -29,7 +29,7 @@ Brand identity for cronova.dev and verava.ai. Created 2026-01-14.
 
 ### Name Etymology
 
-```
+```text
 cron    +    nova
 ────         ────
 scheduled    new star
@@ -49,8 +49,9 @@ timing       brilliance
 
 | Element | Value |
 |---------|-------|
+
 | **Domain** | cronova.dev |
-| **Email** | augusto@cronova.dev |
+| **Email** | <augusto@cronova.dev> |
 | **GitHub Org** | github.com/cronova |
 | **Personal GitHub** | github.com/ajhermosilla |
 
@@ -59,7 +60,8 @@ timing       brilliance
 > **"Build weird. Ship fast."**
 
 Alternative taglines:
-- "0 * * * * /bin/innovate" (cron syntax flex)
+
+- "0 *** * /bin/innovate" (cron syntax flex)
 - "From localhost to the world"
 - "Open source. Open mind."
 - "Where side projects ship"
@@ -76,6 +78,7 @@ Alternative taglines:
 
 | Attribute | Expression |
 |-----------|------------|
+
 | **Tone** | Geeky, irreverent, maker culture |
 | **Voice** | Technical but approachable |
 | **Personality** | The friend who shares their dotfiles |
@@ -101,6 +104,7 @@ Alternative taglines:
 
 | Color | Hex | Usage |
 |-------|-----|-------|
+
 | Terminal Green | #00FF00 | Accents, highlights |
 | Dark Background | #1a1a2e | Primary background |
 | Light Text | #eaeaea | Body text |
@@ -108,7 +112,7 @@ Alternative taglines:
 
 ### Logo Concepts
 
-```
+```text
 Option A: Cron Syntax
 ┌─────────────────┐
 │  * * * * *      │
@@ -135,7 +139,7 @@ Option C: Terminal
 
 ### Name Etymology
 
-```
+```text
 vera     +    .ai
 ────          ───
 true          artificial intelligence
@@ -157,8 +161,9 @@ real          data-driven
 
 | Element | Value |
 |---------|-------|
+
 | **Domain** | verava.ai |
-| **Email** | augusto@verava.ai (to configure) |
+| **Email** | <augusto@verava.ai> (to configure) |
 | **Focus** | Supply Chain + AI Consulting |
 
 ### Tagline
@@ -166,6 +171,7 @@ real          data-driven
 > **"From chaos to clarity"**
 
 Alternative taglines:
+
 - "True intelligence for supply chain"
 - "Predict. Optimize. Deliver."
 - "Supply chains don't lie. Neither do we."
@@ -184,6 +190,7 @@ Alternative taglines:
 
 | Attribute | Expression |
 |-----------|------------|
+
 | **Tone** | Professional, confident, transformational |
 | **Voice** | Expert but accessible |
 | **Personality** | The strategic advisor who delivers results |
@@ -209,6 +216,7 @@ Alternative taglines:
 
 | Color | Hex | Usage |
 |-------|-----|-------|
+
 | Trust Blue | #0077b6 | Primary brand color |
 | Clean White | #ffffff | Backgrounds |
 | Dark Navy | #023e8a | Text, headers |
@@ -216,7 +224,7 @@ Alternative taglines:
 
 ### Logo Concepts
 
-```
+```text
 Option A: Abstract Flow
 ┌─────────────────┐
 │    ∿∿∿→         │
@@ -244,6 +252,7 @@ Option C: Clean Text
 
 | Aspect | cronova.dev | verava.ai |
 |--------|-------------|-----------|
+
 | **Tagline** | "Build weird. Ship fast." | "From chaos to clarity" |
 | **Tone** | Geeky, irreverent | Professional, confident |
 | **Audience** | Developers, makers | Executives, enterprises |
@@ -267,13 +276,13 @@ Option C: Clean Text
 
 ### Long Version
 
-> **Augusto Hermosilla** is a developer and consultant based in Paraguay. He runs **Verava** (verava.ai), helping supply chain companies leverage AI for better decisions. He also builds open source tools and micro SaaS products at **Cronova** (cronova.dev).
+> **Augusto Hermosilla**is a developer and consultant based in Paraguay. He runs**Verava**(verava.ai), helping supply chain companies leverage AI for better decisions. He also builds open source tools and micro SaaS products at**Cronova** (cronova.dev).
 >
 > With a background in software engineering and a passion for self-hosted infrastructure, Augusto believes in digital sovereignty—owning your data, your servers, and your destiny. His homelab runs on the same principles he brings to enterprise clients: simplicity, automation, and relentless optimization.
 >
 > When not coding or consulting, he's probably tweaking his dotfiles or researching 3D-printable Raspberry Pi cases.
 >
-> **Contact:** augusto@cronova.dev
+> **Contact:** <augusto@cronova.dev>
 > **GitHub:** github.com/ajhermosilla
 > **Organization:** github.com/cronova
 
@@ -283,6 +292,7 @@ Option C: Clean Text
 
 | Platform | cronova.dev | verava.ai |
 |----------|-------------|-----------|
+
 | Twitter/X | @cronova_dev | @verava_ai |
 | LinkedIn | /company/cronova | /company/verava-ai |
 | GitHub | /cronova | - |
@@ -296,6 +306,7 @@ Option C: Clean Text
 
 | Audience | Message |
 |----------|---------|
+
 | **Developers** | "Tools built by a developer, for developers. No bloat. No BS." |
 | **Open Source** | "Free as in freedom. Fork it, break it, make it yours." |
 | **Indie Hackers** | "Your side project deserves real infrastructure." |
@@ -305,6 +316,7 @@ Option C: Clean Text
 
 | Audience | Message |
 |----------|---------|
+
 | **C-Suite** | "AI that delivers ROI, not just reports." |
 | **Operations** | "See problems before they become crises." |
 | **IT Leaders** | "AI that integrates, not complicates." |
@@ -334,7 +346,7 @@ Option C: Clean Text
 
 ## The Cronova Manifesto
 
-```
+```text
 WE BELIEVE:
 
 That software should be owned, not rented.
@@ -365,7 +377,7 @@ Build weird. Ship fast.
 
 ## The Verava Promise
 
-```
+```text
 TO OUR CLIENTS:
 
 We will tell you the truth about your supply chain.

@@ -6,6 +6,7 @@ Step-by-step guide to deploy the Raspberry Pi 5 as an OpenClaw AI assistant node
 
 | Component | Model | Notes |
 |-----------|-------|-------|
+
 | Board | Raspberry Pi 5 8GB | OpenClaw AI assistant |
 | Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
@@ -32,7 +33,7 @@ docker exec headscale headscale preauthkeys create --expiration 1h
 
 ### 2. Add OPNsense DHCP Reservation
 
-- Login to OPNsense via Tailscale: https://100.79.230.235
+- Login to OPNsense via Tailscale: <https://100.79.230.235>
 - Services > DHCPv4 > LAN
 - Add reservation: MAC -> 192.168.0.20 (get MAC from RPi 5 board sticker)
 
@@ -61,17 +62,20 @@ docker exec headscale headscale preauthkeys create --expiration 1h
 ## Pre-Deployment Checklist
 
 ### Hardware Ready
+
 - [ ] RPi 5 board with active cooler attached
 - [ ] 32GB SD card flashed with Pi OS (hostname: rpi5, user: augusto)
 - [ ] 27W PSU available
 - [ ] Ethernet cable to MokerLink switch
 
 ### Network Ready
+
 - [ ] MokerLink switch port available
 - [ ] OPNsense DHCP reservation: 192.168.0.20 -> RPi 5 MAC
 - [ ] Pi-hole DNS entry: rpi5.home -> 192.168.0.20
 
 ### Software Ready
+
 - [ ] Tailscale auth key from Headscale (generate day-of, 1h expiry)
 - [ ] OpenClaw API keys saved in Vaultwarden
 
@@ -193,7 +197,7 @@ curl http://localhost:18789
 
 Edit `~/.ssh/config` on MacBook:
 
-```
+```bash
 # RPi 5 - OpenClaw (Tailscale)
 Host rpi5
     HostName <rpi5-tailscale-ip>
@@ -207,10 +211,11 @@ Edit `ansible/inventory.yml` — replace LAN IP with Tailscale IP for the `rpi5`
 
 ### 3. Add Uptime Kuma Monitor
 
-Via web UI at https://status.cronova.dev:
+Via web UI at <https://status.cronova.dev:>
+
 - **Name:** OpenClaw Gateway
 - **Type:** HTTP(s)
-- **URL:** http://<rpi5-tailscale-ip>:18789
+- **URL:** <http://<rpi5-tailscale-ip>:18789
 - **Interval:** 60s
 
 ### 4. Update Hardware Doc
@@ -305,6 +310,7 @@ If something goes wrong:
 
 | Phase | Estimate |
 |-------|----------|
+
 | Physical setup | 5 min |
 | SSH + key copy | 2 min |
 | Ansible playbooks | 10-15 min |

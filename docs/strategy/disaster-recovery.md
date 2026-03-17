@@ -4,7 +4,7 @@ Procedures for recovering from failures across all homelab environments.
 
 ## Quick Reference — Emergency Cheat Sheet
 
-**Recovery priority order:**
+#### Recovery priority order
 
 1. **Headscale** (VPS) — mesh network dies without it
 2. **Pi-hole** (Docker VM) — DNS resolution
@@ -13,23 +13,26 @@ Procedures for recovering from failures across all homelab environments.
 5. **Home Assistant** (Docker VM) — automations
 6. Everything else
 
-**SSH access:**
+#### SSH access
 
 | Host | Command | User |
 |------|---------|------|
+
 | VPS | `ssh vps` | `linuxuser` |
 | Docker VM | `ssh docker-vm` | `augusto` |
 | NAS | `ssh nas` | `augusto` |
 | Proxmox | `ssh proxmox` | `root` |
 
-**Restic REST server:**
-```
+#### Restic REST server
+
+```text
 http://augusto:<PASS>@192.168.0.12:8000/augusto/<service>
 ```
 
 **ntfy alerts:** `https://notify.cronova.dev` (topics: `cronova-critical`, `cronova-warning`, `cronova-info`)
 
-**Compose file locations:**
+#### Compose file locations
+
 - Docker VM: `/opt/homelab/repo/docker/fixed/docker-vm/`
 - NAS: `/opt/homelab/repo/docker/fixed/nas/`
 - VPS: `/opt/homelab/headscale/`, `/opt/homelab/caddy/`
@@ -40,9 +43,9 @@ http://augusto:<PASS>@192.168.0.12:8000/augusto/<service>
 
 ### How Backups Work
 
-All backups use **Restic** with a centralized REST server on the NAS. Each backed-up service has a dedicated **sidecar container** that runs the shared backup script on a cron schedule.
+All backups use **Restic**with a centralized REST server on the NAS. Each backed-up service has a dedicated**sidecar container** that runs the shared backup script on a cron schedule.
 
-```
+```text
 [Vaultwarden Sidecar]──┐
 [HA Sidecar]────────────┤
 [Paperless Sidecar]─────┼──► Restic REST Server (NAS :8000) ──► /mnt/purple/backup/restic/
@@ -52,10 +55,11 @@ All backups use **Restic** with a centralized REST server on the NAS. Each backe
 [Headscale Sidecar]──► Local backup on VPS (separate — hourly tar.gz)
 ```
 
-**Components:**
+#### Components
 
 | Component | Details |
 |-----------|---------|
+
 | REST server | `restic/rest-server:0.14.0` on NAS, port 8000 |
 | Data path | `/mnt/purple/backup/restic/` (WD Purple 2TB) |
 | Auth | htpasswd file, `--private-repos` (forces `/username/` prefix) |
@@ -69,6 +73,7 @@ All times in PYT (America/Asuncion).
 
 | Service | Container | Schedule | Repository | What's Backed Up |
 |---------|-----------|----------|------------|------------------|
+
 | Headscale | headscale-backup | Hourly | VPS local (`/backup/`) | SQLite DB + noise key + config |
 | Vaultwarden | vaultwarden-backup | 2:00 AM daily | `/augusto/vaultwarden` | vaultwarden-data volume |
 | Home Assistant | homeassistant-backup | 2:30 AM daily | `/augusto/homeassistant` | homeassistant-config volume |
@@ -83,11 +88,12 @@ All times in PYT (America/Asuncion).
 
 | Target | Location | Contents | Status |
 |--------|----------|----------|--------|
+
 | Restic REST (NAS) | `/mnt/purple/backup/restic/` | Vaultwarden, HA, Paperless, Immich, Coolify | Active (WD Purple 2TB, **97% full**) |
 | VPS local | `/backup/` in headscale-backup container | Headscale SQLite + config | Active (hourly) |
 | Google Drive (encrypted) | `gdrive-crypt:homelab/` | Restic repos + Headscale backups | Active (4:30 AM daily, rclone crypt) |
 
-**Known gaps — documented honestly:**
+#### Known gaps — documented honestly
 
 - **WD Purple at 97% capacity** — Restic pruning keeps it in check, but monitor closely
 - **WD Red Plus 8TB** installed in NAS but partition needs recovery/reformatting (see `journal/red-8tb-recovery-2026-02-22.md`)
@@ -97,6 +103,7 @@ All times in PYT (America/Asuncion).
 ### Notification Integration
 
 Backup success/failure notifications use `scripts/backup-notify.sh`:
+
 - Failures → `cronova-critical` (urgent priority)
 - Success → `cronova-info` (default priority)
 - Script sends to `https://notify.cronova.dev` with service-specific tags
@@ -111,7 +118,7 @@ Backup success/failure notifications use `scripts/backup-notify.sh`:
 
 **Symptoms:** Tailscale clients show "Unable to connect to coordination server", no ntfy alerts
 
-**Recovery:**
+#### Recovery
 
 ```bash
 # 1. Provision new Vultr instance (Debian, $6/mo, any region)
@@ -155,7 +162,7 @@ tailscale up --login-server=https://hs.cronova.dev
 
 **Impact:** All Docker VM services (33 containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
 
-**Recovery:**
+#### Recovery
 
 ```bash
 # 1. Recreate VM in Proxmox (VM 101)
@@ -229,7 +236,7 @@ gunzip -c /tmp/immich-restore/backup/immich-db.sql.gz | \
 
 **Impact:** Forgejo (git), Coolify (PaaS), Samba (file shares), Syncthing (sync), Restic REST (backup target), NFS exports (Frigate recordings, media)
 
-**Recovery:**
+#### Recovery
 
 ```bash
 # 1. NAS boots from USB (Generic Flash Disk 3.7GB) — must stay plugged in
@@ -269,7 +276,7 @@ sudo exportfs -ra
 
 **Impact:** Password access (cached copies work temporarily on devices)
 
-**Recovery:**
+#### Recovery
 
 ```bash
 ssh docker-vm
@@ -303,7 +310,7 @@ rm -rf /tmp/vw-restore
 
 ### Scenario 5: Home Assistant Corruption
 
-**Recovery:**
+#### Recovery
 
 ```bash
 ssh docker-vm
@@ -334,7 +341,7 @@ rm -rf /tmp/ha-restore
 
 **Impact:** Document management — scanned documents, OCR data, tags
 
-**Recovery:**
+#### Recovery
 
 ```bash
 ssh docker-vm
@@ -374,7 +381,7 @@ rm -rf /tmp/paperless-restore
 
 **Impact:** Photo metadata, albums, face recognition data, user settings. Photos themselves are safe on NAS.
 
-**Recovery:**
+#### Recovery
 
 ```bash
 ssh docker-vm
@@ -412,7 +419,7 @@ rm -rf /tmp/immich-restore
 
 **What survives:** VPS keeps running (Headscale, Uptime Kuma, ntfy, Caddy)
 
-**Recovery plan:**
+#### Recovery plan
 
 1. VPS services continue operating — mesh network and external monitoring intact
 2. Once power/access restored, boot Proxmox (auto-boot on AC power loss)
@@ -421,13 +428,15 @@ rm -rf /tmp/immich-restore
 5. NAS boots from USB — all containers recreated from compose files
 6. If hardware destroyed: rebuild from Forgejo repo + Restic backups on NAS
 
-**If NAS is also destroyed:**
+#### If NAS is also destroyed
+
 - Git history: clone from GitHub mirror (TODO: set up Forgejo → GitHub mirror)
 - Compose files: in this git repo
 - Secrets: in Vaultwarden (cached on devices) + .env.example templates
 - Restic data: restore from Google Drive offsite (see below)
 
-**Restoring from Google Drive offsite:**
+#### Restoring from Google Drive offsite
+
 ```bash
 # 1. Install rclone, restore rclone.conf from Vaultwarden backup
 brew install rclone  # or apt install rclone
@@ -449,7 +458,8 @@ rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 
 **All backups become unrecoverable.** Restic encryption is AES-256 — no backdoor.
 
-**Prevention:**
+#### Prevention
+
 - Password stored in Vaultwarden
 - Physical copy in secure location
 - RESTIC_PASSWORD is identical across all stacks (one password to remember, but one password to lose)
@@ -462,6 +472,7 @@ rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 
 | Script | Purpose | Location |
 |--------|---------|----------|
+
 | `scripts/backup-verify.sh` | Monthly backup audit (8 test suites) | Docker VM |
 | `scripts/backup-verify.sh --full` | Quarterly full restore drill | Docker VM |
 | `scripts/backup-notify.sh` | ntfy notifications for backup events | Docker VM |
@@ -470,6 +481,7 @@ rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 
 | Task | Frequency | Procedure |
 |------|-----------|-----------|
+
 | Repository health check | Weekly (auto, Sundays) | Built into `restic-backup.sh` |
 | Snapshot freshness | Monthly (1st Sunday) | `backup-verify.sh` |
 | Test restore (Headscale, VW, HA, Paperless, Immich) | Monthly (1st Sunday) | `backup-verify.sh` |

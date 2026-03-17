@@ -8,7 +8,7 @@
 
 ## Current Topology
 
-```
+```text
 ISP coax → ARRIS TG2482 (bridge mode) → TP-Link AX50 (public IP, router/DHCP)
                                               ↓
                                            Switch
@@ -23,7 +23,7 @@ ISP coax → ARRIS TG2482 (bridge mode) → TP-Link AX50 (public IP, router/DHCP
 
 ## Target Topology
 
-```
+```text
 ISP coax → ARRIS TG2482 (bridge mode)
                 ↓ ethernet
          Proxmox NIC 1 (vmbr0) → OPNsense WAN (public IP via DHCP)
@@ -41,6 +41,7 @@ ISP coax → ARRIS TG2482 (bridge mode)
 
 | Device | Role (current) | Role (target) |
 |--------|---------------|---------------|
+
 | ARRIS TG2482 | DOCSIS 3.0 modem (bridge mode already) | Bridge mode (no change) |
 | TP-Link AX50 | Router, DHCP, WiFi (holds public IP) | AP mode (WiFi only) |
 | OPNsense (VM) | Internal firewall/router | Internet gateway, DHCP, firewall |
@@ -50,15 +51,18 @@ ISP coax → ARRIS TG2482 (bridge mode)
 
 | Physical NIC | Bridge | MAC | Current state | Cable |
 |-------------|--------|-----|---------------|-------|
+
 | `nic0` | `vmbr0` | c8:ff:bf:06:13:f7 | UP | Switch (192.168.0.x network) |
-| `nic1` | `vmbr1` | c8:ff:bf:06:13:f8 | **DOWN** | **No cable** |
+| `nic1` | `vmbr1` | c8:ff:bf:06:13:f8 | **DOWN**|**No cable** |
 
 | VM | ID | net0 | net1 |
 |----|-----|------|------|
+
 | OPNsense | 100 | `vmbr0` (WAN) | `vmbr1` (LAN) |
 | Docker | 101 | `vmbr1` (LAN only) | — |
 
-**Key findings:**
+#### Key findings
+
 - `nic1`/`vmbr1` has no physical cable — Docker-vm reaches internet via OPNsense routing (vmbr1 → vmbr0)
 - Proxmox management IP (`192.168.0.237/24`) is on `vmbr0` — must migrate to `vmbr1` before cutover
 - After cutover: `vmbr0` = WAN (public IP), `vmbr1` = LAN (192.168.0.0/24)
@@ -67,6 +71,7 @@ ISP coax → ARRIS TG2482 (bridge mode)
 
 | Device | Current IP | New IP |
 |--------|-----------|--------|
+
 | OPNsense LAN | 192.168.1.1 | **192.168.0.1** |
 | Docker-vm | 192.168.1.10 | **192.168.0.10** |
 | Pi-hole (container) | 192.168.1.10 (host) | **192.168.0.10** (host) |
@@ -108,13 +113,15 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
 > on the same subnet causes routing conflicts. These must happen during Phase 2, after the
 > cable swap gives WAN a public IP.
 
-**Verified (prep):**
+#### Verified (prep)
+
 - [x] WAN interface: DHCP (IPv4 + IPv6), Block private/bogon networks enabled
 - [x] Firewall: LAN → any allow-all (IPv4 + IPv6) rules exist
 - [x] NAT: Automatic outbound NAT, covers GUEST/IOT/LAN networks
 - [x] Existing interfaces: GUEST and IOT already configured
 
-**Deferred to Phase 2 (after cable swap):**
+#### Deferred to Phase 2 (after cable swap)
+
 - [ ] Change LAN interface: `192.168.1.1/24` → `192.168.0.1/24`
 - [ ] Set up DHCP server on LAN:
   - Range: `192.168.0.100` – `192.168.0.250`
@@ -134,20 +141,23 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
 
 226 replacements across 38 files (commit `ca99bfc`). Remote configs also updated (2026-02-09):
 
-**Compose files:**
+#### Compose files
+
 - [x] `docker/fixed/docker-vm/security/docker-compose.yml` — NFS mount IP, Restic repository URL
 - [x] `docker/fixed/docker-vm/networking/caddy/` — Caddy bind address
 - [x] `docker/fixed/nas/storage/docker-compose.yml` — NFS exports
 - [x] `docker/fixed/nas/backup/docker-compose.yml` — REST server references
 
-**Infrastructure:**
+#### Infrastructure
+
 - [x] `ansible/inventory.yml` — Docker-vm host IP, local_network var
 - [x] `~/.ssh/config` — not affected (uses Tailscale IPs)
 - [x] Pi-hole TOML — `nas.home` + `syncthing.home` DNS entries (updated live on docker-vm)
 - [x] Caddy config on Docker-vm — TLS bindings (updated live, container restarted)
 - [x] NAS deployment plan — all 192.168.1.x references
 
-**Documentation:**
+#### Documentation
+
 - [x] `docs/nas-deployment-plan.md`
 - [x] `docs/network-topology.md`
 - [x] `docs/vlan-design.md`
@@ -164,7 +174,7 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
 
 ## Phase 2: Cutover (~15 Min Downtime)
 
-**Do this when nobody is streaming. Ideally early morning.**
+#### Do this when nobody is streaming. Ideally early morning
 
 > **Note:** ARRIS TG2482 is already in bridge mode — no modem changes needed.
 > Two cable changes + OPNsense LAN re-IP + Docker-vm re-IP required.
@@ -182,13 +192,16 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
    - Plug a cable from Proxmox `nic1` into the switch (currently has no cable)
    - Verify `nic1` shows link UP: `ssh proxmox "ip link show nic1 | grep 'state UP'"`
 3. **Apply Proxmox network config:**
+
    ```bash
    ssh proxmox "sudo cp /etc/network/interfaces.cutover /etc/network/interfaces && sudo cp /etc/network/interfaces.d/vmbr1.cutover /etc/network/interfaces.d/vmbr1 && sudo ifreload -a"
    ```
+
    This moves Proxmox management IP from `vmbr0` to `vmbr1` (now on switch).
    Verify: `ssh proxmox "ip -br addr show vmbr1"` — should show `192.168.0.237/24`.
    > **Note:** Proxmox gateway (`192.168.0.1`) won't work until step 7 (OPNsense LAN re-IP).
    > Local SSH still works. Tailscale/internet will be down on Proxmox until then.
+
 4. **Swap ISP cable to `nic0`:**
    - Unplug ISP ethernet from TP-Link WAN port → plug into Proxmox `nic0`
    - Unplug old switch cable from `nic0` (no longer needed — `nic1` is on switch now)
@@ -207,12 +220,15 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
    - Add static mappings: Docker-vm `192.168.0.10` (MAC `BC:24:11:A8:E9:C5`)
    - *(Proxmox gateway now works — Tailscale reconnects automatically)*
 8. **Re-IP Docker-vm:**
+
    ```bash
    # SSH via Proxmox console (Tailscale on docker-vm is down — its gateway 192.168.1.1 is gone)
    ssh proxmox "sudo qm guest exec 101 -- bash -c 'ip addr del 192.168.1.10/24 dev ens18; ip addr add 192.168.0.10/24 dev ens18; ip route add default via 192.168.0.1'"
    # Then make persistent: edit /etc/network/interfaces on docker-vm
    ```
+
    Or if qm guest exec doesn't work, use Proxmox web UI > VM 101 > Console.
+
 9. **Test from phone:**
    - Disconnect/reconnect WiFi
    - Should get `192.168.0.x` IP
@@ -243,19 +259,23 @@ Proxmox management must move from `vmbr0` (becomes WAN) to `vmbr1` (becomes LAN)
 
 If anything breaks during cutover:
 
-**If failed before step 7 (OPNsense LAN still 192.168.1.x):**
+#### If failed before step 7 (OPNsense LAN still 192.168.1.x)
+
 1. Revert Proxmox network config:
+
    ```bash
    ssh proxmox "sudo cp /etc/network/interfaces.original /etc/network/interfaces && sudo cp /etc/network/interfaces.d/vmbr1.original /etc/network/interfaces.d/vmbr1 && sudo ifreload -a"
    ```
-2. Unplug ISP cable from Proxmox `nic0` → plug back into TP-Link WAN port
-3. Reconnect Proxmox `nic0` to switch (restore original cable)
-4. Disconnect `nic1` from switch (return to original state)
-5. Switch TP-Link back to router mode (reboot restores if needed)
-6. ARRIS stays in bridge mode (no change needed)
-7. Everything back to normal — family resumes Netflix
 
-**If failed after step 7 (OPNsense LAN already changed to 192.168.0.x):**
+1. Unplug ISP cable from Proxmox `nic0` → plug back into TP-Link WAN port
+1. Reconnect Proxmox `nic0` to switch (restore original cable)
+1. Disconnect `nic1` from switch (return to original state)
+1. Switch TP-Link back to router mode (reboot restores if needed)
+1. ARRIS stays in bridge mode (no change needed)
+1. Everything back to normal — family resumes Netflix
+
+#### If failed after step 7 (OPNsense LAN already changed to 192.168.0.x)
+
 1. Revert OPNsense LAN: Interfaces > LAN → change back to `192.168.1.1/24`, Apply
 2. Revert Docker-vm IP if changed: `192.168.0.10` → `192.168.1.10`, gateway `192.168.1.1`
 3. Then follow the steps above (revert Proxmox config, re-cable, TP-Link back to router mode)
@@ -266,6 +286,7 @@ If anything breaks during cutover:
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|-----------|------------|
+
 | OPNsense doesn't get public IP | No internet | Low | Plug cable back into TP-Link (1 min) |
 | WiFi devices don't reconnect | No WiFi | Very low | Same SSID/password = auto-reconnect |
 | OPNsense DHCP issues | Devices get no IPs | Low | Rollback to TP-Link |

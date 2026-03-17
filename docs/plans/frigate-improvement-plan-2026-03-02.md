@@ -33,6 +33,7 @@ Applied `fps: 5` globally and per-camera. OpenVINO GPU at ~15ms handles 15 detec
 Current config retains 2 days of motion recordings with no separate alert/detection retention. Important events (person in driveway) are deleted with routine footage.
 
 **Change**:
+
 ```yaml
 record:
   enabled: true
@@ -76,6 +77,7 @@ Downscaled go2rtc transcode from 1080x1920 to 360x640 (`scale=360:640` in ffmpeg
 Current: 2-day retention, no timestamp, default quality (70).
 
 **Change**:
+
 ```yaml
 snapshots:
   enabled: true
@@ -120,6 +122,7 @@ Currently only `person` triggers alerts in the driveway. Adding `car` would noti
 ## Execution Plan
 
 **Phase 1 — COMPLETE (2026-03-02)**:
+
 - ~~Item 1: Increase detect FPS to 5~~
 - ~~Item 3: Reduce retention to 1 day (option C)~~
 - ~~Item 4: Tune motion contour_area~~
@@ -127,6 +130,7 @@ Currently only `person` triggers alerts in the driveway. Adding `car` would noti
 - ~~Item 6: Indoor camera CPU optimization~~ (2026-03-09)
 
 **Phase 2 — After new 8TB HDD (blocked on purchase)**:
+
 - Item 2: Event-based retention (14 days alerts, 7 days detections)
 - Item 7: Snapshot retention to 7 days
 - Item 8-10: Zone and alert refinements

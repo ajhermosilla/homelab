@@ -37,6 +37,7 @@ Deployed at `/root/wan_watchdog.sh` on OPNsense. Runs every 5 minutes via cron. 
 
 | Step | Method | What It Does |
 |------|--------|-------------|
+
 | 1 | `configctl interface reconfigure wan` | OPNsense-native, keeps system state consistent |
 | 2 | `dhclient -r` + `dhclient` | Full DHCP release/renew cycle |
 | 3 | `ifconfig down/up` + `dhclient` | Nuclear option — full interface reset |
@@ -54,6 +55,7 @@ Each step waits 30 seconds and re-tests connectivity before escalating.
 
 | File | Purpose |
 |------|---------|
+
 | `/root/wan_watchdog.sh` | Watchdog script |
 | `/usr/local/opnsense/service/conf/actions.d/actions_wanwatchdog.conf` | configd action (enables cron integration) |
 | `/etc/newsyslog.conf.d/wan_watchdog.conf` | Log rotation config |
@@ -61,7 +63,7 @@ Each step waits 30 seconds and re-tests connectivity before escalating.
 
 ### Cron Job
 
-- **Schedule**: `*/5 * * * *` (every 5 minutes)
+- **Schedule**: `*/5 *** *` (every 5 minutes)
 - **Location**: System > Settings > Cron in OPNsense web UI
 
 ## OPNsense Settings to Review

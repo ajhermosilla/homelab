@@ -32,7 +32,7 @@ The tailscaled daemon **is working correctly** - it's the GL.iNet wrapper that's
 
 ## Research Sources
 
-- GL.iNet Forum: https://forum.gl-inet.com/t/tailscale-settings-lost-on-reboot/31524
+- GL.iNet Forum: <https://forum.gl-inet.com/t/tailscale-settings-lost-on-reboot/31524>
 - Multiple users report identical behavior
 - Community consensus: Must modify `/usr/sbin/gl_tailscale` script
 
@@ -98,7 +98,8 @@ tailscale up \
   --hostname=beryl-ax
 ```
 
-**Important notes:**
+#### Important notes
+
 - Replace `<YOUR_PRE_AUTH_KEY>` with the actual key from step 3
 - Keep the `--authkey` parameter - this allows automatic re-registration
 - Use `--reusable` and long expiration when generating the key
@@ -138,7 +139,7 @@ ssh vps 'sudo docker exec headscale headscale nodes list'
 
 If you only need basic Tailscale features (no custom login server), use the built-in GUI:
 
-1. Web UI: http://192.168.8.1
+1. Web UI: <http://192.168.8.1>
 2. Applications > Tailscale
 3. Configure through GUI
 
@@ -159,7 +160,7 @@ If you only need basic Tailscale features (no custom login server), use the buil
 
 ### Can't connect to Headscale
 
-- Check VPS is reachable: `curl -I https://hs.cronova.dev`
+- Check VPS is reachable: `curl -I <https://hs.cronova.dev`>
 - Verify pre-auth key is valid: regenerate if needed
 - Check logs: `logread | grep tailscale`
 
@@ -184,6 +185,7 @@ After successful implementation:
 **Backup created:** `/usr/bin/gl_tailscale.backup`
 
 **Line modified:** Near end of script, the `tailscale up` command:
+
 ```bash
 timeout 10 /usr/sbin/tailscale up --reset --accept-routes $param --timeout 3s --accept-dns=false --login-server=https://hs.cronova.dev --authkey=<KEY> --hostname=beryl-ax > /dev/null
 ```

@@ -6,6 +6,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Component | Details |
 |-----------|---------|
+
 | Model | GL.iNet Beryl AX (GT-MT3000) |
 | CPU | MediaTek MT7981B 1.3GHz dual-core (Arm Cortex-A53) |
 | RAM / Flash | 512MB / 256MB |
@@ -21,7 +22,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 1. Unbox, connect USB-C power
 2. Connect to `GL-MT3000-xxx` WiFi (password on device label)
-3. Access admin panel: https://192.168.8.1 (accept self-signed cert warning)
+3. Access admin panel: <https://192.168.8.1> (accept self-signed cert warning)
 4. Set admin password
 5. Configure WiFi SSID and password
 
@@ -29,6 +30,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Setting | Value |
 |---------|-------|
+
 | SSID 2.4GHz | `mbohapy` |
 | SSID 5GHz | `mbohapy-5G` |
 | WiFi Password | (stored in KeepassXC) |
@@ -50,6 +52,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Mode | Use Case |
 |------|----------|
+
 | Router | Connect to ethernet WAN |
 | Repeater | Extend existing WiFi |
 | Access Point | Create WiFi from ethernet |
@@ -58,7 +61,7 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 ### Default Settings
 
-- Admin panel: https://192.168.8.1 (HTTP also works)
+- Admin panel: <https://192.168.8.1> (HTTP also works)
 - LAN subnet: `192.168.8.0/24`
 - DHCP range: `192.168.8.100-200`
 
@@ -68,15 +71,16 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Option | Base | Pros | Cons |
 |--------|------|------|------|
+
 | **Stock GL.iNet** | OpenWrt 21.02 | Easy UI, VPN presets, toggle switch | Older kernel |
 | **GL.iNet Open Source** | OpenWrt 23.05 | Latest kernel, open WiFi drivers | May lose some GL features |
 | **Vanilla OpenWrt** | OpenWrt 23.05.x | Full control, latest packages | Flashing issues, no GL.iNet UI |
 
 ### Firmware URLs
 
-- Stock: https://www.gl-inet.com/support/firmware-versions/
-- Open Source: https://forum.gl-inet.com/t/mt3000-beryl-ax-open-source-wifi-driver-firmware/36607
-- Vanilla OpenWrt: https://firmware-selector.openwrt.org (mediatek/filogic, glinet_gl-mt3000)
+- Stock: <https://www.gl-inet.com/support/firmware-versions/>
+- Open Source: <https://forum.gl-inet.com/t/mt3000-beryl-ax-open-source-wifi-driver-firmware/36607>
+- Vanilla OpenWrt: <https://firmware-selector.openwrt.org> (mediatek/filogic, glinet_gl-mt3000)
 
 ### Flashing Notes
 
@@ -108,6 +112,7 @@ tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --authkey
 ```
 
 **If disconnected/logged out**, reset and re-register:
+
 ```bash
 tailscale down
 tailscale logout
@@ -116,6 +121,7 @@ tailscale up --login-server=https://hs.cronova.dev --hostname=beryl-ax --authkey
 ```
 
 Verify:
+
 ```bash
 tailscale status
 /etc/init.d/tailscale enabled && echo "Auto-start enabled" || echo "Not enabled"
@@ -133,11 +139,13 @@ tailscale set --exit-node=vps-vultr
 tailscale set --exit-node=
 ```
 
-**When to use:**
+#### When to use
+
 - Untrusted WiFi (hotels, cafes)
 - Need US IP for geo-restricted content
 
-**When NOT to use:**
+#### When NOT to use
+
 - Local banking (homebanking rejects VPS IPs)
 - Local streaming services
 - Normal browsing (adds latency)
@@ -148,17 +156,19 @@ Mobile kit uses two DNS ad-blockers for redundancy:
 
 | Device | Role | Why |
 |--------|------|-----|
+
 | Beryl AX | AdGuard Home (primary) | Built-in, lightweight, always on with router |
 | RPi 5 | Pi-hole (secondary) | Full-featured, but RPi 5 may be used for tinkering |
 
-**Setup:**
+#### Setup
+
 1. Enable AdGuard Home: Applications > AdGuard Home
 2. Configure upstream DNS (Cloudflare/Quad9)
 3. Optional: Add RPi 5 Pi-hole as fallback DNS in DHCP settings
 
 ### Travel Kit Configuration
 
-```
+```json
 [Hotel WiFi] --> [Beryl AX (Repeater)] --> [Your Devices]
                       |
                       +--> AdGuard Home (primary DNS, ad blocking)
@@ -188,6 +198,7 @@ wg show
 
 | Device | Role | IP |
 |--------|------|-----|
+
 | Beryl AX | Travel router, AdGuard Home (primary DNS) | 192.168.8.1 |
 | MacBook | Primary workstation | DHCP |
 | Phone (mombeu) | Mobile client | DHCP |
@@ -201,6 +212,7 @@ wg show
 
 | Service | Port | Bind Address | WAN Access | Status |
 |---------|------|--------------|------------|--------|
+
 | SSH | 22 | 192.168.8.1 | Blocked | ✓ LAN-only |
 | Admin UI | 80, 443 | 0.0.0.0 | Blocked (firewall) | ✓ Secured |
 | Admin UI | 8080, 8443 | 127.0.0.1 | N/A | ✓ Localhost |
@@ -209,7 +221,7 @@ wg show
 
 ### Firewall Rules
 
-```
+```text
 WAN → Default DROP policy
 LAN → ACCEPT (trusted)
 Tailscale → ACCEPT (trusted)
@@ -221,6 +233,7 @@ Tailscale → ACCEPT (trusted)
 
 | Component | Method | Status |
 |-----------|--------|--------|
+
 | Admin UI | Password | Set (KeepassXC) |
 | SSH | Password | Active (LAN-only, Tailscale OK) |
 | AdGuard Home | None | No login configured |
@@ -231,14 +244,16 @@ Tailscale → ACCEPT (trusted)
 
 | Component | Version | Date Checked |
 |-----------|---------|--------------|
+
 | GL.iNet Firmware | 4.8.1 | 2026-01-19 |
 | OpenWrt | 21.02-SNAPSHOT | 2026-01-19 |
 
 **Status:** Up to date (no updates available)
 
-**Check for updates:**
+#### Check for updates
+
 - Web UI: System > Upgrade > Online Upgrade
-- Or: https://dl.gl-inet.com/firmware/mt3000/release/
+- Or: <https://dl.gl-inet.com/firmware/mt3000/release/>
 
 ### Security Commands Reference
 
@@ -260,14 +275,17 @@ iptables -L zone_wan_input -n -v
 
 ### Threat Model
 
-**Trusted networks:**
+#### Trusted networks
+
 - LAN (192.168.8.0/24) - your devices
 - Tailscale mesh (100.x.x.x) - your homelab
 
-**Untrusted networks:**
+#### Untrusted networks
+
 - WAN (hotel WiFi, cafe, tethering) - hostile
 
-**Defense in depth:**
+#### Defense in depth
+
 1. Firewall blocks all WAN ports by default
 2. Services bind to LAN IP only (SSH, AdGuard)
 3. Localhost-only for sensitive services (uhttpd)
@@ -277,7 +295,7 @@ iptables -L zone_wan_input -n -v
 
 ### Create Backup
 
-**Via SSH (recommended):**
+#### Via SSH (recommended)
 
 ```bash
 # 1. SSH to Beryl AX
@@ -298,7 +316,8 @@ ls -lh ~/homelab/backups/beryl-ax/
 tar -tzf ~/homelab/backups/beryl-ax/beryl-ax-backup-*.tar.gz | head -10
 ```
 
-**What's backed up:**
+#### What's backed up
+
 - Network settings (WiFi, DHCP, DNS)
 - Firewall rules
 - Tailscale configuration
@@ -306,14 +325,15 @@ tar -tzf ~/homelab/backups/beryl-ax/beryl-ax-backup-*.tar.gz | head -10
 - Admin passwords
 - SSH configuration
 
-**NOT backed up:**
+#### NOT backed up
+
 - Firmware itself
 - AdGuard Home logs/statistics
 - DHCP leases
 
 ### Restore from Backup
 
-**If router is reset or bricked:**
+#### If router is reset or bricked
 
 ```bash
 # 1. Copy backup to router
@@ -326,7 +346,8 @@ sysupgrade -r /tmp/beryl-ax-backup-*.tar.gz
 # Router will reboot with restored settings
 ```
 
-**After restore:**
+#### After restore
+
 - Verify Tailscale: `tailscale status`
 - Verify AdGuard: `netstat -tuln | grep 3000`
 - Verify SSH: `netstat -tuln | grep :22`
@@ -335,11 +356,13 @@ sysupgrade -r /tmp/beryl-ax-backup-*.tar.gz
 
 | When | Why |
 |------|-----|
+
 | Before travel | Pre-trip safety net |
 | After config changes | Capture new settings |
 | Weekly during heavy use | Prevent data loss |
 
-**Storage:**
+#### Storage
+
 - Local: `~/homelab/backups/beryl-ax/`
 - Optional: Commit to git (contains passwords - use SOPS if sharing)
 - Optional: Upload to Vaultwarden as attachment

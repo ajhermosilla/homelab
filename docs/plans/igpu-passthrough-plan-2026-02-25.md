@@ -22,6 +22,7 @@ Frigate NVR runs OpenVINO on CPU (~117ms inference) with VAAPI hardware decoding
 
 | Item | Status | Value |
 |------|--------|-------|
+
 | Proxmox kernel | >= 6.11 required | 6.17.4-2-pve |
 | Docker VM kernel | >= 6.11 required | 6.12.63+deb13 (Trixie) |
 | VM 101 BIOS | OVMF (UEFI) | OK |
@@ -38,7 +39,7 @@ No kernel upgrades needed — both are above the 6.11 minimum.
 
 ## Step 1: BIOS Settings (~5 min)
 
-**Requires physical access to the Aoostar N1 Pro.**
+#### Requires physical access to the Aoostar N1 Pro
 
 Power off Proxmox host, enter BIOS, verify/enable:
 
@@ -70,8 +71,10 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt i915.enable_guc=3 i915
 ```
 
 Parameter breakdown:
+
 | Parameter | Purpose |
 |-----------|---------|
+
 | `intel_iommu=on` | Enable Intel VT-d IOMMU |
 | `iommu=pt` | Passthrough mode (performance for non-passthrough devices) |
 | `i915.enable_guc=3` | Enable GuC firmware (required for SR-IOV) |
@@ -79,6 +82,7 @@ Parameter breakdown:
 | `module_blacklist=xe` | Prevent newer `xe` driver (no SR-IOV support yet) |
 
 Apply:
+
 ```bash
 update-grub
 ```
@@ -86,7 +90,8 @@ update-grub
 ### 2b. Add VFIO kernel modules
 
 Append to `/etc/modules`:
-```
+
+```text
 vfio
 vfio_iommu_type1
 vfio_pci
@@ -106,6 +111,7 @@ dpkg -i i915-sriov-dkms_*.deb
 ```
 
 Verify:
+
 ```bash
 dkms status
 # Should show: i915-sriov-dkms, <version>, <kernel>: installed
@@ -170,12 +176,14 @@ qm start 101
 ```
 
 Resulting `/etc/pve/qemu-server/101.conf` should include:
-```
+
+```text
 machine: q35
 hostpci0: 0000:00:02.1,pcie=1
 ```
 
 **Risk note:** Changing i440fx → q35 may change device naming inside the VM. OVMF + virtio-scsi-single + virtio NIC should work fine with q35. If VM doesn't boot, revert:
+
 ```bash
 qm stop 101
 qm set 101 -machine i440fx
@@ -235,6 +243,7 @@ sudo reboot
 ### 5a. Frigate config (`docker/fixed/docker-vm/security/frigate.yml`)
 
 Change detector from CPU to GPU:
+
 ```yaml
 detectors:
   ov:
@@ -244,6 +253,7 @@ detectors:
 ```
 
 Enable VAAPI hardware decoding (uncomment):
+
 ```yaml
 ffmpeg:
   hwaccel_args: preset-vaapi
@@ -252,6 +262,7 @@ ffmpeg:
 ### 5b. Docker Compose (`docker/fixed/docker-vm/security/docker-compose.yml`)
 
 Optionally tighten device mapping and add render group:
+
 ```yaml
 devices:
   - /dev/dri/renderD128:/dev/dri/renderD128  # was: /dev/dri:/dev/dri
@@ -299,6 +310,7 @@ git push
 
 | Step | Duration | Notes |
 |------|----------|-------|
+
 | Step 1: BIOS check | 5 min | Physical access, reboot into BIOS |
 | Step 2: Proxmox IOMMU + SR-IOV | 15-20 min | GRUB, DKMS install, reboot |
 | Step 3: VM config + GPU assign | 5 min | Stop/start VM |
@@ -306,8 +318,8 @@ git push
 | Step 5: Update Frigate config | 5 min | Edit 2 files |
 | Step 6: Deploy + verify | 5-10 min | SCP, restart, check logs |
 | Step 7: Commit | 2 min | Git commit + push |
-| **Total** | **~45-60 min** | **Including troubleshooting buffer** |
-| **Downtime** | **~10-15 min** | **Proxmox reboot + VM stop/start** |
+| **Total**|**~45-60 min**|**Including troubleshooting buffer** |
+| **Downtime**|**~10-15 min**|**Proxmox reboot + VM stop/start** |
 
 ---
 
@@ -316,6 +328,7 @@ git push
 If anything goes wrong, revert in reverse order:
 
 ### Revert Frigate config
+
 ```bash
 # Change device: GPU back to device: CPU
 # Comment out hwaccel_args: preset-vaapi
@@ -323,6 +336,7 @@ If anything goes wrong, revert in reverse order:
 ```
 
 ### Revert VM configuration
+
 ```bash
 qm stop 101
 qm set 101 -delete hostpci0
@@ -331,6 +345,7 @@ qm start 101
 ```
 
 ### Revert Proxmox GRUB (if needed)
+
 ```bash
 # Restore GRUB to original
 GRUB_CMDLINE_LINUX_DEFAULT="quiet"
@@ -344,6 +359,7 @@ reboot
 
 | Risk | Impact | Mitigation |
 |------|--------|-----------|
+
 | i440fx → q35 breaks VM boot | VM won't start | Revert: `qm set 101 -machine i440fx -delete hostpci0` |
 | DKMS breaks on PVE kernel update | VFs disappear after update | Monitor `dkms status` after `apt upgrade`; pin kernel if needed |
 | SR-IOV not upstream kernel | Community module maintenance | Watch GitHub releases, rebuild after kernel updates |
@@ -356,6 +372,7 @@ reboot
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
+
 | OpenVINO inference | ~117ms (CPU) | ~15ms (GPU) | **~7x faster** |
 | Video decoding | ffmpeg CPU | VAAPI hardware | **Major CPU savings** |
 | Frigate CPU usage | High | Significantly lower | Free CPU for other services |

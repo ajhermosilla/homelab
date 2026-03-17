@@ -72,6 +72,7 @@ face_recognition:
 ```
 
 Training:
+
 - Start with 10-30 front-facing photos per person via Frigate's "Train" tab
 - Build to 50-100 for optimal accuracy
 - Avoid hats, sunglasses, extreme angles, IR images
@@ -124,6 +125,7 @@ condition:
 Key: suppress **notifications** only, not recordings. Recordings should always run for security.
 
 Frigate also exposes MQTT topics for per-camera notification control:
+
 - `frigate/<camera>/notifications/set` -- ON/OFF
 - `frigate/<camera>/notifications/suspend` -- minutes to suspend
 
@@ -140,6 +142,7 @@ condition:
 ```
 
 Community patterns:
+
 - **Night:** Notify on ALL person detections, use critical/high-priority alerts that break through DND
 - **Day:** Only notify for persons in required zones (porch, front door)
 - **Away:** All cameras, all zones, all alerts regardless of time
@@ -163,6 +166,7 @@ The SgtBatten blueprint has this built-in with a configurable cooldown parameter
 
 | Tool | Status | Recommendation |
 |------|--------|----------------|
+
 | Double-Take (original) | Last commit Feb 2024, abandoned | Skip |
 | Double-Take (skrashevich fork) | Community fork, somewhat active | Only if native doesn't work |
 | CompreFace | HA add-on broken after Core 2025 | Avoid |
@@ -190,6 +194,7 @@ Frigate reports "CPU is Slow" because it's using the default TFLite CPU detector
 
 | Spec | Value |
 |------|-------|
+
 | CPU | 4 E-cores (Gracemont), 3.6 GHz boost |
 | iGPU | Intel UHD Graphics, 24 EUs, Xe-LP architecture |
 | TDP | 6W base |
@@ -200,7 +205,7 @@ Frigate reports "CPU is Slow" because it's using the default TFLite CPU detector
 
 The standard `ghcr.io/blakeblackshear/frigate:stable` image already includes OpenVINO and the default SSDLite MobileNet v2 model. No image change needed.
 
-**Current config:**
+#### Current config
 
 ```yaml
 detectors:
@@ -209,7 +214,7 @@ detectors:
     num_threads: 2
 ```
 
-**Recommended config:**
+#### Recommended config
 
 ```yaml
 detectors:
@@ -230,6 +235,7 @@ Expected improvement:
 
 | Config | Inference Speed |
 |--------|----------------|
+
 | CPU TFLite (current) | ~100 ms |
 | OpenVINO GPU, MobileNet v2 | ~15 ms |
 | OpenVINO GPU, YOLO-NAS-S | ~25-30 ms |
@@ -243,14 +249,14 @@ At 15 ms inference, capacity is ~66 detections/second. With 3 cameras at 2 fps d
 
 The Docker Compose already passes `/dev/dri:/dev/dri`, but VAAPI is commented out in the Frigate config. Enabling it offloads H.264/H.265 decoding from CPU to iGPU.
 
-**Current config (commented out):**
+#### Current config (commented out)
 
 ```yaml
 # ffmpeg:
 #   hwaccel_args: preset-vaapi
 ```
 
-**Recommended config:**
+#### Recommended config
 
 ```yaml
 ffmpeg:
@@ -312,6 +318,7 @@ With OpenVINO GPU + VAAPI enabled, the heaviest workloads (video decoding + obje
 
 | Workload | Before | After |
 |----------|--------|-------|
+
 | Object detection | CPU (~100 ms) | iGPU (~15 ms) |
 | Video decoding | CPU (ffmpeg software) | iGPU (VAAPI hardware) |
 | Motion detection | CPU | CPU (unchanged) |
@@ -323,6 +330,7 @@ With OpenVINO GPU + VAAPI enabled, the heaviest workloads (video decoding + obje
 
 | Priority | Action | Impact |
 |----------|--------|--------|
+
 | 1 | Enable OpenVINO GPU detector | Inference 100 ms -> 15 ms |
 | 2 | Enable VAAPI hardware decoding | Major CPU reduction |
 | 3 | Define zones + required_zones per camera | Biggest notification noise reduction |

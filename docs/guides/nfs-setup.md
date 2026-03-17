@@ -4,7 +4,7 @@ NFS configuration for Frigate recordings (Docker VM → NAS).
 
 ## Overview
 
-```
+```text
 ┌─────────────────┐         NFS          ┌─────────────────┐
 │   Docker VM     │ ◄──────────────────► │      NAS        │
 │  (192.168.0.10) │                      │  (192.168.0.12) │
@@ -51,13 +51,14 @@ sudo nano /etc/exports
 
 Add the following lines:
 
-```
+```text
 /srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash)
 /srv/media      192.168.0.0/24(ro,sync,no_subtree_check)
 /srv/downloads  192.168.0.0/24(rw,sync,no_subtree_check)
 ```
 
-**Options explained:**
+#### Options explained
+
 - `rw` - Read/write access
 - `sync` - Write changes to disk before replying (safer)
 - `no_subtree_check` - Disable subtree checking (better performance)
@@ -132,11 +133,12 @@ sudo nano /etc/fstab
 
 Add the following line:
 
-```
+```text
 192.168.0.12:/srv/frigate  /mnt/nas/frigate  nfs  defaults,_netdev,nofail  0  0
 ```
 
-**Options explained:**
+#### Options explained
+
 - `defaults` - Standard mount options
 - `_netdev` - Wait for network before mounting
 - `nofail` - Don't fail boot if mount fails
@@ -251,6 +253,7 @@ sudo tcpdump -i eth0 port 2049
 ## Verification Checklist
 
 ### NAS (Server)
+
 - [ ] NFS server installed and running
 - [ ] `/srv/frigate` directory exists
 - [ ] Ownership set to 1000:1000
@@ -258,6 +261,7 @@ sudo tcpdump -i eth0 port 2049
 - [ ] `exportfs -v` shows the share
 
 ### Docker VM (Client)
+
 - [ ] NFS client installed
 - [ ] `/mnt/nas/frigate` mount point exists
 - [ ] Manual mount works
@@ -266,6 +270,7 @@ sudo tcpdump -i eth0 port 2049
 - [ ] Write test passes
 
 ### Frigate
+
 - [ ] `FRIGATE_RECORDINGS` set in `.env`
 - [ ] Container starts without errors
 - [ ] Recordings appear in `/mnt/nas/frigate`
@@ -293,18 +298,20 @@ This allows Frigate to access NAS recordings even when not on local network.
 ### Network Isolation
 
 NFS is **only accessible on the local LAN** (192.168.0.0/24):
+
 - Firewall restricts access to specific IPs
 - NFS ports not exposed to internet
 - OPNsense blocks NFS traffic from IoT/Guest VLANs
 
 ### Export Options
 
-```
+```text
 /srv/frigate    192.168.0.10(rw,sync,no_subtree_check,no_root_squash)
 ```
 
 | Option | Security Impact |
 |--------|-----------------|
+
 | `192.168.0.10` | Only Docker VM can access (not subnet wildcard) |
 | `sync` | Data integrity - writes confirmed before reply |
 | `no_root_squash` | Needed for Docker, but limits to specific IP |

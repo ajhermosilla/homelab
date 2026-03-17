@@ -22,6 +22,7 @@ Current VPS is Vultr ($6/mo, 1 vCPU, 1 GB RAM, 25 GB disk, 2 TB traffic). Runnin
 
 | | Vultr (current) | Vultr 2GB | Hetzner CX22 (EU) | Hetzner CAX11 ARM (EU) | Hetzner CX32 (EU) |
 |---|---|---|---|---|---|
+
 | **Price** | $6/mo | ~$12/mo | ~$4.10/mo | ~$4.10/mo | ~$6.80/mo |
 | **vCPUs** | 1 | 1 | 2 | 2 (ARM) | 4 |
 | **RAM** | 1 GB | 2 GB | 4 GB | 4 GB | 8 GB |
@@ -45,6 +46,7 @@ Current VPS is Vultr ($6/mo, 1 vCPU, 1 GB RAM, 25 GB disk, 2 TB traffic). Runnin
 
 | Location | Region | Traffic | Pricing |
 |----------|--------|---------|---------|
+
 | Nuremberg (NBG1) | Germany | 20 TB | Base price |
 | Falkenstein (FSN1) | Germany | 20 TB | Base price |
 | Helsinki (HEL1) | Finland | 20 TB | Base price |
@@ -67,6 +69,7 @@ Current VPS is Vultr ($6/mo, 1 vCPU, 1 GB RAM, 25 GB disk, 2 TB traffic). Runnin
 ### ARM Option (CAX series)
 
 Ampere Altra processors, same price as x86. Good for Docker workloads but requires arm64 container images. Most of our images support arm64:
+
 - headscale, caddy, pihole, adguard, unbound, uptime-kuma, ntfy, changedetection — all have arm64
 - **playwright (sockpuppetbrowser)** — needs verification, likely x86 only
 
@@ -105,6 +108,7 @@ Ampere Altra processors, same price as x86. Good for Docker workloads but requir
 
 | | Hetzner (Germany) | Vultr (US) |
 |---|---|---|
+
 | **Jurisdiction** | GDPR-native | GDPR as overlay |
 | **Data Protection Officer** | Published, dedicated | Generic email |
 | **Sub-processors** | Mostly EU-based, transparent list | US-based, opaque |
@@ -121,6 +125,7 @@ Hetzner is meaningfully stronger on privacy: GDPR-native jurisdiction, no ad dat
 
 | Method | Details |
 |--------|---------|
+
 | Credit Card | Visa, Mastercard, Amex, UnionPay (auto-charged, except UnionPay) |
 | SEPA Direct Debit | EUR accounts only, auto-charged |
 | PayPal | Available for active accounts |
@@ -171,6 +176,7 @@ Keep Vultr instance running for 48h after migration. If issues arise, revert DNS
 ## Recommendation
 
 **Hetzner CX22 (Falkenstein)** at ~$4.10/mo:
+
 - 2 vCPU, 4 GB RAM, 40 GB disk, 20 TB traffic
 - Saves ~$8/mo vs Vultr 2 GB upgrade ($12/mo)
 - 4x the RAM, 2x the CPU, 10x the bandwidth

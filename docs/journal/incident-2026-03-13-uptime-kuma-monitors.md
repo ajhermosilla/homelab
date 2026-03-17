@@ -9,6 +9,7 @@
 
 | Time | Event |
 |------|-------|
+
 | ~Mar 7 | Uptime Kuma and ntfy containers started on VPS. Host `resolv.conf` pointed to `100.100.100.100` (MagicDNS). Docker embedded DNS cached this as `ExtServers: [host(100.100.100.100)]` |
 | Mar 12 ~21:50 | DNS incident fix: `accept-dns=false` applied, host `resolv.conf` changed to `127.0.0.1` (AdGuard). Headscale, Caddy, AdGuard containers restarted — but Uptime Kuma and ntfy were NOT restarted |
 | Mar 12 ~21:50 | Uptime Kuma container retains stale `ExtServers: [host(100.100.100.100)]`. All hostname-based monitors begin failing silently |
@@ -33,12 +34,13 @@ Two independent issues compounded to create a complete monitoring blind spot:
 Docker's embedded DNS (`127.0.0.11`) caches the host's upstream DNS servers (`ExtServers`) at container startup and **never refreshes them**. When the VPS host's `resolv.conf` was changed from `100.100.100.100` (MagicDNS) to `127.0.0.1` (AdGuard) during the Mar 12 DNS incident fix, the Uptime Kuma container kept the old MagicDNS upstream.
 
 MagicDNS on the VPS (with `accept-dns=false`) forwards to the headscale global nameservers:
+
 1. `100.68.63.168` (Docker VM Pi-hole) — returns LAN IPs unreachable from VPS
 2. `1.1.1.1` (Cloudflare fallback)
 
 This intermittent/broken resolution caused all hostname-based monitors to fail with connection timeouts.
 
-```
+```text
 Container: 127.0.0.11 → 100.100.100.100 (MagicDNS, stale)
                               ↓
                     100.68.63.168 (Pi-hole)
@@ -52,7 +54,7 @@ Container: 127.0.0.11 → 100.100.100.100 (MagicDNS, stale)
 
 After fixing Cause 1, monitors checking `*.cronova.dev` internal services (vault, jara, taguato, etc.) still failed with `ENOTFOUND`. These hostnames only exist in headscale `extra_records`, which are served by MagicDNS to Tailscale clients. The VPS, with `accept-dns=false`, uses AdGuard → Unbound → root servers for DNS — a fully public resolution path that has no knowledge of internal records.
 
-```
+```text
 Container: 127.0.0.11 → 127.0.0.1 (AdGuard, correct)
                               ↓
                     Unbound → root servers
@@ -71,16 +73,20 @@ Container: 127.0.0.11 → 127.0.0.1 (AdGuard, correct)
 ## Fix Applied
 
 ### Fix 1: Container restart
+
 ```bash
 docker restart uptime-kuma
 ```
+
 Updated `ExtServers` from stale `100.100.100.100` to current `127.0.0.1` (AdGuard).
 
 ### Fix 2: AdGuard DNS rewrites
+
 Added 18 DNS rewrites to `/var/lib/docker/volumes/adguard-conf/_data/AdGuardHome.yaml` matching all headscale `extra_records`:
 
 | Domain | Answer (Tailscale IP) |
 |--------|----------------------|
+
 | vault.cronova.dev | 100.68.63.168 |
 | jara.cronova.dev | 100.68.63.168 |
 | taguato.cronova.dev | 100.68.63.168 |
@@ -106,6 +112,7 @@ Each rewrite required explicit `enabled: true` — AdGuard defaults new rewrites
 
 | Monitor | Reason | Action |
 |---------|--------|--------|
+
 | Jellyfin | Container not in current compose up | Pause until when-home deployment |
 | OPNsense | Offline on Tailscale | Pause — home-only device |
 | Beryl AX | Not connected | Pause — mobile device |
@@ -118,6 +125,7 @@ Each rewrite required explicit `enabled: true` — AdGuard defaults new rewrites
 Docker's embedded DNS caches upstream servers at startup and never refreshes. Any change to the host's `resolv.conf` requires restarting containers that depend on DNS resolution.
 
 **Action**: Add to the DNS change checklist:
+
 ```bash
 # After any change to /etc/resolv.conf or DNS infrastructure:
 docker restart $(docker ps -q)  # or at minimum, restart monitoring containers
@@ -128,10 +136,12 @@ This gotcha was already documented in memory (`networking-notes.md`) but was not
 ### 2. Keep AdGuard DNS rewrites in sync with headscale extra_records
 
 The VPS runs a separate DNS path (AdGuard → public resolvers) from MagicDNS. Internal `*.cronova.dev` hostnames need to exist in both:
+
 - **Headscale `extra_records`** — for all Tailscale clients via MagicDNS
 - **AdGuard DNS rewrites** — for VPS-local containers (which bypass MagicDNS)
 
 **Action**: When adding a new internal service:
+
 1. Add to headscale `extra_records` in `config.yaml`
 2. Add matching DNS rewrite in AdGuard (via web UI or config file)
 3. Verify with `dig <hostname> @127.0.0.1` from VPS
@@ -143,6 +153,7 @@ When adding rewrites by editing `AdGuardHome.yaml` directly, AdGuard serializes 
 ### 4. Monitoring needs meta-monitoring
 
 Uptime Kuma had no way to alert that its own monitors were broken. Consider:
+
 - A simple external health check (e.g., a cron on another host that checks if Uptime Kuma's status page reports any UP monitors)
 - Or at minimum: check Uptime Kuma dashboard after any infrastructure DNS change
 

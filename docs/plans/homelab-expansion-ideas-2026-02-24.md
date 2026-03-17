@@ -12,6 +12,7 @@
 
 | # | Service | Host | Category |
 |---|---------|------|----------|
+
 | 1 | Headscale | VPS | Networking |
 | 2 | Caddy (VPS) | VPS | Networking |
 | 3 | Uptime Kuma | VPS | Monitoring |
@@ -152,6 +153,7 @@ Frigate detects person → ntfy notification with action buttons: "View Camera,"
 
 | Service | Why Not |
 |---------|---------|
+
 | Nextcloud | Resource hog (500MB+ min), Syncthing + Samba already covers file sync/sharing |
 | Ollama / Local LLM | N150 has no GPU, CPU inference painfully slow |
 | GitLab | 4GB+ RAM, Forgejo covers your needs perfectly |
@@ -168,6 +170,7 @@ Frigate detects person → ntfy notification with action buttons: "View Camera,"
 
 | Service | RAM | Status |
 |---------|-----|--------|
+
 | Homepage | 30MB | Deployed |
 | Dozzle | 15MB | Deployed |
 | BentoPDF | ~4MB | Deployed (replaced Stirling-PDF) |
@@ -175,14 +178,15 @@ Frigate detects person → ntfy notification with action buttons: "View Camera,"
 | VictoriaMetrics + Grafana | 150MB | Deployed |
 | Paperless-ngx | 400MB | Deployed |
 | n8n | 200MB | Pending |
-| **Total deployed** | **~629MB** | |
+| **Total deployed**|**~629MB** | |
 
 ### NAS (8GB total, ~3GB used)
 
 | Service | RAM |
 |---------|-----|
+
 | Immich | 750MB |
-| **Total** | **~750MB** |
+| **Total**|**~750MB** |
 
 Both well within capacity.
 
@@ -192,6 +196,7 @@ Both well within capacity.
 
 | # | Service | Where | Status |
 |---|---------|-------|--------|
+
 | 1 | Homepage (Mbyja) | Docker VM | Deployed |
 | 2 | Dozzle (Ysyry) | Docker VM | Deployed |
 | 3 | CrowdSec | OPNsense | **Pending** |

@@ -8,19 +8,20 @@
 
 | Switch | Position | Purpose |
 |--------|----------|---------|
+
 | Cable/Off/BT | BT | Wireless mode |
 | Mac/Win | Mac | macOS key layout |
 
 ### Pairing to MacBook
 
-1. **Enter pairing mode:** Hold **Fn + 1** for 3-4 seconds
+1. **Enter pairing mode:**Hold**Fn + 1** for 3-4 seconds
    - LED will flash rapidly (white/blue)
 
-2. **On MacBook:** System Settings > Bluetooth
+1. **On MacBook:** System Settings > Bluetooth
    - Wait for "Keychron K2" to appear
    - Click Connect
 
-3. **Test:** Type something - should work immediately
+1. **Test:** Type something - should work immediately
 
 ## Multi-Device Pairing
 
@@ -28,11 +29,13 @@ The K2 remembers 3 Bluetooth devices:
 
 | Shortcut | Action |
 |----------|--------|
+
 | Fn + 1 | Switch to device slot 1 (MacBook) |
 | Fn + 2 | Switch to device slot 2 |
 | Fn + 3 | Switch to device slot 3 |
 
-**To pair a new device to a slot:**
+#### To pair a new device to a slot
+
 - Hold **Fn + [slot number]** for 3-4 seconds
 - LED flashes = pairing mode
 - Connect from the device
@@ -41,6 +44,7 @@ The K2 remembers 3 Bluetooth devices:
 
 | Shortcut | Action |
 |----------|--------|
+
 | Fn + Light bulb | Cycle brightness: High > Low > Off |
 | Fn + < | Decrease RGB effect speed |
 | Fn + > | Increase RGB effect speed |
@@ -49,6 +53,7 @@ The K2 remembers 3 Bluetooth devices:
 
 | Key | Mac Function |
 |-----|--------------|
+
 | F1 | Decrease brightness |
 | F2 | Increase brightness |
 | F3 | Mission Control |
@@ -95,7 +100,8 @@ Press the key to the **right** of left Shift (usually Z on ANSI layout).
 ## Firmware Updates
 
 Check Keychron website for firmware updates:
-- https://www.keychron.com/pages/firmware-and-json-files
+
+- <https://www.keychron.com/pages/firmware-and-json-files>
 - Look for K2 (non-hotswap version)
 
 ## References
