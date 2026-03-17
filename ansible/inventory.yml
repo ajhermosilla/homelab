@@ -19,7 +19,7 @@ all:
       hosts:
         vultr:
           ansible_host: 100.77.172.46  # Tailscale IP
-          # ansible_host: 104.207.144.195  # Public IP
+          # ansible_host: <VPS_PUBLIC_IP>  # Public IP (see KeePassXC)
           ansible_user: linuxuser
           ansible_become: true
       vars:

@@ -54,7 +54,7 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
                         [Internet]
                             |
                      [Vultr VPS - US]
-                      104.207.144.195
+                      <VPS_PUBLIC_IP>
                       100.77.172.46 (TS)
                             |
     +------------+----------+----------+------------+

@@ -28,3 +28,12 @@ logs/
 
 # MkDocs
 site/
+
+# Backups (may contain secrets)
+backups/
+
+# Local-only files
+*.local
+
+# Audit (contains sensitive findings)
+docs/plans/pre-public-audit-*.md
