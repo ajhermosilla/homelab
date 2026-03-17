@@ -1,6 +1,6 @@
 # VPS Architecture
 
-Cloud node for Tailscale coordination, monitoring, and external services - minimal personal data at rest.
+Cloud node for Tailscale coordination, monitoring, and external services — minimal personal data at rest. **12 containers** running 24/7.
 
 **Key principle:** Headscale runs on VPS for 24/7 mesh availability. Mobile kit operates on-demand (7AM-7PM). If VPS dies, mesh clients still work with cached keys but can't add new nodes.
 
@@ -39,14 +39,18 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
 | Uptime Kuma | 3001 | Status monitoring | Active |
 | ntfy | 80 | Push notifications | Active |
 
-### Tier 3: Future Services
+### Tier 3: Utilities
 
 | Service | Port | Purpose | Status |
 |---------|------|---------|--------|
 
-| changedetection.io | 5000 | Website change monitoring | Planned |
-| DERP Relay | 3478/udp | Tailscale NAT traversal | Planned |
-| Restic REST Server | 8000 | Encrypted backup target | Planned |
+| changedetection.io | 5000 | Website change monitoring | Active |
+| Playwright | — | Browser engine for changedetection | Active |
+| DERP Relay | 3478/udp | Tailscale NAT traversal | Active |
+| Restic REST Server | 8000 | Encrypted backup target | Active |
+| AdGuard Home (Yvága) | 53, 3000 | DNS ad-blocking + filtering | Active |
+| Unbound (Yvága) | 5335 | Recursive DNS resolver | Active |
+| Pi-hole (VPS) | 53 | DNS (legacy, secondary) | Active |
 
 ## Architecture Diagram
 
@@ -57,10 +61,10 @@ Cloud node for Tailscale coordination, monitoring, and external services - minim
                       <VPS_PUBLIC_IP>
                       100.77.172.46 (TS)
                             |
-    +------------+----------+----------+------------+
-    |            |          |          |            |
-[Headscale]  [Caddy]  [Uptime Kuma]  [ntfy]    [Future]
-(TS coord)  (proxy)   (monitoring) (alerts)  (DERP, etc)
+    +------------+----------+----------+------------+----------+
+    |            |          |          |            |          |
+[Headscale]  [Caddy]  [Uptime Kuma]  [ntfy]    [DERP]   [Yvága]
+(TS coord)  (proxy)   (monitoring) (alerts)  (relay)  (AdGuard+Unbound)
                             |
                      [Tailscale Mesh]
                             |
@@ -111,12 +115,22 @@ docker/vps/
 │   │   ├── docker-compose.yml
 │   │   ├── backup.sh
 │   │   └── config/
-│   └── caddy/
-│       ├── docker-compose.yml
-│       ├── Caddyfile
-│       └── www/
-└── monitoring/
-    └── docker-compose.yml    # Uptime Kuma, ntfy
+│   ├── caddy/
+│   │   ├── docker-compose.yml
+│   │   ├── Caddyfile
+│   │   └── www/
+│   ├── adguard/              # AdGuard Home + Unbound (Yvága)
+│   │   └── docker-compose.yml
+│   ├── derp/                 # DERP relay
+│   │   └── docker-compose.yml
+│   └── pihole/               # Pi-hole (VPS, legacy)
+│       └── docker-compose.yml
+├── monitoring/
+│   └── docker-compose.yml    # Uptime Kuma, ntfy
+├── scraping/
+│   └── docker-compose.yml    # changedetection, Playwright
+└── backup/
+    └── docker-compose.yml    # Restic REST Server
 ```
 
 ## Deployment Status
@@ -131,8 +145,11 @@ docker/vps/
 | 5 | Deploy Caddy reverse proxy | Done |
 | 6 | Deploy Uptime Kuma | Done |
 | 7 | Deploy ntfy | Done |
-| 8 | Deploy changedetection.io | Pending |
-| 9 | Configure DERP relay | Pending |
+| 8 | Deploy changedetection.io | Done |
+| 9 | Configure DERP relay | Done |
+| 10 | Deploy AdGuard + Unbound (Yvága) | Done |
+| 11 | Deploy Pi-hole (VPS) | Done |
+| 12 | Deploy Restic REST Server | Done |
 
 ## Security Hardening
 
@@ -160,10 +177,7 @@ docker/vps/
 
 ## Future Enhancements
 
-- [ ] Deploy changedetection.io for website monitoring
-- [ ] Add DERP relay for better NAT traversal
 - [ ] Grafana for VPS metrics
-- [ ] Restic REST server for encrypted backups
 
 ## References
 
