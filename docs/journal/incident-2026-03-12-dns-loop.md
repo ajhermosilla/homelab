@@ -90,7 +90,7 @@ For domains without an `extra_record` (e.g., `notify.cronova.dev` when queried f
 
 **Verification after fix**:
 
-- `dig notify.cronova.dev @100.100.100.100` → `104.207.144.195` (VPS public IP via global DNS)
+- `dig notify.cronova.dev @100.100.100.100` → `<VPS_PUBLIC_IP>` (VPS public IP via global DNS)
 - `dig vault.cronova.dev @100.100.100.100` → `100.68.63.168` (Tailscale IP via extra_records)
 - `curl <https://notify.cronova.dev/`> → 200 OK (from VPS, Mac, and phone)
 
