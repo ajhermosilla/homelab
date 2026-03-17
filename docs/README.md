@@ -9,9 +9,9 @@ Core infrastructure documentation — what runs where, hardware specs, network t
 | Document | Description |
 |----------|-------------|
 
-| [services.md](architecture/services.md) | Definitive service inventory (40+ services, ports, dependencies, Guarani names) |
+| [services.md](architecture/services.md) | Definitive service inventory (67 services, ports, dependencies, Guarani names) |
 | [hardware.md](architecture/hardware.md) | Device specs, Tailscale IPs, power budget, storage strategy |
-| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (33 containers), NAS (19 containers), OPNsense |
+| [fixed-homelab.md](architecture/fixed-homelab.md) | Fixed site: Proxmox, Docker VM (35 containers), NAS (19 containers), OPNsense |
 | [mobile-homelab.md](architecture/mobile-homelab.md) | Portable kit (MacBook + Beryl AX + phone) |
 | [vps-architecture.md](architecture/vps-architecture.md) | VPS infrastructure (Headscale, Caddy, monitoring) |
 | [network-topology.md](architecture/network-topology.md) | Network diagrams and connectivity |
@@ -98,6 +98,12 @@ Future plans and proposals — what's next.
 | [nas-deployment-plan.md](plans/nas-deployment-plan.md) | NAS initial deployment plan |
 | [rpi5-deployment-plan.md](plans/rpi5-deployment-plan.md) | RPi 5 OpenClaw deployment |
 | [wan-watchdog-2026-02-23.md](plans/wan-watchdog-2026-02-23.md) | WAN monitoring watchdog |
+| [8tb-recovery-plan-2026-03-12.md](plans/8tb-recovery-plan-2026-03-12.md) | 8TB drive recovery plan |
+| [hetzner-migration-2026-03-13.md](plans/hetzner-migration-2026-03-13.md) | Hetzner vs Vultr VPS migration research |
+| [codebase-audit-2026-03-12.md](plans/codebase-audit-2026-03-12.md) | Codebase audit round 0 |
+| [codebase-audit-2026-03-15.md](plans/codebase-audit-2026-03-15.md) | Codebase audit round 1 (10/18 fixed) |
+| [codebase-audit-2026-03-16.md](plans/codebase-audit-2026-03-16.md) | Codebase audit round 2 (10/16 fixed) |
+| [codebase-audit-2026-03-17.md](plans/codebase-audit-2026-03-17.md) | Codebase audit round 3 (88 findings) |
 
 ## Journal
 
@@ -114,6 +120,10 @@ Execution logs, reports, and session notes — what happened.
 | [improvement-report-2026-02-22.md](journal/improvement-report-2026-02-22.md) | Improvement report |
 | [documentation-review-2026-02-26.md](journal/documentation-review-2026-02-26.md) | Documentation review and gap analysis |
 | [frigate-ha-optimization-2026-02-24.md](journal/frigate-ha-optimization-2026-02-24.md) | Frigate + HA optimization |
+| [incident-2026-03-12-dns-loop.md](journal/incident-2026-03-12-dns-loop.md) | DNS recursive loop incident |
+| [incident-2026-03-13-uptime-kuma-monitors.md](journal/incident-2026-03-13-uptime-kuma-monitors.md) | Uptime Kuma monitors incident |
+| [incident-2026-03-16-vaultwarden-502.md](journal/incident-2026-03-16-vaultwarden-502.md) | Vaultwarden 502 incident |
+| [community-assessment-2026-03-16.md](journal/community-assessment-2026-03-16.md) | Community assessment vs top homelab projects |
 
 ### Sessions
 

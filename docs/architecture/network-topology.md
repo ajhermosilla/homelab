@@ -30,8 +30,8 @@ graph TB
             vault[Vaultwarden — vault]
             media["Jellyfin / *arr — yrasema"]
             monitoring["VictoriaMetrics / Grafana — papa"]
-            paperless[Paperless-ngx — kuatia]
-            immich[Immich — mbyja]
+            paperless[Paperless-ngx — aranduka]
+            immich[Immich — vera]
             tools[Homepage / Dozzle / BentoPDF]
         end
     end
