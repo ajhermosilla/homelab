@@ -7,6 +7,10 @@
 #
 # Tags: dotfiles (config files), tools (CLI tools), shell (zsh setup)
 #
+# Requires: SSH key for git@github.com on the controller (Mac).
+#   This playbook clones via delegate_to: localhost — it will fail
+#   if run from a machine without GitHub SSH access.
+#
 # Examples:
 #   ansible-playbook -i inventory.yml playbooks/dotfiles.yml
 #   ansible-playbook -i inventory.yml playbooks/dotfiles.yml -l docker

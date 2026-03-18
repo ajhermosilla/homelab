@@ -198,6 +198,8 @@ Upstream DNS:
 - 9.9.9.9 (Quad9, fallback)
 ```
 
+> **Note**: Split DNS with Unbound was removed (caused recursive loop). Current setup uses Unbound on OPNsense only for the fixed homelab. VPS uses AdGuard → Unbound → root servers.
+
 ## Port Allocation
 
 | Service | Port | Interface |

@@ -23,6 +23,9 @@
 | Immich | **vera** | shine, flash | `vera.cronova.dev` |
 | Paperless-ngx | **aranduka** | book, library | `aranduka.cronova.dev` |
 | AdGuard Home + Unbound | **yvága** | sky | `yvaga.cronova.dev` |
+| Sonarr | **japysaka** | to catch, capture | `japysaka.cronova.dev` |
+| Radarr | **taanga** | bone, structure | `taanga.cronova.dev` |
+| Prowlarr | **aoao** | to search, investigate | `aoao.cronova.dev` |
 
 ---
 

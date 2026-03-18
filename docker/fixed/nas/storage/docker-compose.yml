@@ -42,7 +42,7 @@ services:
       - ${DATA_PATH:-/srv/data}:/data
       - ${DOWNLOADS_PATH:-/srv/downloads}:/downloads
       - ${BACKUP_PATH:-/srv/backup}:/backup
-      - ./smb.conf:/etc/samba/smb.conf
+      - ./smb.conf:/etc/samba/smb.conf:ro
     environment:
       TZ: ${TZ:-America/Asuncion}
       USER: ${SAMBA_USER:-augusto}
