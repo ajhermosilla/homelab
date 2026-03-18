@@ -28,6 +28,7 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=git"
       - "com.cronova.critical=true"
+      - "com.centurylinklabs.watchtower.enable=false"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/healthz"]
       interval: 30s

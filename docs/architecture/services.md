@@ -20,63 +20,63 @@
 | 11 | — | Playwright | Scraping | VPS | Active |
 | 12 | — | Restic REST (VPS) | Backup | VPS | Active |
 | 13 | — | Pi-hole | DNS | Docker VM | Active |
-| 7 | — | Caddy (Docker VM) | Networking | Docker VM | Active |
-| 8 | — | Watchtower | Maintenance | Docker VM | Active |
-| 9 | — | Vaultwarden | Security | Docker VM | Active |
-| 10 | — | vaultwarden-backup | Backup | Docker VM | Active |
-| 11 | Taguato | Frigate NVR | Surveillance | Docker VM | Active |
-| 12 | Jara | Home Assistant | Automation | Docker VM | Active |
-| 13 | — | homeassistant-backup | Backup | Docker VM | Active |
-| 14 | — | Mosquitto | Messaging | Docker VM | Active |
-| 15 | Okẽ | Authelia | Auth / SSO | Docker VM | Active |
-| 16 | Yrasema | Jellyfin | Media | Docker VM | Active |
-| 17 | Mbyja | Homepage | Dashboard | Docker VM | Active |
-| 18 | Ysyry | Dozzle | Log viewer | Docker VM | Active |
-| 19 | Kuatia | BentoPDF | Tools | Docker VM | Active |
-| 20 | Papa | VictoriaMetrics | Monitoring | Docker VM | Active |
-| 21 | Papa | Grafana | Monitoring | Docker VM | Active |
-| 22 | Papa | vmagent | Monitoring | Docker VM | Active |
-| 23 | Vera | Immich Server | Photos | Docker VM | Active |
-| 24 | Vera | Immich ML | Photos | Docker VM | Active |
-| 25 | Vera | Immich Valkey | Photos | Docker VM | Active |
-| 26 | Vera | Immich DB | Photos | Docker VM | Active |
-| 27 | Aranduka | Paperless-ngx | Documents | Docker VM | Active |
-| 28 | — | Sonarr | Media | Docker VM | Active |
-| 29 | — | Radarr | Media | Docker VM | Active |
-| 30 | — | Prowlarr | Media | Docker VM | Active |
-| 31 | — | qBittorrent | Media | Docker VM | Active |
-| 32 | — | paperless-db | Documents | Docker VM | Active |
-| 33 | — | paperless-redis | Documents | Docker VM | Active |
-| 34 | — | paperless-backup | Backup | Docker VM | Active |
-| 35 | — | immich-backup | Backup | Docker VM | Active |
-| 36 | — | caddy-backup | Backup | Docker VM | Active |
-| 37 | — | pihole-backup | Backup | Docker VM | Active |
-| 36 | Papa | vmalert | Monitoring | Docker VM | Active |
-| 37 | Papa | Alertmanager | Monitoring | Docker VM | Active |
-| 38 | Papa | cAdvisor | Monitoring | Docker VM | Active |
-| 39 | — | Samba | Storage | NAS | Active |
-| 40 | — | Syncthing | Storage | NAS | Active |
-| 41 | — | Restic REST | Backup | NAS | Active |
-| 42 | — | Offsite Sync | Backup | NAS | Active |
-| 43 | — | Forgejo | Git | NAS | Active |
-| 44 | — | NFS | Storage | NAS | Active |
-| 45 | — | Glances | Monitoring | NAS | Active |
-| 46 | Tajy | Coolify | PaaS | NAS | Active |
-| 47 | Tajy | coolify-db | PaaS | NAS | Active |
-| 48 | Tajy | coolify-redis | PaaS | NAS | Active |
-| 49 | Tajy | coolify-realtime | PaaS | NAS | Active |
-| 50 | Tajy | coolify-proxy (Traefik) | PaaS | NAS | Active |
-| 51 | Tajy | coolify-sentinel | PaaS | NAS | Active |
-| 52 | Tajy | coolify-backup | PaaS | NAS | Active |
-| 53 | — | Katupyry App | Finance | NAS | Active |
-| 54 | — | Katupyry DB | Finance | NAS | Active |
-| 55 | — | Katupyry Redis | Finance | NAS | Active |
-| 56 | Javya | Javya App | Worship | NAS | Active |
-| 57 | Javya | Javya DB | Worship | NAS | Active |
-| 58 | Javya | Javya Redis | Worship | NAS | Active |
-| 59 | — | OpenClaw | AI | RPi 5 | Pending |
+| 14 | — | Caddy (Docker VM) | Networking | Docker VM | Active |
+| 15 | — | Watchtower | Maintenance | Docker VM | Active |
+| 16 | — | Vaultwarden | Security | Docker VM | Active |
+| 17 | — | vaultwarden-backup | Backup | Docker VM | Active |
+| 18 | Taguato | Frigate NVR | Surveillance | Docker VM | Active |
+| 19 | Jara | Home Assistant | Automation | Docker VM | Active |
+| 20 | — | homeassistant-backup | Backup | Docker VM | Active |
+| 21 | — | Mosquitto | Messaging | Docker VM | Active |
+| 22 | Okẽ | Authelia | Auth / SSO | Docker VM | Active |
+| 23 | Yrasema | Jellyfin | Media | Docker VM | Active |
+| 24 | Mbyja | Homepage | Dashboard | Docker VM | Active |
+| 25 | Ysyry | Dozzle | Log viewer | Docker VM | Active |
+| 26 | Kuatia | BentoPDF | Tools | Docker VM | Active |
+| 27 | Papa | VictoriaMetrics | Monitoring | Docker VM | Active |
+| 28 | Papa | Grafana | Monitoring | Docker VM | Active |
+| 29 | Papa | vmagent | Monitoring | Docker VM | Active |
+| 30 | Vera | Immich Server | Photos | Docker VM | Active |
+| 31 | Vera | Immich ML | Photos | Docker VM | Active |
+| 32 | Vera | Immich Valkey | Photos | Docker VM | Active |
+| 33 | Vera | Immich DB | Photos | Docker VM | Active |
+| 34 | Aranduka | Paperless-ngx | Documents | Docker VM | Active |
+| 35 | — | Sonarr | Media | Docker VM | Active |
+| 36 | — | Radarr | Media | Docker VM | Active |
+| 37 | — | Prowlarr | Media | Docker VM | Active |
+| 38 | — | qBittorrent | Media | Docker VM | Active |
+| 39 | — | paperless-db | Documents | Docker VM | Active |
+| 40 | — | paperless-redis | Documents | Docker VM | Active |
+| 41 | — | paperless-backup | Backup | Docker VM | Active |
+| 42 | — | immich-backup | Backup | Docker VM | Active |
+| 43 | — | caddy-backup | Backup | Docker VM | Active |
+| 44 | — | pihole-backup | Backup | Docker VM | Active |
+| 45 | Papa | vmalert | Monitoring | Docker VM | Active |
+| 46 | Papa | Alertmanager | Monitoring | Docker VM | Active |
+| 47 | Papa | cAdvisor | Monitoring | Docker VM | Active |
+| 48 | — | Samba | Storage | NAS | Active |
+| 49 | — | Syncthing | Storage | NAS | Active |
+| 50 | — | Restic REST | Backup | NAS | Active |
+| 51 | — | Offsite Sync | Backup | NAS | Active |
+| 52 | — | Forgejo | Git | NAS | Active |
+| 53 | — | NFS | Storage | NAS | Active |
+| 54 | — | Glances | Monitoring | NAS | Active |
+| 55 | Tajy | Coolify | PaaS | NAS | Active |
+| 56 | Tajy | coolify-db | PaaS | NAS | Active |
+| 57 | Tajy | coolify-redis | PaaS | NAS | Active |
+| 58 | Tajy | coolify-realtime | PaaS | NAS | Active |
+| 59 | Tajy | coolify-proxy (Traefik) | PaaS | NAS | Active |
+| 60 | Tajy | coolify-sentinel | PaaS | NAS | Active |
+| 61 | Tajy | coolify-backup | PaaS | NAS | Active |
+| 62 | — | Katupyry App | Finance | NAS | Active |
+| 63 | — | Katupyry DB | Finance | NAS | Active |
+| 64 | — | Katupyry Redis | Finance | NAS | Active |
+| 65 | Javya | Javya App | Worship | NAS | Active |
+| 66 | Javya | Javya DB | Worship | NAS | Active |
+| 67 | Javya | Javya Redis | Worship | NAS | Active |
+| 68 | — | OpenClaw | AI | RPi 5 | Pending |
 
-**Active:**67 |**Pending:** 1
+**Active:** 67 | **Pending:** 1
 
 ## By Environment
 
@@ -116,7 +116,7 @@ Caddy on Docker VM is a custom build with the Cloudflare DNS module for DNS-01 T
 |---------|---------|---------|-----------|-------|
 
 | — | **Vaultwarden** | 8843 | vault.cronova.dev | vaultwarden/server:1.35.2 |
-| — | **vaultwarden-backup** | — | — | bruceforce/vaultwarden-backup |
+| — | **vaultwarden-backup** | — | — | restic/restic:0.16.4 |
 | Taguato | **Frigate NVR** | 5000, 8554, 8555, 1984 | taguato.cronova.dev | ghcr.io/blakeblackshear/frigate |
 
 Frigate uses OpenVINO GPU detector (iGPU passthrough, ~15ms inference) with VA-API hwaccel. NFS mount to NAS Purple 2TB for recordings. 3 cameras: front_door (192.168.0.110), back_yard (192.168.0.111), indoor Tapo (192.168.0.101, downscaled to 360x640 for CPU-efficient rotation). Face recognition enabled.
@@ -181,7 +181,7 @@ Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), A
 | Vera | **Immich Server** | 2283 | vera.cronova.dev | ghcr.io/immich-app/immich-server:v2.5.6 |
 | Vera | **Immich ML** | — | — | ghcr.io/immich-app/immich-machine-learning:v2.5.6 |
 | Vera | **Immich Valkey** | — | — | valkey/valkey |
-| Vera | **Immich DB** | — | — | tensorchord/pgvecto-rs |
+| Vera | **Immich DB** | — | — | ghcr.io/immich-app/postgres:17-vectorchord0.5.3 |
 
 #### Documents
 
@@ -204,8 +204,8 @@ Watchtower uses the maintained fork (nicholas-fedor) — the original containrrr
 | Guarani | Service | Port(s) | Purpose | Image |
 |---------|---------|---------|---------|-------|
 
-| — | **Samba** | 445 | Network file shares | justinpatchett/samba |
-| — | **Syncthing** | 8384, 22000 | Peer-to-peer file sync | syncthing/syncthing:2.0.14 |
+| — | **Samba** | 445 | Network file shares | dockurr/samba:4.23.5 |
+| — | **Syncthing** | 8384, 22000 | Peer-to-peer file sync | lscr.io/linuxserver/syncthing:2.0.14 |
 | — | **Restic REST** | 8000 | Backup target | restic/rest-server:0.14.0 |
 | — | **Forgejo** | 3000, 2222 | Git server (SSH + web) | codeberg.org/forgejo/forgejo:11.0 |
 | — | **NFS** | 2049 | Exports Purple 2TB for Frigate | kernel (not containerized) |

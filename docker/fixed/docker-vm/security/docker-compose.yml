@@ -187,7 +187,8 @@ services:
     networks:
       - security-net
     depends_on:
-      - vaultwarden
+      vaultwarden:
+        condition: service_healthy
 
 volumes:
   vaultwarden-data:
