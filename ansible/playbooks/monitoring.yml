@@ -34,9 +34,7 @@
         repo: "{{ homelab_repo }}"
         dest: "{{ homelab_base }}/repo"
         version: main
-        force: yes
       tags: clone
-      ignore_errors: true
 
     # =========================================================================
     # Create Docker Network
