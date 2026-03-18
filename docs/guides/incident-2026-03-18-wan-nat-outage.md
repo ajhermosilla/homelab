@@ -1,7 +1,7 @@
-# Incident Report: ISP Outage + Missing NAT Rules
+# Incident Report: ISP Outage + Missing Outbound NAT Rules
 
 **Date**: 2026-03-18
-**Duration**: ~2 hours (ISP recovery + troubleshooting)
+**Duration**: ~3.5 hours (two outages + troubleshooting)
 **Severity**: High — all homelab services unreachable externally, no LAN internet
 **ISP**: Tigo Paraguay (ARRIS modem, bridge mode)
 
@@ -9,39 +9,55 @@
 
 ## Summary
 
-An ISP outage caused OPNsense to lose WAN connectivity. The WAN watchdog script (deployed earlier the same day) had its cron entry registered but never executed. Manual `configctl interface reconfigure wan` restored WAN, but OPNsense's outbound NAT rules were not regenerated. Without NAT, LAN hosts could reach OPNsense but not the internet. This caused a cascading failure: Docker VM lost internet → Tailscale disconnected → Pi-hole DNS upstream failed → all LAN DNS broke → cameras went offline.
+Two related but distinct failures on the same day:
+
+**Outage #1 (morning)**: ISP outage caused OPNsense WAN to lose routing. The WAN watchdog script (deployed hours earlier) had its cron entry registered but never executed. Manual `configctl interface reconfigure wan` restored connectivity. Internet worked for ~1 hour.
+
+**Outage #2 (afternoon)**: ISP dropped again, WAN lost its IP entirely. After manual WAN recovery, discovered OPNsense had **zero outbound NAT rules** — a persistent configuration issue, not a transient outage side-effect. Without NAT, LAN hosts could reach OPNsense but not the internet, causing a cascading failure: Docker VM lost internet → Tailscale disconnected → Pi-hole DNS upstream failed → all LAN DNS broke → cameras went offline.
+
+Root cause: OPNsense's "Automatic outbound NAT" mode was generating no rules. This may have been broken since installation or a recent OPNsense update — the March 5 outage auto-recovered (suggesting NAT was working then), so this likely regressed between March 5 and March 18.
 
 ---
 
 ## Timeline (PYT, UTC-3)
 
+### Outage #1 — WAN Routing (morning)
+
 | Time | Event |
 |------|-------|
-| ~12:30 | ISP outage begins |
-| ~12:30 | OPNsense WAN loses IP, all Tailscale tunnels drop |
-| 13:00 | Investigation begins — Mac on phone hotspot, Docker VM reachable via Tailscale relay |
-| 13:05 | Docker VM Tailscale shows offline, NAS/Proxmox unreachable |
-| 13:10 | Plugged USB-Gigabit to MokerLink switch — Mac gets DHCP (192.168.0.117) |
-| 13:12 | SSH to OPNsense — WAN shows blank (no IP) |
-| 13:12 | `configctl interface reconfigure wan` — WAN IP restored (181.127.152.105) |
-| 13:14 | OPNsense can ping 8.8.8.8, but Docker VM cannot |
-| 13:15 | Reconnected Tailscale on Docker VM via LAN SSH |
-| ~13:30 | Second outage — ISP drops again, WAN goes blank |
+| ~10:30 | ISP outage begins |
+| 10:38 | NAS reachable (Tailscale), Docker VM/Proxmox unreachable |
+| 10:45 | Plugged USB-Gigabit — Mac gets DHCP, can ping LAN hosts |
+| 10:50 | SSH to OPNsense — WAN has IP but `ping 8.8.8.8` fails (stale routing) |
+| 10:50 | `configctl interface reconfigure wan` — **internet restored** |
+| 10:55 | Reconnected Tailscale on Docker VM via LAN SSH |
+| 11:00 | Full recovery — all services operational |
+
+### Outage #2 — WAN + NAT Failure (afternoon)
+
+| Time | Event |
+|------|-------|
+| ~12:30 | ISP drops again — WAN loses IP entirely (vtnet0 blank) |
+| 13:00 | Investigation begins — Mac on phone hotspot |
+| 13:05 | Docker VM Tailscale offline, NAS/Proxmox unreachable |
+| 13:12 | SSH to OPNsense via LAN — `configctl interface reconfigure wan` restores WAN IP |
+| 13:14 | OPNsense can ping 8.8.8.8, but Docker VM **cannot** |
 | 13:36 | WAN watchdog log checked — script never ran (cron issue) |
-| 13:38 | Manual watchdog execution — WAN recovered via Step 1 |
-| 13:40 | Cron restarted (`service cron restart`) |
-| 13:48 | Pi-hole DNS found broken — gravity.db corrupted (missing views), FTL PID file permission denied |
-| 13:50 | Discovered Docker VM `/etc/resolv.conf` overwritten by Tailscale (`nameserver 100.100.100.100`) |
-| 13:52 | Set Docker VM DNS to `nameserver 192.168.0.1` — still no internet |
-| 13:56 | Docker VM routing OK (gateway 192.168.0.1, can ping OPNsense) but no internet |
-| 13:58 | Discovered `pfctl -s nat` shows NO outbound NAT rules |
-| 14:00 | `configctl filter reload` — returned OK but NAT not restored |
-| 14:01 | `configctl service reload all` — configd communication error |
-| 14:05 | `/usr/local/etc/rc.filter_configure` — firewall reconfigured but still no NAT |
-| 14:10 | Manual pfctl NAT injection: `echo 'nat on vtnet0 from 192.168.0.0/24 to any -> (vtnet0) round-robin' > /tmp/nat.conf && pfctl -a '*' -N -f /tmp/nat.conf` — **SUCCESS** |
-| 14:10 | LAN internet restored, cameras green |
-| 14:15 | Pi-hole restarted — FTL running, DNS resolving (PID file error is cosmetic) |
-| 14:17 | Full recovery confirmed — `dig google.com @192.168.0.10` returns results |
+| 13:38 | Manual watchdog execution — confirms script works, cron doesn't |
+| 13:40 | `service cron restart` on OPNsense |
+| 13:48 | Pi-hole DNS broken — gravity.db corrupted, FTL PID permissions |
+| 13:50 | Docker VM `/etc/resolv.conf` = `nameserver 100.100.100.100` (Tailscale, unreachable) |
+| 13:56 | Docker VM gateway correct, can ping OPNsense but NOT internet |
+| 13:58 | **`pfctl -sn` shows zero outbound NAT rules** — root cause found |
+| 14:00 | `configctl filter reload` → OK but no NAT |
+| 14:01 | `configctl service reload all` → configd error |
+| 14:05 | `/usr/local/etc/rc.filter_configure` → reconfigured but still no NAT |
+| 14:10 | `scp` NAT config + `pfctl -N -f /tmp/nat.conf` — **LAN internet restored** |
+| 14:15 | Pi-hole restarted — FTL running, DNS resolving |
+| 14:17 | Full recovery confirmed |
+| 14:50 | Investigated OPNsense web UI — Automatic rules table empty (persistent, survives reboot) |
+| 15:00 | Changed to Hybrid mode, created 3 manual NAT rules (LAN, IOT, GUEST) |
+| 15:05 | Permanent fix applied — rules in OPNsense config, pending reboot verification |
 
 ---
 
@@ -95,9 +111,33 @@ Operator could not have internet and LAN access simultaneously — USB-Gigabit a
 
 ---
 
-## Temporary Fix in Place
+## Root Cause: Missing Outbound NAT Configuration
 
-Manual NAT rule added via pfctl — **will not survive OPNsense reboot**. A scheduled reboot is needed to cleanly restore all rules from OPNsense config.
+Investigation revealed OPNsense's "Automatic outbound NAT" mode was generating **zero rules**. The Automatic rules table was empty in the web UI, and `pfctl -sn` confirmed no NAT rules at pf level. This persisted across reboots and `configctl filter reload` / `rc.filter_configure` attempts.
+
+### Resolution
+
+1. Changed NAT mode from **Automatic** to **Hybrid** (Firewall > NAT > Outbound)
+2. Created 3 manual outbound NAT rules via web UI:
+
+| Interface | Source | Destination | NAT Address | Description |
+|-----------|--------|-------------|-------------|-------------|
+| WAN | 192.168.0.0/24 | * | Interface address | LAN outbound NAT |
+| IOT | 192.168.10.0/24 | * | Interface address | IOT outbound NAT |
+| GUEST | 192.168.20.0/24 | * | Interface address | GUEST outbound NAT |
+
+3. Applied changes — rules now persist in OPNsense config (surviving reboots)
+
+### Interim Fix (before permanent rules)
+
+Manual pfctl injection was used to restore internet while troubleshooting:
+```sh
+# Write NAT config locally, scp to OPNsense, then load
+scp /tmp/nat.conf root@192.168.0.1:/tmp/nat.conf
+ssh root@192.168.0.1 "pfctl -N -f /tmp/nat.conf"
+```
+
+Note: `pfctl -a '*' -N -f` and `pfctl -a 'OPNsense' -N -f` did NOT work. Only `pfctl -N -f` (loading into the main ruleset) was effective.
 
 ---
 
@@ -117,70 +157,72 @@ Investigate why cron didn't execute. Options:
 Add NAT rule check and restoration to `wan_watchdog.sh`:
 ```sh
 # After WAN recovery, check if NAT rules exist
-if ! pfctl -s nat | grep -q 'nat on vtnet0'; then
-    echo 'nat on vtnet0 from 192.168.0.0/24 to any -> (vtnet0) round-robin' > /tmp/nat_emergency.conf
-    pfctl -a '*' -N -f /tmp/nat_emergency.conf
+if ! pfctl -sn | grep -q 'nat on vtnet0'; then
+    log_msg "NAT rules missing — triggering filter reconfigure"
     /usr/local/etc/rc.filter_configure
-    log_msg "NAT rules were missing — emergency NAT injected + filter reconfigured"
+    sleep 10
+    if ! pfctl -sn | grep -q 'nat on vtnet0'; then
+        # Emergency: inject NAT directly
+        pfctl -N -f /tmp/nat_emergency.conf
+        log_msg "Emergency NAT injected via pfctl"
+    fi
 fi
 ```
 
 #### 3. Fix Docker VM Tailscale DNS Bootstrap
 
-Add `hs.cronova.dev` to Docker VM's `/etc/hosts` (like VPS already has):
-```
-104.207.144.195 hs.cronova.dev
-```
-This prevents Tailscale from failing to reconnect when DNS is down.
-
-Note: Docker VM already has this in `/etc/hosts` but Tailscale overwrites `/etc/resolv.conf` to `100.100.100.100`. When Tailscale is disconnected, this DNS server is unreachable. Consider setting `accept-dns=false` on Docker VM or adding a fallback nameserver.
+Docker VM's `/etc/resolv.conf` is overwritten by Tailscale to `nameserver 100.100.100.100`. When Tailscale disconnects, the entire host loses DNS resolution. Options:
+- Set `accept-dns=false` on Docker VM Tailscale
+- Add a fallback nameserver to `/etc/resolv.conf` (e.g., `nameserver 192.168.0.1`)
+- Configure systemd-resolved with a fallback
 
 #### 4. Fix Pi-hole PID File Permissions
 
-The `pihole status` check fails with "Permission denied" on `/run/pihole-FTL.pid`. This is a Pi-hole v6 issue. Options:
-- Add `CHOWN` and `DAC_OVERRIDE` to Pi-hole container caps
-- Run FTL as root inside the container
-- Ignore — FTL is running, the status check is misleading
+`pihole status` reports "DNS service is NOT running" due to PID file permission denied, but FTL IS running (confirmed via `pgrep -a pihole-FTL`). Cosmetic but confusing during incidents.
 
 ### P1 — Short Term
 
-#### 5. Schedule OPNsense Reboot
+#### 5. Dual Network Troubleshooting
 
-Reboot OPNsense to cleanly restore all pf rules from config. Do this during a maintenance window (late night). The manual NAT rule currently in place will not survive reboot, but the proper rules should load from config.
-
-#### 6. Investigate OPNsense Outbound NAT Config
-
-Via web UI (Firewall > NAT > Outbound), verify:
-- Mode is set to "Automatic outbound NAT" or "Hybrid"
-- Rules exist for 192.168.0.0/24, 192.168.10.0/24, 192.168.20.0/24
-- If mode is "Manual" and rules were somehow deleted, recreate them
-
-#### 7. Dual Network Troubleshooting
-
-The inability to have internet + LAN simultaneously severely hampered troubleshooting. Options:
-- Set Mac network service order: phone hotspot as primary, USB-Gigabit as secondary
-- Use `route add` to only route 192.168.0.0/24 via USB-Gigabit while keeping internet via hotspot
-- Example: `sudo route add 192.168.0.0/24 192.168.0.1`
+The inability to have internet + LAN simultaneously severely hampered troubleshooting. Fix:
+```bash
+# Route only homelab LAN via USB-Gigabit, keep internet via hotspot
+sudo route add 192.168.0.0/24 192.168.0.1
+```
 
 ---
 
 ## Architecture Lessons
 
 ```text
-FAILURE CASCADE:
+FAILURE CASCADE (Outage #2):
 ISP Down → WAN Lost → Watchdog didn't fire → Manual WAN fix
-  → NAT not restored → LAN no internet → Tailscale down
-  → Docker VM DNS broken (resolv.conf = Tailscale)
+  → NAT rules missing (persistent config issue) → LAN no internet
+  → Docker VM DNS broken (resolv.conf = Tailscale 100.100.100.100)
+  → Tailscale disconnects (can't reach Headscale)
   → Pi-hole upstream fails → ALL LAN DNS dead
   → Cameras offline, all services unreachable
 
 GAPS EXPOSED:
-1. Watchdog cron not integrated with OPNsense properly
-2. WAN recovery doesn't restore NAT rules
-3. Docker VM DNS depends on Tailscale (single point of failure)
-4. No way to have LAN + internet simultaneously for troubleshooting
-5. Pi-hole status check broken (cosmetic but confusing)
+1. Outbound NAT was silently broken (Automatic mode generating zero rules)
+2. Watchdog cron not integrated with OPNsense properly
+3. WAN recovery (configctl reconfigure) doesn't restore NAT rules
+4. Docker VM DNS depends entirely on Tailscale (single point of failure)
+5. No way to have LAN + internet simultaneously for troubleshooting
+6. Pi-hole status check broken (cosmetic but confusing during incidents)
+
+WHAT WORKED:
+1. SSH key auth on OPNsense — enabled scripted recovery
+2. WAN watchdog script — works when manually executed (Step 1 = instant fix)
+3. pfctl NAT injection — creative workaround while investigating
+4. Incident documented in real-time — precise timeline for post-mortem
 ```
+
+## Open Questions
+
+1. **When did Automatic NAT break?** The March 5 outage auto-recovered (NAT was working). Something regressed between March 5-18. Candidates: OPNsense update, VLAN configuration changes, or a config corruption during an outage.
+2. **Why does `rc.filter_configure` not generate NAT rules?** This script should regenerate all pf rules from config, including NAT. The fact that it doesn't suggests the NAT config in `/conf/config.xml` may have been incomplete even before this incident.
+3. **Will the manual Hybrid rules survive an OPNsense upgrade?** Manual rules in Hybrid mode should persist, but worth verifying after the next OPNsense update.
 
 ---
 
@@ -189,3 +231,4 @@ GAPS EXPOSED:
 - Previous incident: `docs/guides/incident-2026-03-05-isp-outage.md`
 - WAN watchdog plan: `docs/plans/wan-watchdog-2026-02-23.md`
 - WAN watchdog script: `scripts/wan_watchdog.sh`
+- OPNsense outbound NAT docs: `https://docs.opnsense.org/manual/nat.html`
