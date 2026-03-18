@@ -204,7 +204,7 @@ Portable infrastructure for dev, self-hosting, and travel.
 
 ## RPi 5 (Moved to Fixed Homelab)
 
-RPi 5 has been migrated from the mobile kit to the fixed homelab, running OpenClaw directly (not Docker). See `docs/rpi5-deployment-plan.md`.
+RPi 5 has been migrated from the mobile kit to the fixed homelab, running OpenClaw directly (not Docker). See [`../plans/rpi5-deployment-plan.md`](../plans/rpi5-deployment-plan.md).
 
 ## Backup Strategy
 

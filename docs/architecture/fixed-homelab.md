@@ -8,7 +8,7 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
 |-----------|----------|------|------------|
 
 | Oga (Proxmox) | AOOSTAR Mini PC, Intel N150, 12GB RAM | Hypervisor: OPNsense VM + Docker VM | — |
-| Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 35 containers | 33 |
+| Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 35 containers | 35 |
 | NAS | i3-3220T, 8GB DDR3, Mini-ITX | Storage, git, PaaS: 5 stacks + Coolify | 19 |
 | OPNsense (100) | 2 vCPU, 2GB RAM, 20GB disk | Gateway, DHCP, VLANs, Tailscale | — |
 
@@ -181,7 +181,7 @@ Rescue USB: SystemRescue 12.03 on Lexar 128GB USB.
 - **Forgejo** — Git server at `git.cronova.dev`, data at `/srv/forgejo`, SSH on port 2222
 - **Restic REST** — Backup target on port 8000, data at `/mnt/purple/backup/restic/`, `--private-repos`
 - **Coolify (Tajy)** — PaaS at `tajy.cronova.dev`, port 8888, Traefik on 80/443
-- **Samba** — Network shares (justinpatchett/samba, migrated from abandoned dperson/samba)
+- **Samba** — Network shares (dockurr/samba:4.23.5, migrated from abandoned dperson/samba)
 - **Syncthing** — File sync, version 2.0.14
 - **Glances** — System monitoring, integrated with Home Assistant
 
