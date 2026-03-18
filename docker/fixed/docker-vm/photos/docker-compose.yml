@@ -58,7 +58,7 @@ services:
       immich-db:
         condition: service_healthy
       immich-valkey:
-        condition: service_started
+        condition: service_healthy
 
   # =========================================================================
   # Immich Machine Learning

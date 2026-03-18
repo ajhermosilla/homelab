@@ -162,7 +162,8 @@ services:
     networks:
       - automation-net
     depends_on:
-      - homeassistant
+      homeassistant:
+        condition: service_healthy
 
 volumes:
   homeassistant-config:

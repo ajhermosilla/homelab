@@ -26,7 +26,6 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=media"
       - "com.centurylinklabs.watchtower.enable=true"
-      - "com.cronova.backup=true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
       interval: 30s
