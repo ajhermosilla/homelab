@@ -12,6 +12,13 @@
 
 set -euo pipefail
 
+if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+    echo "Usage: docker-boot-orchestrator.sh"
+    echo "Starts Docker Compose stacks in dependency order on boot."
+    echo "Designed to run as a systemd service on the Docker VM."
+    exit 0
+fi
+
 REPO_ROOT="/opt/homelab/repo"
 COMPOSE_BASE="${REPO_ROOT}/docker/fixed/docker-vm"
 NFS_MOUNT="/mnt/nas/frigate"

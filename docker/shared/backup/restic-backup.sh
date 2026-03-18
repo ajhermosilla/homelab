@@ -92,5 +92,5 @@ if [ "$(date +%u)" = "7" ]; then
 fi
 
 # Print backup stats
-SNAPSHOT_COUNT=$(restic snapshots --tag "$BACKUP_TAG" --json 2>/dev/null | grep -c '"short_id"' || echo "0")
+SNAPSHOT_COUNT=$(restic snapshots --tag "$BACKUP_TAG" --json 2>/dev/null | jq 'length')
 log "Backup complete: $BACKUP_TAG (Total snapshots: $SNAPSHOT_COUNT)"
