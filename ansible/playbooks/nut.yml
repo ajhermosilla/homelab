@@ -33,12 +33,19 @@
     nut_listen_port: 3493
     nas_lan_ip: "{{ nas_lan_ip | default('192.168.0.12') }}"
     ntfy_url: "https://notify.cronova.dev/cronova-critical"
-    # Pass via -e or add to inventory/vault
-    nut_admin_pass: "{{ nut_admin_pass | default('changeme-admin') }}"
-    nut_monitor_pass: "{{ nut_monitor_pass | default('changeme-monitor') }}"
-    nut_slave_pass: "{{ nut_slave_pass | default('changeme-slave') }}"
+    # Pass via -e (required — no defaults)
+    nut_admin_pass: "{{ nut_admin_pass }}"
+    nut_monitor_pass: "{{ nut_monitor_pass }}"
+    nut_slave_pass: "{{ nut_slave_pass }}"
 
   tasks:
+    - name: Validate NUT passwords are provided
+      assert:
+        that:
+          - nut_admin_pass is defined and nut_admin_pass != ''
+          - nut_monitor_pass is defined and nut_monitor_pass != ''
+          - nut_slave_pass is defined and nut_slave_pass != ''
+        fail_msg: "NUT passwords required: -e nut_admin_pass=... -e nut_monitor_pass=... -e nut_slave_pass=..."
     # =========================================================================
     # Install
     # =========================================================================
@@ -130,6 +137,7 @@
           [upsmon_slave]
               password = {{ nut_slave_pass }}
               upsmon slave
+      no_log: true
       notify: Restart NUT server
 
     - name: Configure UPS monitor - master (upsmon.conf)
@@ -140,6 +148,7 @@
         mode: '0640'
         content: |
           MONITOR {{ nut_ups_name }}@localhost 1 upsmon {{ nut_monitor_pass }} master
+      no_log: true
           MINSUPPLIES 1
           SHUTDOWNCMD "/sbin/shutdown -h +0"
           POLLFREQ 5

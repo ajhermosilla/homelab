@@ -169,6 +169,10 @@ See [docs/README.md](docs/README.md) for the full documentation index.
 
 See [docs/guides/deployment-order.md](docs/guides/deployment-order.md) for the full sequence.
 
+## For External Readers
+
+This is a personal infrastructure repo, not a deployable template. It documents a specific homelab setup and may reference private infrastructure. Feel free to browse the [documentation](https://docs.cronova.dev), borrow ideas, and adapt patterns to your own setup.
+
 ---
 
 **Owner**: Augusto Hermosilla — augusto@hermosilla.me

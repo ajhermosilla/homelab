@@ -37,7 +37,7 @@ services:
     environment:
       DB_HOSTNAME: immich-db
       DB_USERNAME: ${DB_USERNAME:-immich}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required in .env}
       DB_DATABASE_NAME: ${DB_DATABASE_NAME:-immich}
       REDIS_HOSTNAME: immich-valkey
     healthcheck:
@@ -172,7 +172,7 @@ services:
       - immich-db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USERNAME:-immich}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required in .env}
       POSTGRES_DB: ${DB_DATABASE_NAME:-immich}
       POSTGRES_INITDB_ARGS: '--data-checksums'
     healthcheck:
@@ -229,7 +229,7 @@ services:
       PGPASSWORD: ${DB_PASSWORD}
       PGDATABASE: ${DB_DATABASE_NAME:-immich}
       RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/immich}
-      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD:?RESTIC_PASSWORD required in .env}
       KEEP_DAILY: "7"
       KEEP_WEEKLY: "4"
       KEEP_MONTHLY: "12"
