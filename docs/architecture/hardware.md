@@ -125,7 +125,7 @@ All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured
 | Docker | 101 | 2 | 9GB | 100GB | 2 (delay: 30) |
 
 - **OPNsense** (VM 100) — Gateway/firewall since 2026-02-21, LAN 192.168.0.1/24
-- **Docker** (VM 101) — 33 containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, Paperless-ngx, monitoring (VM+vmagent+vmalert+alertmanager+cAdvisor+Grafana), tools, media, backup sidecars
+- **Docker** (VM 101) — 35 containers: Pi-hole, Caddy, Frigate, HA, Vaultwarden, Authelia, Jellyfin, Immich, Paperless-ngx, monitoring (VM+vmagent+vmalert+alertmanager+cAdvisor+Grafana), tools, media, backup sidecars
 
 **Network bridges:** nic0/vmbr0 = ISP modem (ARRIS bridge mode), nic1/vmbr1 = MokerLink switch. OPNsense has both NICs; Docker VM has vmbr1 only.
 
@@ -266,7 +266,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 | Device | Running Containers | Key Services |
 |--------|-------------------|--------------|
 
-| Docker VM | 33 | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (BentoPDF), Papa (VictoriaMetrics+Grafana+vmagent+vmalert+Alertmanager+cAdvisor), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower, media (*arr stack), backup sidecars |
+| Docker VM | 35 | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (BentoPDF), Papa (VictoriaMetrics+Grafana+vmagent+vmalert+Alertmanager+cAdvisor), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower, media (*arr stack), backup sidecars |
 | NAS | 19 | Forgejo, Tajy (Coolify + 6 sub-containers), Samba, Syncthing, Restic REST, Offsite Sync, Glances, Katupyry (3), Javya (3) |
 | RPi 5 | — | OpenClaw (pending PSU) |
 | RPi 4 | — | Bitcoin Core, LND, Electrum Server (Start9) |
@@ -284,7 +284,7 @@ Cloud helper node (not critical infrastructure).
 
 | Vultr | High Frequency | 1 vCPU, 1GB RAM, 32GB NVMe | ~$6/mo |
 
-**Services (5 active):** Headscale, Caddy, headscale-backup, Uptime Kuma, ntfy
+**Services (12 active):** Headscale, Caddy, headscale-backup, Uptime Kuma, ntfy, AdGuard Home (Yvága), Unbound (Yvága), DERP Relay, Pi-hole (VPS), changedetection, Playwright, Restic REST
 
 **See:** [docs/architecture/vps-architecture.md](vps-architecture.md)
 

@@ -19,13 +19,16 @@ Security configuration to protect against script kiddies, malware, and DoS attac
 
 ### Public Exposure
 
-Only **one service** exposed to internet: Headscale on VPS.
+Multiple services on the VPS are exposed to the internet via Caddy reverse proxy. All fixed homelab services are behind Tailscale (no public ports).
 
 ```text
-Internet Access:
-├── hs.cronova.dev (Headscale) ← Only public endpoint
+Internet Access (VPS — Caddy reverse proxy):
+├── hs.cronova.dev (Headscale) ← Tailscale coordination
 │   └── Port 443 (HTTPS)
 │   └── Port 3478 (STUN/DERP)
+├── status.cronova.dev (Uptime Kuma) ← Public status page
+├── notify.cronova.dev (ntfy) ← Push notifications
+├── cronova.dev (Landing page) ← Static HTML
 │
 └── Everything else via Tailscale mesh (no public ports)
     ├── Home Assistant
@@ -72,8 +75,8 @@ All traffic filtered through OPNsense VM (gateway since 2026-02-21):
 
 Authelia (Okẽ) provides SSO + TOTP 2FA for services behind Caddy on Docker VM:
 
-- **Protected:** Yrasema (Jellyfin), Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx)
-- **Own auth (not protected):** Jara (HA), Taguato (Frigate), Vaultwarden, Vera (Immich), Forgejo
+- **Protected:** Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx)
+- **Own auth (not protected):** Jara (HA), Taguato (Frigate), Vaultwarden, Vera (Immich), Forgejo, Yrasema (Jellyfin — mobile/TV clients can't handle redirects)
 - **Notifier:** Filesystem (writes codes to `/data/notification.txt`), not SMTP
 - **2FA:** TOTP via Authy app
 

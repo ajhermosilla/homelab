@@ -98,7 +98,7 @@ services:
           memory: 512M
           cpus: '1'
     ports:
-      - "8384:8384"     # Web UI
+      - "127.0.0.1:8384:8384"  # Web UI — access via SSH tunnel or Tailscale
       - "22000:22000/tcp"  # Transfer
       - "22000:22000/udp"
       - "21027:21027/udp"  # Discovery

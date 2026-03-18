@@ -154,7 +154,7 @@ When on Tailscale mesh, devices can use Pi-hole on Docker VM or VPS:
 dns_config:
   nameservers:
     - 100.68.63.168   # Home Pi-hole (primary)
-    - 100.77.172.46   # VPS Pi-hole (fallback)
+    - 100.77.172.46   # VPS AdGuard (fallback)
   magic_dns: true
   base_domain: tail.net
 ```

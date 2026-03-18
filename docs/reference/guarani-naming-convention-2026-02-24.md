@@ -75,9 +75,9 @@
 | `mbyja.cronova.dev` | Homepage | Docker VM |
 | `ysyry.cronova.dev` | Dozzle | Docker VM |
 | `kuatia.cronova.dev` | BentoPDF | Docker VM |
-| `okẽ.cronova.dev` | Authelia | Docker VM |
+| `auth.cronova.dev` | Authelia | Docker VM |
 | `papa.cronova.dev` | VictoriaMetrics + Grafana | Docker VM |
-| `vera.cronova.dev` | Immich | NAS |
+| `vera.cronova.dev` | Immich | Docker VM |
 | `tajy.cronova.dev` | Coolify PaaS | NAS |
 | `aranduka.cronova.dev` | Paperless-ngx | Docker VM |
 | `pytyvõ.cronova.dev` | n8n | Docker VM |

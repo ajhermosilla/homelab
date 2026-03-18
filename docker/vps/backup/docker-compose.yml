@@ -32,7 +32,7 @@ services:
           memory: 256M
           cpus: '0.5'
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"  # Accessed via Tailscale only
     volumes:
       - restic-data:/data
       - ./htpasswd:/data/.htpasswd:ro
