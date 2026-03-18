@@ -70,7 +70,7 @@ fi
 
 # Step 4: Verify backup
 log "Verifying backup snapshot exists"
-LATEST_SNAPSHOT=$(restic snapshots --tag "$BACKUP_TAG" --latest 1 --json 2>/dev/null | grep -o '"short_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+LATEST_SNAPSHOT=$(restic snapshots --tag "$BACKUP_TAG" --latest 1 --json 2>/dev/null | jq -r '.[0].short_id // empty')
 if [ -z "$LATEST_SNAPSHOT" ]; then
     log "ERROR: Could not verify backup snapshot"
     rm -f "$DUMP_FILE"
@@ -99,5 +99,5 @@ fi
 # Cleanup
 rm -f "$DUMP_FILE"
 
-SNAPSHOT_COUNT=$(restic snapshots --tag "$BACKUP_TAG" --json 2>/dev/null | grep -c '"short_id"' || echo "0")
+SNAPSHOT_COUNT=$(restic snapshots --tag "$BACKUP_TAG" --json 2>/dev/null | jq 'length')
 log "Backup complete: $BACKUP_TAG (Total snapshots: $SNAPSHOT_COUNT)"

@@ -95,7 +95,7 @@ send() {
         -H "Tags: $tags" \
         -H "Title: Homelab Backup" \
         -d "$message" \
-        "$NTFY_URL/$topic" > /dev/null 2>&1
+        "$NTFY_URL/$topic" > /dev/null 2>&1 || true
 
     echo "Notification sent: $message"
 }

@@ -58,7 +58,7 @@ services:
       immich-db:
         condition: service_healthy
       immich-valkey:
-        condition: service_started
+        condition: service_healthy
 
   # =========================================================================
   # Immich Machine Learning
@@ -207,6 +207,11 @@ services:
       - "com.cronova.environment=fixed"
       - "com.cronova.category=backup"
       - "com.centurylinklabs.watchtower.enable=true"
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep crond || exit 1"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
     deploy:
       resources:
         limits:

@@ -83,6 +83,38 @@ test_restic_health() {
     fi
 }
 
+# Helper: Check a single snapshot's freshness
+# Usage: check_snapshot <tag> <display_name> <max_hours> <required>
+# Sets SNAPSHOT_ERRORS++ on failure
+check_snapshot() {
+    local tag="$1"
+    local display_name="$2"
+    local max_hours="$3"
+    local required="$4"
+
+    local snapshot
+    snapshot=$(restic snapshots --tag "$tag" --json 2>/dev/null | jq -r '.[-1].time // empty')
+    if [[ -z "$snapshot" ]]; then
+        if [[ "$required" == "true" ]]; then
+            log_error "No ${display_name} snapshot found!"
+            ((SNAPSHOT_ERRORS++))
+        else
+            log_warn "No ${display_name} snapshot found (may be expected if not deployed)"
+        fi
+        return
+    fi
+
+    local snap_time
+    snap_time=$(date -d "$snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${snapshot%%.*}" +%s 2>/dev/null)
+    local age_hours=$(( ($(date +%s) - snap_time) / 3600 ))
+    if [[ $age_hours -le $max_hours ]]; then
+        log_info "${display_name} snapshot: ${age_hours}h ago (OK)"
+    else
+        log_warn "${display_name} snapshot: ${age_hours}h ago (expected <${max_hours}h)"
+        ((SNAPSHOT_ERRORS++))
+    fi
+}
+
 # Test 2: Verify Snapshots Exist
 test_snapshots() {
     log_test "Snapshot Verification"
@@ -90,117 +122,17 @@ test_snapshots() {
     export RESTIC_REPOSITORY
     export RESTIC_PASSWORD_FILE
 
-    local now=$(date +%s)
-    local errors=0
+    SNAPSHOT_ERRORS=0
 
-    # Check Headscale (should be within 2 hours)
-    local hs_snapshot=$(restic snapshots --tag headscale --json 2>/dev/null | jq -r '.[-1].time // empty')
-    if [[ -n "$hs_snapshot" ]]; then
-        local hs_time=$(date -d "$hs_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${hs_snapshot%%.*}" +%s 2>/dev/null)
-        local hs_age=$(( (now - hs_time) / 3600 ))
-        if [[ $hs_age -le 2 ]]; then
-            log_info "Headscale snapshot: ${hs_age}h ago (OK)"
-        else
-            log_warn "Headscale snapshot: ${hs_age}h ago (expected <2h)"
-            ((errors++))
-        fi
-    else
-        log_error "No Headscale snapshot found!"
-        ((errors++))
-    fi
+    check_snapshot "headscale"     "Headscale"      2  "true"
+    check_snapshot "vaultwarden"   "Vaultwarden"    25 "true"
+    check_snapshot "homeassistant" "Home Assistant"  25 "false"
+    check_snapshot "paperless"     "Paperless-ngx"  25 "false"
+    check_snapshot "immich-db"     "Immich DB"      25 "false"
+    check_snapshot "caddy"         "Caddy"          25 "false"
+    check_snapshot "pihole"        "Pi-hole"        25 "false"
 
-    # Check Vaultwarden (should be within 25 hours)
-    local vw_snapshot=$(restic snapshots --tag vaultwarden --json 2>/dev/null | jq -r '.[-1].time // empty')
-    if [[ -n "$vw_snapshot" ]]; then
-        local vw_time=$(date -d "$vw_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${vw_snapshot%%.*}" +%s 2>/dev/null)
-        local vw_age=$(( (now - vw_time) / 3600 ))
-        if [[ $vw_age -le 25 ]]; then
-            log_info "Vaultwarden snapshot: ${vw_age}h ago (OK)"
-        else
-            log_warn "Vaultwarden snapshot: ${vw_age}h ago (expected <25h)"
-            ((errors++))
-        fi
-    else
-        log_error "No Vaultwarden snapshot found!"
-        ((errors++))
-    fi
-
-    # Check Home Assistant (should be within 25 hours)
-    local ha_snapshot=$(restic snapshots --tag homeassistant --json 2>/dev/null | jq -r '.[-1].time // empty')
-    if [[ -n "$ha_snapshot" ]]; then
-        local ha_time=$(date -d "$ha_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${ha_snapshot%%.*}" +%s 2>/dev/null)
-        local ha_age=$(( (now - ha_time) / 3600 ))
-        if [[ $ha_age -le 25 ]]; then
-            log_info "Home Assistant snapshot: ${ha_age}h ago (OK)"
-        else
-            log_warn "Home Assistant snapshot: ${ha_age}h ago (expected <25h)"
-            ((errors++))
-        fi
-    else
-        log_warn "No Home Assistant snapshot found (may be expected if not deployed)"
-    fi
-
-    # Check Paperless-ngx (should be within 25 hours)
-    local pl_snapshot=$(restic snapshots --tag paperless --json 2>/dev/null | jq -r '.[-1].time // empty')
-    if [[ -n "$pl_snapshot" ]]; then
-        local pl_time=$(date -d "$pl_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${pl_snapshot%%.*}" +%s 2>/dev/null)
-        local pl_age=$(( (now - pl_time) / 3600 ))
-        if [[ $pl_age -le 25 ]]; then
-            log_info "Paperless-ngx snapshot: ${pl_age}h ago (OK)"
-        else
-            log_warn "Paperless-ngx snapshot: ${pl_age}h ago (expected <25h)"
-            ((errors++))
-        fi
-    else
-        log_warn "No Paperless-ngx snapshot found (may be expected if not deployed)"
-    fi
-
-    # Check Immich DB (should be within 25 hours)
-    local im_snapshot=$(restic snapshots --tag immich-db --json 2>/dev/null | jq -r '.[-1].time // empty')
-    if [[ -n "$im_snapshot" ]]; then
-        local im_time=$(date -d "$im_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${im_snapshot%%.*}" +%s 2>/dev/null)
-        local im_age=$(( (now - im_time) / 3600 ))
-        if [[ $im_age -le 25 ]]; then
-            log_info "Immich DB snapshot: ${im_age}h ago (OK)"
-        else
-            log_warn "Immich DB snapshot: ${im_age}h ago (expected <25h)"
-            ((errors++))
-        fi
-    else
-        log_warn "No Immich DB snapshot found (may be expected if not deployed)"
-    fi
-
-    # Check Caddy (should be within 25 hours)
-    local caddy_snapshot=$(restic snapshots --tag caddy --json 2>/dev/null | jq -r '.[-1].time // empty')
-    if [[ -n "$caddy_snapshot" ]]; then
-        local caddy_time=$(date -d "$caddy_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${caddy_snapshot%%.*}" +%s 2>/dev/null)
-        local caddy_age=$(( (now - caddy_time) / 3600 ))
-        if [[ $caddy_age -le 25 ]]; then
-            log_info "Caddy snapshot: ${caddy_age}h ago (OK)"
-        else
-            log_warn "Caddy snapshot: ${caddy_age}h ago (expected <25h)"
-            ((errors++))
-        fi
-    else
-        log_warn "No Caddy snapshot found (may be expected if not deployed)"
-    fi
-
-    # Check Pi-hole (should be within 25 hours)
-    local pihole_snapshot=$(restic snapshots --tag pihole --json 2>/dev/null | jq -r '.[-1].time // empty')
-    if [[ -n "$pihole_snapshot" ]]; then
-        local pihole_time=$(date -d "$pihole_snapshot" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%S" "${pihole_snapshot%%.*}" +%s 2>/dev/null)
-        local pihole_age=$(( (now - pihole_time) / 3600 ))
-        if [[ $pihole_age -le 25 ]]; then
-            log_info "Pi-hole snapshot: ${pihole_age}h ago (OK)"
-        else
-            log_warn "Pi-hole snapshot: ${pihole_age}h ago (expected <25h)"
-            ((errors++))
-        fi
-    else
-        log_warn "No Pi-hole snapshot found (may be expected if not deployed)"
-    fi
-
-    if [[ $errors -eq 0 ]]; then
+    if [[ $SNAPSHOT_ERRORS -eq 0 ]]; then
         ((TESTS_PASSED++))
         return 0
     else

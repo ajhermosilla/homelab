@@ -28,6 +28,8 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 ### verava.ai (To Purchase)
 
+> **Status (2026-03-18)**: verava.ai purchase deferred — not needed for current homelab scope.
+
 | Factor | Value |
 |--------|-------|
 
