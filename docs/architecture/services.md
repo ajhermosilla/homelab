@@ -41,9 +41,9 @@
 | 32 | Vera | Immich Valkey | Photos | Docker VM | Active |
 | 33 | Vera | Immich DB | Photos | Docker VM | Active |
 | 34 | Aranduka | Paperless-ngx | Documents | Docker VM | Active |
-| 35 | — | Sonarr | Media | Docker VM | Active |
-| 36 | — | Radarr | Media | Docker VM | Active |
-| 37 | — | Prowlarr | Media | Docker VM | Active |
+| 35 | Japysaka | Sonarr | Media | Docker VM | Active |
+| 36 | Taanga | Radarr | Media | Docker VM | Active |
+| 37 | Aoao | Prowlarr | Media | Docker VM | Active |
 | 38 | — | qBittorrent | Media | Docker VM | Active |
 | 39 | — | paperless-db | Documents | Docker VM | Active |
 | 40 | — | paperless-redis | Documents | Docker VM | Active |
@@ -147,9 +147,9 @@ Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), A
 |---------|---------|---------|-----------|-------|
 
 | Yrasema | **Jellyfin** | 8096 | yrasema.cronova.dev | jellyfin/jellyfin |
-| — | **Sonarr** | 8989 | — | lscr.io/linuxserver/sonarr |
-| — | **Radarr** | 7878 | — | lscr.io/linuxserver/radarr |
-| — | **Prowlarr** | 9696 | — | lscr.io/linuxserver/prowlarr |
+| Japysaka | **Sonarr** | 8989 | japysaka.cronova.dev | lscr.io/linuxserver/sonarr |
+| Taanga | **Radarr** | 7878 | taanga.cronova.dev | lscr.io/linuxserver/radarr |
+| Aoao | **Prowlarr** | 9696 | aoao.cronova.dev | lscr.io/linuxserver/prowlarr |
 | — | **qBittorrent** | 8081, 6881 | — | lscr.io/linuxserver/qbittorrent |
 
 #### Tools
