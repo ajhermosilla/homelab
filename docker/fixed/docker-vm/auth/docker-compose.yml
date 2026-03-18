@@ -64,6 +64,7 @@ services:
       - ALL
     cap_add:
       - CHOWN
+      - DAC_OVERRIDE  # Read root-owned files in authelia-data volume
       - SETGID
       - SETUID
     security_opt:
