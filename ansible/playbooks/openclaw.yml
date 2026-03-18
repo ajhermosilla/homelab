@@ -74,7 +74,7 @@
       npm:
         name: openclaw
         global: yes
-        state: latest
+        state: present
       become_user: root
 
     - name: Verify OpenClaw installation

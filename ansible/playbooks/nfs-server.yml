@@ -172,7 +172,7 @@
     # NFS Configuration
     # =========================================================================
     - name: Configure NFS exports
-      template:
+      copy:
         dest: /etc/exports
         content: |
           # NFS Exports - Managed by Ansible
