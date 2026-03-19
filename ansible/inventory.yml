@@ -63,6 +63,7 @@ all:
               # ansible_host: 192.168.0.12  # Local access
           vars:
             storage_host: true
+            docker_data_root: /data/docker  # NAS /var is only 6GB
 
         start9:
           hosts:
