@@ -104,6 +104,7 @@ nav:
       - Javya on NAS: plans/javya-deploy-nas-2026-03-02.md
       - Uptime Kuma Monitors: plans/uptime-kuma-monitors-2026-03-02.md
       - WAN Watchdog: plans/wan-watchdog-2026-02-23.md
+      - Low Priority Audit Batches: plans/low-priority-batches-2026-03-18.md
       - Homelab Expansion: plans/homelab-expansion-ideas-2026-02-24.md
   - Reference:
       - Guarani Naming: reference/guarani-naming-convention-2026-02-24.md
@@ -132,5 +133,6 @@ nav:
       - DNS Loop (2026-03-12): journal/incident-2026-03-12-dns-loop.md
       - Uptime Kuma Monitors (2026-03-13): journal/incident-2026-03-13-uptime-kuma-monitors.md
       - Vaultwarden 502 (2026-03-16): journal/incident-2026-03-16-vaultwarden-502.md
+      - WAN + NAT Outage (2026-03-18): guides/incident-2026-03-18-wan-nat-outage.md
       - Frigate Crash (2026-03-05): guides/incident-2026-03-05-frigate-crash.md
       - ISP Outage (2026-03-05): guides/incident-2026-03-05-isp-outage.md
