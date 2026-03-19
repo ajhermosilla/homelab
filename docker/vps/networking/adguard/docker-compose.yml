@@ -47,7 +47,7 @@ services:
       - adguard-work:/opt/adguardhome/work
       - adguard-conf:/opt/adguardhome/conf
     environment:
-      - TZ=${TZ:-America/Asuncion}
+      TZ: ${TZ:-America/Asuncion}
     depends_on:
       unbound:
         condition: service_healthy
@@ -95,7 +95,7 @@ services:
     volumes:
       - ./unbound.conf:/usr/local/unbound/conf.d/custom.conf:ro
     environment:
-      - TZ=${TZ:-America/Asuncion}
+      TZ: ${TZ:-America/Asuncion}
     logging:
       driver: "json-file"
       options:
