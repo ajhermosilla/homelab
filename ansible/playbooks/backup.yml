@@ -43,7 +43,7 @@
 
     - name: Download Restic binary
       get_url:
-        url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_linux_amd64.bz2"
+        url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_linux_{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}.bz2"
         dest: /tmp/restic.bz2
         mode: '0644'
       when: restic_installed.rc != 0

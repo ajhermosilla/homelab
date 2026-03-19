@@ -63,6 +63,8 @@ services:
         max-size: "20m"
         max-file: "3"
     networks:
+      # Not on caddy-net — Jellyfin excluded from Authelia (mobile/TV clients
+      # can't handle redirects). Uses host.docker.internal via Caddy.
       - media-net
 
   # =========================================================================
