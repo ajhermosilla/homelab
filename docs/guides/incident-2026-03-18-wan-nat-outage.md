@@ -143,52 +143,42 @@ Note: `pfctl -a '*' -N -f` and `pfctl -a 'OPNsense' -N -f` did NOT work. Only `p
 
 ## Prevention Plan
 
-### P0 — Immediate
+### P0 — Immediate (all resolved 2026-03-19)
 
-#### 1. Fix WAN Watchdog Cron
+#### 1. Fix WAN Watchdog Cron — DONE
 
-Investigate why cron didn't execute. Options:
-- Use OPNsense's built-in cron (System > Settings > Cron in web UI) instead of system crontab
-- Create a configd action for the watchdog so it integrates with OPNsense's cron system
-- Add a configd action file: `/usr/local/opnsense/service/conf/actions.d/actions_wanwatchdog.conf`
+**Root cause**: Cron job in OPNsense web UI had Hours set to `0` (midnight only). Changed to `*` for 24/7 operation. The system crontab entry (`/var/cron/tabs/root`) was also present but OPNsense's configd-managed cron takes precedence.
 
-#### 2. Update Watchdog to Restore NAT
+#### 2. Permanent NAT Rules — DONE
 
-Add NAT rule check and restoration to `wan_watchdog.sh`:
-```sh
-# After WAN recovery, check if NAT rules exist
-if ! pfctl -sn | grep -q 'nat on vtnet0'; then
-    log_msg "NAT rules missing — triggering filter reconfigure"
-    /usr/local/etc/rc.filter_configure
-    sleep 10
-    if ! pfctl -sn | grep -q 'nat on vtnet0'; then
-        # Emergency: inject NAT directly
-        pfctl -N -f /tmp/nat_emergency.conf
-        log_msg "Emergency NAT injected via pfctl"
-    fi
-fi
-```
+Switched from Automatic to **Hybrid outbound NAT**. Created 3 manual rules via web UI (LAN, IOT, GUEST → WAN Interface address). Initially had IOT/GUEST on wrong interface (opt1/opt2) — corrected to WAN. Confirmed rules persist across reboot (2026-03-19).
 
-#### 3. Fix Docker VM Tailscale DNS Bootstrap
+#### 3. Fix Docker VM Tailscale DNS Bootstrap — DONE
 
-Docker VM's `/etc/resolv.conf` is overwritten by Tailscale to `nameserver 100.100.100.100`. When Tailscale disconnects, the entire host loses DNS resolution. Options:
-- Set `accept-dns=false` on Docker VM Tailscale
-- Add a fallback nameserver to `/etc/resolv.conf` (e.g., `nameserver 192.168.0.1`)
-- Configure systemd-resolved with a fallback
+Set `accept-dns=false` on Docker VM Tailscale. `/etc/resolv.conf` now points to OPNsense (`192.168.0.1`) instead of Tailscale (`100.100.100.100`). DNS works even when Tailscale is disconnected.
 
-#### 4. Fix Pi-hole PID File Permissions
+#### 4. Fix Pi-hole Gravity DB + Permissions — DONE
 
-`pihole status` reports "DNS service is NOT running" due to PID file permission denied, but FTL IS running (confirmed via `pgrep -a pihole-FTL`). Cosmetic but confusing during incidents.
+Added `DAC_OVERRIDE` and `FOWNER` caps to Pi-hole container (PR #11). Rebuilt gravity DB successfully. `pihole status` now reports FTL listening correctly. Ad-blocking restored.
 
-### P1 — Short Term
+#### 5. OPNsense SSH Key Persistence — PARTIAL
 
-#### 5. Dual Network Troubleshooting
+SSH key re-added after reboot. Note: OPNsense may lose `/root/.ssh/authorized_keys` on firmware upgrades. Consider adding key deployment to an Ansible playbook for repeatability.
+
+### P1 — Short Term (not yet started)
+
+#### 6. Dual Network Troubleshooting
 
 The inability to have internet + LAN simultaneously severely hampered troubleshooting. Fix:
+
 ```bash
 # Route only homelab LAN via USB-Gigabit, keep internet via hotspot
 sudo route add 192.168.0.0/24 192.168.0.1
 ```
+
+#### 7. Update Watchdog to Check NAT
+
+Add NAT rule verification to `wan_watchdog.sh` after WAN recovery. Low priority now that permanent NAT rules are in place, but good defense-in-depth.
 
 ---
 
@@ -220,9 +210,9 @@ WHAT WORKED:
 
 ## Open Questions
 
-1. **When did Automatic NAT break?** The March 5 outage auto-recovered (NAT was working). Something regressed between March 5-18. Candidates: OPNsense update, VLAN configuration changes, or a config corruption during an outage.
-2. **Why does `rc.filter_configure` not generate NAT rules?** This script should regenerate all pf rules from config, including NAT. The fact that it doesn't suggests the NAT config in `/conf/config.xml` may have been incomplete even before this incident.
-3. **Will the manual Hybrid rules survive an OPNsense upgrade?** Manual rules in Hybrid mode should persist, but worth verifying after the next OPNsense update.
+1. **When did Automatic NAT break?** The March 5 outage auto-recovered (NAT was working). Something regressed between March 5-18. Candidates: OPNsense update, VLAN configuration changes, or a config corruption during an outage. **Mitigated**: now using Hybrid mode with explicit manual rules — no longer depends on automatic rule generation.
+2. **Why does `rc.filter_configure` not generate NAT rules?** Confirmed: `/conf/config.xml` had no `<rule>` entries under `<outbound>` before we added them. The Automatic mode was configured but never generated persistent rules in the config — only in pf runtime memory. **Resolved**: manual rules now in config.xml.
+3. **Will the manual Hybrid rules survive an OPNsense upgrade?** Confirmed they survive reboots (tested 2026-03-19). Firmware upgrades should also preserve them since they're in `/conf/config.xml`. Worth verifying after next update.
 
 ---
 
