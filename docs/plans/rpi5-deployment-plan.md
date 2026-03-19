@@ -1,16 +1,27 @@
 # RPi 5 Deployment Plan
 
+> **Status**: Blocked on 27W PSU purchase. Plan updated 2026-03-19 with provider strategy and security notes.
+
 Step-by-step guide to deploy the Raspberry Pi 5 as an OpenClaw AI assistant node.
+
+## Overview
+
+OpenClaw is an open-source personal AI assistant gateway (325K+ GitHub stars, MIT license). It runs locally as a thin client, routing messages from 20+ chat platforms (WhatsApp, Telegram, Signal, Discord, etc.) to cloud LLM APIs. Created by Peter Steinberger, acquired by OpenAI in Feb 2026.
+
+**RPi 5 8GB is an excellent fit** — officially supported, ~500MB RAM in gateway mode, leaving 7.5GB free. The Cortex-A76 quad-core handles the gateway workload easily.
+
+**Complementary to PicoClaw on RPi Zero W** — OpenClaw is the full-featured hub (20+ platforms, MCP, voice, browser automation), PicoClaw is the lightweight edge agent (Telegram/Discord, <10MB RAM).
 
 ## Hardware Summary
 
 | Component | Model | Notes |
 |-----------|-------|-------|
-| Board | Raspberry Pi 5 8GB | OpenClaw AI assistant |
-| Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
+| Board | Raspberry Pi 5 8GB | OpenClaw AI assistant (~500MB RAM usage) |
+| Storage | 32GB SDHC Class 10 | Consider USB SSD later for better I/O |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
-| PSU | Official 27W USB-C | In transit (Miami -> Asuncion) |
+| PSU | Official 27W USB-C (5V/5A) | **Blocked — needs purchase** |
 | Case | TBD | See `docs/rpi5-case-research.md` |
+| Power draw | ~5W typical | Much lower than PSU rating |
 
 ---
 
@@ -51,10 +62,20 @@ docker exec headscale headscale preauthkeys create --expiration 1h
 
 ### 4. Pre-generate Credentials
 
-```bash
-# OpenClaw API keys (Anthropic, OpenAI, etc.)
-# Store in Vaultwarden before going home
-```
+Register free API keys (no credit card needed):
+
+| Provider | URL | Free Limits | Role |
+|----------|-----|-------------|------|
+| Groq | https://console.groq.com | ~14,400 req/day | Primary |
+| Google Gemini | https://aistudio.google.com/apikey | 250 req/day | Fallback 1 |
+| OpenRouter | https://openrouter.ai/keys | 200 req/day | Fallback 2 |
+| Mistral | https://console.mistral.ai | 1B tokens/month | Fallback 3 |
+
+Store all keys in KeePassXC under "Homelab > OpenClaw".
+
+> **Note**: Anthropic blocked subscription OAuth tokens in third-party agents (Feb 2026).
+> API keys from Claude Console still work but cost $1-25/M tokens. The free providers
+> above give ~15,000+ requests/day at $0/month.
 
 ---
 
@@ -123,8 +144,10 @@ ssh rpi5
 # Run onboarding wizard
 openclaw onboard --install-daemon
 
-# Configure API keys (Anthropic, OpenAI, etc.)
-# Follow the interactive prompts
+# Configure providers (edit ~/.openclaw/openclaw.json)
+# Primary: Groq (fastest, free)
+# Fallback: Gemini, OpenRouter, Mistral
+# See provider config below
 
 # Connect messaging channels
 openclaw channels login
@@ -132,6 +155,38 @@ openclaw channels login
 # Test the gateway
 openclaw gateway --port 18789
 ```
+
+### Provider Configuration
+
+Edit `~/.openclaw/openclaw.json`:
+
+```json
+{
+  "providers": {
+    "groq": {
+      "api_key": "<GROQ_API_KEY>"
+    },
+    "google": {
+      "api_key": "<GEMINI_API_KEY>"
+    },
+    "openrouter": {
+      "api_key": "<OPENROUTER_API_KEY>"
+    },
+    "mistral": {
+      "api_key": "<MISTRAL_API_KEY>"
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": "groq/llama-3.3-70b-versatile",
+      "max_tokens": 4096,
+      "temperature": 0.7
+    }
+  }
+}
+```
+
+Model routing: Groq for quick responses (300+ tok/s), Gemini for complex tasks (1M context), Mistral for code generation.
 
 ### Step 5: Enable Systemd Service
 
@@ -266,7 +321,7 @@ ssh augusto@192.168.0.20
 
 ```bash
 # Check Node.js
-node --version  # Should be v22.x
+node --version  # Should be v24.x (or v22.16+)
 
 # Check OpenClaw
 openclaw --version
@@ -318,10 +373,61 @@ If something goes wrong:
 
 ---
 
+## Security
+
+> **Critical**: OpenClaw had a severe RCE vulnerability (CVE-2026-25253, CVSS 8.8)
+> in Feb 2026. Over 40,000 exposed instances found, 63% vulnerable.
+
+### Mandatory security measures
+
+- Always run the latest OpenClaw version
+- **Never expose gateway port (18789) publicly** — access via Tailscale only
+- UFW: allow 18789 only from Tailscale interface
+- Run as unprivileged user (not root)
+- The RPi being a dedicated device provides natural isolation
+
+### UFW rules (locked down)
+
+```bash
+sudo ufw default deny incoming
+sudo ufw allow ssh
+sudo ufw allow in on tailscale0 to any port 18789
+sudo ufw enable
+```
+
+---
+
+## Complementary Setup with PicoClaw
+
+| Device | Role | Tool | Platforms | RAM |
+|--------|------|------|-----------|-----|
+| RPi 5 (8GB) | Full AI hub | OpenClaw | WhatsApp, Signal, Telegram, Discord, 16+ more | ~500MB |
+| RPi Zero W (512MB) | Edge agent | PicoClaw | Telegram, Discord | ~10MB |
+
+Both share the same free LLM providers (Groq, Gemini, OpenRouter, Mistral).
+
+---
+
+## Cost
+
+| Item | Cost |
+|------|------|
+| RPi 5 + cooler | Already owned |
+| 27W PSU | ~$12 (blocked — needs purchase) |
+| 32GB SD card | Already owned |
+| LLM APIs | $0/month (free tiers) |
+| **Total** | **~$12 one-time, $0/month** |
+
+---
+
 ## References
 
 - [hardware.md](../architecture/hardware.md) - Full hardware specs
 - [mobile-homelab.md](../architecture/mobile-homelab.md) - Mobile kit (RPi 5 migration history)
+- [picoclaw-rpi-zero-2026-03-19.md](picoclaw-rpi-zero-2026-03-19.md) - Complementary PicoClaw plan
 - `ansible/playbooks/openclaw.yml` - OpenClaw Ansible playbook
 - [Raspberry Pi 5 Specs](https://www.raspberrypi.com/products/raspberry-pi-5/)
 - [OpenClaw Docs](https://docs.openclaw.ai/)
+- [OpenClaw RPi Guide](https://docs.openclaw.ai/platforms/raspberry-pi)
+- [OpenClaw GitHub](https://github.com/openclaw/openclaw)
+- [CVE-2026-25253](https://www.sonicwall.com/blog/openclaw-auth-token-theft-leading-to-rce-cve-2026-25253/) - RCE vulnerability details
