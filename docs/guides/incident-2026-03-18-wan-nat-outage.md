@@ -76,6 +76,7 @@ The watchdog script was deployed to `/root/wan_watchdog.sh` and registered in `c
 `configctl interface reconfigure wan` restored the WAN IP and routing, but did NOT regenerate the outbound NAT rules in pf. This is the critical gap — OPNsense could reach the internet, but LAN traffic was not being NATed.
 
 Attempts to restore NAT:
+
 - `configctl filter reload` → OK but no NAT rules appeared
 - `configctl service reload all` → configd communication error
 - `/usr/local/etc/rc.filter_configure` → firewall reconfigured but no NAT
@@ -118,7 +119,7 @@ Investigation revealed OPNsense's "Automatic outbound NAT" mode was generating *
 ### Resolution
 
 1. Changed NAT mode from **Automatic** to **Hybrid** (Firewall > NAT > Outbound)
-2. Created 3 manual outbound NAT rules via web UI:
+1. Created 3 manual outbound NAT rules via web UI:
 
 | Interface | Source | Destination | NAT Address | Description |
 |-----------|--------|-------------|-------------|-------------|
@@ -126,11 +127,12 @@ Investigation revealed OPNsense's "Automatic outbound NAT" mode was generating *
 | IOT | 192.168.10.0/24 | * | Interface address | IOT outbound NAT |
 | GUEST | 192.168.20.0/24 | * | Interface address | GUEST outbound NAT |
 
-3. Applied changes — rules now persist in OPNsense config (surviving reboots)
+1. Applied changes — rules now persist in OPNsense config (surviving reboots)
 
 ### Interim Fix (before permanent rules)
 
 Manual pfctl injection was used to restore internet while troubleshooting:
+
 ```sh
 # Write NAT config locally, scp to OPNsense, then load
 scp /tmp/nat.conf root@192.168.0.1:/tmp/nat.conf
