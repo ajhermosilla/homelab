@@ -103,7 +103,8 @@ Future plans and proposals — what's next.
 | [codebase-audit-2026-03-12.md](plans/codebase-audit-2026-03-12.md) | Codebase audit round 0 |
 | [codebase-audit-2026-03-15.md](plans/codebase-audit-2026-03-15.md) | Codebase audit round 1 (10/18 fixed) |
 | [codebase-audit-2026-03-16.md](plans/codebase-audit-2026-03-16.md) | Codebase audit round 2 (10/16 fixed) |
-| [codebase-audit-2026-03-17.md](plans/codebase-audit-2026-03-17.md) | Codebase audit round 3 (88 findings) |
+| [codebase-audit-2026-03-17.md](plans/codebase-audit-2026-03-17.md) | Codebase audit round 3 (88/88 resolved) |
+| [low-priority-batches-2026-03-18.md](plans/low-priority-batches-2026-03-18.md) | Low priority audit fix batches A-E (50/50 done) |
 
 ## Journal
 
@@ -124,6 +125,7 @@ Execution logs, reports, and session notes — what happened.
 | [incident-2026-03-13-uptime-kuma-monitors.md](journal/incident-2026-03-13-uptime-kuma-monitors.md) | Uptime Kuma monitors incident |
 | [incident-2026-03-16-vaultwarden-502.md](journal/incident-2026-03-16-vaultwarden-502.md) | Vaultwarden 502 incident |
 | [community-assessment-2026-03-16.md](journal/community-assessment-2026-03-16.md) | Community assessment vs top homelab projects |
+| [incident-2026-03-18-wan-nat-outage.md](guides/incident-2026-03-18-wan-nat-outage.md) | ISP outage + missing NAT rules (resolved) |
 
 ### Sessions
 
