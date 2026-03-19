@@ -1,5 +1,7 @@
 # Intel N150 iGPU Passthrough via SR-IOV for Frigate
 
+> **Status**: Completed 2026-03-02. iGPU passthrough working on Docker VM.
+
 **Date:** 2026-02-25
 **Status:** Completed (2026-03-02) — iGPU passthrough active, OpenVINO ~15ms, VA-API decode
 **Estimated time:** 45-60 minutes (including BIOS access, reboots, troubleshooting)

@@ -35,11 +35,11 @@ services:
     volumes:
       - changedetection-data:/datastore
     environment:
-      - TZ=${TZ:-America/Asuncion}
-      - PUID=1000
-      - PGID=1000
-      - BASE_URL=https://watch.cronova.dev
-      - PLAYWRIGHT_DRIVER_URL=ws://playwright:3000
+      TZ: ${TZ:-America/Asuncion}
+      PUID: "1000"
+      PGID: "1000"
+      BASE_URL: https://watch.cronova.dev
+      PLAYWRIGHT_DRIVER_URL: ws://playwright:3000
     logging:
       driver: "json-file"
       options:
@@ -77,10 +77,10 @@ services:
       retries: 3
       start_period: 30s
     environment:
-      - SCREEN_WIDTH=1920
-      - SCREEN_HEIGHT=1080
-      - SCREEN_DEPTH=24
-      - MAX_CONCURRENT_CHROME_PROCESSES=2
+      SCREEN_WIDTH: "1920"
+      SCREEN_HEIGHT: "1080"
+      SCREEN_DEPTH: "24"
+      MAX_CONCURRENT_CHROME_PROCESSES: "2"
     logging:
       driver: "json-file"
       options:
