@@ -8,7 +8,6 @@ Issues identified during codebase review that must be fixed before deployment.
 
 | Priority | Count | Status |
 |----------|-------|--------|
-
 | CRITICAL | 1 | **FIXED** |
 | HIGH | 4 | **FIXED** (already documented) |
 | MEDIUM | 5 | 1 Fixed, 4 Deferred |
@@ -129,7 +128,6 @@ Will clean up after deployment is stable.
 
 | # | Issue | Status |
 |---|-------|--------|
-
 | 1 | Frigate camera IPs | **FIXED** |
 | 2 | External networks | Already documented |
 | 3 | Secrets files | Already documented |

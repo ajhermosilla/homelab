@@ -8,7 +8,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Aspect | Status | Confidence |
 |--------|--------|------------|
-
 | Architecture Design | Excellent | High |
 | Service Selection (22) | Well-balanced | High |
 | Network Topology | Clear | High |
@@ -56,7 +55,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Environment | Hardware | Role | Key Services |
 |-------------|----------|------|--------------|
-
 | **Mobile Kit** | MacBook, Beryl AX, Samsung A13 | On-demand, portable | - |
 | **Fixed Homelab** | Mini PC, RPi 4, NAS | Always-on (24/7) | Media, Bitcoin, storage, automation |
 | **VPS** | Vultr US ($6/mo) | Always-on (24/7) | Headscale, DERP, monitoring |
@@ -69,7 +67,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Strength | Description |
 |----------|-------------|
-
 | **Three-tier redundancy** | Mobile, Fixed, VPS operate independently |
 | **Privacy-first model** | Data stays home, VPS is helper-only |
 | **Mesh sovereignty** | Headscale self-hosted on VPS, not vendor lock-in |
@@ -93,7 +90,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Issue | Impact | Solution | Status |
 |-------|--------|----------|--------|
-
 | **Headscale backup only daily** | Lose DB = re-register ALL devices | Increase to hourly, add restore testing | ✅ Fixed |
 | **No disaster recovery runbook** | Can't recover from failures | Document recovery procedures | ✅ Fixed |
 | **Caddy reverse proxy undefined** | Can't expose services externally | Create Caddyfile with subdomain mappings | ✅ Fixed |
@@ -103,7 +99,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Issue | Impact | Solution |
 |-------|--------|----------|
-
 | **Old PC/NAS specs TBD** | Can't plan storage/UPS properly | Document hardware |
 | **VPS RAM tight (~150MB headroom)** | May OOM under load | Audit actual usage, consider upgrade |
 | **No docker-compose files** | Can't deploy services | Create compose files for each environment |
@@ -113,7 +108,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Issue | Impact | Solution |
 |-------|--------|----------|
-
 | **No VLAN documentation** | IoT isolation unclear | Document OPNsense VLAN strategy |
 | **Monitoring alerts undefined** | Don't know when things break | Configure Uptime Kuma + ntfy |
 | **Backup testing absent** | Untested backups = no backups | Create restore test procedure |
@@ -123,7 +117,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Issue | Impact | Solution |
 |-------|--------|----------|
-
 | **Tailscale IP assignment policy** | New device confusion | Document IP allocation scheme |
 | **Bitcoin pruning strategy** | Disk may fill up | Document blockchain management |
 | **Syncthing limitations** | No WebDAV/CalDAV | Accept limitation or add solution |
@@ -136,7 +129,6 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 
 | Domain | Purpose | Audience |
 |--------|---------|----------|
-
 | **cronova.dev** | Personal homelab infrastructure | You, family |
 | **verava.ai** | Business, customer-facing | Customers, public |
 
@@ -194,7 +186,6 @@ verava.ai
 
 | Service | Public | Tailscale | Rationale |
 |---------|--------|-----------|-----------|
-
 | **Vaultwarden** | Yes | Yes | Need passwords everywhere |
 | **Uptime Kuma** | Yes (read-only) | Yes | Public status page |
 | **ntfy** | Yes | Yes | Push notifications from anywhere |
@@ -382,7 +373,6 @@ verava.ai {
 
 | # | Task | Deliverable | Status |
 |---|------|-------------|--------|
-
 | 1 | Increase Headscale backup frequency | Backup sidecar in docker-compose | ✅ Done |
 | 2 | Create disaster recovery runbook | `docs/strategy/disaster-recovery.md` | ✅ Done |
 | 3 | Add MQTT broker to services | Update `services.md`, compose file | ✅ Done |
@@ -392,7 +382,6 @@ verava.ai {
 
 | # | Task | Deliverable | Priority |
 |---|------|-------------|----------|
-
 | 5 | Document NAS hardware specs | Update `hardware.md` | High |
 | 6 | Create mobile kit compose files | `docker/mobile/` | High |
 | 7 | Create VPS compose files | `docker/vps/` | High |
@@ -403,7 +392,6 @@ verava.ai {
 
 | # | Task | Deliverable | Priority |
 |---|------|-------------|----------|
-
 | 10 | Document VLAN strategy | `docs/network-security.md` | Medium |
 | 11 | Configure monitoring alerts | Uptime Kuma + ntfy rules | Medium |
 | 12 | Create backup test procedure | `docs/guides/backup-test-procedure.md` | Medium |
@@ -413,7 +401,6 @@ verava.ai {
 
 | # | Task | Deliverable | Priority |
 |---|------|-------------|----------|
-
 | 14 | Tailscale IP allocation policy | Document in `hardware.md` | Low |
 | 15 | Bitcoin node management guide | `docs/bitcoin-node.md` | Low |
 | 16 | Ansible playbooks | `ansible/` directory | Low |
@@ -427,7 +414,6 @@ verava.ai {
 
 | Category | Services | Count |
 |----------|----------|-------|
-
 | Networking | Headscale, Pi-hole (x3), Caddy, DERP | 6 |
 | Media | Jellyfin, Sonarr, Radarr, Prowlarr, qBittorrent | 5 |
 | Bitcoin | Bitcoin Core, LND, Electrum Server | 3 |
@@ -443,7 +429,6 @@ verava.ai {
 
 | Service | Purpose | Location | Priority |
 |---------|---------|----------|----------|
-
 | **Mosquitto** | MQTT broker for HA ↔ Frigate | Docker VM | Critical |
 | **Prometheus** | Metrics collection (optional) | Docker VM | Low |
 | **Grafana** | Metrics visualization (optional) | Docker VM | Low |
@@ -456,7 +441,6 @@ verava.ai {
 
 | Item | Cost |
 |------|------|
-
 | VPS (Vultr) | $6.00 |
 | Domain (cronova.dev) | Already owned |
 | Domain (verava.ai) | ~$5.00 |
@@ -466,7 +450,6 @@ verava.ai {
 
 | Item | Cost |
 |------|------|
-
 | VPS | $72.00 |
 | cronova.dev | Already owned |
 | verava.ai | ~$60.00 |
@@ -480,7 +463,6 @@ These MUST work for the architecture to function:
 
 | Factor | Dependency | Backup Plan |
 |--------|------------|-------------|
-
 | Headscale DB | Entire mesh | Hourly backups to NAS + VPS |
 | Unbound on OPNsense | Privacy DNS | Fallback to public DNS |
 | Restic encryption keys | All backups | Store in Vaultwarden + paper |
@@ -493,7 +475,6 @@ These MUST work for the architecture to function:
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-
 | 2026-01-14 | cronova.dev for homelab | Already owned, established brand, $0 additional cost |
 | 2026-01-14 | verava.ai for business | AI-first positioning, modern TLD |
 | 2026-01-14 | Both domains via Cloudflare | At-cost pricing, DNS + CDN included |
@@ -506,7 +487,6 @@ These MUST work for the architecture to function:
 
 | Priority | Action | Blocks |
 |----------|--------|--------|
-
 | 1 | Purchase verava.ai | Nothing |
 | 2 | Create disaster recovery runbook | Nothing |
 | 3 | Create Caddy config documentation | Domain purchase |

@@ -29,7 +29,6 @@ Note: Powering both simultaneously from Anker may work but
 
 | Device | Power | Port |
 |--------|-------|------|
-
 | Beryl AX | 5V/3A (15W) | USB-C |
 | RPi 5 | 5V/5A (27W) | USB-C |
 | Samsung A13 | Self-powered | - |
@@ -53,7 +52,6 @@ Samsung A13 (USB-C) → USB-C to USB-A Dongle → Beryl AX (USB-A port)
 
 | Option | Notes |
 |--------|-------|
-
 | Anker USB-C to USB-A Adapter | Compact, reliable |
 | Apple USB-C to USB-A Adapter | Small, premium |
 | UGREEN USB-C to USB-A Dongle | Budget option |
@@ -75,7 +73,6 @@ Samsung A13 (USB-C) → USB-C to USB-A Dongle → Beryl AX (USB-A port)
 
 | Component | Quantity | Filament | Time |
 |-----------|----------|----------|------|
-
 | Base plate | 1 | ~40g | 1.5h |
 | Rack level (Beryl) | 1 | ~73g | 2.5h |
 | Rack level (RPi 5) | 1 | ~73g | 2.5h |
@@ -146,7 +143,6 @@ Samsung A13 (USB-C) → USB-C to USB-A Dongle → Beryl AX (USB-A port)
 
 | Item | Source | Est. Cost |
 |------|--------|-----------|
-
 | USB-C to USB-A adapter | Amazon | $8-12 |
 | Short USB-C cable (6") | Amazon | $6-8 |
 | M3 screws (if needed) | Hardware store | $3-5 |

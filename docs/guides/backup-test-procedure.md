@@ -10,7 +10,6 @@ All backups use Restic with a centralized REST server on the NAS. See `docs/stra
 
 | Copy | Location | Status |
 |------|----------|--------|
-
 | 1 | Original data (live volumes) | Active |
 | 2 | NAS Restic REST (`/mnt/purple/backup/restic/`) | Active |
 | 3 | Google Drive (rclone crypt) | Not yet configured |
@@ -19,7 +18,6 @@ All backups use Restic with a centralized REST server on the NAS. See `docs/stra
 
 | Service | Container | Schedule | Repository |
 |---------|-----------|----------|------------|
-
 | Headscale | headscale-backup | Hourly (VPS local) | VPS `/backup/` (tar.gz) |
 | Vaultwarden | vaultwarden-backup | 2:00 AM daily | `/augusto/vaultwarden` |
 | Home Assistant | homeassistant-backup | 2:30 AM daily | `/augusto/homeassistant` |
@@ -350,7 +348,6 @@ Add monitors for backup infrastructure:
 
 | Check | Type | Target |
 |-------|------|--------|
-
 | Restic REST (NAS) | HTTP | `http://100.82.77.97:8000/` (expect 401) |
 
 ---
@@ -359,7 +356,6 @@ Add monitors for backup infrastructure:
 
 | Service | RTO | RPO | Notes |
 |---------|-----|-----|-------|
-
 | Headscale | 30 min | 1 hour | Mesh depends on this |
 | Vaultwarden | 1 hour | 24 hours | Can use cached passwords |
 | Home Assistant | 2 hours | 24 hours | Automations can wait |
@@ -376,7 +372,6 @@ If backup restore fails during actual disaster:
 
 | Issue | Action |
 |-------|--------|
-
 | Restic corruption | Run `restic repair index` + `restic repair snapshots` |
 | Restic REST unreachable | Check NAS, Docker, `/data/docker` filesystem |
 | All local backups lost | Restore from Google Drive (when configured) |
@@ -390,5 +385,4 @@ See `docs/strategy/disaster-recovery.md` for full recovery procedures.
 
 | Date | Change |
 |------|--------|
-
 | 2026-01-16 | Initial document |

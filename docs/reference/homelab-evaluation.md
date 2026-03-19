@@ -6,7 +6,6 @@ Comprehensive evaluation of the planned homelab stack. Reviewed 2026-01-15.
 
 | Factor | Score | Notes |
 |--------|-------|-------|
-
 | Utility | 9/10 | All bases covered, maybe over-engineered initially |
 | Learning | 10/10 | Exceptional breadth and depth |
 | Privacy | 9.5/10 | Near-perfect sovereignty |
@@ -21,7 +20,6 @@ Comprehensive evaluation of the planned homelab stack. Reviewed 2026-01-15.
 
 | Service | Daily Use Value |
 |---------|-----------------|
-
 | Headscale | Remote access anywhere, no vendor lock-in |
 | Vaultwarden | Password management across all devices |
 | Pi-hole (x3) | Ad-free browsing everywhere |
@@ -56,7 +54,6 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 
 | Domain | Technologies |
 |--------|--------------|
-
 | Virtualization | Proxmox VE, VM management |
 | Networking | OPNsense, VLANs, DNS, mesh networking |
 | Containers | Docker, docker-compose, multi-host |
@@ -88,7 +85,6 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 
 | Aspect | Implementation | Rating |
 |--------|----------------|--------|
-
 | Mesh control | Headscale (self-hosted) | Excellent |
 | DNS | Pi-hole everywhere | Excellent |
 | Passwords | Vaultwarden (local) | Excellent |
@@ -118,7 +114,6 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 
 | Item | Cost | Notes |
 |------|------|-------|
-
 | VPS (Vultr) | $6/mo | Helper only, not critical |
 | Google One | $0 extra | Already have AI Pro subscription |
 | cronova.dev | Owned | No additional cost |
@@ -156,7 +151,6 @@ Could eliminate VPS entirely (~$72/yr) if you:
 
 | Factor | Geek Points |
 |--------|-------------|
-
 | Headscale on RPi 5 | "Carry your mesh in your backpack" - peak mobile sovereignty |
 | Start9 Bitcoin node | Full node + Lightning on dedicated hardware |
 | Mini-ITX NAS from 2013 | Repurposed hardware, sustainable |
@@ -193,7 +187,6 @@ Prevents overwhelm and lets you learn each layer properly:
 
 | Phase | Services | Focus |
 |-------|----------|-------|
-
 | 1 | Headscale, Pi-hole, Vaultwarden | Core infrastructure |
 | 2 | Jellyfin, *arr stack | Media consumption |
 | 3 | Home Assistant, Frigate, Mosquitto | Automation & security |

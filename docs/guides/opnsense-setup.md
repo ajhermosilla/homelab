@@ -33,7 +33,6 @@ OPNsense VM configuration on Proxmox for the fixed homelab.
 
 | Setting | Value |
 |---------|-------|
-
 | VM ID | 100 |
 | Name | opnsense |
 | OS Type | Other |
@@ -49,7 +48,6 @@ OPNsense VM configuration on Proxmox for the fixed homelab.
 
 | Interface | Type | Purpose |
 |-----------|------|---------|
-
 | net0 | Bridge (vmbr0) | WAN - ISP/switch side |
 | net1 | Bridge (vmbr1) | LAN - internal network |
 
@@ -146,7 +144,6 @@ Password: opnsense
 
 | Setting | Value |
 |---------|-------|
-
 | Hostname | opnsense |
 | Domain | cronova.local |
 | Timezone | America/Asuncion |
@@ -158,7 +155,6 @@ Password: opnsense
 
 | Setting | Value |
 |---------|-------|
-
 | IPv4 Type | DHCP |
 | Block Private | Enabled |
 | Block Bogon | Enabled |
@@ -169,7 +165,6 @@ Password: opnsense
 
 | Setting | Value |
 |---------|-------|
-
 | IPv4 Address | 192.168.0.1/24 |
 | Description | LAN |
 
@@ -181,7 +176,6 @@ Password: opnsense
 
 | Setting | Value |
 |---------|-------|
-
 | Enable | Yes |
 | Range | 192.168.0.100 - 192.168.0.199 |
 | DNS Servers | 192.168.0.10 (Pi-hole) |
@@ -194,7 +188,6 @@ Password: opnsense
 
 | Device | MAC | IP |
 |--------|-----|-----|
-
 | Docker VM | xx:xx:xx:xx:xx:xx | 192.168.0.10 |
 | RPi 4 | xx:xx:xx:xx:xx:xx | 192.168.0.11 |
 | NAS | xx:xx:xx:xx:xx:xx | 192.168.0.12 |
@@ -214,7 +207,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | Parent | Tag | Description |
 |--------|-----|-------------|
-
 | vtnet0 | 10 | IoT |
 | vtnet0 | 20 | Guest |
 
@@ -224,7 +216,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | Interface | Device | Description |
 |-----------|--------|-------------|
-
 | LAN | vtnet0 | Management (untagged) |
 | OPT1 | vtnet0.10 | IoT |
 | OPT2 | vtnet0.20 | Guest |
@@ -235,7 +226,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | Setting | Value |
 |---------|-------|
-
 | Enable | Yes |
 | IPv4 | 192.168.10.1/24 |
 | Description | IoT |
@@ -244,7 +234,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | Setting | Value |
 |---------|-------|
-
 | Enable | Yes |
 | IPv4 | 192.168.20.1/24 |
 | Description | Guest |
@@ -259,7 +248,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | # | Action | Source | Dest | Port | Description |
 |---|--------|--------|------|------|-------------|
-
 | 1 | Pass | LAN net | any | any | Allow all outbound |
 
 ### IoT VLAN
@@ -268,7 +256,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | # | Action | Source | Dest | Port | Description |
 |---|--------|--------|------|------|-------------|
-
 | 1 | Pass | IOT net | 192.168.0.10 | 53 | DNS (Pi-hole) |
 | 2 | Pass | IOT net | 192.168.0.10 | 123 | NTP |
 | 3 | Pass | 192.168.10.101-103 | 192.168.0.10 | 5000 | Cameras → Frigate |
@@ -281,7 +268,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | # | Action | Source | Dest | Port | Description |
 |---|--------|--------|------|------|-------------|
-
 | 1 | Pass | GUEST net | 192.168.0.10 | 53 | DNS |
 | 2 | Block | GUEST net | RFC1918 | any | Block LAN |
 | 3 | Pass | GUEST net | any | 80,443 | HTTP/HTTPS |
@@ -295,7 +281,6 @@ See `docs/guides/vlan-design.md` for detailed VLAN setup.
 
 | Setting | Value |
 |---------|-------|
-
 | Enable | Yes |
 | Listen Port | 53 |
 | Network Interfaces | LAN, IOT, GUEST |
@@ -332,7 +317,6 @@ For graceful shutdown on power loss:
 
 | Setting | Value |
 |---------|-------|
-
 | UPS Type | nut (networked) |
 | Remote Host | 192.168.0.12 (NAS) |
 | Remote User | upsmon |
@@ -356,7 +340,6 @@ The MR100 is a standalone LTE router with a built-in SIM slot. It handles the ce
 
 | Item | Details |
 |------|---------|
-
 | **LTE Router** | TP-Link TL-MR100 (~$32, Flytec CDE) |
 | **SIM** | Tigo or Personal prepaid, 5GB/month (~$3/mo) |
 | **Connection** | Ethernet from MR100 LAN port → MokerLink switch |
@@ -406,7 +389,6 @@ The MR100 is at `192.168.0.3` on the LAN. Add it as a gateway manually.
 
 | Setting | Value |
 |---------|-------|
-
 | Name | LTE_GW |
 | Description | TP-Link MR100 LTE failover |
 | Interface | LAN |
@@ -423,7 +405,6 @@ Verify the existing ISP gateway:
 
 | Setting | Value |
 |---------|-------|
-
 | Name | ISP_WAN_DHCP |
 | Interface | WAN |
 | Monitor IP | 1.1.1.1 |
@@ -436,7 +417,6 @@ Use different monitor IPs (1.1.1.1 vs 9.9.9.9) so both gateways are health-check
 
 | Setting | Value |
 |---------|-------|
-
 | Group Name | WAN_FAILOVER |
 | ISP_WAN_DHCP | Tier 1 (primary) |
 | LTE_GW | Tier 2 (failover) |
@@ -463,7 +443,6 @@ LAN devices should never use `192.168.0.3` as a gateway — only OPNsense should
 
 | # | Action | Source | Dest | Port | Description |
 |---|--------|--------|------|------|-------------|
-
 | 1 | Block | !OPNsense | 192.168.0.3 | any | Only OPNsense can reach MR100 |
 
 This ensures only OPNsense itself routes traffic through the MR100.
@@ -476,7 +455,6 @@ Reserve `192.168.0.3` for the MR100 in OPNsense DHCP so nothing else gets that I
 
 | Setting | Value |
 |---------|-------|
-
 | MAC Address | (MR100's MAC — check sticker on bottom) |
 | IP Address | 192.168.0.3 |
 | Description | TP-Link MR100 LTE failover |

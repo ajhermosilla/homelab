@@ -6,7 +6,6 @@ Security configuration to protect against script kiddies, malware, and DoS attac
 
 | Threat | Likelihood | Mitigation |
 |--------|------------|------------|
-
 | Script kiddies | High | Fail2ban, rate limiting, no exposed ports |
 | Malware/botnets | Medium | 2FA, updates, network segmentation |
 | DoS attacks | Medium | Cloudflare, rate limiting, geo-blocking |
@@ -96,7 +95,6 @@ Authelia (Okẽ) provides SSO + TOTP 2FA for services behind Caddy on Docker VM:
 
 | Service | 2FA Method | Priority | Status |
 |---------|------------|----------|--------|
-
 | Vaultwarden | TOTP or YubiKey | Critical | Available |
 | Authelia (Okẽ) | TOTP via Authy | Critical | Active (protects 6 services) |
 | Headscale | OIDC + 2FA | Critical | Pending (CLI-only for now) |
@@ -344,7 +342,6 @@ All public domains use Cloudflare proxy (orange cloud):
 
 | Domain | Proxy | Notes |
 |--------|-------|-------|
-
 | cronova.dev | Yes | Static site |
 | hs.cronova.dev | **No** | Headscale needs direct IP |
 | verava.ai | Yes | When purchased |
@@ -479,7 +476,6 @@ watchtower:
 
 | Category | Services | Strategy |
 |----------|----------|----------|
-
 | **Pinned (manual bump)** | victoriametrics, vmagent, vmalert, alertmanager, grafana, authelia, paperless-ngx | Version pinned in compose — Watchtower label present but no-op |
 | **Excluded (no label)** | vaultwarden, frigate, homeassistant, immich-db, immich-valkey, paperless-db, paperless-redis | No Watchtower label — manual only |
 | **Excluded (label=false)** | caddy (Docker VM) | Explicitly disabled — custom build with Cloudflare plugin |
@@ -495,7 +491,6 @@ Add monitors for security events:
 
 | Monitor | Type | Alert |
 |---------|------|-------|
-
 | VPS SSH | TCP 22 | If down, possible attack |
 | Fail2ban status | Push | On ban events |
 | UFW logs | Push | On blocked connections |
@@ -649,7 +644,6 @@ cat ~/.ssh/authorized_keys
 
 | Tool | Purpose | Install |
 |------|---------|---------|
-
 | fail2ban | Ban brute forcers | `apt install fail2ban` |
 | ufw | Firewall | `apt install ufw` |
 | rkhunter | Rootkit detection | `apt install rkhunter` |

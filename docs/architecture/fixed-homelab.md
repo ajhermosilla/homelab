@@ -6,7 +6,6 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
 
 | Component | Hardware | Role | Containers |
 |-----------|----------|------|------------|
-
 | Oga (Proxmox) | AOOSTAR Mini PC, Intel N150, 12GB RAM | Hypervisor: OPNsense VM + Docker VM | — |
 | Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 35 containers | 35 |
 | NAS | i3-3220T, 8GB DDR3, Mini-ITX | Storage, git, PaaS: 5 stacks + Coolify | 19 |
@@ -78,7 +77,6 @@ Debian 13 (Trixie) | 4 vCPU | 9GB RAM | 100GB disk | vmbr1 (LAN only)
 
 | Stack | Containers | Ports |
 |-------|-----------|-------|
-
 | **networking** | pihole, caddy | 53 (DNS), 80/443 (HTTP/S) |
 | **automation** | homeassistant, mosquitto, homeassistant-backup | 8123 (HA), 1883 (MQTT) |
 | **security** | vaultwarden, frigate, vaultwarden-backup | 8843 (VW), 5000/8554/8555 (Frigate) |
@@ -98,7 +96,6 @@ Debian 13 (Trixie) | 4 vCPU | 9GB RAM | 100GB disk | vmbr1 (LAN only)
 
 | Phase | Action | Why |
 |-------|--------|-----|
-
 | 1 | Wait for Docker daemon | 60s timeout |
 | 2 | Wait for NFS mount | 300s timeout, non-fatal if unavailable |
 | 3 | Stop all containers | Clean state |
@@ -120,7 +117,6 @@ Docker VM mounts NAS storage for services that need shared data:
 
 | Mount Point | NAS Export | Used By |
 |-------------|-----------|---------|
-
 | `/mnt/nas/frigate` | `/srv/frigate` (Purple 2TB) | Frigate recordings |
 | `/mnt/nas/media` | NAS media share | Jellyfin, \*arr stack |
 | `/mnt/nas/downloads` | NAS downloads share | qBittorrent, \*arr stack |
@@ -158,7 +154,6 @@ Rescue USB: SystemRescue 12.03 on Lexar 128GB USB.
 
 | Drive | Model | Size | Mount | Purpose | Status |
 |-------|-------|------|-------|---------|--------|
-
 | SSD | Lexar NQ100 | 240GB | `/` (LVM) | OS, Docker data-root (`/data/docker`) | Active |
 | HDD | WD Purple | 2TB | `/mnt/purple` | Frigate recordings, Restic backups | Active (97% full) |
 | HDD | WD Red Plus | 8TB | — | Media, backups | Partition recovery pending |
@@ -167,7 +162,6 @@ Rescue USB: SystemRescue 12.03 on Lexar 128GB USB.
 
 | Stack | Containers | Compose Path |
 |-------|-----------|-------------|
-
 | **backup** | restic-rest, offsite-sync | `docker/fixed/nas/backup/` |
 | **git** | forgejo | `docker/fixed/nas/git/` |
 | **storage** | samba, syncthing | `docker/fixed/nas/storage/` |
@@ -199,7 +193,6 @@ Gateway since 2026-02-21. Replaced ISP router.
 
 | Setting | Value |
 |---------|-------|
-
 | vCPU | 2 |
 | RAM | 2GB |
 | Disk | 20GB |
@@ -223,7 +216,6 @@ ssh -L 8443:192.168.0.1:443 augusto@100.78.12.241
 
 | Phase | Task | Status |
 |-------|------|--------|
-
 | 1 | Proxmox VE on Mini PC | Done |
 | 2 | Network bridges (vmbr0 WAN, vmbr1 LAN) | Done |
 | 3 | OPNsense VM (gateway, DHCP) | Done |
@@ -258,7 +250,6 @@ All critical devices connected to **Forza NT-1012U 1000VA UPS**.
 
 | Device | Power | UPS Protected |
 |--------|-------|---------------|
-
 | Mini PC (Proxmox) | ~35W | Yes |
 | NAS | ~50W idle | Yes |
 | MokerLink Switch | ~15W | Yes |

@@ -6,7 +6,6 @@ WD Red 8TB (WDC WD80EFBX-68AZZN0) GPT partition table destroyed. Drive was used 
 
 | Field | Value |
 |-------|-------|
-
 | Model | WDC WD80EFBX-68AZZN0 |
 | Capacity | 8001 GB / 7452 GiB |
 | Sectors | 15,628,053,168 (512-byte logical) |
@@ -70,7 +69,6 @@ Multiple factors from using Parallels and VMware Fusion on the same USB disk:
 
 | Rank | Cause | Probability |
 |------|-------|-------------|
-
 | 1 | Sabrent enclosure sector size translation (512e -> 4096) misaligning GPT writes | **High** |
 | 2 | Multiple VMs (Parallels + VMware Fusion) with unsynchronized disk access | **Moderate-High** |
 | 3 | macOS disk arbitration writing stale/incorrect metadata during VM handoff | **Moderate** |
@@ -275,7 +273,6 @@ Purple has 1.7TB free, selected ~1.2TB of critical data:
 
 | Directory | Size | Priority |
 |-----------|------|----------|
-
 | etc/ | 7.9M | Critical — old system configs |
 | scanner/ | 40M | Critical — scanned documents |
 | videos/ | 145G | Critical — family memories |

@@ -49,7 +49,6 @@ timing       brilliance
 
 | Element | Value |
 |---------|-------|
-
 | **Domain** | cronova.dev |
 | **Email** | <augusto@cronova.dev> |
 | **GitHub Org** | github.com/cronova |
@@ -78,7 +77,6 @@ Alternative taglines:
 
 | Attribute | Expression |
 |-----------|------------|
-
 | **Tone** | Geeky, irreverent, maker culture |
 | **Voice** | Technical but approachable |
 | **Personality** | The friend who shares their dotfiles |
@@ -104,7 +102,6 @@ Alternative taglines:
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-
 | Terminal Green | #00FF00 | Accents, highlights |
 | Dark Background | #1a1a2e | Primary background |
 | Light Text | #eaeaea | Body text |
@@ -161,7 +158,6 @@ real          data-driven
 
 | Element | Value |
 |---------|-------|
-
 | **Domain** | verava.ai |
 | **Email** | <augusto@verava.ai> (to configure) |
 | **Focus** | Supply Chain + AI Consulting |
@@ -190,7 +186,6 @@ Alternative taglines:
 
 | Attribute | Expression |
 |-----------|------------|
-
 | **Tone** | Professional, confident, transformational |
 | **Voice** | Expert but accessible |
 | **Personality** | The strategic advisor who delivers results |
@@ -216,7 +211,6 @@ Alternative taglines:
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-
 | Trust Blue | #0077b6 | Primary brand color |
 | Clean White | #ffffff | Backgrounds |
 | Dark Navy | #023e8a | Text, headers |
@@ -252,7 +246,6 @@ Option C: Clean Text
 
 | Aspect | cronova.dev | verava.ai |
 |--------|-------------|-----------|
-
 | **Tagline** | "Build weird. Ship fast." | "From chaos to clarity" |
 | **Tone** | Geeky, irreverent | Professional, confident |
 | **Audience** | Developers, makers | Executives, enterprises |
@@ -292,7 +285,6 @@ Option C: Clean Text
 
 | Platform | cronova.dev | verava.ai |
 |----------|-------------|-----------|
-
 | Twitter/X | @cronova_dev | @verava_ai |
 | LinkedIn | /company/cronova | /company/verava-ai |
 | GitHub | /cronova | - |
@@ -306,7 +298,6 @@ Option C: Clean Text
 
 | Audience | Message |
 |----------|---------|
-
 | **Developers** | "Tools built by a developer, for developers. No bloat. No BS." |
 | **Open Source** | "Free as in freedom. Fork it, break it, make it yours." |
 | **Indie Hackers** | "Your side project deserves real infrastructure." |
@@ -316,7 +307,6 @@ Option C: Clean Text
 
 | Audience | Message |
 |----------|---------|
-
 | **C-Suite** | "AI that delivers ROI, not just reports." |
 | **Operations** | "See problems before they become crises." |
 | **IT Leaders** | "AI that integrates, not complicates." |

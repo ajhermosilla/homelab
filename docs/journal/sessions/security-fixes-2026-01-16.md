@@ -6,7 +6,6 @@ Security audit findings and remediation plan.
 
 | Severity | Count | Status |
 |----------|-------|--------|
-
 | Critical | 2 | **2 Done** |
 | High | 8 | **8 Done** |
 | Medium | 12 | **11 Done** |
@@ -18,7 +17,6 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-
 | 1 | Default password `changeme` fallback | `docker/mobile/rpi5/networking/pihole/docker-compose.yml` | [x] |
 | 2 | Placeholder creds `USER:PASS` in frigate config | `docker/fixed/docker-vm/security/frigate.yml` | [x] |
 
@@ -28,7 +26,6 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-
 | 3 | `privileged: true` on Home Assistant | `docker/fixed/docker-vm/automation/docker-compose.yml` | [x] |
 | 4 | `privileged: true` on Frigate | `docker/fixed/docker-vm/security/docker-compose.yml` | [x] |
 | 5 | No `security_opt: no-new-privileges` | All docker-compose files (14 files) | [x] |
@@ -44,7 +41,6 @@ Security audit findings and remediation plan.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-
 | 11 | CORS wildcard `*` | `docker/vps/networking/caddy/Caddyfile` | [x] |
 | 12 | Samba credentials in command | `docker/fixed/nas/storage/docker-compose.yml` | [x] |
 | 13 | Pi-hole default password (fixed) | `docker/fixed/docker-vm/networking/pihole/docker-compose.yml` | [x] |
@@ -146,7 +142,6 @@ deploy:
 
 | Service | Current | Fixed |
 |---------|---------|-------|
-
 | pihole | `pihole/pihole:latest` | `pihole/pihole:2024.07.0` |
 | headscale | `headscale/headscale:latest` | `headscale/headscale:0.23.0` |
 | vaultwarden | `vaultwarden/server:latest` | `vaultwarden/server:1.32.0` |

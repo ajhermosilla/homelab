@@ -15,7 +15,6 @@ How to handle sensitive data across the homelab without compromising security.
 
 | Tool | Purpose |
 |------|---------|
-
 | **age** | Modern encryption (replaces GPG) |
 | **SOPS** | Encrypt YAML/JSON files, works with age |
 | **.env files** | Runtime secrets (gitignored) |
@@ -77,7 +76,6 @@ sops -d docker/fixed/nas/git/.env.enc.yaml > docker/fixed/nas/git/.env
 
 | Secret | Storage | Method |
 |--------|---------|--------|
-
 | Headscale API key | `.env` | SOPS encrypted in git |
 | Pi-hole web password | `.env` | SOPS encrypted in git |
 | age private key | `~/.config/sops/age/` | Manual backup only |
@@ -86,7 +84,6 @@ sops -d docker/fixed/nas/git/.env.enc.yaml > docker/fixed/nas/git/.env
 
 | Secret | Storage | Method |
 |--------|---------|--------|
-
 | Vaultwarden admin token | `.env` | SOPS encrypted in git |
 | Jellyfin API key | `.env` | SOPS encrypted in git |
 | OPNsense root password | OPNsense config | Export encrypted backup |
@@ -97,7 +94,6 @@ sops -d docker/fixed/nas/git/.env.enc.yaml > docker/fixed/nas/git/.env
 
 | Secret | Storage | Method |
 |--------|---------|--------|
-
 | Uptime Kuma password | `.env` | SOPS encrypted in git |
 | ntfy admin password | `.env` | SOPS encrypted in git |
 | Restic repository password | `.env` | SOPS encrypted in git |
@@ -106,7 +102,6 @@ sops -d docker/fixed/nas/git/.env.enc.yaml > docker/fixed/nas/git/.env
 
 | Key | Backup Location | Method |
 |-----|-----------------|--------|
-
 | age private key | Paper + secure storage | Print QR code |
 | Restic repo passwords | Vaultwarden | Encrypted password manager |
 | Start9 seed phrase | Paper | Offline only |

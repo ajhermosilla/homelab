@@ -6,7 +6,6 @@ Mini PC configuration for running OPNsense router and Docker VM.
 
 | Component | Spec | Notes |
 |-----------|------|-------|
-
 | CPU | Intel N150 | VT-x/VT-d enabled |
 | RAM | 12GB | ~1GB host + 2GB OPNsense + 9GB Docker |
 | Storage | 512GB SSD | VMs + ISO storage |
@@ -34,7 +33,6 @@ Mini PC configuration for running OPNsense router and Docker VM.
 
 | Setting | Value |
 |---------|-------|
-
 | Target Disk | 512GB SSD |
 | Country | Paraguay |
 | Timezone | America/Asuncion |
@@ -158,7 +156,6 @@ ifreload -a
 
 | Storage | Path | Content |
 |---------|------|---------|
-
 | local | /var/lib/vz | ISO images, CT templates |
 | local-lvm | LVM thin pool | VM disks |
 
@@ -179,7 +176,6 @@ ifreload -a
 
 | Setting | Value |
 |---------|-------|
-
 | VM ID | 100 |
 | Name | opnsense |
 
@@ -187,7 +183,6 @@ ifreload -a
 
 | Setting | Value |
 |---------|-------|
-
 | ISO | OPNsense-24.x-amd64.iso |
 | Type | Other |
 
@@ -195,7 +190,6 @@ ifreload -a
 
 | Setting | Value |
 |---------|-------|
-
 | Machine | q35 |
 | BIOS | OVMF (UEFI) |
 | Add EFI Disk | Yes |
@@ -205,7 +199,6 @@ ifreload -a
 
 | Setting | Value |
 |---------|-------|
-
 | Bus | SCSI |
 | Size | 20 GB |
 | Storage | local-lvm |
@@ -215,7 +208,6 @@ ifreload -a
 
 | Setting | Value |
 |---------|-------|
-
 | Cores | 2 |
 | Type | host |
 
@@ -223,14 +215,12 @@ ifreload -a
 
 | Setting | Value |
 |---------|-------|
-
 | Memory | 2048 MB |
 
 **Network:**
 
 | Setting | Value |
 |---------|-------|
-
 | Bridge | vmbr0 |
 | Model | VirtIO |
 
@@ -243,7 +233,6 @@ The first NIC (vmbr0) was added during VM creation. Now add the second:
 
 | Setting | Value |
 |---------|-------|
-
 | Bridge | vmbr1 |
 | Model | VirtIO |
 
@@ -253,7 +242,6 @@ The first NIC (vmbr0) was added during VM creation. Now add the second:
 
 | Setting | Value |
 |---------|-------|
-
 | Start at boot | Yes |
 | Start/Shutdown order | 1 |
 | Startup delay | 0 |
@@ -272,7 +260,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | VM ID | 101 |
 | Name | docker |
 
@@ -280,7 +267,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | ISO | debian-13-amd64.iso |
 | Type | Linux |
 | Version | 6.x - 2.6 Kernel |
@@ -289,7 +275,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | Machine | q35 |
 | BIOS | OVMF (UEFI) |
 | Add EFI Disk | Yes |
@@ -299,7 +284,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | Bus | SCSI |
 | Size | 100 GB |
 | Storage | local-lvm |
@@ -309,7 +293,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | Cores | 2 |
 | Type | host |
 
@@ -317,7 +300,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | Memory | 9216 MB |
 | Ballooning | Disabled |
 
@@ -325,7 +307,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | Bridge | vmbr1 |
 | Model | VirtIO |
 
@@ -335,7 +316,6 @@ See `docs/guides/opnsense-setup.md` for installation steps.
 
 | Setting | Value |
 |---------|-------|
-
 | Start at boot | Yes |
 | Start/Shutdown order | 2 |
 | Startup delay | 30 |
@@ -460,7 +440,6 @@ vainfo
 
 | Setting | Value |
 |---------|-------|
-
 | Storage | local |
 | Schedule | Daily 03:00 |
 | Selection Mode | Include selected VMs |
@@ -549,7 +528,6 @@ Add Proxmox health check:
 
 | VM | vCPU | RAM | Disk | Purpose |
 |----|------|-----|------|---------|
-
 | OPNsense | 2 | 2GB | 20GB | Router/Firewall |
 | Docker | 2 | 9GB | 100GB | All containers |
 | **Total** | 4 | 11GB | 120GB | |
