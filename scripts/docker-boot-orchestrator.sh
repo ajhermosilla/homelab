@@ -168,6 +168,17 @@ wait_for_healthy() {
     done
 }
 
+verify_phase() {
+    local phase_num="$1"
+    sleep 10
+    log "Verifying phase ${phase_num}..."
+    local unhealthy
+    unhealthy=$(docker ps --filter "health=unhealthy" --format "{{.Names}}" 2>/dev/null)
+    if [ -n "$unhealthy" ]; then
+        log_warn "Unhealthy containers after phase ${phase_num}: ${unhealthy}"
+    fi
+}
+
 # --- Main ---
 
 main() {
@@ -187,43 +198,53 @@ main() {
     for stack in "${NETWORKING_STACKS[@]}"; do
         compose_up "$stack" || true
     done
+    verify_phase 4
 
     # Phase 5: Automation (creates mqtt-net, wait for Mosquitto healthy)
     log "Phase 5: Starting automation stack"
     compose_up "$AUTOMATION_STACK" || true
     wait_for_healthy "mosquitto" 120 || log_warn "Mosquitto not healthy — security stack may have MQTT issues"
+    verify_phase 5
 
     # Phase 6: Security (Frigate joins mqtt-net)
     log "Phase 6: Starting security stack"
     compose_up "$SECURITY_STACK" || true
+    verify_phase 6
 
     # Phase 7: Auth (Authelia — must be up before forward_auth services)
     log "Phase 7: Starting auth stack"
     compose_up "$AUTH_STACK" || true
+    verify_phase 7
 
     # Phase 8: Tools (Dozzle, BentoPDF, Homepage)
     log "Phase 8: Starting tools stack"
     compose_up "$TOOLS_STACK" || true
+    verify_phase 8
 
     # Phase 9: Documents (Paperless-ngx)
     log "Phase 9: Starting documents stack"
     compose_up "$DOCUMENTS_STACK" || true
+    verify_phase 9
 
     # Phase 10: Monitoring (VictoriaMetrics, vmagent, vmalert, Alertmanager, cAdvisor, Grafana)
     log "Phase 10: Starting monitoring stack"
     compose_up "$MONITORING_STACK" || true
+    verify_phase 10
 
     # Phase 11: Photos (Immich)
     log "Phase 11: Starting photos stack"
     compose_up "$PHOTOS_STACK" || true
+    verify_phase 11
 
     # Phase 12: Media (NFS-dependent — needs /mnt/nas/media and /mnt/nas/downloads)
     log "Phase 12: Starting media stack"
     compose_up "$MEDIA_STACK" || true
+    verify_phase 12
 
     # Phase 13: Maintenance (Watchtower — always last)
     log "Phase 13: Starting maintenance stack"
     compose_up "$MAINTENANCE_STACK" || true
+    verify_phase 13
 
     # Phase 14: Final status
     log "Phase 14: Final container status"

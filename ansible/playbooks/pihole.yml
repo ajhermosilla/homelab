@@ -1,6 +1,9 @@
 # Pi-hole deployment via Docker
 # Usage: ansible-playbook -i inventory.yml playbooks/pihole.yml -l pihole_hosts -e "webpassword=xxx"
 # REQUIRED: -e "webpassword=xxx" - Set admin password (will fail without it)
+# NOTE: /etc/resolv.conf inside the Pi-hole container may be overwritten by Docker DNS settings
+# on restart. This is a known Docker behavior and does not affect Pi-hole's DNS forwarding
+# (configured via FTLCONF_dns_upstreams).
 
 ---
 - name: Deploy Pi-hole

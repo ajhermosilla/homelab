@@ -35,7 +35,7 @@ services:
       - ./config:/etc/headscale
       - headscale-data:/var/lib/headscale
     environment:
-      - TZ=${TZ:-America/Asuncion}
+      TZ: ${TZ:-America/Asuncion}
     cap_add:
       - NET_ADMIN
     logging:
@@ -84,8 +84,8 @@ services:
       - ${BACKUP_PATH:-./backups}:/backups
       - ./backup.sh:/backup.sh:ro
     environment:
-      - TZ=${TZ:-America/Asuncion}
-      - BACKUP_RETENTION_HOURS=${BACKUP_RETENTION_HOURS:-720}
+      TZ: ${TZ:-America/Asuncion}
+      BACKUP_RETENTION_HOURS: ${BACKUP_RETENTION_HOURS:-720}
     logging:
       driver: "json-file"
       options:

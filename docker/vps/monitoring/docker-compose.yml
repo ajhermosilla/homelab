@@ -38,7 +38,7 @@ services:
     volumes:
       - uptime-kuma-data:/app/data
     environment:
-      - TZ=${TZ:-America/Asuncion}
+      TZ: ${TZ:-America/Asuncion}
     logging:
       driver: "json-file"
       options:
@@ -84,13 +84,13 @@ services:
       - ntfy-cache:/var/cache/ntfy
       - ntfy-config:/etc/ntfy
     environment:
-      - TZ=${TZ:-America/Asuncion}
-      - NTFY_BASE_URL=${NTFY_BASE_URL:-https://notify.cronova.dev}
-      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
-      - NTFY_BEHIND_PROXY=true
-      - NTFY_AUTH_FILE=/etc/ntfy/user.db
-      - NTFY_AUTH_DEFAULT_ACCESS=deny-all
-      - NTFY_ENABLE_LOGIN=true
+      TZ: ${TZ:-America/Asuncion}
+      NTFY_BASE_URL: ${NTFY_BASE_URL:-https://notify.cronova.dev}
+      NTFY_CACHE_FILE: /var/cache/ntfy/cache.db
+      NTFY_BEHIND_PROXY: "true"
+      NTFY_AUTH_FILE: /etc/ntfy/user.db
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_ENABLE_LOGIN: "true"
     logging:
       driver: "json-file"
       options:
