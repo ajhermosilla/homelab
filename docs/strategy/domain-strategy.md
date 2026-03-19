@@ -6,7 +6,6 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Domain | Status | Purpose | Annual Cost |
 |--------|--------|---------|-------------|
-
 | **cronova.dev** | Owned | Developer, Homelab, Open Source, Micro SaaS | Already paid |
 | **verava.ai** | Available | Supply Chain + AI Consulting | ~$50-80/yr |
 | ~~nanduti.io~~ | Skipped | Was planned for homelab | Saved $30/yr |
@@ -18,7 +17,6 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Asset | Status |
 |-------|--------|
-
 | Domain | Owned |
 | Email | <augusto@cronova.dev> (configured) |
 | GitHub Org | github.com/cronova |
@@ -32,7 +30,6 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Factor | Value |
 |--------|-------|
-
 | TLD | .ai = AI-first positioning |
 | Business | Supply Chain + AI Consulting |
 | Domain hack | "vera" (true) + ".ai" = "True AI" |
@@ -76,7 +73,6 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Subdomain | Service | Location | Access |
 |-----------|---------|----------|--------|
-
 | `hs.cronova.dev` | Headscale | VPS | Tailscale clients |
 | `jara.cronova.dev` | Home Assistant | Docker VM | Tailscale |
 | `yrasema.cronova.dev` | Jellyfin | Docker VM | Tailscale |
@@ -88,7 +84,6 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Subdomain | Service | Location | Access |
 |-----------|---------|----------|--------|
-
 | `vault.cronova.dev` | Vaultwarden | Docker VM | Public |
 | `status.cronova.dev` | Uptime Kuma | VPS | Public |
 | `notify.cronova.dev` | ntfy | VPS | Public |
@@ -97,7 +92,6 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Subdomain | Service | Location | Access |
 |-----------|---------|----------|--------|
-
 | `<www.cronova.dev>` | Landing page | Cloudflare Pages | Public |
 | `docs.cronova.dev` | Documentation | Cloudflare Pages | Public |
 | `api.cronova.dev` | Public APIs | VPS/Docker | Public |
@@ -107,7 +101,6 @@ Two-domain strategy for personal/developer identity and business separation. Upd
 
 | Subdomain | Service | Purpose |
 |-----------|---------|---------|
-
 | `<www.verava.ai>` | Landing page | Company presence |
 | `app.verava.ai` | Customer platform | SaaS for clients |
 | `api.verava.ai` | Customer API | B2B integrations |
@@ -288,7 +281,6 @@ verava.ai {
 
 | Identity | Email | Purpose |
 |----------|-------|---------|
-
 | Developer (primary) | <augusto@cronova.dev> | Open source, GitHub, tech community |
 | Business | <augusto@verava.ai> | Customer communication |
 | Personal/Homelab | <augusto@hermosilla.me> | Private, family |
@@ -297,7 +289,6 @@ verava.ai {
 
 | Domain | Provider | Notes |
 |--------|----------|-------|
-
 | cronova.dev | Google Workspace / Cloudflare Email | Already configured |
 | verava.ai | Google Workspace / Proton | Future setup |
 | hermosilla.me | Existing | Personal |
@@ -341,7 +332,6 @@ verava.ai {
 
 | Factor | cronova.dev | nanduti.io |
 |--------|-------------|------------|
-
 | Status | Already owned | Would need to buy |
 | Email | Configured | Not configured |
 | GitHub | github.com/cronova | None |
@@ -355,7 +345,6 @@ verava.ai {
 
 | Factor | verava.ai | verava.net |
 |--------|-----------|------------|
-
 | TLD vibe | AI-first, modern | Corporate, dated |
 | Business fit | Supply Chain + AI | Generic |
 | Price | ~$50-80/yr | ~$12/yr |
@@ -370,7 +359,6 @@ verava.ai {
 
 | Item | Annual Cost |
 |------|-------------|
-
 | cronova.dev | Already owned |
 | verava.ai | ~$50-80/yr |
 | VPS (Vultr) | ~$72/yr |
@@ -407,7 +395,6 @@ verava.ai {
 
 | Registrar | .ai Price | Notes |
 |-----------|-----------|-------|
-
 | Cloudflare | ~$50-60/yr | At-cost, DNS included |
 | Namecheap | ~$60-70/yr | Good UI |
 | Porkbun | ~$55-65/yr | Budget friendly |
@@ -424,7 +411,6 @@ verava.ai {
 
 | Repository | Purpose |
 |------------|---------|
-
 | `homelab` | This repo - infrastructure as code |
 | `dotfiles` | Personal config (already at ajhermosilla) |
 | `<micro-saas>` | Future SaaS tools |
@@ -434,7 +420,6 @@ verava.ai {
 
 | Repository | Purpose |
 |------------|---------|
-
 | `dotfiles` | Personal configuration |
 | `javya` | Worship planning tool |
 | Private repos | Personal projects |

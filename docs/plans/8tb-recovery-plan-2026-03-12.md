@@ -10,7 +10,6 @@ On 2026-02-22, the 8TB WD Red Plus (WDC WD80EFBX-68AZZN0) suffered GPT partition
 
 | Device | Model | Size | Mount | Status |
 |--------|-------|------|-------|--------|
-
 | sda | Lexar NQ100 SSD | 240GB | / (LVM) | Healthy — OS + Docker |
 | sdb | WD Purple (WD23PURZ) | 2TB | /mnt/purple | **98% full** (1.7TB/1.8TB) |
 | sdc | WD Red Plus (WD80EFBX) | 8TB | **unmounted** | No partition table — needs recovery |
@@ -25,7 +24,6 @@ Wait — sdc, sdd are also connected. The board may have more ports or sdd is vi
 
 | Drive | Size | Location | Interface |
 |-------|------|----------|-----------|
-
 | WD Red 3TB (#1) | 3TB | Sabrent USB dock | SATA |
 | WD Red 3TB (#2) | 3TB | Spare | SATA |
 | Old drive | 1TB | Spare | SATA |
@@ -35,7 +33,6 @@ Wait — sdc, sdd are also connected. The board may have more ports or sdd is vi
 
 | Directory | Size | Criticality | Replaceable? |
 |-----------|------|-------------|-------------|
-
 | `raidmain/videos/` | 45GB | **CRITICAL** | No — family home videos (weddings, birthdays, 2010-2013) |
 | `raidmain/photos/` | 168GB | **CRITICAL** | No — family photos 2006-2014, multiple cameras |
 | `home/` | 473GB | Medium | Mostly — old laptop backups (Andre, XPS) |

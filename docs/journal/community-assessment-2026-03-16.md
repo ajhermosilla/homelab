@@ -6,7 +6,6 @@ Honest comparison against top community homelab projects. Rated on geekness, pri
 
 | Project | Stars | Stack | Approach |
 |---------|-------|-------|----------|
-
 | khuedoan/homelab | ~9k | Kubernetes, Terraform, ArgoCD | Full GitOps, declarative everything |
 | onedr0p/home-ops | ~3k | Talos Linux, Flux, Kubernetes | K8s GitOps with Renovate |
 | ironicbadger/infra | ~1k | Ansible + Docker Compose | Traditional, well-documented |
@@ -19,7 +18,6 @@ Honest comparison against top community homelab projects. Rated on geekness, pri
 
 | Dimension | Score | Rationale |
 |-----------|-------|-----------|
-
 | **Geekness Factor** | 8 | Self-hosted Headscale, recursive DNS, iGPU passthrough for Frigate, Guarani naming, 67 containers across 3 hosts. Not K8s-level complexity but more practical. |
 | **Privacy & Security** | 8.5 | Container hardening above community standard. Recursive DNS is a standout. Missing SOPS is the main gap. |
 | **Documentation Quality** | 8 | 80+ docs with strategy papers, incident reports, and gotchas. Missing public site and diagrams. |

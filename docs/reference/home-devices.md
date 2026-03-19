@@ -6,7 +6,6 @@ Devices served by homelab services.
 
 | Name | Role |
 |------|------|
-
 | Augusto | Owner |
 | Andre | Wife |
 | Anna Pau | Family |
@@ -18,7 +17,6 @@ Devices served by homelab services.
 
 | Device | Owner | OS | Homelab Services |
 |--------|-------|-----|------------------|
-
 | Samsung A16 | Augusto | Android | Tailscale, Vaultwarden, Jellyfin, ntfy, HA Companion |
 | Google Pixel 6 | Andre | Android | Vaultwarden, Jellyfin |
 | iPhone 14 Pro Max | Anna Pau | iOS | Vaultwarden, Jellyfin |
@@ -38,7 +36,6 @@ Devices served by homelab services.
 
 | Device | Owner/Use | Specs | Homelab Services |
 |--------|-----------|-------|------------------|
-
 | MacBook Air M1 | Augusto (main) | 16GB RAM, 1TB SSD | Tailscale, dev work |
 | MacBook Pro Mid 2012 | Andre | Pre-retina | Pi-hole DNS, Jellyfin |
 | Lenovo ThinkPad X240 | Tinkering | i7, 8GB RAM, 240GB SSD | Lab experiments |
@@ -55,7 +52,6 @@ Devices served by homelab services.
 
 | Device | Year | Platform | IP | MAC | Homelab Services |
 |--------|------|----------|----|-----|------------------|
-
 | LG Smart TV UM7100PSA | 2021 | WebOS | 192.168.0.51 | 74:40:be:da:6f:10 | Jellyfin, Pi-hole DNS, HA |
 | Apple TV 4th Gen 32GB | 2016 | tvOS 26.3 | 192.168.0.50 | d0:03:4b:4b:24:91 | Jellyfin (via Infuse), Pi-hole DNS, HA |
 
@@ -72,7 +68,6 @@ Devices served by homelab services.
 
 | Device | Year | Notes |
 |--------|------|-------|
-
 | Yamaha RX-V671 | 2012 | AV Receiver, 7.1 channel |
 | Infinity Speakers + Subwoofer | 2012 | Home theater speakers |
 
@@ -84,7 +79,6 @@ Devices served by homelab services.
 
 | Device | Year | Connection | Notes |
 |--------|------|------------|-------|
-
 | HP Deskjet Ink Advantage 3545 | ~2016 | WiFi (5c:b9:01:56:34:58) | Printer |
 | Brother ADS-1700W | 2021 | WiFi | Document scanner |
 
@@ -94,7 +88,6 @@ Devices served by homelab services.
 
 | Service | Augusto | Andre | Anna Pau | Mauri | TV/AppleTV |
 |---------|---------|-------|----------|-------|------------|
-
 | Tailscale | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Vaultwarden | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Jellyfin | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -110,7 +103,6 @@ Devices served by homelab services.
 
 | Network | Devices |
 |---------|---------|
-
 | Management (VLAN 1) | MacBook Air, ThinkPad, C720 |
 | IoT (VLAN 10) | Cameras (see hardware.md) |
 | Guest (VLAN 20) | Visitor devices |
@@ -136,7 +128,6 @@ Configure via OPNsense DHCP → DNS Server: `192.168.0.10`
 
 | Category | Count |
 |----------|-------|
-
 | Mobile | 4 |
 | Computers | 4 |
 | Entertainment | 2 |

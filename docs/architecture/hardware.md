@@ -24,7 +24,6 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-
 | MacBook Air M1 | 16GB RAM, 1TB SSD, macOS Sonoma | Workstation, Docker dev | Active |
 | Beryl AX | GL-MT3000 | Network gateway, DHCP, VPN, AdGuard DNS | Active |
 | Samsung A13 | Android | USB tethering for internet (travel) | Active |
@@ -49,7 +48,6 @@ Portable infrastructure. Operates 7AM-7PM or when traveling. Not 24/7.
 
 | Device | Services |
 |--------|----------|
-
 | Beryl AX | AdGuard DNS (mobile ad-blocking) |
 | MacBook | Docker workloads |
 
@@ -65,7 +63,6 @@ Always-on infrastructure at home.
 
 | Device | Specs | Role | Status |
 |--------|-------|------|--------|
-
 | AOOSTAR Mini PC (Oga) | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
 | NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian 13 (19 containers) | Active |
 | Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | OpenClaw (AI assistant) | Pending (PSU in transit) |
@@ -75,7 +72,6 @@ Always-on infrastructure at home.
 
 | Device | Model | Specs | Role |
 |--------|-------|-------|------|
-
 | Managed Switch | MokerLink 8-Port | 8x 2.5G + 10G SFP+, fanless, metal | Main LAN backbone |
 | PoE Switch | TP-Link TL-SG1005P | 5x 1G, 4x PoE+ @65W, fanless | Camera power |
 | Access Point | TP-Link Archer AX50 | WiFi 6, Dual Band, Gigabit | AP mode (stock firmware) |
@@ -84,7 +80,6 @@ Always-on infrastructure at home.
 
 | Model | Count | Specs | Status |
 |-------|-------|-------|--------|
-
 | Reolink RLC-520A | 2 | 5MP PoE | Deployed — front_door (192.168.0.110), back_yard (192.168.0.111) |
 | TP-Link Tapo C110 | 1 | 3MP WiFi | Deployed — indoor (192.168.0.101) |
 
@@ -94,21 +89,18 @@ All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured
 
 | Device | Model | Specs |
 |--------|-------|-------|
-
 | UPS | Forza NT-1012U | 1000VA, 220V |
 
 ### Cooling
 
 | Device | Model | Notes |
 |--------|-------|-------|
-
 | USB Fans | AC Infinity MULTIFAN S7 | Dual 120mm, for NAS/switch cooling |
 
 ### Mini PC Details
 
 | Component | Spec | Notes |
 |-----------|------|-------|
-
 | Model | AOOSTAR N1 Pro | |
 | CPU | Intel N150 | VT-x, Intel UHD Graphics (iGPU) |
 | RAM | 12GB | ~1GB host + 2GB OPNsense + 9GB Docker (current) |
@@ -120,7 +112,6 @@ All cameras integrated with Taguato (Frigate NVR) on Docker VM. Zones configured
 
 | VM | ID | vCPU | RAM | Disk | Start Order |
 |----|-----|------|-----|------|-------------|
-
 | OPNsense | 100 | 2 | 2GB | 20GB | 1 (delay: 0) |
 | Docker | 101 | 2 | 9GB | 100GB | 2 (delay: 30) |
 
@@ -135,7 +126,6 @@ iGPU passthrough completed (2026-03-02): OpenVINO GPU inference ~15ms, VA-API ha
 
 | Component | Model | Notes |
 |-----------|-------|-------|
-
 | Board | Raspberry Pi 5 8GB | OpenClaw AI assistant |
 | Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
@@ -146,7 +136,6 @@ iGPU passthrough completed (2026-03-02): OpenVINO GPU inference ~15ms, VA-API ha
 
 | Component | Spec | Notes |
 |-----------|------|-------|
-
 | Board | Raspberry Pi 4 4GB | Bitcoin node |
 | Storage | 1TB external SSD (USB 3.0) | Blockchain + indexes |
 | OS | Start9 OS | Sovereign Bitcoin stack |
@@ -164,7 +153,6 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Component | Model | Notes |
 |-----------|-------|-------|
-
 | Case | Cooler Master Elite 120 Advanced | Mini-ITX, compact |
 | Motherboard | ASUS P8H77-I | Intel H77, LGA 1155 |
 | CPU | Intel Core i3-3220T | Dual-Core 2.8GHz, 35W TDP |
@@ -207,7 +195,6 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Drive | Model | Size | Purpose |
 |-------|-------|------|---------|
-
 | SSD | Lexar NQ100 | 240GB | Debian OS, Docker data-root (/data/docker), configs |
 | HDD | WD Purple | 2TB | Frigate NVR recordings (dedicated) |
 | HDD | WD Red Plus (WD80EFBX) | 8TB | Media, family backups, service backups |
@@ -216,7 +203,6 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Target | Size | Purpose | Notes |
 |--------|------|---------|-------|
-
 | WD Red 3TB | 3TB | Local critical backup | In Sabrent dock, 2013 drive |
 | Google Drive | 1TB | Offsite critical backup | Via rclone crypt, part of AI Pro sub |
 
@@ -224,7 +210,6 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Drive | Size | Age | Status |
 |-------|------|-----|--------|
-
 | Crucial MX500 | 1TB | 2021? | Spare - available for future use |
 | WD Red 3TB (2nd) | 3TB | 2013 | Test with SMART, keep as spare |
 
@@ -265,7 +250,6 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 
 | Device | Running Containers | Key Services |
 |--------|-------------------|--------------|
-
 | Docker VM | 35 | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (BentoPDF), Papa (VictoriaMetrics+Grafana+vmagent+vmalert+Alertmanager+cAdvisor), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower, media (*arr stack), backup sidecars |
 | NAS | 19 | Forgejo, Tajy (Coolify + 6 sub-containers), Samba, Syncthing, Restic REST, Offsite Sync, Glances, Katupyry (3), Javya (3) |
 | RPi 5 | — | OpenClaw (pending PSU) |
@@ -281,7 +265,6 @@ Cloud helper node (not critical infrastructure).
 
 | Provider | Plan | Specs | Cost |
 |----------|------|-------|------|
-
 | Vultr | High Frequency | 1 vCPU, 1GB RAM, 32GB NVMe | ~$6/mo |
 
 **Services (12 active):** Headscale, Caddy, headscale-backup, Uptime Kuma, ntfy, AdGuard Home (Yvága), Unbound (Yvága), DERP Relay, Pi-hole (VPS), changedetection, Playwright, Restic REST
@@ -296,7 +279,6 @@ Cloud helper node (not critical infrastructure).
 
 | Node | Tailscale IP | Type |
 |------|-------------|------|
-
 | vps-vultr | 100.77.172.46 | VPS |
 | oga | 100.78.12.241 | Proxmox host |
 | docker | 100.68.63.168 | Docker VM |
@@ -372,7 +354,6 @@ acls:
 
 | Device | Power | Notes |
 |--------|-------|-------|
-
 | Beryl AX | 15W USB-C | Can share power bank |
 | MacBook | Battery | 15+ hours |
 
@@ -382,7 +363,6 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 | Device | Power | UPS Protected |
 |--------|-------|---------------|
-
 | Mini PC | ~35W | Yes |
 | RPi 5 | 27W | Yes |
 | RPi 4 | 15W | Yes |
@@ -400,7 +380,6 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 | Item | Model | Purpose |
 |------|-------|---------|
-
 | Keyboard | Keychron K2C3 | 75% mechanical keyboard, home workstation |
 | Keyboard | Logitech MX Keys for Mac | Full-size, stationary at T&C office |
 | Mouse | Logitech MX Master 3 | Wireless, portable, mainly with MacBook Air M1 |
@@ -417,7 +396,6 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 | Item | Date | Status |
 |------|------|--------|
-
 | RPi 5 8GB + Active Cooler | 2026-01 | Owned |
 | RPi 5 27W PSU | 2026-01 | In transit |
 | 32GB SD Card | 2026-01 | Owned |
@@ -446,7 +424,6 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 
 | Item | Purpose | Priority |
 |------|---------|----------|
-
 | ~~iGPU passthrough (SR-IOV)~~ | ~~Frigate GPU acceleration on Docker VM~~ | Done (2026-03-02) |
 | NVMe HAT for RPi 5 | Faster storage | Low |
 | 8TB HDD (parity) | SnapRAID parity drive | Low |

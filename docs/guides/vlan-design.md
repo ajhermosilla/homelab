@@ -31,7 +31,6 @@ OPNsense VLAN configuration for network segmentation and IoT isolation.
 
 | VLAN ID | Name | Subnet | Purpose |
 |---------|------|--------|---------|
-
 | 1 | Management | 192.168.0.0/24 | Servers, admin devices |
 | 10 | IoT | 192.168.10.0/24 | Cameras, smart devices |
 | 20 | Guest | 192.168.20.0/24 | Untrusted devices, visitors |
@@ -46,7 +45,6 @@ Trusted devices with full network access.
 
 | Device | IP | Connection | Notes |
 |--------|-----|------------|-------|
-
 | Proxmox (OPNsense + Docker VM) | .1 / .10 | MokerLink P1 | Trunk — both VMs share nic1/vmbr1 |
 | RPi 4 (Start9) | .11 | MokerLink P2 | Bitcoin node |
 | RPi 5 (openclaw) | .20 | MokerLink P3 | AI assistant |
@@ -64,7 +62,6 @@ Untrusted IoT devices. No internet access by default.
 
 | Device | IP | Notes |
 |--------|-----|-------|
-
 | Reolink Cam 1 | .101 | Front door |
 | Reolink Cam 2 | .102 | Back yard |
 | Tapo C110 | .103 | Indoor (WiFi) |
@@ -77,7 +74,6 @@ Internet-only access. No LAN access.
 
 | Device | IP | Notes |
 |--------|-----|-------|
-
 | Guest phones | DHCP | Visitors |
 | Guest laptops | DHCP | Visitors |
 
@@ -91,7 +87,6 @@ Internet-only access. No LAN access.
 
 | Parent | VLAN Tag | Description |
 |--------|----------|-------------|
-
 | vtnet1 (LAN) | 10 | IoT |
 | vtnet1 (LAN) | 20 | Guest |
 
@@ -101,7 +96,6 @@ Internet-only access. No LAN access.
 
 | Interface | Device | Description |
 |-----------|--------|-------------|
-
 | LAN | vtnet1 | Management (untagged) |
 | IOT | vtnet1.10 | IoT VLAN |
 | GUEST | vtnet1.20 | Guest VLAN |
@@ -110,7 +104,6 @@ Internet-only access. No LAN access.
 
 | Interface | IPv4 | DHCP Range |
 |-----------|------|------------|
-
 | LAN | 192.168.0.1/24 | .100-.199 |
 | IOT | 192.168.10.1/24 | .100-.199 |
 | GUEST | 192.168.20.1/24 | .100-.199 |
@@ -133,14 +126,12 @@ For each interface:
 
 | # | Action | Source | Destination | Ports | Description |
 |---|--------|--------|-------------|-------|-------------|
-
 | 1 | Pass | LAN net | any | any | Allow all outbound |
 
 ### IoT VLAN
 
 | # | Action | Source | Destination | Ports | Description |
 |---|--------|--------|-------------|-------|-------------|
-
 | 1 | Pass | IOT net | 192.168.0.10 | 53 | Allow DNS (Pi-hole) |
 | 2 | Pass | IOT net | 192.168.0.10 | 123 | Allow NTP |
 | 3 | Pass | 192.168.10.101-103 | 192.168.0.10 | 5000 | Cameras → Frigate |
@@ -153,7 +144,6 @@ For each interface:
 
 | # | Action | Source | Destination | Ports | Description |
 |---|--------|--------|-------------|-------|-------------|
-
 | 1 | Pass | GUEST net | 192.168.0.10 | 53 | Allow DNS |
 | 2 | Block | GUEST net | RFC1918 | any | Block LAN access |
 | 3 | Pass | GUEST net | any | 80,443 | Allow HTTP/HTTPS |
@@ -169,7 +159,6 @@ Configure for VLAN trunking:
 
 | Port | Mode | VLAN | Device | Speed |
 |------|------|------|--------|-------|
-
 | 1 | Trunk | 1,10,20 | Proxmox (OPNsense + Docker VM) | 2.5G |
 | 2 | Access | 1 | RPi 4 (Start9) | 1G |
 | 3 | Access | 1 | RPi 5 (OpenClaw) | 1G |
@@ -189,7 +178,6 @@ Configure in the switch web UI (<http://192.168.1.2>):
 
 | VLAN ID | Tagged (trunk) | Untagged (access) |
 |---------|----------------|-------------------|
-
 | 1 | P1, P7 | P2, P3, P4, P5, P8 |
 | 10 | P1, P7 | P6 |
 | 20 | P1, P7 | — |
@@ -200,7 +188,6 @@ Each port's PVID determines which VLAN untagged incoming traffic is assigned to:
 
 | Port | PVID |
 |------|------|
-
 | 1 | 1 |
 | 2 | 1 |
 | 3 | 1 |
@@ -216,7 +203,6 @@ Each port's PVID determines which VLAN untagged incoming traffic is assigned to:
 
 | Port | Device | IP |
 |------|--------|-----|
-
 | 1 | Uplink to MokerLink P6 | - |
 | 2 | Reolink Cam 1 | 192.168.10.101 |
 | 3 | Reolink Cam 2 | 192.168.10.102 |
@@ -232,7 +218,6 @@ All cameras automatically on VLAN 10 (IoT) without per-port config.
 
 | SSID | VLAN | Purpose |
 |------|------|---------|
-
 | HomeNet | 1 | Trusted devices |
 | IoT-Devices | 10 | Smart home (if supported) |
 | Guest | 20 | Visitors |
@@ -281,7 +266,6 @@ Tailscale devices access services via overlay network, bypassing VLANs:
 
 | Tailscale IP | Device | Physical VLAN |
 |--------------|--------|---------------|
-
 | 100.68.63.168 | Docker VM | 1 |
 | 100.64.0.11 | RPi 4 | 1 |
 | 100.82.77.97 | NAS | 1 |

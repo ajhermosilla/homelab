@@ -253,7 +253,6 @@ Not in scope for initial setup — add after CrowdSec is stable.
 
 | Resource | Impact |
 |----------|--------|
-
 | RAM | ~100MB (within OPNsense's 2GB) |
 | CPU | Minimal (log parsing is lightweight) |
 | Disk | ~50MB for collections + DB |

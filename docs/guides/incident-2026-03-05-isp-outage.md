@@ -17,7 +17,6 @@ A 4-hour ISP outage took the entire homelab offline. After the ISP restored serv
 
 | Time | Event |
 |------|-------|
-
 | ~01:00 | ISP outage begins (Tigo) |
 | ~01:00 | All Tailscale tunnels to homelab nodes drop (no internet → no DERP relay) |
 | ~01:00 | Uptime Kuma on VPS detects all homelab monitors as DOWN |
@@ -85,7 +84,6 @@ During investigation, OPNsense WAN (`vtnet0`) showed `mtu 576` — far below the
 
 | # | Action | Status |
 |---|--------|--------|
-
 | 1 | Power-cycled ARRIS modem | Done |
 | 2 | Set static IP on Mac (192.168.0.300) for LAN access | Done |
 | 3 | Verified OPNsense WAN lease and internet via `ping 8.8.8.8` | Done |
@@ -106,7 +104,6 @@ During investigation, OPNsense WAN (`vtnet0`) showed `mtu 576` — far below the
 
 | Service | Credential | Note |
 |---------|-----------|------|
-
 | Authelia | augusto user password | Saved to KeePassXC |
 | Authelia | andre user password | Saved to KeePassXC |
 | Paperless | admin password | Saved to KeePassXC |
@@ -187,7 +184,6 @@ The ARRIS modem, MokerLink switch, and Proxmox host should survive brief power o
 
 | Device | Watts |
 |--------|-------|
-
 | ARRIS modem | ~10W |
 | MokerLink switch | ~5W |
 | Proxmox (P8H77-I, i3-3220T) | ~35W idle |
@@ -321,7 +317,6 @@ PROPOSED STATE:
 
 | Item | Cost | Priority | Impact |
 |------|------|----------|--------|
-
 | USB LTE dongle + prepaid SIM | ~$28 | P1 | Eliminates remote access blackout |
 | Small UPS (APC BE425M or similar) | ~$45 | P1 | Survives power flickers, graceful shutdown |
 | **Total**|**~$73** | | |

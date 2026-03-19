@@ -41,7 +41,6 @@ ISP coax → ARRIS TG2482 (bridge mode)
 
 | Device | Role (current) | Role (target) |
 |--------|---------------|---------------|
-
 | ARRIS TG2482 | DOCSIS 3.0 modem (bridge mode already) | Bridge mode (no change) |
 | TP-Link AX50 | Router, DHCP, WiFi (holds public IP) | AP mode (WiFi only) |
 | OPNsense (VM) | Internal firewall/router | Internet gateway, DHCP, firewall |
@@ -51,13 +50,11 @@ ISP coax → ARRIS TG2482 (bridge mode)
 
 | Physical NIC | Bridge | MAC | Current state | Cable |
 |-------------|--------|-----|---------------|-------|
-
 | `nic0` | `vmbr0` | c8:ff:bf:06:13:f7 | UP | Switch (192.168.0.x network) |
 | `nic1` | `vmbr1` | c8:ff:bf:06:13:f8 | **DOWN**|**No cable** |
 
 | VM | ID | net0 | net1 |
 |----|-----|------|------|
-
 | OPNsense | 100 | `vmbr0` (WAN) | `vmbr1` (LAN) |
 | Docker | 101 | `vmbr1` (LAN only) | — |
 
@@ -71,7 +68,6 @@ ISP coax → ARRIS TG2482 (bridge mode)
 
 | Device | Current IP | New IP |
 |--------|-----------|--------|
-
 | OPNsense LAN | 192.168.1.1 | **192.168.0.1** |
 | Docker-vm | 192.168.1.10 | **192.168.0.10** |
 | Pi-hole (container) | 192.168.1.10 (host) | **192.168.0.10** (host) |
@@ -286,7 +282,6 @@ If anything breaks during cutover:
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|-----------|------------|
-
 | OPNsense doesn't get public IP | No internet | Low | Plug cable back into TP-Link (1 min) |
 | WiFi devices don't reconnect | No WiFi | Very low | Same SSID/password = auto-reconnect |
 | OPNsense DHCP issues | Devices get no IPs | Low | Rollback to TP-Link |

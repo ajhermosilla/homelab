@@ -10,7 +10,6 @@
 
 | What you see | Likely cause | What to do |
 |---|---|---|
-
 | **No internet, Mini PC lights ON**| ISP is down | →**Scenario A** (most common) |
 | **No internet, Mini PC lights OFF**| Proxmox/power issue | →**Scenario B** |
 | **Internet is slow or keeps dropping**| ISP issue | →**Scenario C** |
@@ -121,7 +120,6 @@ EMERGENCY:
 
 | Service | Status | Notes |
 |---------|--------|-------|
-
 | Netflix | ✓ Works | Uses phone data |
 | YouTube | ✓ Works | Uses phone data |
 | Web browsing | ✓ Works | |
@@ -132,7 +130,6 @@ EMERGENCY:
 
 | Service | Why |
 |---------|-----|
-
 | Ad blocking | Pi-hole runs on Mini PC |
 | Smart home | Home Assistant is on Mini PC |
 | Security cameras | Frigate is on Mini PC |
@@ -191,7 +188,6 @@ Layer 2 (manual, family activates):
 
 | Person | Contact | When |
 |--------|---------|------|
-
 | Augusto | [phone/WhatsApp] | Always try first |
 | ISP Support | Tigo: 147 / Personal: *111 | If neighbors also have no internet |
 
@@ -265,7 +261,6 @@ Don't worry — nothing is permanently broken.
 
 | Item | Details |
 |------|---------|
-
 | **Emergency Router** | GL-iNet GL-SFT1200 (Opal) |
 | **Color** | White, small box with antennas |
 | **Power** | USB-C (5V/2A) |

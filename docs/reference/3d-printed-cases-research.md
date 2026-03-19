@@ -8,7 +8,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Type | Minimalist enclosure |
 | Cooling | Passive (vented) |
 | NVMe | No (but remixes exist for HatDrive) |
@@ -19,7 +18,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Type | Miniature PC aesthetic (Fractal North style) |
 | Cooling | Passive with wood-style front panel |
 | Supports | RPi 3, 4, 5 + BIGTREETECH Pi 2 |
@@ -30,7 +28,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Type | Functional enclosure |
 | Cooling | Active (official cooler compatible) |
 | NVMe | Yes (nvme-base version) |
@@ -46,7 +43,6 @@ Research conducted: 2026-01-20
 
 | Option | Details |
 |--------|---------|
-
 | 3D Printed | [Thingiverse](https://www.thingiverse.com/thing:6704495) - Vase mode, 21g, transparent PETG |
 | GL.iNet Gadget Organizer | [Amazon](https://www.amazon.com/GL-iNet-GL-MT3000-Pocket-Sized-Wireless-Organizer/dp/B0BTP8ZC2Q) - EVA case, fits router + cables |
 | CaseSack | [Amazon](https://www.amazon.com/CaseSack-GL-MT1300-Wireless-GL-AR750S-Ext-GL-MV1000/dp/B09K1RTPDZ) - PEVA material, water resistant |
@@ -69,7 +65,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Footprint | 160x160mm base (smaller than 10") |
 | Height | 4U or 6U options |
 | Supports | RPi 4/5, TP-Link switches, N100 mini PCs, Mini-ITX |
@@ -88,7 +83,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Design | Wire shelving inspired, maximum airflow |
 | Assembly | No hardware required (snap-fit) |
 | Best for | Mini PC clusters (heat management) |
@@ -98,7 +92,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Design | OpenSCAD parametric |
 | Sizes | Mini (~200mm3), Micro (~180mm3), Nano (~100mm3) |
 | Mounting | Sliding hex nut (no cage nuts) |
@@ -113,7 +106,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Standard | 10" rack compatible |
 | Height | 1U to 5U (stackable to 10U) |
 | Cost | ~$21 total (580g filament + hardware) |
@@ -128,7 +120,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Design | Fully parametric (Fusion 360) |
 | Standards | 10" and 19" (in development) |
 | Assembly | Tool-free (supports + connectors + lock pins) |
@@ -140,7 +131,6 @@ Research conducted: 2026-01-20
 
 | Feature | Details |
 |---------|---------|
-
 | Standard | 10" rack |
 | Supports | No supports needed for printing |
 | Best for | Ubiquiti gear, RPi clusters |
@@ -152,7 +142,6 @@ Research conducted: 2026-01-20
 
 | Project | Size | Complexity | Cost | Best For |
 |---------|------|------------|------|----------|
-
 | JetDev22 | Micro | Low | ~$5 | Mobile kit |
 | Microlab 2 | Small | Medium | ~$15 | Compact portable |
 | RackStack | Variable | Medium | ~$10 | Custom sizes |

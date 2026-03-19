@@ -6,7 +6,6 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Component | Details |
 |-----------|---------|
-
 | Model | GL.iNet Beryl AX (GT-MT3000) |
 | CPU | MediaTek MT7981B 1.3GHz dual-core (Arm Cortex-A53) |
 | RAM / Flash | 512MB / 256MB |
@@ -30,7 +29,6 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Setting | Value |
 |---------|-------|
-
 | SSID 2.4GHz | `mbohapy` |
 | SSID 5GHz | `mbohapy-5G` |
 | WiFi Password | (stored in KeepassXC) |
@@ -52,7 +50,6 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Mode | Use Case |
 |------|----------|
-
 | Router | Connect to ethernet WAN |
 | Repeater | Extend existing WiFi |
 | Access Point | Create WiFi from ethernet |
@@ -71,7 +68,6 @@ Pocket-sized AX3000 Wi-Fi 6 travel router for mobile homelab.
 
 | Option | Base | Pros | Cons |
 |--------|------|------|------|
-
 | **Stock GL.iNet** | OpenWrt 21.02 | Easy UI, VPN presets, toggle switch | Older kernel |
 | **GL.iNet Open Source** | OpenWrt 23.05 | Latest kernel, open WiFi drivers | May lose some GL features |
 | **Vanilla OpenWrt** | OpenWrt 23.05.x | Full control, latest packages | Flashing issues, no GL.iNet UI |
@@ -156,7 +152,6 @@ Mobile kit uses two DNS ad-blockers for redundancy:
 
 | Device | Role | Why |
 |--------|------|-----|
-
 | Beryl AX | AdGuard Home (primary) | Built-in, lightweight, always on with router |
 | RPi 5 | Pi-hole (secondary) | Full-featured, but RPi 5 may be used for tinkering |
 
@@ -198,7 +193,6 @@ wg show
 
 | Device | Role | IP |
 |--------|------|-----|
-
 | Beryl AX | Travel router, AdGuard Home (primary DNS) | 192.168.8.1 |
 | MacBook | Primary workstation | DHCP |
 | Phone (mombeu) | Mobile client | DHCP |
@@ -212,7 +206,6 @@ wg show
 
 | Service | Port | Bind Address | WAN Access | Status |
 |---------|------|--------------|------------|--------|
-
 | SSH | 22 | 192.168.8.1 | Blocked | ✓ LAN-only |
 | Admin UI | 80, 443 | 0.0.0.0 | Blocked (firewall) | ✓ Secured |
 | Admin UI | 8080, 8443 | 127.0.0.1 | N/A | ✓ Localhost |
@@ -233,7 +226,6 @@ Tailscale → ACCEPT (trusted)
 
 | Component | Method | Status |
 |-----------|--------|--------|
-
 | Admin UI | Password | Set (KeepassXC) |
 | SSH | Password | Active (LAN-only, Tailscale OK) |
 | AdGuard Home | None | No login configured |
@@ -244,7 +236,6 @@ Tailscale → ACCEPT (trusted)
 
 | Component | Version | Date Checked |
 |-----------|---------|--------------|
-
 | GL.iNet Firmware | 4.8.1 | 2026-01-19 |
 | OpenWrt | 21.02-SNAPSHOT | 2026-01-19 |
 
@@ -356,7 +347,6 @@ sysupgrade -r /tmp/beryl-ax-backup-*.tar.gz
 
 | When | Why |
 |------|-----|
-
 | Before travel | Pre-trip safety net |
 | After config changes | Capture new settings |
 | Weekly during heavy use | Prevent data loss |

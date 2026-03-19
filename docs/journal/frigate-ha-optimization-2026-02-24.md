@@ -166,7 +166,6 @@ The SgtBatten blueprint has this built-in with a configurable cooldown parameter
 
 | Tool | Status | Recommendation |
 |------|--------|----------------|
-
 | Double-Take (original) | Last commit Feb 2024, abandoned | Skip |
 | Double-Take (skrashevich fork) | Community fork, somewhat active | Only if native doesn't work |
 | CompreFace | HA add-on broken after Core 2025 | Avoid |
@@ -194,7 +193,6 @@ Frigate reports "CPU is Slow" because it's using the default TFLite CPU detector
 
 | Spec | Value |
 |------|-------|
-
 | CPU | 4 E-cores (Gracemont), 3.6 GHz boost |
 | iGPU | Intel UHD Graphics, 24 EUs, Xe-LP architecture |
 | TDP | 6W base |
@@ -235,7 +233,6 @@ Expected improvement:
 
 | Config | Inference Speed |
 |--------|----------------|
-
 | CPU TFLite (current) | ~100 ms |
 | OpenVINO GPU, MobileNet v2 | ~15 ms |
 | OpenVINO GPU, YOLO-NAS-S | ~25-30 ms |
@@ -318,7 +315,6 @@ With OpenVINO GPU + VAAPI enabled, the heaviest workloads (video decoding + obje
 
 | Workload | Before | After |
 |----------|--------|-------|
-
 | Object detection | CPU (~100 ms) | iGPU (~15 ms) |
 | Video decoding | CPU (ffmpeg software) | iGPU (VAAPI hardware) |
 | Motion detection | CPU | CPU (unchanged) |
@@ -330,7 +326,6 @@ With OpenVINO GPU + VAAPI enabled, the heaviest workloads (video decoding + obje
 
 | Priority | Action | Impact |
 |----------|--------|--------|
-
 | 1 | Enable OpenVINO GPU detector | Inference 100 ms -> 15 ms |
 | 2 | Enable VAAPI hardware decoding | Major CPU reduction |
 | 3 | Define zones + required_zones per camera | Biggest notification noise reduction |

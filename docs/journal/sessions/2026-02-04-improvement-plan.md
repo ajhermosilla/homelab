@@ -6,7 +6,6 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 1 | VPS Restic IP mismatch (100.64.0.20 vs 100.64.0.100) | `docker/vps/backup/README.md` | 21, 40, 46 | **Fixed** |
 | 2 | Mobile Pi-hole IP mismatch (.5 vs .10) | `docker/mobile/rpi5/.env.example` | 14, 18 | **Fixed** |
 | 3 | Missing `mosquitto.conf` file | `docker/fixed/docker-vm/automation/` | - | N/A (exists) |
@@ -17,7 +16,6 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 6 | Stack dependency not documented (automation → security) | `docker/fixed/docker-vm/security/docker-compose.yml` | 193 | N/A (exists) |
 | 7 | NFS mount IP hardcoded in playbook warning | `ansible/playbooks/docker-compose-deploy.yml` | 144-145 | **Fixed** |
 | 8 | Camera RTSP credentials in plaintext | `docker/fixed/docker-vm/security/frigate.yml` | 101-104 | **Fixed** |
@@ -28,7 +26,6 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 11 | Proxmox vs OPNsense IP ambiguity (.10 vs .14) | `docker/vps/monitoring/monitors.md` | 31 | **Fixed** |
 | 12 | Missing certificate renewal cron example | `docker/fixed/docker-vm/networking/caddy/Caddyfile` | 110 | **Fixed** |
 | 13 | Docker image version not pinned (watchtower:latest) | `docker/fixed/docker-vm/maintenance/docker-compose.yml` | 11 | **Fixed** |
@@ -42,7 +39,6 @@ Code review findings from deep analysis of docker/, ansible/, and docs/ director
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 19 | Mobile Pi-hole uses port 8080 vs 8053 (inconsistent) | `docker/mobile/rpi5/networking/pihole/docker-compose.yml` | 32 | **Fixed** |
 | 20 | Backup volume path naming (BACKUP_DATA vs BACKUP_PATH) | multiple | - | **Fixed** |
 | 21 | Jellyfin cache not on tmpfs (slow transcoding) | `docker/fixed/docker-vm/media/docker-compose.yml` | 37 | **Fixed** |

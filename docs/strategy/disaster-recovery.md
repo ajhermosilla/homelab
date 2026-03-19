@@ -17,7 +17,6 @@ Procedures for recovering from failures across all homelab environments.
 
 | Host | Command | User |
 |------|---------|------|
-
 | VPS | `ssh vps` | `linuxuser` |
 | Docker VM | `ssh docker-vm` | `augusto` |
 | NAS | `ssh nas` | `augusto` |
@@ -59,7 +58,6 @@ All backups use **Restic**with a centralized REST server on the NAS. Each backed
 
 | Component | Details |
 |-----------|---------|
-
 | REST server | `restic/rest-server:0.14.0` on NAS, port 8000 |
 | Data path | `/mnt/purple/backup/restic/` (WD Purple 2TB) |
 | Auth | htpasswd file, `--private-repos` (forces `/username/` prefix) |
@@ -73,7 +71,6 @@ All times in PYT (America/Asuncion).
 
 | Service | Container | Schedule | Repository | What's Backed Up |
 |---------|-----------|----------|------------|------------------|
-
 | Headscale | headscale-backup | Hourly | VPS local (`/backup/`) | SQLite DB + noise key + config |
 | Vaultwarden | vaultwarden-backup | 2:00 AM daily | `/augusto/vaultwarden` | vaultwarden-data volume |
 | Home Assistant | homeassistant-backup | 2:30 AM daily | `/augusto/homeassistant` | homeassistant-config volume |
@@ -88,7 +85,6 @@ All times in PYT (America/Asuncion).
 
 | Target | Location | Contents | Status |
 |--------|----------|----------|--------|
-
 | Restic REST (NAS) | `/mnt/purple/backup/restic/` | Vaultwarden, HA, Paperless, Immich, Coolify | Active (WD Purple 2TB, **97% full**) |
 | VPS local | `/backup/` in headscale-backup container | Headscale SQLite + config | Active (hourly) |
 | Google Drive (encrypted) | `gdrive-crypt:homelab/` | Restic repos + Headscale backups | Active (4:30 AM daily, rclone crypt) |
@@ -472,7 +468,6 @@ rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 
 | Script | Purpose | Location |
 |--------|---------|----------|
-
 | `scripts/backup-verify.sh` | Monthly backup audit (8 test suites) | Docker VM |
 | `scripts/backup-verify.sh --full` | Quarterly full restore drill | Docker VM |
 | `scripts/backup-notify.sh` | ntfy notifications for backup events | Docker VM |
@@ -481,7 +476,6 @@ rclone copy gdrive-crypt:homelab/headscale /tmp/headscale-restore
 
 | Task | Frequency | Procedure |
 |------|-----------|-----------|
-
 | Repository health check | Weekly (auto, Sundays) | Built into `restic-backup.sh` |
 | Snapshot freshness | Monthly (1st Sunday) | `backup-verify.sh` |
 | Test restore (Headscale, VW, HA, Paperless, Immich) | Monthly (1st Sunday) | `backup-verify.sh` |

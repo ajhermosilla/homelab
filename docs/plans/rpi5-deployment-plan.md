@@ -6,7 +6,6 @@ Step-by-step guide to deploy the Raspberry Pi 5 as an OpenClaw AI assistant node
 
 | Component | Model | Notes |
 |-----------|-------|-------|
-
 | Board | Raspberry Pi 5 8GB | OpenClaw AI assistant |
 | Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
@@ -310,7 +309,6 @@ If something goes wrong:
 
 | Phase | Estimate |
 |-------|----------|
-
 | Physical setup | 5 min |
 | SSH + key copy | 2 min |
 | Ansible playbooks | 10-15 min |

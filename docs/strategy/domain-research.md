@@ -17,7 +17,6 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 | Domain | Status | Price | Purpose |
 |--------|--------|-------|---------|
-
 | **nanduti.io** | Available | ~$30/yr | Homelab / Infra |
 | **verava.net** | Available | ~$12/yr | Business / Consulting |
 | mbyja.io | Available | ~$30/yr | Alternative |
@@ -27,7 +26,6 @@ Domain name options for homelab infrastructure and business. Researched 2026-01-
 
 | Aspect | verava.net | nanduti.io | mbyja.io | kuarahy.io |
 |--------|------------|------------|----------|------------|
-
 | **Meaning** | Brand name | "Web/Lace" (Guarani) | "Star" (Guarani) | "Sun" (Guarani) |
 | **Pronounceable** | Easy | Medium | Hard | Hard |
 | **Spellable** | Easy | Medium | Hard | Hard |
@@ -163,7 +161,6 @@ curl https://api.verava.net/status
 
 | Domain | Use Case | Subdomains |
 |--------|----------|------------|
-
 | **nanduti.io** | Homelab / Personal | headscale.nanduti.io, pihole.nanduti.io, git.nanduti.io |
 | **verava.net** | Business / Customers | <www.verava.net>, api.verava.net, app.verava.net |
 
@@ -180,7 +177,6 @@ curl https://api.verava.net/status
 
 | Subdomain | Service | Environment |
 |-----------|---------|-------------|
-
 | `hs.nanduti.io` | Headscale | Mobile (RPi 5) |
 | `dns.nanduti.io` | Pi-hole | All |
 | `git.nanduti.io` | Forgejo | Fixed (NAS) |
@@ -201,7 +197,6 @@ curl https://api.verava.net/status
 
 | Domain | Registrable? |
 |--------|--------------|
-
 | ~~ñanduti.io~~ | No (special character ñ) |
 | **nanduti.io** | Yes (ASCII only) |
 
@@ -213,7 +208,6 @@ If you want the ñ, use Paraguay's TLD:
 
 | Domain | Notes |
 |--------|-------|
-
 | ñanduti.com.py | Supports IDN |
 | nanduti.com.py | Also available |
 
@@ -236,7 +230,6 @@ kuarahy.io  - Domain not found (AVAILABLE)
 
 | Domain | Decision | Action |
 |--------|----------|--------|
-
 | **nanduti.io** | BUY | Primary homelab domain |
 | **verava.net** | BUY | Business domain |
 | mbyja.io | Skip | Too hard to spell |
@@ -267,7 +260,6 @@ The metaphor is perfect.
 
 | Registrar | .io Price | .net Price | Notes |
 |-----------|-----------|------------|-------|
-
 | Namecheap | ~$30/yr | ~$12/yr | Good UI, privacy included |
 | Cloudflare | ~$28/yr | ~$10/yr | At-cost pricing, no markup |
 | Porkbun | ~$28/yr | ~$10/yr | Cheap, good reputation |

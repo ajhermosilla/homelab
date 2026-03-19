@@ -100,7 +100,6 @@ Comprehensive codebase review after completing hardware documentation.
 
 | # | Task | Status | Commit |
 |---|------|--------|--------|
-
 | 1 | Update architecture-review.md domains | Done | ef92139 |
 | 2 | Fix Frigate location in services.md | Done | ef92139 |
 | 3 | Docker VM docker-compose files | Done | bc86158 |

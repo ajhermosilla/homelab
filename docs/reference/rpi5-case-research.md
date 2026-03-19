@@ -18,7 +18,6 @@ Mini PC tower aesthetic - perfect for a portable server.
 
 | Property | Value |
 |----------|-------|
-
 | Designer | Xavior93 |
 | Platform | Printables |
 | Style | Retro mini PC |
@@ -43,7 +42,6 @@ Maximum geek factor with RGB and display.
 
 | Property | Value |
 |----------|-------|
-
 | Designer | Various |
 | Platform | Cults3D / Etsy |
 | Style | Cyberpunk / Neon |
@@ -75,7 +73,6 @@ Mathematical tribute with functional design.
 
 | Property | Value |
 |----------|-------|
-
 | Designer | Instructables community |
 | Platform | Instructables |
 | Style | Math nerd |
@@ -99,7 +96,6 @@ Clean, proven, just works.
 
 | Property | Value |
 |----------|-------|
-
 | Designer | Stamos |
 | Platform | Printables / Thingiverse |
 | Style | Minimal / Industrial |
@@ -128,7 +124,6 @@ Server-ready with SSD support.
 
 | Property | Value |
 |----------|-------|
-
 | Designer | mrlinux2u |
 | Platform | Printables |
 | Style | Functional server |
@@ -152,7 +147,6 @@ Art Deco meets GPU reference design.
 
 | Property | Value |
 |----------|-------|
-
 | Designer | the printed cow |
 | Platform | Printables |
 | Style | Retro / Art Deco / GPU |
@@ -176,7 +170,6 @@ Overkill flex for maximum geek cred.
 
 | Property | Value |
 |----------|-------|
-
 | Designer | Michael Klements |
 | Platform | XDA / Custom |
 | Style | Enthusiast |
@@ -206,7 +199,6 @@ Overkill flex for maximum geek cred.
 
 | Case | Geek Factor | Difficulty | Cost | Active Cooler | NVMe |
 |------|-------------|------------|------|---------------|------|
-
 | Retro Tower | 9/10 | Medium | Low | Yes | No |
 | Cyberpunk | 10/10 | Hard | Medium | Custom | No |
 | PiCase (π) | 8/10 | Medium | Low | Passive | No |
@@ -219,7 +211,6 @@ Overkill flex for maximum geek cred.
 
 | Platform | URL | Notes |
 |----------|-----|-------|
-
 | Printables | <https://www.printables.com> | Best quality, Prusa community |
 | MakerWorld | <https://makerworld.com> | Bambu Lab, multicolor |
 | Thingiverse | <https://www.thingiverse.com> | Classic, largest library |
@@ -232,7 +223,6 @@ Overkill flex for maximum geek cred.
 
 | Material | Use Case |
 |----------|----------|
-
 | **PETG** | Near active cooler (heat resistant) |
 | **PLA** | Decorative parts, low-heat areas |
 | **ABS** | Maximum heat resistance |
@@ -243,7 +233,6 @@ Overkill flex for maximum geek cred.
 
 | Setting | Value |
 |---------|-------|
-
 | Layer height | 0.2mm |
 | Infill | 20-30% |
 | Supports | Check per model |
@@ -255,7 +244,6 @@ Common parts needed across designs:
 
 | Part | Quantity | Notes |
 |------|----------|-------|
-
 | M2.5 x 6mm screws | 4 | Mount Pi to case |
 | M2.5 nuts | 4 | Some designs |
 | M3 screws/nuts | Varies | Fan mounting |

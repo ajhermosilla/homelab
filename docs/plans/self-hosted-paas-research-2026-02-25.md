@@ -49,7 +49,6 @@ Git-push deploy, managed databases, web UI, SSL automation, monitoring, one-clic
 
 | Platform | Maturity | Stars |
 |----------|----------|-------|
-
 | Coolify | High | 51k |
 | Dokploy | Medium | 28k |
 | CapRover | High | 14k |
@@ -63,7 +62,6 @@ Focused on getting containers to servers. No built-in DB management, minimal UI.
 
 | Platform | Maturity | Stars |
 |----------|----------|-------|
-
 | Kamal | High | 11k+ |
 | Komodo | Medium | 10k |
 | Haloy | Low | New |
@@ -74,7 +72,6 @@ GUI for managing existing Docker containers. Not a deploy pipeline.
 
 | Platform | Maturity | Stars |
 |----------|----------|-------|
-
 | Portainer | Very High | 32k+ |
 | Dockge | Medium | 22k |
 
@@ -84,7 +81,6 @@ GUI for managing existing Docker containers. Not a deploy pipeline.
 
 | Platform | Type | Min RAM | Idle RAM | Git Deploy | Auto SSL | DB Mgmt | Web UI | GitHub Stars | Best For |
 |----------|------|---------|----------|------------|----------|---------|--------|--------------|----------|
-
 | **Coolify** | Full PaaS | 2 GB | ~380 MB | Yes | Yes | Yes | Yes | 51k | Feature-hungry teams |
 | **Dokploy** | Full PaaS | 2 GB (4 rec.) | ~300 MB | Yes | Yes | Yes | Yes | 28k | Clean UI + Docker Swarm |
 | **CapRover** | Full PaaS | 1 GB | ~210 MB | Yes | Yes | Basic | Yes | 14k | Simple + lightweight PaaS |
@@ -907,7 +903,6 @@ Estimated current RAM usage: **4-6 GB** (Frigate is the elephant).
 
 | PaaS | Idle Overhead | Remaining for Apps | Verdict |
 |------|--------------|-------------------|---------|
-
 | Coolify | ~380 MB | ~2.6-4.6 GB | Feasible but tight with Frigate |
 | Dokploy | ~300 MB | ~2.7-4.7 GB | Feasible |
 | CapRover | ~210 MB | ~2.8-4.8 GB | Comfortable |

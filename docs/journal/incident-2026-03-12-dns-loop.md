@@ -9,7 +9,6 @@
 
 | Time | Event |
 |------|-------|
-
 | ~11:45 | Headscale container restarts (cause unknown, possibly Watchtower or OOM) |
 | ~11:45 | Tailscaled on VPS re-fetches DNS config, split DNS loop begins |
 | ~11:45 | DNS request queue floods — all VPS DNS resolution fails |
