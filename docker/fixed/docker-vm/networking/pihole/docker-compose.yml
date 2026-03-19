@@ -47,9 +47,11 @@ services:
       - ALL
     cap_add:
       - CHOWN
+      - DAC_OVERRIDE  # Required for gravity DB creation
+      - FOWNER        # Required for gravity DB file ownership
       - NET_ADMIN
       - NET_RAW
-      - SETFCAP     # Pi-hole FTL capabilities
+      - SETFCAP       # Pi-hole FTL capabilities
       - SETGID
       - SETUID
     logging:
