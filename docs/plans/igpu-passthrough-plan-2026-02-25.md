@@ -24,7 +24,6 @@ Frigate NVR runs OpenVINO on CPU (~117ms inference) with VAAPI hardware decoding
 
 | Item | Status | Value |
 |------|--------|-------|
-
 | Proxmox kernel | >= 6.11 required | 6.17.4-2-pve |
 | Docker VM kernel | >= 6.11 required | 6.12.63+deb13 (Trixie) |
 | VM 101 BIOS | OVMF (UEFI) | OK |
@@ -76,7 +75,6 @@ Parameter breakdown:
 
 | Parameter | Purpose |
 |-----------|---------|
-
 | `intel_iommu=on` | Enable Intel VT-d IOMMU |
 | `iommu=pt` | Passthrough mode (performance for non-passthrough devices) |
 | `i915.enable_guc=3` | Enable GuC firmware (required for SR-IOV) |
@@ -312,7 +310,6 @@ git push
 
 | Step | Duration | Notes |
 |------|----------|-------|
-
 | Step 1: BIOS check | 5 min | Physical access, reboot into BIOS |
 | Step 2: Proxmox IOMMU + SR-IOV | 15-20 min | GRUB, DKMS install, reboot |
 | Step 3: VM config + GPU assign | 5 min | Stop/start VM |
@@ -361,7 +358,6 @@ reboot
 
 | Risk | Impact | Mitigation |
 |------|--------|-----------|
-
 | i440fx → q35 breaks VM boot | VM won't start | Revert: `qm set 101 -machine i440fx -delete hostpci0` |
 | DKMS breaks on PVE kernel update | VFs disappear after update | Monitor `dkms status` after `apt upgrade`; pin kernel if needed |
 | SR-IOV not upstream kernel | Community module maintenance | Watch GitHub releases, rebuild after kernel updates |
@@ -374,7 +370,6 @@ reboot
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-
 | OpenVINO inference | ~117ms (CPU) | ~15ms (GPU) | **~7x faster** |
 | Video decoding | ffmpeg CPU | VAAPI hardware | **Major CPU savings** |
 | Frigate CPU usage | High | Significantly lower | Free CPU for other services |

@@ -9,7 +9,6 @@
 
 | Option | What It Monitors | RAM Cost | New Containers | Setup Effort |
 |--------|-----------------|----------|----------------|-------------|
-
 | **HA System Monitor** | Docker VM only (CPU, RAM, disk, network) | 0 | 0 | Low (built-in) |
 | **Proxmox VE HACS** | Proxmox host + all VMs (CPU, RAM, disk, uptime, status) | 0 | 0 | Low (API token + HACS) |
 | **Glances** | Any host (CPU, RAM, disk, network, temps, per-process) | ~70MB each | 1 per host | Medium |
@@ -96,7 +95,6 @@ HA picks these up via MQTT sensor config. Useful for temperatures that Proxmox A
 
 | Phase | Action | Can Do Remotely? | Status |
 |-------|--------|-----------------|--------|
-
 | **Now** | System Monitor integration (browser) | Yes | Done |
 | **Now** | Proxmox VE HACS integration (browser + Proxmox web UI) | Yes | Done |
 | **Later** | Glances on NAS (SSH + compose) | Yes | Done |
@@ -111,7 +109,6 @@ Once sensors are available, add to the Home Overview Dashboard:
 
 | Card | Data Source | Section |
 |------|-----------|---------|
-
 | Gauge cards | System Monitor (CPU, RAM, disk %) | Infrastructure Status |
 | Entity cards | Proxmox VE (VM status, uptime) | Infrastructure Status |
 | Mini-graph-card | Glances (NAS disk, network trends) | Infrastructure Status |

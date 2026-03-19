@@ -6,7 +6,6 @@ Post-security audit improvement opportunities identified after completing 24/24 
 
 | Priority | Count | Effort |
 |----------|-------|--------|
-
 | Quick Wins | 6 | < 1 hour each |
 | Medium | 8 | 1-2 hours each |
 | Lower | 5 | 2+ hours each |
@@ -23,7 +22,6 @@ Post-security audit improvement opportunities identified after completing 24/24 
 
 | File | Services |
 |------|----------|
-
 | `docker/fixed/nas/storage/docker-compose.yml` | Samba, Syncthing |
 | `docker/fixed/nas/backup/docker-compose.yml` | Restic REST |
 | `docker/vps/backup/docker-compose.yml` | Restic REST |
@@ -55,7 +53,6 @@ Services may start out-of-order, causing initialization failures.
 
 | Service | Depends On |
 |---------|------------|
-
 | Frigate | Mosquitto |
 | Home Assistant | Mosquitto |
 | Jellyfin | NFS mount |
@@ -116,7 +113,6 @@ labels:
 
 | Directory | Missing README |
 |-----------|---------------|
-
 | `docker/fixed/docker-vm/media/` | *arr stack integration, setup |
 | `docker/fixed/docker-vm/automation/` | MQTT setup, HA config |
 | `docker/fixed/docker-vm/security/` | Frigate setup, camera config |
@@ -154,7 +150,6 @@ Current playbooks: `common.yml`, `docker.yml`, `tailscale.yml`
 
 | Playbook | Purpose |
 |----------|---------|
-
 | `backup.yml` | Deploy restic, configure cronjobs |
 | `monitoring.yml` | Deploy Uptime Kuma, ntfy, configure monitors |
 | `update.yml` | System and container update automation |
@@ -330,7 +325,6 @@ Missing:
 
 | File | Purpose |
 |------|---------|
-
 | `docs/network-topology.md` | Network visualization |
 | `docs/service-startup-guide.md` | Deployment workflow |
 | `docs/service-upgrade-strategy.md` | Update procedures |

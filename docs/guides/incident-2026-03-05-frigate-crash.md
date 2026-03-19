@@ -19,7 +19,6 @@ The root cause is a **driver version mismatch**: the Frigate container bundles `
 
 | Time | Event |
 |------|-------|
-
 | Mar 2, 10:06 | First `Failed to sync surface` error appears (both cameras) |
 | Mar 2, 09:30 | Indoor camera (Tapo) already unreachable ("No route to host") — separate issue |
 | Mar 2–3 | Continuous crash loop: ffmpeg crashes → watchdog restarts → crashes again (~6/min per camera) |
@@ -97,7 +96,6 @@ The Tapo C110 (192.168.0.101) has been returning "No route to host" since at lea
 
 | # | Action | Status |
 |---|--------|--------|
-
 | 1 | Restarted Frigate: `docker compose up -d frigate` | Done |
 | 2 | Verified all 3 cameras reachable (ping) | Done |
 | 3 | Verified VA-API loads (`vainfo` shows iHD 24.3.3) | Done |
@@ -201,7 +199,6 @@ Add Uptime Kuma "Docker Container" monitor (if supported) or a script-based chec
 
 | Metric | Value |
 |--------|-------|
-
 | Frigate version | 0.16.4 (image built 2026-01-28) |
 | Container driver | intel-media-va-driver-non-free 24.3.3 |
 | Host driver | intel-media-va-driver 25.2.3 |

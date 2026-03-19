@@ -10,7 +10,6 @@ Step-by-step guide to deploy the DIY NAS (Mini-ITX build from 2013).
 
 | Component | Model |
 |-----------|-------|
-
 | Case | Cooler Master Elite 120 Advanced |
 | Motherboard | ASUS P8H77-I (LGA 1155) |
 | CPU | Intel Core i3-3220T (35W TDP) |
@@ -21,7 +20,6 @@ Step-by-step guide to deploy the DIY NAS (Mini-ITX build from 2013).
 
 | Drive | Size | Purpose | Mount |
 |-------|------|---------|-------|
-
 | Lexar NQ110 SSD | 240GB | Debian OS, Docker | / |
 | WD Purple | 2TB | Frigate recordings (NFS) | /mnt/purple |
 | WD Red Plus | 8TB | Media, data, backups | /mnt/red8 |
@@ -106,7 +104,6 @@ Save these securely (Vaultwarden) before going home.
 
 | Setting | Value |
 |---------|-------|
-
 | Language | English |
 | Location | Paraguay |
 | Hostname | nas |
@@ -461,7 +458,6 @@ curl http://192.168.0.12:8000/
 
 | Hostname | IP |
 |----------|-----|
-
 | nas.home | 192.168.0.12 |
 | syncthing.home | 192.168.0.12 |
 
@@ -469,7 +465,6 @@ curl http://192.168.0.12:8000/
 
 | Service | Check |
 |---------|-------|
-
 | NAS SSH | TCP 192.168.0.12:22 |
 | Samba | TCP 192.168.0.12:445 |
 | Syncthing | HTTP 192.168.0.12:8384 |
@@ -556,7 +551,6 @@ If something goes wrong:
 
 | Phase | Estimate |
 |-------|----------|
-
 | Debian install | 20-30 min |
 | Drive setup | 15-20 min |
 | Docker + Tailscale | 10-15 min |

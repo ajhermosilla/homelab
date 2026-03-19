@@ -6,7 +6,6 @@ Comprehensive codebase review findings and action plan.
 
 | Priority | Count | Status |
 |----------|-------|--------|
-
 | Critical | 7 | **Complete** |
 | High | 5 | **Complete** |
 | Medium | 12 | **Complete** |
@@ -20,7 +19,6 @@ Must be fixed before any deployment attempt.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-
 | 1 | Missing `frigate.yml` config | `docker/fixed/docker-vm/security/` | [x] |
 | 2 | Missing `mosquitto.conf` | `docker/fixed/docker-vm/automation/` | [x] |
 | 3 | Missing Caddyfile (fixed homelab) | `docker/fixed/docker-vm/networking/caddy/` | [x] |
@@ -37,7 +35,6 @@ Complete before testing services.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-
 | 8 | Missing `.env.example` files | All docker directories | [x] |
 | 9 | Docker network isolation undefined | `docker/README.md` | [x] |
 | 10 | Headscale `config/config.yaml` template | `docker/vps/networking/headscale/config/` | [x] |
@@ -52,7 +49,6 @@ Complete before production use.
 
 | # | Issue | Location | Status |
 |---|-------|----------|--------|
-
 | 13 | qBittorrent port conflict (8080 vs 6881) | `docs/services.md` | [x] |
 | 14 | NAS symlink creation not documented | `docs/fixed-homelab.md` | [x] |
 | 15 | Uptime Kuma monitors not seeded | `docker/vps/monitoring/monitors.md` | [x] |

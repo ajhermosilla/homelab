@@ -182,7 +182,6 @@ Schedule: 3:00 AM PYT (between HA 2:30 AM and Coolify 3:30 AM).
 
 | Container | RAM | CPU |
 |-----------|-----|-----|
-
 | javya-db | 512M | 1.0 |
 | javya-backend | 256M | 0.5 |
 | javya-frontend | 128M | 0.25 |
@@ -194,7 +193,6 @@ NAS (i3-3220T, 8GB RAM) can handle this alongside existing 16 containers.
 
 | Aspect | Katupyry | Javya |
 |--------|----------|-------|
-
 | NAS path | `~/deploy/katupyry/` | `~/deploy/javya/` |
 | Domain | `katupyry.cronova.dev` | `javya.cronova.dev` |
 | DB volume | `katupyry_postgres_data` | `javya_postgres_data` |

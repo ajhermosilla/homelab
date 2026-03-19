@@ -6,7 +6,6 @@ How the homelab is monitored, alerted, and observed.
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
-
 | **Uptime Kuma** | VPS | External health checks (HTTP, TCP, ping) |
 | **ntfy** | VPS | Push notifications (alerts, backup status) |
 | **VictoriaMetrics** (Papa) | Docker VM | Time-series metrics database |
@@ -38,7 +37,6 @@ Home Assistant (/api/prometheus) ──┘                   (30s eval)    (grou
 
 | Job | Target | Labels |
 |-----|--------|--------|
-
 | node-docker-vm | `host.docker.internal:9100` | instance: docker-vm |
 | node-nas | `100.82.77.97:9100` | instance: nas |
 | victoriametrics | `victoriametrics:8428` | instance: victoriametrics |
@@ -69,7 +67,6 @@ Home Assistant (/api/prometheus) ──┘                   (30s eval)    (grou
 
 | Dashboard | Grafana ID | Source | What it shows |
 |-----------|-----------|--------|---------------|
-
 | Node Exporter Full | 1860 | node-docker-vm, node-nas | Host CPU, RAM, disk, network |
 | VictoriaMetrics Single | 10229 | victoriametrics | TSDB health, ingestion rate, storage |
 | cAdvisor Docker | 19792 | cadvisor | Per-container CPU, memory, network |
@@ -87,7 +84,6 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. **35 m
 
 | Monitor | Type | Target |
 |---------|------|--------|
-
 | Headscale | HTTP | `https://hs.cronova.dev/health` |
 | Vaultwarden | HTTP | `https://vault.cronova.dev/alive` |
 | Pi-hole DNS | TCP | `100.68.63.168:53` |
@@ -103,7 +99,6 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. **35 m
 
 | Monitor | Type | Target |
 |---------|------|--------|
-
 | Home Assistant (Jara) | HTTP | `https://jara.cronova.dev` (300s) |
 | Frigate (Taguato) | HTTP | `https://taguato.cronova.dev/api/version` (60s) |
 | Forgejo | HTTP | `http://100.82.77.97:3000` (60s) |
@@ -121,7 +116,6 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. **35 m
 
 | Monitor | Type | Target |
 |---------|------|--------|
-
 | Jellyfin (Yrasema) | HTTP | `https://yrasema.cronova.dev/health` |
 | Grafana (Papa) | HTTP | `https://papa.cronova.dev` |
 | Immich (Vera) | HTTP | `https://vera.cronova.dev` |
@@ -144,7 +138,6 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. **35 m
 
 | Topic | Purpose | Priority |
 |-------|---------|----------|
-
 | `cronova-critical` | Service down, data loss risk | Urgent (wakes phone) |
 | `cronova-warning` | Degraded performance | High |
 | `cronova-info` | Backups completed, maintenance | Default (silent) |
@@ -160,7 +153,6 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. **35 m
 
 | Source | Topic | Trigger |
 |--------|-------|---------|
-
 | Uptime Kuma | `cronova-critical` / `cronova-warning` | Service down/degraded |
 | Backup sidecars | `cronova-critical` / `cronova-info` | Backup failure / success |
 | `scripts/backup-notify.sh` | Per-service routing | Backup event notifications |
@@ -198,7 +190,6 @@ Android/iOS ntfy app → Subscribe to:
 
 | Integration | Source | What It Monitors |
 |-------------|--------|------------------|
-
 | System Monitor | Docker VM | CPU, RAM, disk usage |
 | Glances | NAS (100.82.77.97:61208) | NAS system metrics |
 | Proxmox VE (HACS) | Oga (100.78.12.241) | Host and VM status |

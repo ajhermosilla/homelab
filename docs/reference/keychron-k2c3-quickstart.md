@@ -8,7 +8,6 @@
 
 | Switch | Position | Purpose |
 |--------|----------|---------|
-
 | Cable/Off/BT | BT | Wireless mode |
 | Mac/Win | Mac | macOS key layout |
 
@@ -29,7 +28,6 @@ The K2 remembers 3 Bluetooth devices:
 
 | Shortcut | Action |
 |----------|--------|
-
 | Fn + 1 | Switch to device slot 1 (MacBook) |
 | Fn + 2 | Switch to device slot 2 |
 | Fn + 3 | Switch to device slot 3 |
@@ -44,7 +42,6 @@ The K2 remembers 3 Bluetooth devices:
 
 | Shortcut | Action |
 |----------|--------|
-
 | Fn + Light bulb | Cycle brightness: High > Low > Off |
 | Fn + < | Decrease RGB effect speed |
 | Fn + > | Increase RGB effect speed |
@@ -53,7 +50,6 @@ The K2 remembers 3 Bluetooth devices:
 
 | Key | Mac Function |
 |-----|--------------|
-
 | F1 | Decrease brightness |
 | F2 | Increase brightness |
 | F3 | Mission Control |

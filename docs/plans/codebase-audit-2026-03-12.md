@@ -8,7 +8,6 @@ Full audit of compose files, documentation, Ansible, and scripts. Filtered for r
 
 | Service | File | Notes |
 |---------|------|-------|
-
 | DERP relay | `docker/vps/networking/derp/docker-compose.yml` | Has `security_opt` and `read_only`, missing cap_drop |
 | Headscale | `docker/vps/networking/headscale/docker-compose.yml` | Has `cap_add: NET_ADMIN`, missing cap_drop |
 | Headscale-backup | `docker/vps/networking/headscale/docker-compose.yml` | Missing cap_drop |
@@ -21,7 +20,6 @@ Services with admin/API ports exposed to all interfaces that should be localhost
 
 | Service | File | Current | Fix |
 |---------|------|---------|-----|
-
 | Syncthing Web UI | `docker/fixed/nas/storage/docker-compose.yml` | `8384:8384` | `127.0.0.1:8384:8384` |
 | Glances API | `docker/fixed/nas/monitoring/docker-compose.yml` | `61208:61208` | `127.0.0.1:61208:61208` |
 | Uptime Kuma | `docker/vps/monitoring/docker-compose.yml` | `3001:3001` | `127.0.0.1:3001:3001` |
@@ -39,7 +37,6 @@ Multiple docs say 12, actual is 19 (includes Javya 3, Katupyry 3, offsite-sync):
 
 | File | Line | Current | Fix |
 |------|------|---------|-----|
-
 | `docs/README.md` | ~13 | 12 containers | 19 |
 | `docs/architecture/hardware.md` | ~67, ~248 | 11/12 containers | 19 |
 | `docs/architecture/fixed-homelab.md` | ~11 | 12 containers | 19 |

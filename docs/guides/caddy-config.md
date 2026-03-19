@@ -40,7 +40,6 @@ Caddy configuration for cronova.dev and verava.ai across all environments. Creat
 
 | Subdomain | Destination | Access |
 |-----------|-------------|--------|
-
 | `<www.cronova.dev>` | Cloudflare Pages | Public |
 | `docs.cronova.dev` | Cloudflare Pages | Public |
 | `vault.cronova.dev` | VPS → Fixed Homelab (Tailscale) | Public |
@@ -374,7 +373,6 @@ networks:
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
-
 | A | @ | VPS_IP | Yes |
 | CNAME | www | cronova.pages.dev | Yes |
 | CNAME | docs | cronova-docs.pages.dev | Yes |
@@ -394,7 +392,6 @@ networks:
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
-
 | A | @ | VPS_IP | Yes |
 | A | www | VPS_IP | Yes |
 | A | app | VPS_IP | Yes |
@@ -441,7 +438,6 @@ Use Caddy's internal CA for Tailscale-only services (simpler but requires trusti
 
 | Setting | Value |
 |---------|-------|
-
 | SSL/TLS | Full (strict) |
 | Always Use HTTPS | On |
 | Minimum TLS Version | TLS 1.2 |

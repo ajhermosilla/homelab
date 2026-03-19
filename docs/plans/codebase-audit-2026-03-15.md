@@ -13,7 +13,6 @@ Services without pinned versions:
 
 | Service | Image | Host | Notes |
 |---------|-------|------|-------|
-
 | cadvisor | `gcr.io/cadvisor/cadvisor:latest` | Docker VM | Pin to stable release |
 | dozzle | `amir20/dozzle:latest` | Docker VM | Pin to stable release |
 | bentopdf | `ghcr.io/alam00000/bentopdf:latest` | Docker VM | Pin to stable release |

@@ -128,7 +128,6 @@ Use these settings when prompted:
 
 | Setting | Value |
 |---------|-------|
-
 | Language | English |
 | Location | Paraguay |
 | Hostname | `nas` |
@@ -691,7 +690,6 @@ Open the Uptime Kuma web UI and add these monitors:
 
 | Service | Type | Target |
 |---------|------|--------|
-
 | NAS SSH | TCP | 192.168.0.12:22 |
 | Samba | TCP | 192.168.0.12:445 |
 | Syncthing | HTTP | <http://192.168.0.12:8384> |

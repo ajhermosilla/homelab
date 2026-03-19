@@ -19,7 +19,6 @@ GitHub becomes **read-only** — any direct changes there get overwritten by the
 
 | Forgejo Repo | GitHub Repo | Visibility |
 |---|---|---|
-
 | `augusto/homelab` | `ajhermosilla/homelab` | Public or private |
 | `augusto/notes` | `ajhermosilla/notes` | **Private** (personal session notes) |
 

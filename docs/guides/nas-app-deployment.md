@@ -195,7 +195,6 @@ Add via the web UI at `https://status.cronova.dev` (username: `ajhermosilla`):
 
 | Field | Value |
 |-------|-------|
-
 | Type | HTTP(s) |
 | URL | `https://<app>.cronova.dev` |
 | Interval | 60s |
@@ -233,7 +232,6 @@ docker compose -f docker-compose.prod.yml up -d --force-recreate
 
 | App | URL | API URL | Deploy Path | Traefik Config |
 |-----|-----|---------|-------------|----------------|
-
 | Katupyry | katupyry.cronova.dev | (internal) | ~/deploy/katupyry/ | /data/coolify/proxy/dynamic/katupyry.yaml |
 | Javya | javya.cronova.dev | javya-api.cronova.dev | ~/deploy/javya/ | /data/coolify/proxy/dynamic/javya.yaml |
 
@@ -241,7 +239,6 @@ docker compose -f docker-compose.prod.yml up -d --force-recreate
 
 | Aspect | Katupyry | Javya |
 |--------|----------|-------|
-
 | API routing | Internal only (frontend proxies) | External (`javya-api.cronova.dev`) |
 | Coolify network | Frontend only | Frontend + backend |
 | Container names | Default (compose-generated) | Explicit (`container_name:`) |
