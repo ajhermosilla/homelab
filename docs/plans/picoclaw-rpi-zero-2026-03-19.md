@@ -21,13 +21,13 @@ PicoClaw is an ultra-lightweight AI assistant by Sipeed (<10MB RAM, single Go bi
 - [ ] Micro-USB power supply (5V/1.2A+ — any phone charger or USB port on NAS)
 - [ ] Micro-USB OTG adapter (for initial setup if needed, optional with WiFi)
 
-### Accounts
+### Accounts (all free, no credit card)
 
 - [ ] Telegram bot — create via @BotFather, get bot token
-- [ ] LLM API key — one of:
-  - Anthropic (Claude) — `ANTHROPIC_API_KEY`
-  - OpenRouter — free 200K tokens/month
-  - Or any supported provider
+- [ ] Groq API key — https://console.groq.com (primary)
+- [ ] Google Gemini API key — https://aistudio.google.com/apikey (fallback 1)
+- [ ] OpenRouter API key — https://openrouter.ai/keys (fallback 2)
+- [ ] Mistral API key — https://console.mistral.ai (fallback 3)
 
 ### Network
 
@@ -106,13 +106,34 @@ su - picoclaw -c "picoclaw onboard"
 
 ## Phase 4 — Configuration (10 min)
 
+### Provider Strategy ($0/month)
+
+Anthropic blocked subscription OAuth tokens in third-party agents (Feb 2026). API keys
+still work but cost $1-25/M tokens. Instead, use free providers with failover:
+
+| Priority | Provider | Model | Free Limits | Why |
+|----------|----------|-------|-------------|-----|
+| Primary | Groq | Llama 3.3 70B | ~14,400 req/day | Fastest (300+ tok/s), GPT-4 quality, tool calling |
+| Fallback 1 | Google Gemini | 2.5 Flash | 250 req/day | Best quality, 1M context |
+| Fallback 2 | OpenRouter | Free router | 200 req/day | Auto-selects best free model |
+| Fallback 3 | Mistral | Small 3.1 | 1B tokens/month, 2 RPM | Huge quota, slow RPM |
+
+### Get API keys (free, no credit card)
+
+1. **Groq**: https://console.groq.com → API Keys → Create
+2. **Google Gemini**: https://aistudio.google.com/apikey → Create API key
+3. **OpenRouter**: https://openrouter.ai/keys → Create Key (select free models only)
+4. **Mistral**: https://console.mistral.ai → API Keys → Create
+
+### Edit config
+
 Edit `~picoclaw/.picoclaw/config.json`:
 
 ```json
 {
   "agents": {
     "defaults": {
-      "model": "anthropic/claude-sonnet-4-6",
+      "model": "groq/llama-3.3-70b-versatile",
       "max_tokens": 4096,
       "temperature": 0.7,
       "max_tool_iterations": 10,
@@ -120,8 +141,17 @@ Edit `~picoclaw/.picoclaw/config.json`:
     }
   },
   "providers": {
-    "anthropic": {
-      "api_key": "<ANTHROPIC_API_KEY>"
+    "groq": {
+      "api_key": "<GROQ_API_KEY>"
+    },
+    "google": {
+      "api_key": "<GEMINI_API_KEY>"
+    },
+    "openrouter": {
+      "api_key": "<OPENROUTER_API_KEY>"
+    },
+    "mistral": {
+      "api_key": "<MISTRAL_API_KEY>"
     }
   },
   "channels": {
@@ -137,6 +167,32 @@ Edit `~picoclaw/.picoclaw/config.json`:
   }
 }
 ```
+
+### Model routing (cost optimization)
+
+PicoClaw supports rule-based model routing. For heavier tasks, fall back to
+higher-quality models:
+
+- Quick questions → `groq/llama-3.3-70b-versatile` (fast, free)
+- Complex reasoning → `google/gemini-2.5-flash` (1M context, free)
+- Code generation → `mistral/codestral-latest` (free, 2 RPM)
+
+### Optional: local fallback (internet outage)
+
+If you have Ollama on Docker VM:
+
+```json
+{
+  "providers": {
+    "ollama": {
+      "base_url": "http://192.168.0.10:11434/v1",
+      "api_key": "ollama"
+    }
+  }
+}
+```
+
+Model: `ollama/qwen3:8b` (~5GB RAM, CPU-only ~5 tok/s, tool calling works)
 
 ---
 
@@ -222,8 +278,11 @@ Following the naming convention: **Ñe'ẽ** (ñe'ẽ = "word/speech" in Guarani
 | RPi Zero W | $0 (already owned) |
 | 32GB microSD | ~$8 |
 | Micro-USB cable | ~$2 (or reuse) |
-| LLM API | $0-20/month |
-| **Total** | **~$10 one-time** |
+| LLM API (Groq/Gemini/OpenRouter/Mistral) | $0/month (free tiers) |
+| Web search (DuckDuckGo) | $0/month |
+| **Total** | **~$10 one-time, $0/month** |
+
+Combined free API budget: ~15,000+ requests/day across all providers.
 
 ---
 
