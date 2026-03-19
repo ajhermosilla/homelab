@@ -10,7 +10,6 @@
 
 | If done Jan 23 | Jan 24 benefit |
 |----------------|----------------|
-
 | Proxmox installed | Skip Phase 2 (save 45 min) |
 | OPNsense VM created | Skip most of Phase 3 (save 45 min) |
 | NAS drives installed | Phase 6 faster |
@@ -296,7 +295,6 @@ After configuration, VM 100 should have:
 
 | Device | Purpose |
 |--------|---------|
-
 | virtio0 | 20GB disk |
 | net0 (vmbr0) | LAN interface |
 | hostpci0 OR net1 (vmbr1) | WAN interface |
@@ -446,7 +444,6 @@ After this session:
 
 | Phase | Status | Jan 24 Action |
 |-------|--------|---------------|
-
 | Phase 1 | Ready | Just connect cables |
 | Phase 2 | **DONE** | Skip |
 | Phase 3 | **Mostly DONE** | Only cutover config |

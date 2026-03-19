@@ -6,7 +6,6 @@ Codebase review identified issues in Ansible playbooks, Docker Compose files, an
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 1 | `ansible_connection_timeout` is not a valid Ansible parameter (should be `ansible_connect_timeout`) | `ansible/inventory.yml` | 82 | **Fixed** |
 | 2 | Caddy references external networks (`headscale-net`, `monitoring-net`) not created by any task | `ansible/playbooks/caddy.yml` | 178-191 | **Fixed** |
 | 3 | Path construction used `environment_type` instead of host-specific paths, breaking deployments | `ansible/playbooks/docker-compose-deploy.yml` | 19-42, 66-82 | **Fixed** |
@@ -25,7 +24,6 @@ Codebase review identified issues in Ansible playbooks, Docker Compose files, an
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 6 | No `.env` files present (only `.env.example`) - fresh deployments will fail | All docker directories | - | **N/A** (handled by docker-compose-deploy.yml) |
 | 7 | Pi-hole password defaults to empty string (insecure) | `ansible/playbooks/pihole.yml` | 22-31 | **Fixed** |
 | 8 | NFS export paths hardcoded (`/srv/media`, `/srv/downloads`), may not exist | `ansible/playbooks/nfs-server.yml` | 12-39 | **Fixed** |
@@ -44,7 +42,6 @@ Codebase review identified issues in Ansible playbooks, Docker Compose files, an
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 11 | Hardcoded IPs should use environment variables or container names | Multiple docker-compose files | - | **Acceptable** (defaults with env var override) |
 | 12 | Dead code: `docker_compose_version: "2"` variable defined but never used | `ansible/inventory.yml` | 93 | **Fixed** |
 | 13 | Inconsistent Tailscale IP addressing between docs and configs | Multiple files | - | **Fixed** |
@@ -61,7 +58,6 @@ Codebase review identified issues in Ansible playbooks, Docker Compose files, an
 
 | # | Issue | File | Line | Status |
 |---|-------|------|------|--------|
-
 | 14 | Relative paths in docker-compose assume specific working directories | Multiple files | - | **Fixed** |
 | 15 | Session docs in README may reference deleted files | `README.md` | 85 | **Verified OK** |
 

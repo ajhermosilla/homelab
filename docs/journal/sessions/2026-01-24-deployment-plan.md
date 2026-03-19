@@ -10,7 +10,6 @@
 
 | Component | Status |
 |-----------|--------|
-
 | Mini PC | Bare metal |
 | NAS | Bare metal |
 | Physical cabling | Not done |
@@ -864,7 +863,6 @@ After verifying feeds in Frigate:
 
 | Task | Priority | Notes |
 |------|----------|-------|
-
 | Install Debian on NAS | High | Skip if done Day 1 |
 | Set up NFS export for Frigate | High | Skip if done Day 1 |
 | Deploy Frigate + cameras | High | Skip if done Day 1 |
@@ -883,7 +881,6 @@ After verifying feeds in Frigate:
 
 | Issue | Action |
 |-------|--------|
-
 | Can't boot Proxmox | Check USB, try different USB port |
 | No network after Proxmox | Check NIC assignment, cables |
 | OPNsense no WAN IP | Check ISP modem bridge mode, try reboot modem |
@@ -896,7 +893,6 @@ After verifying feeds in Frigate:
 
 | Device | IP | Role |
 |--------|-----|------|
-
 | OPNsense LAN | 192.168.1.1 | Gateway, DHCP, DNS |
 | AX3000 (AP mode) | 192.168.1.2 | WiFi only |
 | Proxmox | 192.168.1.5 | Hypervisor management |
@@ -911,7 +907,6 @@ After verifying feeds in Frigate:
 
 | Service | URL |
 |---------|-----|
-
 | Proxmox | <https://192.168.1.5:8006> |
 | OPNsense | <https://192.168.1.1> |
 | Frigate | <http://192.168.1.10:5000> |

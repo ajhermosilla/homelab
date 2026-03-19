@@ -33,7 +33,6 @@ status.cronova.dev {
 
 | Name | Type | Target | Interval |
 |------|------|--------|----------|
-
 | Headscale | HTTP(s) | `https://hs.cronova.dev/health` | 60s |
 | Uptime Kuma | HTTP(s) | `https://status.cronova.dev` | 60s |
 | Caddy | TCP | `caddy:443` | 60s |
@@ -45,7 +44,6 @@ status.cronova.dev {
 
 | Name | Type | Target |
 |------|------|--------|
-
 | MacBook | Ping | `100.86.220.9` |
 | Phone (mombeu) | Ping | `100.110.253.126` |
 
@@ -53,7 +51,6 @@ status.cronova.dev {
 
 | Name | Type | Target |
 |------|------|--------|
-
 | cronova.dev | HTTP(s) | `https://cronova.dev` |
 | hermosilla.me | HTTP(s) | `https://hermosilla.me` |
 
@@ -61,14 +58,12 @@ status.cronova.dev {
 
 | Name | Type | Query | Server |
 |------|------|-------|--------|
-
 | DNS Check | DNS | `hs.cronova.dev` | `1.1.1.1` |
 
 ### External Dependencies (15m interval)
 
 | Name | Type | Target |
 |------|------|--------|
-
 | GitHub | HTTP(s) | `https://github.com` |
 | Cloudflare | HTTP(s) | `https://1.1.1.1` |
 | Fastmail | HTTP(s) | `https://www.fastmail.com` |
@@ -77,7 +72,6 @@ status.cronova.dev {
 
 | Service | Type | Target |
 |---------|------|--------|
-
 | Pi-hole (RPi 5) | TCP | `100.64.0.1:53` |
 | Vaultwarden | HTTP(s) | `https://vault.cronova.dev/alive` |
 | Home Assistant | HTTP(s) | `http://100.68.63.168:8123` |
@@ -87,7 +81,6 @@ status.cronova.dev {
 
 | Type | Use Case |
 |------|----------|
-
 | HTTP(s) | Web services, APIs, health endpoints |
 | TCP | Port availability (databases, services without HTTP) |
 | Ping | Host reachability (Tailscale nodes, servers) |
@@ -199,7 +192,6 @@ curl -u augusto:PASSWORD \
 
 | Topic | Use Case | Priority |
 |-------|----------|----------|
-
 | `alerts` | Uptime Kuma alerts | high |
 | `backups` | Backup job notifications | default |
 | `info` | General homelab info | low |

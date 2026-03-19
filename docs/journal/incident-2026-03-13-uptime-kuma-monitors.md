@@ -9,7 +9,6 @@
 
 | Time | Event |
 |------|-------|
-
 | ~Mar 7 | Uptime Kuma and ntfy containers started on VPS. Host `resolv.conf` pointed to `100.100.100.100` (MagicDNS). Docker embedded DNS cached this as `ExtServers: [host(100.100.100.100)]` |
 | Mar 12 ~21:50 | DNS incident fix: `accept-dns=false` applied, host `resolv.conf` changed to `127.0.0.1` (AdGuard). Headscale, Caddy, AdGuard containers restarted — but Uptime Kuma and ntfy were NOT restarted |
 | Mar 12 ~21:50 | Uptime Kuma container retains stale `ExtServers: [host(100.100.100.100)]`. All hostname-based monitors begin failing silently |
@@ -86,7 +85,6 @@ Added 18 DNS rewrites to `/var/lib/docker/volumes/adguard-conf/_data/AdGuardHome
 
 | Domain | Answer (Tailscale IP) |
 |--------|----------------------|
-
 | vault.cronova.dev | 100.68.63.168 |
 | jara.cronova.dev | 100.68.63.168 |
 | taguato.cronova.dev | 100.68.63.168 |
@@ -112,7 +110,6 @@ Each rewrite required explicit `enabled: true` — AdGuard defaults new rewrites
 
 | Monitor | Reason | Action |
 |---------|--------|--------|
-
 | Jellyfin | Container not in current compose up | Pause until when-home deployment |
 | OPNsense | Offline on Tailscale | Pause — home-only device |
 | Beryl AX | Not connected | Pause — mobile device |

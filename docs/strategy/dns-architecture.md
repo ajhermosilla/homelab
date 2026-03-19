@@ -39,7 +39,6 @@ Mobile kit uses Beryl AX AdGuard Home as the sole DNS ad-blocker:
 
 | Component | Role | IP |
 |-----------|------|-----|
-
 | Beryl AX | AdGuard Home (DNS), DHCP | 192.168.8.1 |
 | Upstream | Public recursive DNS | 1.1.1.1, 9.9.9.9 |
 
@@ -67,7 +66,6 @@ Mobile kit uses Beryl AX AdGuard Home as the sole DNS ad-blocker:
 
 | Component | Role | IP |
 |-----------|------|-----|
-
 | OPNsense | DHCP, points to Pi-hole | 192.168.0.1 |
 | Pi-hole (Docker) | Ad-blocking, DNS server | 192.168.0.10 |
 | Unbound (OPNsense) | Recursive resolver | 192.168.0.1:5353 |
@@ -116,7 +114,6 @@ Settings → DNS → Upstream DNS Servers
 
 | Component | Role | IP |
 |-----------|------|-----|
-
 | AdGuard Home | Ad-blocking, DNS filtering, internal rewrites | 127.0.0.1:53, 100.77.172.46:53 |
 | Unbound | Recursive resolver (no third-party DNS) | 172.20.0.10:5335 (adguard-net) |
 | Pi-hole (VPS) | Legacy, secondary — may be removed | 127.0.0.1 (not actively used) |
@@ -143,7 +140,6 @@ When on Tailscale mesh, devices can use Pi-hole on Docker VM or VPS:
 
 | DNS Location | Tailscale IP | Use Case |
 |--------------|--------------|----------|
-
 | Pi-hole, Docker VM (home) | 100.68.63.168 | Primary — LAN DNS for all home devices |
 | AdGuard, VPS (yvága) | 100.77.172.46 | Fallback — recursive DNS via Unbound |
 
@@ -182,7 +178,6 @@ docker.tail.net  → 100.68.63.168
 
 | Scenario | Behavior |
 |----------|----------|
-
 | Home Pi-hole down | Home devices fail DNS (fix quickly) |
 | OPNsense Unbound down | Pi-hole falls back to public DNS |
 | VPS AdGuard down | Tailscale nodes fall back to home Pi-hole; VPS containers fail DNS |
@@ -204,7 +199,6 @@ Upstream DNS:
 
 | Service | Port | Interface |
 |---------|------|-----------|
-
 | Pi-hole DNS | 53 | LAN-facing |
 | Pi-hole Web | 8053 | LAN-facing |
 | Unbound | 5353 | localhost only |

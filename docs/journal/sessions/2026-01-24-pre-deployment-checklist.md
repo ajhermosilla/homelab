@@ -8,7 +8,6 @@
 
 | Done | Task | Link |
 |:----:|------|------|
-
 | [x] | Proxmox VE 9.1 ISO (1.8G) | proxmox.com/en/downloads |
 | [x] | OPNsense 25.7 ISO (amd64, dvd) | opnsense.org/download |
 | [x] | Debian 13 netinst ISO (791M) | debian.org/download |
@@ -22,7 +21,6 @@
 
 | Done | Task |
 |:----:|------|
-
 | [x] | USB keyboard works |
 | [x] | HDMI cable works |
 | [ ] | Ethernet cables labeled |
@@ -37,7 +35,6 @@
 
 | Done | Task |
 |:----:|------|
-
 | [ ] | Open NAS case |
 | [ ] | Install SSD 240GB (boot drive) |
 | [ ] | Install WD Purple 2TB (Frigate) |
@@ -51,7 +48,6 @@
 
 | Done | Task |
 |:----:|------|
-
 | [ ] | Unbox Reolink x2, verify mounts included |
 | [ ] | Unbox Tapo C110, verify contents |
 | [ ] | Plan mounting locations |
@@ -68,7 +64,6 @@
 
 | Done | Task |
 |:----:|------|
-
 | [ ] | Beryl AX tested (emergency router) |
 | [ ] | Phone charged (backup tether) |
 
@@ -80,7 +75,6 @@
 
 | Device | IP Address | Confirmed |
 |--------|------------|:---------:|
-
 | OPNsense LAN | 192.168.1.1 | [ ] |
 | AX3000 (AP mode) | 192.168.1.2 | [ ] |
 | Proxmox | 192.168.1.5 | [ ] |
@@ -94,7 +88,6 @@
 
 | Item | Value |
 |------|-------|
-
 | AX3000 current IP | _______________ |
 | AX3000 DHCP range | _______________ |
 | ISP modem mode | Bridge / Router |
@@ -105,7 +98,6 @@
 
 | Service | Username | Password |
 |---------|----------|----------|
-
 | Proxmox | root | _________________ |
 | OPNsense | root | _________________ |
 | NAS (root) | root | _________________ |
@@ -118,7 +110,6 @@
 
 | Done | Task |
 |:----:|------|
-
 | [ ] | Generate auth key from Headscale |
 
 Auth key: `tskey-auth-________________________`
@@ -129,7 +120,6 @@ Auth key: `tskey-auth-________________________`
 
 | Done | Item |
 |:----:|------|
-
 | [ ] | Ventoy USB ready with all ISOs |
 | [ ] | Keyboard + HDMI cable ready |
 | [ ] | All passwords written down |
@@ -168,7 +158,6 @@ Auth key: `tskey-auth-________________________`
 
 | Service | URL | Notes |
 |---------|-----|-------|
-
 | Proxmox | <https://192.168.0.237:8006> | Current (pre-OPNsense) |
 | Proxmox | <https://192.168.1.5:8006> | After OPNsense cutover |
 | OPNsense | <https://192.168.1.1> | After cutover |

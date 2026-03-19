@@ -385,7 +385,6 @@ ss -tlnp | grep 3493
 
 | Spec | Value |
 |------|-------|
-
 | Capacity | 1000VA / 500W |
 | Input Voltage | 220V |
 | Battery | 12V 7Ah x2 |

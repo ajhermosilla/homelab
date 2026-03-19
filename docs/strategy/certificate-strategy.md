@@ -6,7 +6,6 @@ SSL/TLS certificate management for homelab services.
 
 | Service Type | Method | Provider |
 |--------------|--------|----------|
-
 | Public (VPS) | Let's Encrypt (HTTP-01) | Caddy ACME |
 | Public (Static) | Cloudflare | Edge certificates |
 | Internal (Docker VM) | Let's Encrypt (DNS-01) | Caddy + Cloudflare DNS |
@@ -19,7 +18,6 @@ SSL/TLS certificate management for homelab services.
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-
 | VPS Caddy + Let's Encrypt (HTTP-01) | Deployed | cronova.dev, hs, status, notify |
 | Cloudflare Edge | Deployed | DNS proxied |
 | Docker VM Caddy + Let's Encrypt (DNS-01) | Deployed | home, media, frigate, sonarr, radarr, prowlarr |
@@ -35,7 +33,6 @@ SSL/TLS certificate management for homelab services.
 
 | Factor | DNS-01 (Cloudflare) | Internal CA | Tailscale HTTPS |
 |--------|---------------------|-------------|-----------------|
-
 | Headscale compatible | Yes | Yes | No |
 | Setup complexity | Low | Medium | N/A |
 | Device trust setup | None | Install CA on each device | None |
@@ -173,7 +170,6 @@ Cloudflare provides free edge certificates for:
 
 | Option | Value |
 |--------|-------|
-
 | SSL/TLS Mode | Full (strict) |
 | Always Use HTTPS | On |
 | Minimum TLS | 1.2 |
@@ -203,7 +199,6 @@ www.verava.ai {
 
 | Domain | Type | Provider | Challenge | Auto-Renew |
 |--------|------|----------|-----------|------------|
-
 | status.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
 | notify.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
 | vault.cronova.dev | Let's Encrypt | VPS Caddy | HTTP-01 | Yes |
@@ -227,7 +222,6 @@ Add certificate expiry monitoring:
 
 | Monitor | Type | Alert Threshold |
 |---------|------|-----------------|
-
 | status.cronova.dev | HTTPS | 14 days |
 | vault.cronova.dev | HTTPS | 14 days |
 | jara.cronova.dev | HTTPS | 14 days |

@@ -311,7 +311,6 @@ NFS is **only accessible on the local LAN** (192.168.0.0/24):
 
 | Option | Security Impact |
 |--------|-----------------|
-
 | `192.168.0.10` | Only Docker VM can access (not subnet wildcard) |
 | `sync` | Data integrity - writes confirmed before reply |
 | `no_root_squash` | Needed for Docker, but limits to specific IP |

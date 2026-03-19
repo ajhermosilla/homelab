@@ -6,7 +6,6 @@ Follow-up review after completing the initial 15 issues in `2026-01-21-improveme
 
 | # | Issue | File | Status |
 |---|-------|------|--------|
-
 | 1 | Missing `maintenance.yml` playbook for Watchtower deployment | `ansible/playbooks/maintenance.yml` | **Fixed** |
 | 2 | `monitoring.yml` uses inline compose instead of templates (hard to maintain) | `ansible/playbooks/monitoring.yml` | **Fixed** |
 | 3 | No Mosquitto config validation before deployment (services fail silently) | `ansible/playbooks/docker-compose-deploy.yml` | **Fixed** |
@@ -21,7 +20,6 @@ Follow-up review after completing the initial 15 issues in `2026-01-21-improveme
 
 | # | Issue | File | Status |
 |---|-------|------|--------|
-
 | 4 | No validation that required .env vars are set before deploy | Multiple docker stacks | **Fixed** |
 | 5 | Inconsistent resource limits across services (string vs number, missing limits) | Various docker-compose files | **Fixed** (verified consistent) |
 | 6 | Frigate config not version controlled (only exists in comments) | `docker/fixed/docker-vm/security/` | **Fixed** (already exists) |
@@ -46,7 +44,6 @@ Follow-up review after completing the initial 15 issues in `2026-01-21-improveme
 
 | # | Issue | File | Status |
 |---|-------|------|--------|
-
 | 12 | env_file relative path inconsistency (`../../../` vs `../../../../`) | Multiple docker-compose files | **Fixed** (verified correct) |
 | 13 | Soft-Serve missing named network | `docker/git/docker-compose.yml` | **Fixed** |
 | 14 | Hardcoded URLs in monitoring stack (ntfy base URL) | `docker/vps/monitoring/` | **Fixed** |
@@ -61,7 +58,6 @@ Follow-up review after completing the initial 15 issues in `2026-01-21-improveme
 
 | # | Issue | Status |
 |---|-------|--------|
-
 | 15 | Missing first-time setup guide | **Fixed** (exists) |
 | 16 | No emergency procedures runbook | **Fixed** (exists) |
 | 17 | Deployment order/dependency graph not documented | **Fixed** |

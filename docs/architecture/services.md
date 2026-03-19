@@ -6,7 +6,6 @@
 
 | # | Guarani Name | Service | Category | Host | Status |
 |---|--------------|---------|----------|------|--------|
-
 | 1 | — | Headscale | Networking | VPS | Active |
 | 2 | — | Caddy (VPS) | Networking | VPS | Active |
 | 3 | — | headscale-backup | Backup | VPS | Active |
@@ -84,7 +83,6 @@
 
 | Service | Port(s) | Purpose | Image |
 |---------|---------|---------|-------|
-
 | **Headscale** | 443, 3478 | Tailscale coordination (PRIMARY) | headscale/headscale:0.28.0 |
 | **Caddy** | 80, 443 | Reverse proxy, auto-TLS | caddy:2.8.4-alpine |
 | **headscale-backup** | — | Headscale DB backups | custom script |
@@ -104,7 +102,6 @@
 
 | Service | Port(s) | Subdomain | Image |
 |---------|---------|-----------|-------|
-
 | **Pi-hole** | 53, 8053 | local | pihole/pihole (v6.3) |
 | **Caddy** | 80, 443 | — | custom (caddy:2 + caddy-dns/cloudflare) |
 
@@ -114,7 +111,6 @@ Caddy on Docker VM is a custom build with the Cloudflare DNS module for DNS-01 T
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | — | **Vaultwarden** | 8843 | vault.cronova.dev | vaultwarden/server:1.35.2 |
 | — | **vaultwarden-backup** | — | — | restic/restic:0.16.4 |
 | Taguato | **Frigate NVR** | 5000, 8554, 8555, 1984 | taguato.cronova.dev | ghcr.io/blakeblackshear/frigate |
@@ -125,7 +121,6 @@ Frigate uses OpenVINO GPU detector (iGPU passthrough, ~15ms inference) with VA-A
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | Jara | **Home Assistant** | 8123 | jara.cronova.dev | homeassistant/home-assistant:stable |
 | — | **homeassistant-backup** | — | — | custom restic script |
 | — | **Mosquitto** | 1883 | — | eclipse-mosquitto:2.0 |
@@ -136,7 +131,6 @@ HA integrations: System Monitor (Docker VM), Proxmox VE (HACS), Glances (NAS), M
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | Okẽ | **Authelia** | 9091 | auth.cronova.dev | authelia/authelia |
 
 Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx). NOT protecting (own auth): Jara, Taguato, Vault, Vera, Forgejo, Yrasema (Jellyfin — excluded because mobile/TV clients can't handle redirects). TOTP 2FA via Authy, filesystem notifier (not SMTP).
@@ -145,7 +139,6 @@ Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), A
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | Yrasema | **Jellyfin** | 8096 | yrasema.cronova.dev | jellyfin/jellyfin |
 | Japysaka | **Sonarr** | 8989 | japysaka.cronova.dev | lscr.io/linuxserver/sonarr |
 | Taanga | **Radarr** | 7878 | taanga.cronova.dev | lscr.io/linuxserver/radarr |
@@ -156,7 +149,6 @@ Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), A
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | Mbyja | **Homepage** | 3030 | mbyja.cronova.dev | ghcr.io/gethomepage/homepage |
 | Ysyry | **Dozzle** | 9999 | ysyry.cronova.dev | amir20/dozzle |
 | Kuatia | **BentoPDF** | 8080 | kuatia.cronova.dev | bentopdf (client-side WASM) |
@@ -165,7 +157,6 @@ Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), A
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | Papa | **VictoriaMetrics** | 8428 | papa.cronova.dev | victoriametrics/victoria-metrics |
 | Papa | **Grafana** | 3000 | papa.cronova.dev/grafana | grafana/grafana |
 | Papa | **vmagent** | 8429 | — | victoriametrics/vmagent |
@@ -177,7 +168,6 @@ Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), A
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | Vera | **Immich Server** | 2283 | vera.cronova.dev | ghcr.io/immich-app/immich-server:v2.5.6 |
 | Vera | **Immich ML** | — | — | ghcr.io/immich-app/immich-machine-learning:v2.5.6 |
 | Vera | **Immich Valkey** | — | — | valkey/valkey |
@@ -187,14 +177,12 @@ Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), A
 
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
-
 | Aranduka | **Paperless-ngx** | 8010 | aranduka.cronova.dev | ghcr.io/paperless-ngx/paperless-ngx |
 
 #### Maintenance
 
 | Service | Purpose | Image |
 |---------|---------|-------|
-
 | **Watchtower** | Automatic container updates | nicholas-fedor/watchtower:1.14.2 |
 
 Watchtower uses the maintained fork (nicholas-fedor) — the original containrrr image is abandoned and incompatible with Docker 29+.
@@ -203,7 +191,6 @@ Watchtower uses the maintained fork (nicholas-fedor) — the original containrrr
 
 | Guarani | Service | Port(s) | Purpose | Image |
 |---------|---------|---------|---------|-------|
-
 | — | **Samba** | 445 | Network file shares | dockurr/samba:4.23.5 |
 | — | **Syncthing** | 8384, 22000 | Peer-to-peer file sync | lscr.io/linuxserver/syncthing:2.0.14 |
 | — | **Restic REST** | 8000 | Backup target | restic/rest-server:0.14.0 |
@@ -231,7 +218,6 @@ Forgejo web: `https://git.cronova.dev` (via Docker VM Caddy). SSH: `<git@git.cro
 
 | Service | Port(s) | Purpose |
 |---------|---------|---------|
-
 | **OpenClaw** | 18789 | AI assistant (cloud APIs) |
 
 Blocked: 27W PSU in transit.
@@ -246,7 +232,6 @@ No Docker services. DNS handled by Beryl AX AdGuard Home.
 
 | Port | Service | Host | Subdomain |
 |------|---------|------|-----------|
-
 | 53 | Pi-hole DNS | Docker VM | — |
 | 80 | Caddy HTTP | Docker VM / VPS | — |
 | 443 | Caddy HTTPS | Docker VM / VPS | *.cronova.dev |
@@ -284,7 +269,6 @@ No Docker services. DNS handled by Beryl AX AdGuard Home.
 
 | Range | Purpose |
 |-------|---------|
-
 | 53 | DNS (Pi-hole) |
 | 80, 443 | HTTP/HTTPS (Caddy, Traefik) |
 | 1000-1999 | Infrastructure (MQTT, NFS, go2rtc) |
@@ -301,7 +285,6 @@ All HTTPS services go through Caddy on Docker VM (DNS-01 TLS via Cloudflare). Pi
 
 | Service | Subdomain | Authelia | Auth Type |
 |---------|-----------|----------|-----------|
-
 | Headscale | hs.cronova.dev | No | API key |
 | Vaultwarden | vault.cronova.dev | No | Own auth |
 | Jara (HA) | jara.cronova.dev | No | Own auth |
@@ -387,7 +370,6 @@ Coolify (Tajy)               ← PaaS on NAS
 
 | Guarani | Service | Host | Impact if Down |
 |---------|---------|------|----------------|
-
 | — | Headscale | VPS | Mesh network offline, no remote access |
 | — | Pi-hole | Docker VM | DNS resolution fails for all local services |
 | — | Caddy | Docker VM | No HTTPS, all subdomains unreachable |
@@ -399,7 +381,6 @@ Coolify (Tajy)               ← PaaS on NAS
 
 | Guarani | Service | Host | Impact if Down |
 |---------|---------|------|----------------|
-
 | Jara | Home Assistant | Docker VM | Automation offline |
 | Taguato | Frigate | Docker VM | No camera recording |
 | — | Samba | NAS | File shares unavailable |
@@ -411,7 +392,6 @@ Coolify (Tajy)               ← PaaS on NAS
 
 | Guarani | Service | Host | Impact if Down |
 |---------|---------|------|----------------|
-
 | Yrasema | Jellyfin | Docker VM | Media streaming unavailable |
 | Vera | Immich | Docker VM | Photo management unavailable |
 | Aranduka | Paperless-ngx | Docker VM | Document management unavailable |
@@ -471,7 +451,6 @@ docker/
 
 | Category | Services | Count |
 |----------|----------|-------|
-
 | Networking | Headscale, Pi-hole, Caddy (x2) | 4 |
 | Surveillance | Frigate (Taguato) | 1 |
 | Automation | Home Assistant (Jara), Mosquitto | 2 |
@@ -492,7 +471,6 @@ docker/
 
 | Guarani | Meaning | Service |
 |---------|---------|---------|
-
 | Oga | House | Proxmox host |
 | Jara | Owner/Lord | Home Assistant |
 | Taguato | Hawk | Frigate NVR |

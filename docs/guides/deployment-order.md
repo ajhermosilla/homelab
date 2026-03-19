@@ -25,7 +25,6 @@ Stacks communicate via external Docker networks. The **creating stack must start
 
 | Network | Created By | Consumed By |
 |---------|-----------|-------------|
-
 | `caddy-net` | networking/caddy | auth, tools, documents, monitoring (grafana), photos (immich) |
 | `mqtt-net` | automation | security (frigate) |
 | `monitoring-net` | monitoring | _(internal only)_ |
@@ -228,7 +227,6 @@ ansible-playbook -i inventory.yml playbooks/docker-compose-deploy.yml -l docker_
 
 | Service | Depends On | Network | Notes |
 |---------|------------|---------|-------|
-
 | **Headscale** | None | headscale-net | Deploy first, enables mesh |
 | **Caddy (VPS)** | Headscale | headscale-net, monitoring-net | TLS for hs.cronova.dev |
 | **Pi-hole** | None | — | Can run standalone |

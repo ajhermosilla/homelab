@@ -131,7 +131,6 @@ graph TB
 
 | Device | Tailscale IP | LAN IP | Role | Location |
 |--------|-------------|--------|------|----------|
-
 | oga | 100.78.12.241 | 192.168.0.237 | Proxmox host | Fixed |
 | docker | 100.68.63.168 | 192.168.0.10 | Container host | Fixed |
 | opnsense | 100.79.230.235 | 192.168.0.1 | Firewall/Router VM | Fixed |
@@ -190,7 +189,6 @@ graph TB
 
 | Device | Model | Specs | IP | Role |
 |--------|-------|-------|-----|------|
-
 | Mini PC (oga) | N150 | 12GB RAM, 512GB SSD | 192.168.0.237 | Proxmox host |
 | Docker VM | Debian | 9GB RAM, 100GB | 192.168.0.10 | Containers |
 | RPi 5 (openclaw) | Raspberry Pi OS | 8GB RAM, 32GB SD | 192.168.0.20 | AI assistant |
@@ -366,7 +364,6 @@ graph TB
 
 | Network | Services | Purpose |
 |---------|----------|---------|
-
 | `dns-net` | Pi-hole | DNS resolution |
 | `proxy-net` | Caddy | Reverse proxy |
 | `headscale-net` | Headscale, backup sidecar | Mesh coordination |
@@ -378,7 +375,6 @@ graph TB
 
 | Network | Services | Purpose |
 |---------|----------|---------|
-
 | `pihole-net` | Pi-hole | DNS resolution |
 | `caddy-net` | Caddy | Reverse proxy |
 | `security-net` | Vaultwarden, Frigate | Security services |
@@ -389,7 +385,6 @@ graph TB
 
 | Network | Services | Purpose |
 |---------|----------|---------|
-
 | `storage-net` | Samba, Syncthing | File sharing |
 | `backup-net` | Restic REST | Local backup |
 
@@ -403,7 +398,6 @@ graph TB
 
 | From | To | Protocol | Port |
 |------|-----|----------|------|
-
 | Home Assistant | Mosquitto | MQTT | 1883 |
 | Sonarr | Prowlarr | HTTP | 9696 |
 | Radarr | Prowlarr | HTTP | 9696 |
@@ -415,7 +409,6 @@ graph TB
 
 | From | To | Protocol | Port | Notes |
 |------|-----|----------|------|-------|
-
 | Frigate | Mosquitto | MQTT | 1883 | Via host IP |
 | Caddy | All services | HTTP | various | Reverse proxy |
 | Home Assistant | Frigate | HTTP | 5000 | Integration |
@@ -424,7 +417,6 @@ graph TB
 
 | From | To | Protocol | Port | Notes |
 |------|-----|----------|------|-------|
-
 | Docker VM | NAS Restic | HTTP | 8000 | Backup |
 | All hosts | VPS Headscale | HTTPS | 443 | Mesh coordination |
 | All hosts | VPS Pi-hole | DNS | 53 | Fallback DNS |
@@ -435,7 +427,6 @@ graph TB
 
 | Port | Service | Protocol |
 |------|---------|----------|
-
 | 53 | Pi-hole DNS | TCP/UDP |
 | 80 | Caddy HTTP | TCP |
 | 443 | Caddy HTTPS | TCP/UDP |
@@ -450,7 +441,6 @@ graph TB
 
 | Port | Service | Protocol |
 |------|---------|----------|
-
 | 53 | Pi-hole DNS | TCP/UDP |
 | 80 | Caddy HTTP | TCP |
 | 443 | Caddy HTTPS | TCP/UDP |
@@ -473,7 +463,6 @@ graph TB
 
 | Port | Service | Protocol |
 |------|---------|----------|
-
 | 139 | Samba | TCP |
 | 445 | Samba | TCP |
 | 8000 | Restic REST | TCP |
@@ -485,7 +474,6 @@ graph TB
 
 | Port | Service | Protocol |
 |------|---------|----------|
-
 | 18789 | OpenClaw Gateway | TCP |
 
 ## Network Isolation
@@ -509,7 +497,6 @@ docker network inspect media-net
 
 | Domain | Backend | Port |
 |--------|---------|------|
-
 | vault.cronova.dev | Vaultwarden | 8843 |
 | jara.cronova.dev | Home Assistant | 8123 |
 | yrasema.cronova.dev | Jellyfin | 8096 |

@@ -39,7 +39,6 @@ Aliases simplify rule management. Create these before writing rules.
 
 | Name | Type | Content | Description |
 |------|------|---------|-------------|
-
 | `RFC1918` | Network(s) | `10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16` | All private networks |
 | `PiHole_DNS` | Host(s) | `192.168.0.10` | Docker VM (Pi-hole) |
 
@@ -57,7 +56,6 @@ LAN should already have a default "allow all" rule. Verify:
 
 | # | Action | Source | Dest | Port | Protocol | Description |
 |---|--------|--------|------|------|----------|-------------|
-
 | 1 | Pass | LAN net | any | any | any | Default allow all |
 
 This should exist from the initial OPNsense setup. If not, create it.
@@ -74,7 +72,6 @@ Rules are evaluated **top to bottom, first match wins**. Order matters.
 
 | # | Action | Protocol | Source | Dest | Port | Description |
 |---|--------|----------|--------|------|------|-------------|
-
 | 1 | Pass | TCP/UDP | IOT net | PiHole_DNS | 53 | Allow DNS to Pi-hole |
 | 2 | Pass | UDP | IOT net | IOT address | 123 | Allow NTP from OPNsense gateway |
 | 3 | Block | any | IOT net | RFC1918 | any | Block all private networks |
@@ -124,7 +121,6 @@ Expected behavior:
 
 | # | Action | Protocol | Source | Dest | Port | Description |
 |---|--------|----------|--------|------|------|-------------|
-
 | 1 | Pass | TCP/UDP | GUEST net | PiHole_DNS | 53 | Allow DNS to Pi-hole |
 | 2 | Block | any | GUEST net | RFC1918 | any | Block all private networks |
 | 3 | Pass | TCP | GUEST net | any | 80 | Allow HTTP |
@@ -167,7 +163,6 @@ This means cameras **already receive VLAN 10 at Layer 2**. They just need VLAN 1
 
 | MAC Address | IP | Hostname | Description |
 |-------------|-----|----------|-------------|
-
 | (from cam 1) | 192.168.10.101 | front-door | Reolink front door |
 | (from cam 2) | 192.168.10.102 | back-yard | Reolink back yard |
 

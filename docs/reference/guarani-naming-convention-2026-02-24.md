@@ -9,7 +9,6 @@
 
 | Service | Guarani Name | Meaning | Subdomain |
 |---------|-------------|---------|-----------|
-
 | Proxmox host | **oga** | house | — (SSH alias) |
 | Home Assistant / Docker VM | **jara** | owner, lord | `jara.cronova.dev` |
 | Frigate NVR | **taguato** | hawk | `taguato.cronova.dev` |
@@ -35,7 +34,6 @@
 
 | Service | Guarani Name | Pronunciation | Meaning | Why |
 |---------|-------------|---------------|---------|-----|
-
 | Homepage | **mbyja** | mm-BUH-zhah | star | Guiding light, sees everything from above |
 | Dozzle | **ysyry** | uh-suh-RUH | river, stream | Logs flowing like water |
 | BentoPDF | **kuatia** | kwa-TEE-ah | paper, document | Literally what it handles |
@@ -50,7 +48,6 @@
 
 | Service | Alternative | Meaning | Notes |
 |---------|-----------|---------|-------|
-
 | Homepage | arakuaa | wisdom | Knows the state of everything |
 | Dozzle | ñe'ẽ | word, voice | Reading the words of containers |
 | Authelia | ñangareko | guardian, caretaker | Longer but more descriptive |
@@ -66,7 +63,6 @@
 
 | Subdomain | Service | Host |
 |-----------|---------|------|
-
 | `jara.cronova.dev` | Home Assistant | Docker VM |
 | `taguato.cronova.dev` | Frigate NVR | Docker VM |
 | `yrasema.cronova.dev` | Jellyfin | Docker VM |
