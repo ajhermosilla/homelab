@@ -126,25 +126,30 @@ Container counts 33→35, Samba image discrepancy, Guarani names missing for *ar
 ## Recommended Fix Order
 
 ### Batch 1 — Security (remote, do ASAP)
+
 - D1: VPS Pi-hole open resolver
 - D2: STUN port conflict
 - D7: VPS Pi-hole missing caps
 
 ### Batch 2 — Public-facing fixes (local)
+
 - X1-X2: README (Stirling-PDF, counts)
 - X4-X5: Mermaid diagram names
 - X6: docs/README.md index
 
 ### Batch 3 — Reliability (local)
+
 - D3-D4: Pin HA and Frigate versions
 - D5: Update cAdvisor
 - D8: Authelia backup sidecar
 - A1-A3: Ansible secret leaks
 
 ### Batch 4 — Hardening (local)
+
 - D10-D11, D19: `:?` env validation
 - D13-D14: Bind ports to localhost
 - A8: Proxmox root login exclusion
 
 ### Batch 5 — Docs cleanup (local)
+
 - X3, X7-X17: Stale content and inconsistencies
