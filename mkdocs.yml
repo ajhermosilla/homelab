@@ -105,6 +105,10 @@ nav:
       - Uptime Kuma Monitors: plans/uptime-kuma-monitors-2026-03-02.md
       - WAN Watchdog: plans/wan-watchdog-2026-02-23.md
       - Low Priority Audit Batches: plans/low-priority-batches-2026-03-18.md
+      - AI Assistant Strategy: plans/ai-assistant-strategy-2026-03-19.md
+      - PicoClaw on RPi Zero: plans/picoclaw-rpi-zero-2026-03-19.md
+      - Phone Number Research: plans/phone-number-research-2026-03-20.md
+      - Remaining Audit Items: plans/remaining-audit-items-2026-03-19.md
       - Homelab Expansion: plans/homelab-expansion-ideas-2026-02-24.md
   - Reference:
       - Guarani Naming: reference/guarani-naming-convention-2026-02-24.md
@@ -119,6 +123,7 @@ nav:
       - 3D Printed Cases: reference/3d-printed-cases-research.md
       - RPi 5 Case Research: reference/rpi5-case-research.md
       - Keychron Quickstart: reference/keychron-k2c3-quickstart.md
+      - Prepaid SIM Paraguay: reference/prepaid-sim-paraguay-2026-03-20.md
   - Journal:
       - Community Assessment: journal/community-assessment-2026-03-16.md
       - Documentation Review: journal/documentation-review-2026-02-26.md
