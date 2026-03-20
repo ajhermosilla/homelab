@@ -52,7 +52,7 @@ On-demand                 24/7                                24/7
 | **VPS** | Vultr (1 vCPU, 1GB) | Active | 12 |
 | **Docker VM** | Proxmox VM 101 (9GB RAM) | Active | 36 |
 | **NAS** | Mini-ITX i3-3220T | Active | 19 |
-| **RPi 5** | OpenClaw | Pending (PSU in transit) | - |
+| **RPi 5** | OpenClaw | Pending (case) | - |
 | **Mobile Kit** | MacBook + Beryl AX | Active | - |
 
 ## Key Services

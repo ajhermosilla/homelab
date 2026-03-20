@@ -1,6 +1,6 @@
 # RPi 5 Deployment Plan
 
-> **Status**: Blocked on 27W PSU purchase. Plan updated 2026-03-19 with provider strategy and security notes.
+> **Status**: Ready to deploy. PSU purchased Jan 2026. Case: pending 3D print with friend. Plan updated 2026-03-19 with provider strategy and security notes.
 
 Step-by-step guide to deploy the Raspberry Pi 5 as an OpenClaw AI assistant node.
 
@@ -19,8 +19,8 @@ OpenClaw is an open-source personal AI assistant gateway (325K+ GitHub stars, MI
 | Board | Raspberry Pi 5 8GB | OpenClaw AI assistant (~500MB RAM usage) |
 | Storage | 32GB SDHC Class 10 | Consider USB SSD later for better I/O |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
-| PSU | Official 27W USB-C (5V/5A) | **Blocked — needs purchase** |
-| Case | TBD | See `docs/rpi5-case-research.md` |
+| PSU | Official 27W USB-C (5V/5A) | **Purchased Jan 2026 (Amazon B0D3MFLNC1, ~$30)** |
+| Case | TBD | Pending 3D print with friend |
 | Power draw | ~5W typical | Much lower than PSU rating |
 
 ---
@@ -104,7 +104,7 @@ Setup:
 
 - [ ] RPi 5 board with active cooler attached
 - [ ] 32GB SD card flashed with Pi OS (hostname: rpi5, user: augusto)
-- [ ] 27W PSU available
+- [x] 27W PSU available
 - [ ] Ethernet cable to MokerLink switch
 - [ ] Dedicated Personal prepaid SIM for WhatsApp (~$1.35)
 
@@ -433,11 +433,11 @@ Both share the same free LLM providers (Groq, Gemini, OpenRouter, Mistral).
 | Item | Cost |
 |------|------|
 | RPi 5 + cooler | Already owned |
-| 27W PSU | ~$12 (blocked — needs purchase) |
+| 27W PSU | $0 (already purchased) |
 | 32GB SD card | Already owned |
 | Personal prepaid SIM | ~$1.35 one-time (balances don't expire) |
 | LLM APIs | $0/month (free tiers) |
-| **Total** | **~$13 one-time, ~$0/year** (Personal balances don't expire) |
+| **Total** | **~$1.35 one-time, ~$0/year** (Personal balances don't expire) |
 
 ---
 
