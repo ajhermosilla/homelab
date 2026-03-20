@@ -7,7 +7,7 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
 | Component | Hardware | Role | Containers |
 |-----------|----------|------|------------|
 | Oga (Proxmox) | AOOSTAR Mini PC, Intel N150, 12GB RAM | Hypervisor: OPNsense VM + Docker VM | — |
-| Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 35 containers | 35 |
+| Docker VM (101) | 4 vCPU, 9GB RAM, 100GB disk | Services: 10 stacks, 36 containers | 36 |
 | NAS | i3-3220T, 8GB DDR3, Mini-ITX | Storage, git, PaaS: 5 stacks + Coolify | 19 |
 | OPNsense (100) | 2 vCPU, 2GB RAM, 20GB disk | Gateway, DHCP, VLANs, Tailscale | — |
 
@@ -32,7 +32,7 @@ Always-on infrastructure at home. Proxmox hypervisor runs OPNsense (gateway) and
    |          |        |          |          |          |
 [Docker VM] [NAS]   [RPi 5]   [WiFi AP]  [PoE SW]  [Proxmox mgmt]
   .0.10     .0.12   .0.20     AX50                   .0.237
-  35 cnt    19 cnt  pending                              |
+  36 cnt    19 cnt  pending                              |
                                              +-----------+-----------+
                                              |           |           |
                                         [front_door] [back_yard]  [indoor]
@@ -88,7 +88,7 @@ Debian 13 (Trixie) | 4 vCPU | 9GB RAM | 100GB disk | vmbr1 (LAN only)
 | **media** | jellyfin, sonarr, radarr, prowlarr, qbittorrent | 8096, 8989, 7878, 9696, 8081 |
 | **maintenance** | watchtower | — |
 
-**Total: 10 stacks, 35 containers**
+**Total: 10 stacks, 36 containers**
 
 ### Boot Orchestrator
 
