@@ -7,7 +7,7 @@ Personal infrastructure as code. Self-hosted services across three environments,
 
 All services are named in **Guarani** (the indigenous language of Paraguay) as a nod to home. English descriptions follow each name.
 
-> 67 services | 65+ containers | 3 environments | 8 Tailscale nodes
+> 68 services | 66+ containers | 3 environments | 8 Tailscale nodes
 
 ## Architecture
 
@@ -50,7 +50,7 @@ On-demand                 24/7                                24/7
 | Environment | Host | Status | Containers |
 |-------------|------|--------|------------|
 | **VPS** | Vultr (1 vCPU, 1GB) | Active | 12 |
-| **Docker VM** | Proxmox VM 101 (9GB RAM) | Active | 35 |
+| **Docker VM** | Proxmox VM 101 (9GB RAM) | Active | 36 |
 | **NAS** | Mini-ITX i3-3220T | Active | 19 |
 | **RPi 5** | OpenClaw | Pending (PSU in transit) | - |
 | **Mobile Kit** | MacBook + Beryl AX | Active | - |

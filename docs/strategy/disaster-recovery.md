@@ -156,7 +156,7 @@ tailscale up --login-server=https://hs.cronova.dev
 
 ### Scenario 2: Docker VM Failure
 
-**Impact:** All Docker VM services (35 containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
+**Impact:** All Docker VM services (36 containers) — Pi-hole, Caddy, Frigate, HA, Vaultwarden, etc.
 
 #### Recovery
 
