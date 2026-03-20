@@ -319,32 +319,47 @@ Paraguay supports number portability between carriers (CONATEL regulation). If y
 
 ### For OpenClaw (WhatsApp)
 
-**Buy one Tigo prepaid SIM (~$2).**
+**Buy one Personal prepaid SIM (~10,000 PYG / $1.35).**
+
+> **Updated 2026-03-20**: Changed from Tigo to Personal based on local research
+> (see `docs/reference/prepaid-sim-paraguay-2026-03-20.md`). Personal balances
+> don't expire — lowest maintenance for a bot SIM.
 
 Rationale:
-- Cheapest and simplest option
+
+- **Balances don't expire** — no risk of number recycling from forgetting to top up
 - Real carrier number — zero risk of WhatsApp blocking it
 - Isolates your personal WhatsApp from ban risk
-- No ongoing cost beyond minimal top-ups (~$3/year)
-- Available at any Tigo store with your cedula
-- Privacy-focused alternatives (Silent.link at $59/year) are overkill for a personal/family assistant
+- Comes with 40,000 PYG credit included
+- Available at Shopping del Sol (Sun 11-20h), kioscos, or cell phone shops
+- Privacy-focused alternatives (Silent.link at $59/year) are overkill
 
 Setup flow:
-1. Buy Tigo SIM at a store ($0.70)
+
+1. Buy Personal SIM at Shopping del Sol or kiosco ($1.35)
 2. Insert in any old phone
 3. Register WhatsApp on that phone
 4. Scan OpenClaw QR code to link as a device
 5. Remove SIM, store it safely
 6. The RPi 5 maintains the WhatsApp session via internet (no SIM needed after linking)
 
+### SIM Strategy (two SIMs, different carriers)
+
+| SIM | Carrier | Purpose | Why this carrier |
+|-----|---------|---------|-----------------|
+| Bot SIM | **Personal** | OpenClaw WhatsApp | Balances don't expire, lowest maintenance |
+| LTE SIM | **Tigo** | TL-MR100 failover router | Best coverage for always-on backup internet |
+
+Buy both on the same shopping trip — ~$2 total for both SIMs.
+
 ### Total Cost
 
 | Item | Cost |
 |------|------|
 | PicoClaw phone number | $0 (bot token) |
-| OpenClaw dedicated SIM (Tigo) | ~$0.70 one-time |
-| Keep SIM active | ~$0.70 every 2-3 months |
-| **Year 1 total** | **~$3.50** |
+| OpenClaw dedicated SIM (Personal) | ~$1.35 one-time (includes 40K credit) |
+| Keep SIM active | ~$0/year (Personal balances don't expire) |
+| **Year 1 total** | **~$1.35** |
 | Silent.link alternative | $59/year |
 
 ### What NOT to Do
@@ -352,7 +367,7 @@ Setup flow:
 - Do NOT use your personal WhatsApp number for OpenClaw
 - Do NOT use Google Voice, TextNow, or VoIP numbers for WhatsApp
 - Do NOT use the dedicated number for 2FA on any account
-- Do NOT pay $59/year for Silent.link when a $0.70 SIM does the same job
+- Do NOT pay $59/year for Silent.link when a $1.35 SIM does the same job
 - Do NOT set up WhatsApp Business API (overkill, adds cost and complexity)
 
 ---
