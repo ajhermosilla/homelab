@@ -24,10 +24,10 @@ PicoClaw is an ultra-lightweight AI assistant by Sipeed (<10MB RAM, single Go bi
 ### Accounts (all free, no credit card)
 
 - [ ] Telegram bot — create via @BotFather, get bot token
-- [ ] Groq API key — https://console.groq.com (primary)
-- [ ] Google Gemini API key — https://aistudio.google.com/apikey (fallback 1)
-- [ ] OpenRouter API key — https://openrouter.ai/keys (fallback 2)
-- [ ] Mistral API key — https://console.mistral.ai (fallback 3)
+- [ ] Groq API key — <https://console.groq.com> (primary)
+- [ ] Google Gemini API key — <https://aistudio.google.com/apikey> (fallback 1)
+- [ ] OpenRouter API key — <https://openrouter.ai/keys> (fallback 2)
+- [ ] Mistral API key — <https://console.mistral.ai> (fallback 3)
 
 ### Network
 
@@ -41,7 +41,7 @@ PicoClaw is an ultra-lightweight AI assistant by Sipeed (<10MB RAM, single Go bi
 
 ### Option A: DietPi (recommended)
 
-1. Download DietPi ARMv6 image: https://dietpi.com/#downloadinfo
+1. Download DietPi ARMv6 image: <https://dietpi.com/#downloadinfo>
 2. Flash to microSD with Balena Etcher or `dd`
 3. Before first boot, edit on the SD card:
    - `dietpi.txt`: set `AUTO_SETUP_NET_WIFI_ENABLED=1`
@@ -120,10 +120,10 @@ still work but cost $1-25/M tokens. Instead, use free providers with failover:
 
 ### Get API keys (free, no credit card)
 
-1. **Groq**: https://console.groq.com → API Keys → Create
-2. **Google Gemini**: https://aistudio.google.com/apikey → Create API key
-3. **OpenRouter**: https://openrouter.ai/keys → Create Key (select free models only)
-4. **Mistral**: https://console.mistral.ai → API Keys → Create
+1. **Groq**: <https://console.groq.com> → API Keys → Create
+2. **Google Gemini**: <https://aistudio.google.com/apikey> → Create API key
+3. **OpenRouter**: <https://openrouter.ai/keys> → Create Key (select free models only)
+4. **Mistral**: <https://console.mistral.ai> → API Keys → Create
 
 ### Edit config
 
@@ -280,7 +280,7 @@ Following the naming convention: **Ñe'ẽ** (ñe'ẽ = "word/speech" in Guarani
 | Micro-USB cable | ~$2 (or reuse) |
 | LLM API (Groq/Gemini/OpenRouter/Mistral) | $0/month (free tiers) |
 | Web search (DuckDuckGo) | $0/month |
-| **Total** | **~$10 one-time, $0/month** |
+| **Total**|**~$10 one-time, $0/month** |
 
 Combined free API budget: ~15,000+ requests/day across all providers.
 
@@ -307,6 +307,6 @@ Combined free API budget: ~15,000+ requests/day across all providers.
 | 5. Systemd service | 5 min | At home |
 | 6. Verification | 5 min | At home |
 | 7. Homelab integration | 15 min | At home |
-| **Total** | **~65 min** | |
+| **Total**|**~65 min** | |
 
 Blocked on: microSD card purchase (~$8).
