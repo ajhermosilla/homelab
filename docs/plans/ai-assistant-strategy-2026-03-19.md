@@ -121,10 +121,10 @@ Combined: ~15,000+ requests/day at zero cost.
 | Phase | What | When | Cost | Time |
 |-------|------|------|------|------|
 | 1 | PicoClaw on RPi Zero W | After $8 microSD purchase | $8 | 65 min |
-| 2 | OpenClaw on RPi 5 | After $12 PSU + $1.35 SIM purchase | $13 | 30 min |
+| 2 | OpenClaw on RPi 5 | After $1.35 SIM purchase (PSU owned, case optional) | $1.35 | 30 min |
 | 3 | HA MCP integration | When projects reach v1.0 | $0 | TBD |
 
-Total: ~$21 hardware, $0/month ongoing.
+Total: ~$9.35 hardware, $0/month ongoing.
 
 ### SIM Strategy
 

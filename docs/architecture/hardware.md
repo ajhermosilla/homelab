@@ -65,7 +65,7 @@ Always-on infrastructure at home.
 |--------|-------|------|--------|
 | AOOSTAR Mini PC (Oga) | Intel N150, 12GB RAM, 512GB SSD | Proxmox VE (OPNsense + Docker VM) | Active |
 | NAS | i3-3220T, 8GB RAM, Mini-ITX | Debian 13 (19 containers) | Active |
-| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | OpenClaw (AI assistant) | Pending (PSU in transit) |
+| Raspberry Pi 5 | 8GB RAM, 32GB SD, Active Cooler | OpenClaw (AI assistant) | Pending (case) |
 | Raspberry Pi 4 | 4GB RAM, 1TB external SSD | Start9 (Bitcoin node) | Pending setup |
 
 ### Networking
@@ -129,8 +129,8 @@ iGPU passthrough completed (2026-03-02): OpenVINO GPU inference ~15ms, VA-API ha
 | Board | Raspberry Pi 5 8GB | OpenClaw AI assistant |
 | Storage | 32GB SDHC Class 10 | Consider NVMe HAT later |
 | Cooling | Official Active Cooler | Required for 24/7 operation |
-| PSU | Official 27W USB-C | In transit (Miami → Asunción) |
-| Case | TBD | See [docs/reference/rpi5-case-research.md](../reference/rpi5-case-research.md) |
+| PSU | Official 27W USB-C | Purchased (Amazon B0D3MFLNC1) |
+| Case | TBD | Pending 3D print with friend |
 
 ### RPi 4 Details
 
@@ -252,7 +252,7 @@ DIY Mini-ITX build from 2013, repurposed for NAS duty.
 |--------|-------------------|--------------|
 | Docker VM | 36 | Pi-hole, Caddy, Taguato (Frigate), Jara (HA), Vaultwarden, Okẽ (Authelia), Yrasema (Jellyfin), Mbyja (Homepage), Ysyry (Dozzle), Kuatia (BentoPDF), Papa (VictoriaMetrics+Grafana+vmagent+vmalert+Alertmanager+cAdvisor), Vera (Immich), Aranduka (Paperless-ngx), Mosquitto, Watchtower, media (*arr stack), backup sidecars |
 | NAS | 19 | Forgejo, Tajy (Coolify + 6 sub-containers), Samba, Syncthing, Restic REST, Offsite Sync, Glances, Katupyry (3), Javya (3) |
-| RPi 5 | — | OpenClaw (pending PSU) |
+| RPi 5 | — | OpenClaw (pending case) |
 | RPi 4 | — | Bitcoin Core, LND, Electrum Server (Start9) |
 
 *Frigate runs on Docker VM with OpenVINO GPU detector and NFS mount to NAS Purple 2TB for recordings.*
@@ -397,7 +397,7 @@ All critical devices connected to Forza NT-1012U 1000VA UPS.
 | Item | Date | Status |
 |------|------|--------|
 | RPi 5 8GB + Active Cooler | 2026-01 | Owned |
-| RPi 5 27W PSU | 2026-01 | In transit |
+| RPi 5 27W PSU | 2026-01 | Owned |
 | 32GB SD Card | 2026-01 | Owned |
 | Mini PC (N150) | ? | Owned |
 | RPi 4 4GB | ? | Owned |
