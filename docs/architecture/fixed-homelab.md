@@ -237,7 +237,7 @@ ssh -L 8443:192.168.0.1:443 augusto@100.78.12.241
 | 19 | Media (Jellyfin, *arr stack) | Done |
 | 20 | Coolify PaaS on NAS | Done |
 | 21 | Boot orchestrator (systemd) | Done |
-| — | RPi 5 (OpenClaw) | Pending (PSU in transit) |
+| — | RPi 5 (OpenClaw) | Pending (case) |
 | — | OPNsense firewall rules, CrowdSec | Pending |
 | — | VLAN hardening | Pending |
 | 22 | iGPU passthrough for Frigate | Done (2026-03-02) |
