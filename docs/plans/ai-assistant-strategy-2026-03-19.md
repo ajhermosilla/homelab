@@ -121,10 +121,20 @@ Combined: ~15,000+ requests/day at zero cost.
 | Phase | What | When | Cost | Time |
 |-------|------|------|------|------|
 | 1 | PicoClaw on RPi Zero W | After $8 microSD purchase | $8 | 65 min |
-| 2 | OpenClaw on RPi 5 | After $12 PSU purchase | $12 | 30 min |
+| 2 | OpenClaw on RPi 5 | After $12 PSU + $1.35 SIM purchase | $13 | 30 min |
 | 3 | HA MCP integration | When projects reach v1.0 | $0 | TBD |
 
-Total: ~$20 hardware, $0/month ongoing.
+Total: ~$21 hardware, $0/month ongoing.
+
+### SIM Strategy
+
+| SIM | Carrier | Purpose | Why |
+|-----|---------|---------|-----|
+| Bot SIM | **Personal** | OpenClaw WhatsApp | Balances don't expire |
+| LTE SIM | **Tigo** | TL-MR100 failover router | Best coverage |
+
+Both available at Shopping del Sol or kioscos. ~$2 total.
+See `phone-number-research-2026-03-20.md` and `../reference/prepaid-sim-paraguay-2026-03-20.md`.
 
 ---
 
