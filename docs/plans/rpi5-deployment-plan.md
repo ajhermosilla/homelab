@@ -77,6 +77,19 @@ Store all keys in KeePassXC under "Homelab > OpenClaw".
 > API keys from Claude Console still work but cost $1-25/M tokens. The free providers
 > above give ~15,000+ requests/day at $0/month.
 
+### 5. Dedicated Phone Number (WhatsApp)
+
+Buy a **Tigo prepaid SIM** (~5,000 PYG / $0.70) for WhatsApp registration:
+
+1. Buy SIM at any Tigo store (cedula + fingerprint required)
+2. Insert in any old phone, register WhatsApp on the new number
+3. Link to OpenClaw via QR code on RPi 5
+4. Remove SIM — session persists over home Ethernet
+5. Store SIM safely, top up ~$0.70 every 2-3 months to keep active
+
+> **Security**: Never use this number for 2FA. If WhatsApp bans it, buy a new SIM ($0.70) and re-link.
+> See `docs/plans/phone-number-research-2026-03-20.md` for full analysis.
+
 ---
 
 ## Pre-Deployment Checklist
@@ -87,6 +100,7 @@ Store all keys in KeePassXC under "Homelab > OpenClaw".
 - [ ] 32GB SD card flashed with Pi OS (hostname: rpi5, user: augusto)
 - [ ] 27W PSU available
 - [ ] Ethernet cable to MokerLink switch
+- [ ] Dedicated Tigo prepaid SIM for WhatsApp (~$0.70)
 
 ### Network Ready
 
@@ -415,8 +429,9 @@ Both share the same free LLM providers (Groq, Gemini, OpenRouter, Mistral).
 | RPi 5 + cooler | Already owned |
 | 27W PSU | ~$12 (blocked — needs purchase) |
 | 32GB SD card | Already owned |
+| Tigo prepaid SIM | ~$0.70 one-time + ~$3/year keep-alive |
 | LLM APIs | $0/month (free tiers) |
-| **Total** | **~$12 one-time, $0/month** |
+| **Total** | **~$13 one-time, ~$3/year** |
 
 ---
 
