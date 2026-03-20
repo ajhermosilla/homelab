@@ -147,3 +147,59 @@ Top-10% homelab project in operational depth. Surpasses every community project 
 The closest comparable project is ironicbadger/infra, and this project exceeds it in security posture, monitoring completeness, and backup automation.
 
 Single highest-ROI action for visibility: generate a MkDocs site from existing docs and write one blog post about the backup-verify approach.
+
+---
+
+## Progress Review — 2026-03-20
+
+Four days after the original assessment, systematic improvement sessions addressed most gaps.
+
+### "Good to Exceptional" Scorecard
+
+| # | Recommendation | Mar 16 | Mar 20 | Notes |
+|---|---------------|--------|--------|-------|
+| 1 | SOPS + age | Missing | Deferred | .env approach works for solo operator. Documented rationale. |
+| 2 | MkDocs site | Missing | **DONE** | docs.cronova.dev on Cloudflare Pages, dark theme, Mermaid support |
+| 3 | Mermaid diagram | Missing | **DONE** | Interactive network topology with Guarani names |
+| 4 | CI/CD pipeline | Missing | **DONE** | GitHub Actions: yamllint, shellcheck, markdownlint + auto-deploy |
+| 5 | VLANs + CrowdSec | Planned | Pending | Execution checklists ready, needs at-home time |
+| 6 | Blog post | Missing | Not started | Candidate topics: backup-verify, WAN outage incident |
+
+### "Missing vs Top Projects" Scorecard
+
+| # | Gap | Mar 16 | Mar 20 | Notes |
+|---|-----|--------|--------|-------|
+| 1 | SOPS + age | Missing | Deferred | Low priority for solo operator |
+| 2 | CI/CD | Missing | **DONE** | Full lint + deploy pipeline |
+| 3 | Public docs site | Missing | **DONE** | docs.cronova.dev |
+| 4 | Architecture diagrams | ASCII only | **DONE** | Mermaid + ASCII |
+| 5 | Renovate/Dependabot | Missing | Not started | Watchtower handles most updates |
+| 6 | Terraform | Missing | Not started | Low priority for solo operator |
+
+### Updated Ratings
+
+| Dimension | Mar 16 | Mar 20 | Delta | What changed |
+|-----------|--------|--------|-------|-------------|
+| Geekness Factor | 8 | **9** | +1 | MkDocs site, Mermaid diagrams, 68 services, AI assistant strategy, WAN watchdog |
+| Privacy & Security | 8.5 | **9** | +0.5 | Pre-public audit, secrets purged from history, Pi-hole hardened, OPNsense NAT fixed |
+| Documentation Quality | 8 | **9.5** | +1.5 | Public docs site, 4 incident reports, 4 audit rounds (100+ items all resolved), AI strategy docs |
+| Operational Maturity | 8 | **9** | +1 | CI/CD pipeline, WAN watchdog with cron, boot orchestrator health checks, zero audit debt |
+| Community Shareability | 6.5 | **8.5** | +2 | Public repo on GitHub, docs.cronova.dev, MIT license, README badges, "For External Readers" section |
+| Portfolio/Resume Value | 9 | **9.5** | +0.5 | Public portfolio-ready repo, 26 PRs of systematic improvement, incident response documentation |
+
+### Key Achievements (Mar 16–20)
+
+- **Repo made public** — secrets purged from history, PII redacted, pre-public audit completed
+- **docs.cronova.dev** — MkDocs Material site on Cloudflare Pages with custom dark theme
+- **CI/CD pipeline** — yamllint + shellcheck + markdownlint + MkDocs auto-deploy
+- **4 rounds of codebase audits** — 100+ findings, all resolved, zero technical debt
+- **ISP outage incident** — survived 2 outages, found root cause (missing NAT rules), deployed WAN watchdog, wrote comprehensive incident report
+- **AI assistant strategy** — PicoClaw (RPi Zero W) + OpenClaw (RPi 5) with free provider stack
+- **26 Forgejo PRs** merged via CLI workflow
+
+### What's Still Missing for a Perfect 10
+
+1. **VLAN enforcement + CrowdSec** — planned, needs at-home execution
+2. **Blog post** about backup-verify or the WAN outage incident — would drive community visibility
+3. **Renovate** for automated image version PRs — nice to have
+4. **SOPS** — deferred but would close the last security gap for team collaboration
