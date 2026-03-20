@@ -28,54 +28,55 @@
 | 20 | — | homeassistant-backup | Backup | Docker VM | Active |
 | 21 | — | Mosquitto | Messaging | Docker VM | Active |
 | 22 | Okẽ | Authelia | Auth / SSO | Docker VM | Active |
-| 23 | Yrasema | Jellyfin | Media | Docker VM | Active |
-| 24 | Mbyja | Homepage | Dashboard | Docker VM | Active |
-| 25 | Ysyry | Dozzle | Log viewer | Docker VM | Active |
-| 26 | Kuatia | BentoPDF | Tools | Docker VM | Active |
-| 27 | Papa | VictoriaMetrics | Monitoring | Docker VM | Active |
-| 28 | Papa | Grafana | Monitoring | Docker VM | Active |
-| 29 | Papa | vmagent | Monitoring | Docker VM | Active |
-| 30 | Vera | Immich Server | Photos | Docker VM | Active |
-| 31 | Vera | Immich ML | Photos | Docker VM | Active |
-| 32 | Vera | Immich Valkey | Photos | Docker VM | Active |
-| 33 | Vera | Immich DB | Photos | Docker VM | Active |
-| 34 | Aranduka | Paperless-ngx | Documents | Docker VM | Active |
-| 35 | Japysaka | Sonarr | Media | Docker VM | Active |
-| 36 | Taanga | Radarr | Media | Docker VM | Active |
-| 37 | Aoao | Prowlarr | Media | Docker VM | Active |
-| 38 | — | qBittorrent | Media | Docker VM | Active |
-| 39 | — | paperless-db | Documents | Docker VM | Active |
-| 40 | — | paperless-redis | Documents | Docker VM | Active |
-| 41 | — | paperless-backup | Backup | Docker VM | Active |
-| 42 | — | immich-backup | Backup | Docker VM | Active |
-| 43 | — | caddy-backup | Backup | Docker VM | Active |
-| 44 | — | pihole-backup | Backup | Docker VM | Active |
-| 45 | Papa | vmalert | Monitoring | Docker VM | Active |
-| 46 | Papa | Alertmanager | Monitoring | Docker VM | Active |
-| 47 | Papa | cAdvisor | Monitoring | Docker VM | Active |
-| 48 | — | Samba | Storage | NAS | Active |
-| 49 | — | Syncthing | Storage | NAS | Active |
-| 50 | — | Restic REST | Backup | NAS | Active |
-| 51 | — | Offsite Sync | Backup | NAS | Active |
-| 52 | — | Forgejo | Git | NAS | Active |
-| 53 | — | NFS | Storage | NAS | Active |
-| 54 | — | Glances | Monitoring | NAS | Active |
-| 55 | Tajy | Coolify | PaaS | NAS | Active |
-| 56 | Tajy | coolify-db | PaaS | NAS | Active |
-| 57 | Tajy | coolify-redis | PaaS | NAS | Active |
-| 58 | Tajy | coolify-realtime | PaaS | NAS | Active |
-| 59 | Tajy | coolify-proxy (Traefik) | PaaS | NAS | Active |
-| 60 | Tajy | coolify-sentinel | PaaS | NAS | Active |
-| 61 | Tajy | coolify-backup | PaaS | NAS | Active |
-| 62 | — | Katupyry App | Finance | NAS | Active |
-| 63 | — | Katupyry DB | Finance | NAS | Active |
-| 64 | — | Katupyry Redis | Finance | NAS | Active |
-| 65 | Javya | Javya App | Worship | NAS | Active |
-| 66 | Javya | Javya DB | Worship | NAS | Active |
-| 67 | Javya | Javya Redis | Worship | NAS | Active |
-| 68 | — | OpenClaw | AI | RPi 5 | Pending |
+| 23 | — | authelia-backup | Auth / Backup | Docker VM | Active |
+| 24 | Yrasema | Jellyfin | Media | Docker VM | Active |
+| 25 | Mbyja | Homepage | Dashboard | Docker VM | Active |
+| 26 | Ysyry | Dozzle | Log viewer | Docker VM | Active |
+| 27 | Kuatia | BentoPDF | Tools | Docker VM | Active |
+| 28 | Papa | VictoriaMetrics | Monitoring | Docker VM | Active |
+| 29 | Papa | Grafana | Monitoring | Docker VM | Active |
+| 30 | Papa | vmagent | Monitoring | Docker VM | Active |
+| 31 | Vera | Immich Server | Photos | Docker VM | Active |
+| 32 | Vera | Immich ML | Photos | Docker VM | Active |
+| 33 | Vera | Immich Valkey | Photos | Docker VM | Active |
+| 34 | Vera | Immich DB | Photos | Docker VM | Active |
+| 35 | Aranduka | Paperless-ngx | Documents | Docker VM | Active |
+| 36 | Japysaka | Sonarr | Media | Docker VM | Active |
+| 37 | Taanga | Radarr | Media | Docker VM | Active |
+| 38 | Aoao | Prowlarr | Media | Docker VM | Active |
+| 39 | — | qBittorrent | Media | Docker VM | Active |
+| 40 | — | paperless-db | Documents | Docker VM | Active |
+| 41 | — | paperless-redis | Documents | Docker VM | Active |
+| 42 | — | paperless-backup | Backup | Docker VM | Active |
+| 43 | — | immich-backup | Backup | Docker VM | Active |
+| 44 | — | caddy-backup | Backup | Docker VM | Active |
+| 45 | — | pihole-backup | Backup | Docker VM | Active |
+| 46 | Papa | vmalert | Monitoring | Docker VM | Active |
+| 47 | Papa | Alertmanager | Monitoring | Docker VM | Active |
+| 48 | Papa | cAdvisor | Monitoring | Docker VM | Active |
+| 49 | — | Samba | Storage | NAS | Active |
+| 50 | — | Syncthing | Storage | NAS | Active |
+| 51 | — | Restic REST | Backup | NAS | Active |
+| 52 | — | Offsite Sync | Backup | NAS | Active |
+| 53 | — | Forgejo | Git | NAS | Active |
+| 54 | — | NFS | Storage | NAS | Active |
+| 55 | — | Glances | Monitoring | NAS | Active |
+| 56 | Tajy | Coolify | PaaS | NAS | Active |
+| 57 | Tajy | coolify-db | PaaS | NAS | Active |
+| 58 | Tajy | coolify-redis | PaaS | NAS | Active |
+| 59 | Tajy | coolify-realtime | PaaS | NAS | Active |
+| 60 | Tajy | coolify-proxy (Traefik) | PaaS | NAS | Active |
+| 61 | Tajy | coolify-sentinel | PaaS | NAS | Active |
+| 62 | Tajy | coolify-backup | PaaS | NAS | Active |
+| 63 | — | Katupyry App | Finance | NAS | Active |
+| 64 | — | Katupyry DB | Finance | NAS | Active |
+| 65 | — | Katupyry Redis | Finance | NAS | Active |
+| 66 | Javya | Javya App | Worship | NAS | Active |
+| 67 | Javya | Javya DB | Worship | NAS | Active |
+| 68 | Javya | Javya Redis | Worship | NAS | Active |
+| 69 | — | OpenClaw | AI | RPi 5 | Pending |
 
-**Active:** 67 | **Pending:** 1
+**Active:** 68 | **Pending:** 1
 
 ## By Environment
 
@@ -96,7 +97,7 @@
 | **Playwright** | — | Browser engine for changedetection | dgtlmoon/sockpuppetbrowser:latest |
 | **Restic REST** (VPS) | 8000 | Headscale backup target | restic/rest-server:0.14.0 |
 
-### Docker VM — 35 containers, 24/7
+### Docker VM — 36 containers, 24/7
 
 #### Networking
 
@@ -132,6 +133,7 @@ HA integrations: System Monitor (Docker VM), Proxmox VE (HACS), Glances (NAS), M
 | Guarani | Service | Port(s) | Subdomain | Image |
 |---------|---------|---------|-----------|-------|
 | Okẽ | **Authelia** | 9091 | auth.cronova.dev | authelia/authelia |
+| — | **authelia-backup** | — | — | restic/restic:0.16.4 |
 
 Protects: Ysyry (Dozzle), Kuatia (BentoPDF), Mbyja (Homepage), Papa (Grafana), Aranduka (Paperless-ngx). NOT protecting (own auth): Jara, Taguato, Vault, Vera, Forgejo, Yrasema (Jellyfin — excluded because mobile/TV clients can't handle redirects). TOTP 2FA via Authy, filesystem notifier (not SMTP).
 
@@ -461,7 +463,7 @@ docker/
 | Tools | Dozzle (Ysyry), BentoPDF (Kuatia), Homepage (Mbyja) | 3 |
 | Monitoring | VictoriaMetrics + Grafana + vmagent + vmalert + Alertmanager + cAdvisor (Papa), Uptime Kuma, ntfy, Glances | 10 |
 | Storage | Samba, Syncthing, NFS | 3 |
-| Backup | Restic REST, headscale-backup, vaultwarden-backup, caddy-backup, pihole-backup, homeassistant-backup, paperless-backup, immich-backup, coolify-backup, offsite-sync | 10 |
+| Backup | Restic REST, headscale-backup, vaultwarden-backup, caddy-backup, pihole-backup, homeassistant-backup, paperless-backup, immich-backup, coolify-backup, authelia-backup, offsite-sync | 11 |
 | Maintenance | Watchtower | 1 |
 | Git | Forgejo | 1 |
 | PaaS | Coolify (Tajy) — 7 containers | 7 |
