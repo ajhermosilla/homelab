@@ -72,6 +72,7 @@ Device guides, naming conventions, research, and reference material.
 | [rpi5-case-research.md](reference/rpi5-case-research.md) | RPi 5 case options |
 | [3d-printed-cases-research.md](reference/3d-printed-cases-research.md) | 3D printed enclosure research |
 | [family-emergency-internet.md](reference/family-emergency-internet.md) | Emergency internet procedures |
+| [prepaid-sim-paraguay-2026-03-20.md](reference/prepaid-sim-paraguay-2026-03-20.md) | Paraguay prepaid SIM card research (Tigo, Personal, Claro) |
 
 ## Plans
 
@@ -100,6 +101,10 @@ Future plans and proposals — what's next.
 | [codebase-audit-2026-03-16.md](plans/codebase-audit-2026-03-16.md) | Codebase audit round 2 (10/16 fixed) |
 | [codebase-audit-2026-03-17.md](plans/codebase-audit-2026-03-17.md) | Codebase audit round 3 (88/88 resolved) |
 | [low-priority-batches-2026-03-18.md](plans/low-priority-batches-2026-03-18.md) | Low priority audit fix batches A-E (50/50 done) |
+| [ai-assistant-strategy-2026-03-19.md](plans/ai-assistant-strategy-2026-03-19.md) | AI assistant strategy — two-device plan (PicoClaw + OpenClaw) |
+| [picoclaw-rpi-zero-2026-03-19.md](plans/picoclaw-rpi-zero-2026-03-19.md) | PicoClaw deployment plan for RPi Zero W |
+| [phone-number-research-2026-03-20.md](plans/phone-number-research-2026-03-20.md) | Phone number research for AI assistants |
+| [remaining-audit-items-2026-03-19.md](plans/remaining-audit-items-2026-03-19.md) | Remaining audit items from rounds 0-2 (all resolved) |
 
 ## Journal
 
