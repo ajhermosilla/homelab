@@ -66,10 +66,10 @@ Register free API keys (no credit card needed):
 
 | Provider | URL | Free Limits | Role |
 |----------|-----|-------------|------|
-| Groq | https://console.groq.com | ~14,400 req/day | Primary |
-| Google Gemini | https://aistudio.google.com/apikey | 250 req/day | Fallback 1 |
-| OpenRouter | https://openrouter.ai/keys | 200 req/day | Fallback 2 |
-| Mistral | https://console.mistral.ai | 1B tokens/month | Fallback 3 |
+| Groq | <https://console.groq.com> | ~14,400 req/day | Primary |
+| Google Gemini | <https://aistudio.google.com/apikey> | 250 req/day | Fallback 1 |
+| OpenRouter | <https://openrouter.ai/keys> | 200 req/day | Fallback 2 |
+| Mistral | <https://console.mistral.ai> | 1B tokens/month | Fallback 3 |
 
 Store all keys in KeePassXC under "Homelab > OpenClaw".
 
@@ -437,7 +437,7 @@ Both share the same free LLM providers (Groq, Gemini, OpenRouter, Mistral).
 | 32GB SD card | Already owned |
 | Personal prepaid SIM | ~$1.35 one-time (balances don't expire) |
 | LLM APIs | $0/month (free tiers) |
-| **Total** | **~$1.35 one-time, ~$0/year** (Personal balances don't expire) |
+| **Total**|**~$1.35 one-time, ~$0/year** (Personal balances don't expire) |
 
 ---
 

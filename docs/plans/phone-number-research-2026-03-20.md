@@ -14,6 +14,7 @@
 Telegram bots are special accounts that do not require a phone number. You create a bot via @BotFather, receive a bot token, and that token is all PicoClaw needs. The bot operates independently of any phone number.
 
 However, **you need a personal Telegram account** (which requires a phone number) to:
+
 - Message @BotFather and create the bot
 - Interact with the bot as a user
 
@@ -48,6 +49,7 @@ OpenClaw uses Baileys, an open-source reverse-engineered implementation of the W
 ### WhatsApp Business API (Official)
 
 The official alternative requires:
+
 - Meta Business Manager account with verification (3 days to 2 weeks)
 - A dedicated phone number (cannot be shared with regular WhatsApp)
 - Per-conversation charges
@@ -81,6 +83,7 @@ OpenClaw connects as a linked device. It can see and respond to all your chats (
 ### WhatsApp
 
 WhatsApp collects extensive metadata even though messages are E2E encrypted:
+
 - Your phone number and recipients' numbers
 - Timestamps, frequency, and duration of communications
 - IP address (reveals location)
@@ -145,6 +148,7 @@ Personal assistant usage (low volume, small allowlist, responding only when ment
 | Claro | 5,000 PYG ($0.65) + 10,000 PYG registration | Passport/cedula + fingerprint | Similar |
 
 **Pros:**
+
 - Cheapest option (~$2-3 one-time, ~$3-5/month for minimal data)
 - Real carrier number — works with WhatsApp, Telegram, Signal, everything
 - No VoIP detection risk
@@ -152,6 +156,7 @@ Personal assistant usage (low volume, small allowlist, responding only when ment
 - Can use the cheapest possible plan (bot only needs internet for API calls)
 
 **Cons:**
+
 - Requires keeping the SIM active (top up periodically to prevent number recycling)
 - Physical SIM needs a phone for initial WhatsApp setup (can use an old phone)
 - SIM swap risk (low in Paraguay but nonzero)
@@ -167,6 +172,7 @@ Personal assistant usage (low volume, small allowlist, responding only when ment
 | IDENTITY (UK +44) | ~$59/year | Yes (UK) | Inbound only | 150+ countries |
 
 **Pros:**
+
 - No KYC — completely anonymous purchase
 - Pays with Bitcoin/Lightning/Monero
 - Works with WhatsApp, Telegram, Signal registration
@@ -174,6 +180,7 @@ Personal assistant usage (low volume, small allowlist, responding only when ment
 - No carrier customer service to social-engineer
 
 **Cons:**
+
 - **$59/year** — expensive compared to $2 Paraguay SIM
 - US/UK numbers only — your contacts see a foreign number
 - Inbound SMS only (can't send texts)
@@ -193,10 +200,12 @@ Personal assistant usage (low volume, small allowlist, responding only when ment
 | Payments | Crypto + credit card |
 
 **Pros:**
+
 - No KYC, encrypted SMS
 - Cheaper than Silent.link
 
 **Cons:**
+
 - Mixed reviews (unresponsive support, fund issues, no refunds)
 - Number availability fluctuates (UK numbers sometimes out of stock)
 - Monthly recurring cost
@@ -206,6 +215,7 @@ Personal assistant usage (low volume, small allowlist, responding only when ment
 ### Option D: Google Voice / TextNow / VoIP Numbers
 
 **Do not use.** WhatsApp has gotten much stricter about virtual numbers in 2025-2026:
+
 - Google Voice, TextNow, and most VoIP numbers are now blocked during verification
 - WhatsApp maintains databases of VoIP number ranges and blocks them
 - Even if registration succeeds initially, re-verification will likely fail
@@ -299,6 +309,7 @@ For this use case, a physical SIM is the practical choice.
 ### Data Plan Needs
 
 The bot number does NOT need a data plan on the SIM. The RPi 5 connects to the internet via Ethernet/WiFi on your home network. The SIM is only needed for:
+
 1. Initial WhatsApp verification (one-time SMS)
 2. Periodic re-verification (rare, maybe every few months)
 3. Potentially Signal verification (one-time SMS)
@@ -359,7 +370,7 @@ Buy both on the same shopping trip — ~$2 total for both SIMs.
 | PicoClaw phone number | $0 (bot token) |
 | OpenClaw dedicated SIM (Personal) | ~$1.35 one-time (includes 40K credit) |
 | Keep SIM active | ~$0/year (Personal balances don't expire) |
-| **Year 1 total** | **~$1.35** |
+| **Year 1 total**|**~$1.35** |
 | Silent.link alternative | $59/year |
 
 ### What NOT to Do
@@ -381,6 +392,7 @@ Even with a dedicated number, running OpenClaw on WhatsApp carries inherent risk
 - **Meta's 2026 AI chatbot ban** explicitly targets general-purpose AI assistants
 
 If the dedicated WhatsApp number gets banned:
+
 1. Buy another Tigo SIM ($0.70)
 2. Re-register WhatsApp
 3. Re-link to OpenClaw
