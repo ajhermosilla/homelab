@@ -79,16 +79,22 @@ Store all keys in KeePassXC under "Homelab > OpenClaw".
 
 ### 5. Dedicated Phone Number (WhatsApp)
 
-Buy a **Tigo prepaid SIM** (~5,000 PYG / $0.70) for WhatsApp registration:
+Buy a **Personal prepaid SIM** (~10,000 PYG / $1.35, comes with 40K credit) for WhatsApp registration.
 
-1. Buy SIM at any Tigo store (cedula + fingerprint required)
+**Why Personal over Tigo:** Balances don't expire — lowest maintenance for a bot SIM that only needs occasional keep-alive. Tigo is better for the LTE failover router (always-on, coverage matters).
+
+**Where to buy:** Shopping del Sol (Av. Eusebio Ayala 4599, open Sun 11-20h), or any kiosco/cell phone shop for just the chip. Cedula + fingerprint required.
+
+Setup:
+
+1. Buy Personal SIM at a store
 2. Insert in any old phone, register WhatsApp on the new number
 3. Link to OpenClaw via QR code on RPi 5
 4. Remove SIM — session persists over home Ethernet
-5. Store SIM safely, top up ~$0.70 every 2-3 months to keep active
+5. Store SIM safely, top up ~2,000-5,000 PYG every 2-3 months
 
-> **Security**: Never use this number for 2FA. If WhatsApp bans it, buy a new SIM ($0.70) and re-link.
-> See `docs/plans/phone-number-research-2026-03-20.md` for full analysis.
+> **Security**: Never use this number for 2FA. If WhatsApp bans it, buy a new SIM and re-link.
+> See `docs/plans/phone-number-research-2026-03-20.md` and `docs/reference/prepaid-sim-paraguay-2026-03-20.md` for full analysis.
 
 ---
 
@@ -100,7 +106,7 @@ Buy a **Tigo prepaid SIM** (~5,000 PYG / $0.70) for WhatsApp registration:
 - [ ] 32GB SD card flashed with Pi OS (hostname: rpi5, user: augusto)
 - [ ] 27W PSU available
 - [ ] Ethernet cable to MokerLink switch
-- [ ] Dedicated Tigo prepaid SIM for WhatsApp (~$0.70)
+- [ ] Dedicated Personal prepaid SIM for WhatsApp (~$1.35)
 
 ### Network Ready
 
@@ -429,9 +435,9 @@ Both share the same free LLM providers (Groq, Gemini, OpenRouter, Mistral).
 | RPi 5 + cooler | Already owned |
 | 27W PSU | ~$12 (blocked — needs purchase) |
 | 32GB SD card | Already owned |
-| Tigo prepaid SIM | ~$0.70 one-time + ~$3/year keep-alive |
+| Personal prepaid SIM | ~$1.35 one-time (balances don't expire) |
 | LLM APIs | $0/month (free tiers) |
-| **Total** | **~$13 one-time, ~$3/year** |
+| **Total** | **~$13 one-time, ~$0/year** (Personal balances don't expire) |
 
 ---
 
