@@ -1,6 +1,12 @@
 # Hetzner Cloud Migration Plan — 2026-03-13
 
-## Status: Research complete, pending decision
+## Status: DECIDED — Stay on Vultr 1GB ($6/mo)
+
+> **Decision (2026-03-21)**: Stay on current Vultr 1GB plan. Workload runs fine on 1GB RAM. Defer upgrade to 2GB or migration to Sao Paulo when memory pressure requires it. Hetzner EU saves ~$5.65/mo but adds 240ms latency and account suspension risk — not worth it for $68/year.
+>
+> **Trigger to revisit**: consistent >80% memory usage on VPS, or adding new VPS services.
+>
+> See community research below (updated 2026-03-21 with Hetzner April price increase data).
 
 ## Context
 
