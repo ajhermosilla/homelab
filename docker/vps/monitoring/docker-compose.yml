@@ -146,7 +146,7 @@ networks:
 #
 # External (check every 15m):
 #   - cronova.dev:    https://cronova.dev
-#   - verava.ai:      https://verava.ai (when live)
+#   - <BUSINESS_DOMAIN>:      <BUSINESS_DOMAIN> (when live)
 #
 # =============================================================================
 # NTFY TOPICS

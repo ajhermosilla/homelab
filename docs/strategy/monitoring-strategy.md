@@ -126,7 +126,7 @@ Uptime Kuma runs on the VPS and monitors all services via Tailscale mesh. **35 m
 | Beryl AX | Ping | `100.102.244.131` (120s, may be offline) |
 | Beryl AX - Admin | TCP | `100.102.244.131:80` (120s) |
 | hermosilla.me | HTTP | `https://hermosilla.me/` (900s) |
-| verava.ai | HTTP | `https://verava.ai` (900s) |
+| <BUSINESS_DOMAIN> | HTTP | `<BUSINESS_DOMAIN> (900s) |
 
 ---
 

@@ -98,8 +98,6 @@ nav:
       - Storage Strategy: strategy/storage-strategy.md
       - Disaster Recovery: strategy/disaster-recovery.md
       - Secrets Management: strategy/secrets-management.md
-      - Domain Strategy: strategy/domain-strategy.md
-      - Domain Research: strategy/domain-research.md
   - Plans:
       - CrowdSec on OPNsense: plans/crowdsec-opnsense-2026-03-11.md
       - VLAN Hardening: plans/vlan-hardening-execution-2026-03-11.md
@@ -133,7 +131,6 @@ nav:
       - Tailscale Primer: reference/tailscale-primer.md
       - Beryl AX Setup: reference/beryl-ax-setup-2026-01-19.md
       - Beryl AX Persistence: reference/beryl-ax-tailscale-persistence.md
-      - Branding: reference/branding.md
       - Homelab Evaluation: reference/homelab-evaluation.md
       - Family Emergency Internet: reference/family-emergency-internet.md
       - 3D Printed Cases: reference/3d-printed-cases-research.md

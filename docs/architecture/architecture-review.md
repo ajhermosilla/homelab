@@ -130,7 +130,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 | Domain | Purpose | Audience |
 |--------|---------|----------|
 | **cronova.dev** | Personal homelab infrastructure | You, family |
-| **verava.ai** | Business, customer-facing | Customers, public |
+| **<BUSINESS_DOMAIN>** | Business, customer-facing | Customers, public |
 
 ### Why Two Domains?
 
@@ -139,7 +139,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 │                     SEPARATION OF CONCERNS                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  cronova.dev                          verava.ai                  │
+│  cronova.dev                          <BUSINESS_DOMAIN>                  │
 │  ───────────                         ──────────                  │
 │  • Personal infrastructure           • Professional presence     │
 │  • Homelab services                  • Customer-facing apps      │
@@ -147,7 +147,7 @@ Comprehensive analysis of homelab architecture with domain coexistence strategy.
 │  • Guarani cultural flex             • Easy to spell/remember    │
 │  • ~$30/year                         • ~$12/year                 │
 │                                                                  │
-│  "ssh admin@cronova.dev"              "Visit verava.ai"          │
+│  "ssh admin@cronova.dev"              "Visit <BUSINESS_DOMAIN>"          │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -171,15 +171,15 @@ cronova.dev
 └── watch.cronova.dev     → changedetection (VPS)
 ```
 
-#### verava.ai (Business)
+#### <BUSINESS_DOMAIN> (Business)
 
 ```text
-verava.ai
-├── www.verava.ai       → Company landing page
-├── api.verava.ai       → Customer APIs
-├── app.verava.ai       → Web application / SaaS
-├── docs.verava.ai      → Documentation
-└── demo.verava.ai      → Sales demos
+<BUSINESS_DOMAIN>
+├── <BUSINESS_DOMAIN>       → Company landing page
+├── <BUSINESS_DOMAIN>       → Customer APIs
+├── <BUSINESS_DOMAIN>       → Web application / SaaS
+├── <BUSINESS_DOMAIN>      → Documentation
+└── <BUSINESS_DOMAIN>      → Sales demos
 ```
 
 ### Service Access Model
@@ -194,8 +194,8 @@ verava.ai
 | **Start9** | No | Yes | Bitcoin = maximum privacy |
 | **Forgejo** | No | Yes | Code is private |
 | **Syncthing** | No | Yes | Files are private |
-| **<www.verava.ai>** | Yes | No | Public website |
-| **api.verava.ai** | Yes | No | Customer API |
+| **<<BUSINESS_DOMAIN>>** | Yes | No | Public website |
+| **<BUSINESS_DOMAIN>** | Yes | No | Customer API |
 
 ---
 
@@ -209,7 +209,7 @@ verava.ai
 │                   (Registrar + DNS + CDN)                         │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                   │
-│  cronova.dev                          verava.ai                   │
+│  cronova.dev                          <BUSINESS_DOMAIN>                   │
 │  ───────────                         ──────────                   │
 │  A      @     → VPS_IP               A      @     → VPS_IP        │
 │  A      *     → VPS_IP (wildcard)    A      *     → VPS_IP        │
@@ -228,7 +228,7 @@ verava.ai
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              INTERNET                                    │
 │                                                                          │
-│         cronova.dev (homelab)              verava.ai (business)          │
+│         cronova.dev (homelab)              <BUSINESS_DOMAIN> (business)          │
 └────────────────────────────────┬─────────────────────────────────────────┘
                                  │
                           [Cloudflare DNS]
@@ -242,8 +242,8 @@ verava.ai
               status.cronova.dev    All internal
               notify.cronova.dev    services via
               vault.cronova.dev     100.64.0.x
-              www.verava.ai
-              api.verava.ai
+              <BUSINESS_DOMAIN>
+              <BUSINESS_DOMAIN>
                                           │
                     ┌─────────────────────┼─────────────────────┐
                     │                     │                     │
@@ -269,13 +269,13 @@ notify.cronova.dev {
     reverse_proxy localhost:80
 }
 
-# verava.ai - Business services
-www.verava.ai {
-    root * /var/www/verava
+# <BUSINESS_DOMAIN> - Business services
+<BUSINESS_DOMAIN> {
+    root * /var/www/<business>
     file_server
 }
 
-api.verava.ai {
+<BUSINESS_DOMAIN> {
     reverse_proxy localhost:8080
 }
 
@@ -284,8 +284,8 @@ cronova.dev {
     redir https://status.cronova.dev
 }
 
-verava.ai {
-    redir https://www.verava.ai
+<BUSINESS_DOMAIN> {
+    redir <BUSINESS_DOMAIN>
 }
 ```
 
@@ -297,7 +297,7 @@ verava.ai {
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              INTERNET                                    │
 │                                                                          │
-│              cronova.dev                      verava.ai                  │
+│              cronova.dev                      <BUSINESS_DOMAIN>                  │
 │         (Personal Homelab)              (Business/Customers)             │
 └────────────────────────────────┬─────────────────────────────────────────┘
                                  │
@@ -443,7 +443,7 @@ verava.ai {
 |------|------|
 | VPS (Vultr) | $6.00 |
 | Domain (cronova.dev) | Already owned |
-| Domain (verava.ai) | ~$5.00 |
+| Domain (<BUSINESS_DOMAIN>) | ~$5.00 |
 | **Total**|**~$11/mo** |
 
 ### Annual
@@ -452,7 +452,7 @@ verava.ai {
 |------|------|
 | VPS | $72.00 |
 | cronova.dev | Already owned |
-| verava.ai | ~$60.00 |
+| <BUSINESS_DOMAIN> | ~$60.00 |
 | **Total**|**~$132/yr** |
 
 ---
@@ -476,7 +476,7 @@ These MUST work for the architecture to function:
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-01-14 | cronova.dev for homelab | Already owned, established brand, $0 additional cost |
-| 2026-01-14 | verava.ai for business | AI-first positioning, modern TLD |
+| 2026-01-14 | <BUSINESS_DOMAIN> for business | AI-first positioning, modern TLD |
 | 2026-01-14 | Both domains via Cloudflare | At-cost pricing, DNS + CDN included |
 | 2026-01-14 | Public: vault, status, notify | Need access from anywhere |
 | 2026-01-14 | Private: media, home, bitcoin | Personal/sensitive data |
@@ -487,7 +487,7 @@ These MUST work for the architecture to function:
 
 | Priority | Action | Blocks |
 |----------|--------|--------|
-| 1 | Purchase verava.ai | Nothing |
+| 1 | Purchase <BUSINESS_DOMAIN> | Nothing |
 | 2 | Create disaster recovery runbook | Nothing |
 | 3 | Create Caddy config documentation | Domain purchase |
 | 4 | Add MQTT to service inventory | Nothing |

@@ -355,8 +355,8 @@ MONITORS = [
     },
     {
         "type": MonitorType.HTTP,
-        "name": "verava.ai",
-        "url": "https://verava.ai",
+        "name": "<BUSINESS_DOMAIN>",
+        "url": "<BUSINESS_DOMAIN>
         "interval": 900,
         "maxretries": 2,
         "notification_tier": "info",

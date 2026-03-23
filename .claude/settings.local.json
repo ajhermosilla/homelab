@@ -57,7 +57,11 @@
       "WebFetch(domain:forum.gitea.com)",
       "WebFetch(domain:docs.gitea.com)",
       "WebFetch(domain:www.lloydatkinson.net)",
-      "WebFetch(domain:thelinuxcode.com)"
+      "WebFetch(domain:thelinuxcode.com)",
+      "Bash(gh run:*)",
+      "WebFetch(domain:linus.dev)",
+      "WebFetch(domain:www.devroom.io)",
+      "WebFetch(domain:emasblog.dev)"
     ]
   }
 }

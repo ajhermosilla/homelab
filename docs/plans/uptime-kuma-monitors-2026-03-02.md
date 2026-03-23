@@ -58,7 +58,7 @@ kuma monitor add http --name "Glances" --url "http://100.82.77.97:61208/api/4/cp
 
 ```bash
 kuma monitor add http --name "cronova.dev" --url "https://cronova.dev" --interval 900
-kuma monitor add http --name "verava.ai" --url "https://verava.ai" --interval 900
+kuma monitor add http --name "<BUSINESS_DOMAIN>" --url "<BUSINESS_DOMAIN> --interval 900
 ```
 
 ## ntfy Notification Setup

@@ -344,7 +344,7 @@ All public domains use Cloudflare proxy (orange cloud):
 |--------|-------|-------|
 | cronova.dev | Yes | Static site |
 | hs.cronova.dev | **No** | Headscale needs direct IP |
-| verava.ai | Yes | When purchased |
+| <BUSINESS_DOMAIN> | Yes | When purchased |
 
 **For Headscale:** IP is exposed, but:
 

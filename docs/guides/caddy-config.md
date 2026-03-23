@@ -1,13 +1,13 @@
 # Caddy Reverse Proxy Configuration
 
-Caddy configuration for cronova.dev and verava.ai across all environments. Created 2026-01-14.
+Caddy configuration for cronova.dev and <BUSINESS_DOMAIN> across all environments. Created 2026-01-14.
 
 > **WARNING (2026-03-10):** This doc is a pre-deployment design from January 2026 and does NOT reflect the current Caddyfile. Key differences:
 >
 > - Docker VM Caddy is a **custom build** with `caddy-dns/cloudflare` for DNS-01 TLS (not Let's Encrypt ACME)
 > - **Authelia forward auth** protects 6 services (not shown below)
 > - **BentoPDF** replaced Stirling-PDF (Kuatia)
-> - Many subdomains below (api.cronova.dev, saas.cronova.dev, app.verava.ai) are speculative and don't exist
+> - Many subdomains below (api.cronova.dev, saas.cronova.dev, <BUSINESS_DOMAIN>) are speculative and don't exist
 > - Actual Caddyfile: `docker/fixed/docker-vm/networking/caddy/Caddyfile`
 > - See `services.md` for the current access matrix
 
@@ -29,7 +29,7 @@ Caddy configuration for cronova.dev and verava.ai across all environments. Creat
               ┌─────┴─────┐   ┌─────┴─────┐   ┌─────┴─────┐
               │           │   │           │   │           │
          www.cronova  docs.  vault.    www.   home.    media.
-         cronova.dev  cronova status.  verava cronova  cronova
+         cronova.dev  cronova status.  (biz)  cronova  cronova
                              notify.   app.   btc.     nas.
                              api.      api.   git.
                              saas.
@@ -47,9 +47,9 @@ Caddy configuration for cronova.dev and verava.ai across all environments. Creat
 | `notify.cronova.dev` | VPS localhost:80 | Public |
 | `api.cronova.dev` | VPS localhost:8080 | Public |
 | `saas.cronova.dev` | VPS localhost:3000 | Public |
-| `<www.verava.ai>` | VPS static files | Public |
-| `app.verava.ai` | VPS localhost:4000 | Public |
-| `api.verava.ai` | VPS localhost:4001 | Public |
+| `<<BUSINESS_DOMAIN>>` | VPS static files | Public |
+| `<BUSINESS_DOMAIN>` | VPS localhost:4000 | Public |
+| `<BUSINESS_DOMAIN>` | VPS localhost:4001 | Public |
 | `jara.cronova.dev` | Fixed Homelab (Tailscale only) | Private |
 | `yrasema.cronova.dev` | Fixed Homelab (Tailscale only) | Private |
 | `btc.cronova.dev` | RPi 4 Start9 (Tailscale only) | Private |
@@ -64,7 +64,7 @@ Primary reverse proxy for all public services.
 
 ```caddyfile
 # =============================================================================
-# VPS Caddyfile - cronova.dev + verava.ai
+# VPS Caddyfile - cronova.dev + <BUSINESS_DOMAIN>
 # Location: /etc/caddy/Caddyfile
 # =============================================================================
 
@@ -154,17 +154,17 @@ saas.cronova.dev {
 }
 
 # =============================================================================
-# VERAVA.AI - Business/Supply Chain Services
+# BUSINESS DOMAIN - Supply Chain Services (placeholder)
 # =============================================================================
 
 # Root redirect
-verava.ai {
-    redir https://www.verava.ai{uri} permanent
+<BUSINESS_DOMAIN> {
+    redir <BUSINESS_DOMAIN> permanent
 }
 
 # Main website
-www.verava.ai {
-    root * /var/www/verava
+<BUSINESS_DOMAIN> {
+    root * /var/www/<business>
     file_server
 
     # Try files, then index
@@ -186,7 +186,7 @@ www.verava.ai {
 }
 
 # Customer application
-app.verava.ai {
+<BUSINESS_DOMAIN> {
     reverse_proxy localhost:4000
 
     header {
@@ -198,14 +198,14 @@ app.verava.ai {
 }
 
 # Customer API
-api.verava.ai {
+<BUSINESS_DOMAIN> {
     reverse_proxy localhost:4001
 
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         X-Content-Type-Options "nosniff"
         # CORS for authenticated API
-        Access-Control-Allow-Origin "https://app.verava.ai"
+        Access-Control-Allow-Origin "https://<BUSINESS_DOMAIN>"
         Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
         Access-Control-Allow-Headers "Content-Type, Authorization"
         Access-Control-Allow-Credentials "true"
@@ -213,8 +213,8 @@ api.verava.ai {
 }
 
 # Documentation
-docs.verava.ai {
-    root * /var/www/verava-docs
+<BUSINESS_DOMAIN> {
+    root * /var/www/<business>
     file_server
 
     try_files {path} /index.html
@@ -388,7 +388,7 @@ networks:
 | A | nas | 100.82.77.97 | No (internal) |
 | A | git | 100.64.0.2 | No (internal) |
 
-### verava.ai
+### <BUSINESS_DOMAIN>
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
@@ -478,7 +478,7 @@ api.cronova.dev {
 
 - [ ] Install Caddy: `apt install caddy`
 - [ ] Copy Caddyfile to `/etc/caddy/Caddyfile`
-- [ ] Create web directories: `mkdir -p /var/www/verava /var/www/verava-docs`
+- [ ] Create web directories: `mkdir -p /var/www/<business> /var/www/<business>
 - [ ] Validate config: `caddy validate --config /etc/caddy/Caddyfile`
 - [ ] Reload Caddy: `systemctl reload caddy`
 - [ ] Test SSL: `curl -I <https://status.cronova.dev`>

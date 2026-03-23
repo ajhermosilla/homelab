@@ -186,9 +186,9 @@ For VPS behind Cloudflare proxy:
 
 ```caddyfile
 # If using Cloudflare origin cert
-www.verava.ai {
-    tls /etc/ssl/cloudflare/verava.ai.pem /etc/ssl/cloudflare/verava.ai.key
-    root * /var/www/verava
+<BUSINESS_DOMAIN> {
+    tls /etc/ssl/cloudflare/<BUSINESS_DOMAIN>.pem /etc/ssl/cloudflare/<BUSINESS_DOMAIN>.key
+    root * /var/www/<business>
     file_server
 }
 ```
@@ -277,7 +277,7 @@ echo | openssl s_client -connect jara.cronova.dev:443 -servername jara.cronova.d
 # Dashboard → SSL/TLS → Overview → Should show "Full (strict)"
 
 # Check origin cert validity
-openssl x509 -in /etc/ssl/cloudflare/verava.ai.pem -noout -dates
+openssl x509 -in /etc/ssl/cloudflare/<BUSINESS_DOMAIN>.pem -noout -dates
 ```
 
 ---

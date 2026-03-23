@@ -46,7 +46,7 @@ Public websites and services.
 | Monitor | Type | Target | Notes |
 |---------|------|--------|-------|
 | cronova.dev | HTTP | `https://cronova.dev` | Main domain |
-| verava.ai | HTTP | `https://verava.ai` | When purchased |
+| <BUSINESS_DOMAIN> | HTTP | `<BUSINESS_DOMAIN> | When purchased |
 
 ### Certificates (1d interval)
 

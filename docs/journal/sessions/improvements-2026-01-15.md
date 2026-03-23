@@ -6,8 +6,8 @@ Comprehensive codebase review after completing hardware documentation.
 
 - [x] **1. Update architecture-review.md domains**
   - File: `docs/architecture-review.md`
-  - Issue: References old domains (nanduti.io, verava.net)
-  - Action: Update to cronova.dev + verava.ai
+  - Issue: References old domains (nanduti.io, <BUSINESS_DOMAIN>)
+  - Action: Update to cronova.dev + <BUSINESS_DOMAIN>
   - Lines: 130-484 (Domain Coexistence Strategy, Caddyfile examples, costs)
   - **DONE**: Replaced all domain references, updated costs
 
@@ -86,7 +86,7 @@ Comprehensive codebase review after completing hardware documentation.
 
 - [x] **11. Archive or update domain-research.md**
   - File: `docs/domain-research.md`
-  - Issue: References superseded domains (nanduti.io, verava.net)
+  - Issue: References superseded domains (nanduti.io, <BUSINESS_DOMAIN>)
   - Action: Add notice that it's superseded by domain-strategy.md
   - **DONE**: Added archive notice at top of file
 

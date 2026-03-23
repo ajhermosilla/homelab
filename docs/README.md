@@ -44,7 +44,6 @@ Design decisions and policies — why things are done a certain way.
 
 | Document | Description |
 |----------|-------------|
-| [domain-strategy.md](strategy/domain-strategy.md) | cronova.dev DNS and domain plan |
 | [certificate-strategy.md](strategy/certificate-strategy.md) | TLS certificates (DNS-01 Cloudflare) |
 | [dns-architecture.md](strategy/dns-architecture.md) | DNS resolution flow (Pi-hole, AdGuard, Cloudflare) |
 | [monitoring-strategy.md](strategy/monitoring-strategy.md) | VictoriaMetrics + Grafana metrics, Uptime Kuma monitors, ntfy alerts |
@@ -52,7 +51,6 @@ Design decisions and policies — why things are done a certain way.
 | [secrets-management.md](strategy/secrets-management.md) | Credential handling (.env, SOPS, age) |
 | [security-hardening.md](strategy/security-hardening.md) | 2FA, firewall rules, SSH hardening, fail2ban |
 | [storage-strategy.md](strategy/storage-strategy.md) | Drive layout, backup topology, data protection, capacity planning |
-| [domain-research.md](strategy/domain-research.md) | Domain comparison (archived — see domain-strategy) |
 
 ## Reference
 
@@ -64,7 +62,6 @@ Device guides, naming conventions, research, and reference material.
 | [ha-devices-guide-2026-02-24.md](reference/ha-devices-guide-2026-02-24.md) | Home Assistant device integration guide |
 | [home-devices.md](reference/home-devices.md) | Family device inventory |
 | [tailscale-primer.md](reference/tailscale-primer.md) | Tailscale/Headscale introduction |
-| [branding.md](reference/branding.md) | cronova.dev identity and branding |
 | [homelab-evaluation.md](reference/homelab-evaluation.md) | Hardware comparison research |
 | [beryl-ax-setup-2026-01-19.md](reference/beryl-ax-setup-2026-01-19.md) | Beryl AX initial setup |
 | [beryl-ax-tailscale-persistence.md](reference/beryl-ax-tailscale-persistence.md) | Beryl AX Tailscale reboot fix |

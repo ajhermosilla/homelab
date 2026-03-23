@@ -78,8 +78,8 @@ vps/
 | https://status.cronova.dev | Uptime Kuma |
 | https://notify.cronova.dev | ntfy |
 | https://vault.cronova.dev | Vaultwarden (proxied to homelab) |
-| https://www.verava.ai | Business website |
-| https://app.verava.ai | Customer app |
+| <BUSINESS_DOMAIN> | Business website |
+| https://<BUSINESS_DOMAIN> | Customer app |
 
 ## Tailscale Integration
 
@@ -107,8 +107,8 @@ Point these records to VPS IP:
 | A | status | Yes |
 | A | notify | Yes |
 | A | vault | Yes |
-| A | www.verava.ai | Yes |
-| A | app.verava.ai | Yes |
+| A | <BUSINESS_DOMAIN> | Yes |
+| A | <BUSINESS_DOMAIN> | Yes |
 
 ## Initial Server Setup
 
@@ -124,7 +124,7 @@ usermod -aG docker $USER
 curl -fsSL https://tailscale.com/install.sh | sh
 
 # Create directories
-mkdir -p /var/www/verava /var/www/verava-docs
+mkdir -p /var/www/<business> /var/www/<business>
 
 # Clone homelab repo
 git clone git@github.com:cronova/homelab.git /opt/homelab

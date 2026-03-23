@@ -117,7 +117,7 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 | VPS (Vultr) | $6/mo | Helper only, not critical |
 | Google One | $0 extra | Already have AI Pro subscription |
 | cronova.dev | Owned | No additional cost |
-| verava.ai | ~$5/mo | ~$60/yr to purchase |
+| <BUSINESS_DOMAIN> | ~$5/mo | ~$60/yr to purchase |
 | Electricity | ~$5-10/mo | Estimate for ~200W |
 | **Total**|**~$12-16/mo** | |
 
@@ -128,7 +128,7 @@ Consider if all 23 services are needed at launch. Start with core (Headscale, Pi
 
 ### Cost Optimizations Already Done
 
-- Skipped nanduti.io + verava.net ($42/yr saved)
+- Skipped nanduti.io + <BUSINESS_DOMAIN> ($42/yr saved)
 - No Portainer (free tier limits)
 - No Nextcloud (Syncthing is lighter)
 - VPS as helper only (could be $0 if removed)

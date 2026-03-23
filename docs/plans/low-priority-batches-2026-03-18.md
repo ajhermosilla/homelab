@@ -57,7 +57,7 @@ Status: [ ] Not started
 | 3 | Remaining 33→35 container count refs | docs/architecture/fixed-homelab.md |
 | 4 | Documents port 8000→8010 | docs/architecture/fixed-homelab.md |
 | 5 | Fix broken relative path | docs/architecture/mobile-homelab.md |
-| 6 | Mark verava.ai status | docs/strategy/domain-strategy.md |
+| 6 | Mark <BUSINESS_DOMAIN> status | docs/strategy/domain-strategy.md |
 | 7 | Update stale upstream recommendation | docs/strategy/dns-architecture.md |
 | 8 | Verify Immich host fix (NAS→Docker VM) | docs/reference/guarani-naming-convention |
 | 9 | Add Javya/Katupyry deploy paths | docs/architecture/services.md |
