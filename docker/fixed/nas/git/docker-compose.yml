@@ -102,7 +102,7 @@ services:
       - ${HOMELAB_ROOT:-/opt/homelab/repo}/docker/shared/backup/restic-backup.sh:/backup.sh:ro
     environment:
       TZ: ${TZ:-America/Asuncion}
-      RESTIC_REPOSITORY: rest:http://${RESTIC_USER}:${RESTIC_PASS}@127.0.0.1:8000/${RESTIC_USER}/forgejo
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:-rest:http://${RESTIC_USER}:${RESTIC_PASS}@192.168.0.12:8000/${RESTIC_USER}/forgejo}
       RESTIC_PASSWORD: ${RESTIC_PASSWORD:?RESTIC_PASSWORD required in .env}
       BACKUP_PATH: /data
       BACKUP_TAG: forgejo
