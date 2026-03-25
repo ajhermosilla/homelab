@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: docker
+    container:
+      image: python:3.12-bookworm
+    steps:
+      - uses: https://github.com/actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          apt-get update -qq && apt-get install -y -qq shellcheck > /dev/null
+          pip install -q yamllint
+          npm install -g markdownlint-cli2 > /dev/null 2>&1
+
+      - name: Lint YAML
+        run: |
+          yamllint -d '{extends: default, rules: {line-length: {max: 200}, truthy: {check-keys: false}, comments-indentation: disable}}' docker/
+
+      - name: Lint shell scripts
+        run: |
+          shellcheck -S error scripts/*.sh
+          shellcheck -S error docker/shared/backup/restic-backup.sh docker/shared/backup/backup-env.sh docker/shared/backup/offsite-sync.sh docker/shared/backup/immich-db-backup.sh
+
+      - name: Lint Markdown
+        run: markdownlint-cli2 "docs/**/*.md"
+
+      - name: Build MkDocs
+        run: |
+          pip install -q -r requirements-docs.txt
+          mkdocs build --strict
