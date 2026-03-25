@@ -10,12 +10,17 @@ jobs:
     container:
       image: python:3.12-bookworm
     steps:
-      - uses: https://github.com/actions/checkout@v4
+      - name: Checkout
+        run: |
+          apt-get update -qq && apt-get install -y -qq git > /dev/null
+          git clone --depth 1 --branch $GITHUB_HEAD_REF https://git.cronova.dev/augusto/homelab.git .
 
       - name: Install tools
         run: |
-          apt-get update -qq && apt-get install -y -qq shellcheck > /dev/null
+          apt-get install -y -qq shellcheck > /dev/null
           pip install -q yamllint
+          curl -fsSL https://deb.nodesource.com/setup_22.x | bash - > /dev/null 2>&1
+          apt-get install -y -qq nodejs > /dev/null
           npm install -g markdownlint-cli2 > /dev/null 2>&1
 
       - name: Lint YAML
