@@ -160,7 +160,21 @@ offsite-sync (NAS container, 4:30 AM)
 └── Bandwidth limit: 5 MB/s (RCLONE_BWLIMIT)
 ```
 
-**Encryption:**rclone crypt wraps Google Drive with AES-256. Restore requires**three secrets**: rclone password, rclone salt, and RESTIC_PASSWORD. All stored in Vaultwarden.
+**Encryption:** rclone crypt wraps Google Drive with AES-256. Restore requires **three secrets**: rclone password, rclone salt, and RESTIC_PASSWORD. All stored in Vaultwarden.
+
+### Google Drive Storage
+
+| Detail | Value |
+|--------|-------|
+| Plan | Google AI Pro (includes Google One) |
+| Total storage | **5 TB** (upgraded from 2 TB, March 2026, no extra cost) |
+| Used | ~1.03 TB |
+| Free | ~4 TB |
+| Encryption | rclone crypt (AES-256) via `gdrive-crypt:` remote |
+| Family data uploaded | 212 GB (21,129 files — videos + photos, completed 2026-03-23) |
+| Service backups | ~30 MB (Restic repos + Headscale, synced nightly at 4:30 AM) |
+
+With 4 TB free, there is ample headroom for the full 8TB recovery data (1.5 TB), Immich photo library growth, and any future backup needs.
 
 ---
 
@@ -168,8 +182,8 @@ offsite-sync (NAS container, 4:30 AM)
 
 | Data | Size | Irreplaceable | Copies | Location(s) |
 |------|------|---------------|--------|-------------|
-| Family videos (2010-2013) | 45GB | **Yes** | 2 (pending 3) | Purple recovery, 8TB (planned), SSD (planned), GDrive |
-| Family photos (2006-2014) | 168GB | **Yes** | 2 (pending 3) | Purple recovery, 8TB (planned), SSD (planned), GDrive |
+| Family videos (2010-2013) | 56GB | **Yes** | 2 | Purple recovery, **GDrive** (uploaded 2026-03-23), 8TB + SSD planned |
+| Family photos (2006-2014) | 156GB | **Yes** | 2 | Purple recovery, **GDrive** (uploaded 2026-03-23), 8TB + SSD planned |
 | Vaultwarden DB | ~50MB | Yes (passwords) | 3 | Docker VM, Restic, GDrive |
 | HA config | ~200MB | Hard to recreate | 3 | Docker VM, Restic, GDrive |
 | Paperless documents | Variable | Yes (scanned docs) | 3 | Docker VM, Restic, GDrive |
